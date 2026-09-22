@@ -1,0 +1,69 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+
+export default async function DashboardPage() {
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: perfil } = await supabase
+    .from("perfiles")
+    .select("nombre_completo, grado")
+    .eq("id", user.id)
+    .single();
+
+  const { data: solicitudes } = await supabase
+    .from("solicitudes_credito")
+    .select("*")
+    .eq("asociado_id", user.id)
+    .order("fecha_solicitud", { ascending: false })
+    .limit(1);
+
+  const ultimaSolicitud = solicitudes?.[0];
+
+  return (
+    <main className="min-h-screen px-4 py-6 flex justify-center">
+      <div className="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-6">
+        <div className="flex items-center justify-between mb-5">
+          <span className="text-sm font-bold text-navy">GREEN ALLIANCE</span>
+          <span className="text-sm text-gray-500">
+            {perfil?.nombre_completo ?? "Asociado"}
+          </span>
+        </div>
+
+        <a
+          href="/dashboard/solicitar"
+          className="block text-center h-14 leading-[3.5rem] bg-green text-white rounded-lg font-bold mb-5"
+        >
+          Solicita tu credito
+        </a>
+
+        {ultimaSolicitud ? (
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="bg-surface-muted rounded-xl p-4">
+              <p className="text-xs text-gray-500 font-semibold">Valor credito</p>
+              <p className="text-lg font-bold">
+                ${ultimaSolicitud.monto_solicitado.toLocaleString("es-CO")}
+              </p>
+            </div>
+            <div className="bg-surface-muted rounded-xl p-4">
+              <p className="text-xs text-gray-500 font-semibold">Cuota mes</p>
+              <p className="text-lg font-bold">
+                ${ultimaSolicitud.cuota_mensual.toLocaleString("es-CO")}
+              </p>
+            </div>
+            <div className="col-span-2 bg-surface-muted rounded-xl p-4">
+              <p className="text-xs text-gray-500 font-semibold">Estado de la solicitud</p>
+              <p className="text-lg font-bold capitalize">{ultimaSolicitud.estado}</p>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500 mb-3">
+            Aun no tienes solicitudes de credito activas.
+          </p>
+        )}
+      </div>
+    </main>
+  );
+}
