@@ -2,7 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #f4f5f2;
-  color: #1a2b33;
+/* Tokens de diseño de Green Alliance (valores de design/*.dc.html). */
+:root {
+  /* Base (lista del agente de diseño) */
+  --ga-verde: #1e6652;
+  --ga-verde-oscuro: #14493a;
+  --ga-navy: #1a3c57;
+  --ga-texto: #14212b;
+  --ga-texto-2: #3f4f5b;
+  --ga-texto-3: #52626e;
+  --ga-borde: #b9c3ca;
+  --ga-linea: #e1e6e3;
+  --ga-fondo-suave: #f3f6f4;
+  --ga-verde-claro: #dcefe6;
+  --ga-verde-tint: #e3f0ea;
+
+  /* Nuevos, encontrados en el diseño */
+  --ga-navy-logo: #1f3a56; /* texto «COOPERATIVA / ALLIANCE» del logo */
+  --ga-navy-claro: #22496a; /* tarjetas de testimonio sobre navy */
+  --ga-navy-texto-suave: #c9d6e0; /* texto secundario sobre navy */
+  --ga-verde-icono: #cde8dc; /* checks del panel verde de ingreso */
+  --ga-ambar: #e0a33a; /* paso «En revisión» */
+  --ga-ambar-texto: #7a4a00; /* texto de la etiqueta «En revisión» */
+  --ga-ambar-fondo: #fff1d6; /* fondo de la etiqueta «En revisión» */
+  --ga-gris-paso: #d5dce0; /* barra de paso pendiente (escritorio) */
+  --ga-gris-circulo: #c3cbd1; /* círculo de paso pendiente */
+  --ga-borde-tarjeta: #dde3df; /* borde de tarjetas de convenio */
+  --ga-foto-fondo: #dce7e2; /* placeholder de foto principal */
+  --ga-foto-texto: #3f5a50;
+  --ga-foto-fondo-2: #e6ecf0; /* placeholder de fotos de apoyos */
+  --ga-foto-texto-2: #4a5f6e;
+  --ga-blanco-translucido: rgba(255, 255, 255, 0.14); /* botón volver sobre verde */
+  --ga-sombra: rgba(20, 33, 43, 0.16);
+
+  /* No está en el diseño: color para mensajes de error de formulario.
+     TODO(pendiente-spec): confirmar con diseño. */
+  --ga-error: #b3261e;
+}
+
+@layer base {
+  body {
+    background-color: #ffffff;
+    color: var(--ga-texto);
+    font-family: var(--font-manrope), system-ui, sans-serif;
+    /* El diseño no usa el reset de Tailwind: el interlineado por defecto es «normal». */
+    line-height: normal;
+  }
+}
+
+@layer components {
+  /* Enlace de texto: en el diseño todo <a> es verde y oscurece al pasar el mouse. */
+  .enlace {
+    @apply text-ga-verde underline hover:text-ga-verde-oscuro;
+  }
 }

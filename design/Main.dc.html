@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Landing · escritorio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Manrope',system-ui,sans-serif;background:#FFFFFF;color:#14212B}
+a{color:#1E6652}a:hover{color:#14493A}
+</style>
+</helmet>
+<div style="width: 1280px; height: 2380px; box-sizing: border-box; background: #FFFFFF; display: flex; flex-direction: column;">
+
+  <header style="height: 76px; box-sizing: border-box; padding: 0 64px; display: flex; align-items: center; justify-content: space-between; background: #1E6652; color: #FFFFFF;">
+    <a href="Main.dc.html" aria-label="Cooperativa Green Alliance, inicio" style="display: block; width: 240px; height: 44px;"><dc-import name="Logo" tone="light" hint-size="240px,44px"></dc-import></a>
+    <nav style="display: flex; gap: 28px; align-items: center; font-size: 16px; font-weight: 600;">
+      <a href="#c-apoyos" style="color: #FFFFFF; text-decoration: none;">Apoyos</a>
+      <a href="#c-historias" style="color: #FFFFFF; text-decoration: none;">Historias</a>
+      <a href="#c-convenios" style="color: #FFFFFF; text-decoration: none;">Convenios</a>
+      <a href="Afiliacion-PC.dc.html" style="color: #FFFFFF; text-decoration: none;">Afíliate</a>
+      <a href="Ingreso-PC.dc.html" style="display: inline-flex; align-items: center; height: 44px; padding: 0 22px; background: #FFFFFF; border-radius: 10px; color: #1E6652; font-weight: 800; text-decoration: none;">Mi cuenta</a>
+    </nav>
+  </header>
+
+  <section style="padding: 64px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; align-items: center;">
+    <div style="display: flex; flex-direction: column; gap: 22px;">
+      <h1 style="margin: 0; font-size: 58px; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; color: #1A3C57;">Crédito entre compañeros, con reglas claras.</h1>
+      <p style="margin: 0; font-size: 20px; line-height: 1.55; color: #3F4F5B;">Somos una cooperativa hecha por y para la familia policial. Pides en línea, sabes tu tope desde el inicio y ves cada paso de tu solicitud.</p>
+      <div style="display: flex; gap: 12px;">
+        <a href="Ingreso-PC.dc.html" style="display: inline-flex; align-items: center; height: 54px; padding: 0 28px; background: #1E6652; border-radius: 10px; color: #FFFFFF; font-size: 17px; font-weight: 800; text-decoration: none;">Solicitar crédito</a>
+        <a href="#c-apoyos" style="display: inline-flex; align-items: center; height: 54px; padding: 0 24px; border: 1.5px solid #1A3C57; border-radius: 10px; color: #1A3C57; font-size: 17px; font-weight: 700; text-decoration: none;">Conocer la cooperativa</a>
+      </div>
+    </div>
+    <div style="position: relative; height: 520px;">
+      <div style="position: absolute; inset: 0 60px 60px 0; border-radius: 20px; background: #DCE7E2; display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px; box-sizing: border-box; font-size: 16px; font-weight: 600; color: #3F5A50;">[Foto real de asociados — con autorización de uso]</div>
+      <div style="position: absolute; right: 0; bottom: 0; width: 330px; box-sizing: border-box; background: #FFFFFF; border-radius: 16px; padding: 22px; box-shadow: 0 16px 40px rgba(20,33,43,0.16); display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;"><strong style="font-size: 16px;">Tu solicitud</strong><span style="font-size: 13px; font-weight: 700; color: #7A4A00; background: #FFF1D6; border-radius: 999px; padding: 4px 10px;">En revisión</span></div>
+        <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 15px;">
+          <li style="display: flex; gap: 10px; align-items: center;"><span style="width: 22px; height: 22px; border-radius: 50%; background: #1E6652; display: flex; align-items: center; justify-content: center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10"></path></svg></span>Enviada</li>
+          <li style="display: flex; gap: 10px; align-items: center; font-weight: 700;"><span style="width: 22px; height: 22px; box-sizing: border-box; border-radius: 50%; border: 6px solid #E0A33A;"></span>En revisión</li>
+          <li style="display: flex; gap: 10px; align-items: center; color: #52626E;"><span style="width: 22px; height: 22px; box-sizing: border-box; border-radius: 50%; border: 2px solid #C3CBD1;"></span>Aprobada</li>
+          <li style="display: flex; gap: 10px; align-items: center; color: #52626E;"><span style="width: 22px; height: 22px; box-sizing: border-box; border-radius: 50%; border: 2px solid #C3CBD1;"></span>Desembolso</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin: 0 64px; padding: 32px 40px; background: #F3F6F4; border-radius: 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;">
+    <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 40px; font-weight: 800; color: #1E6652;">+200</span><span style="font-size: 16px; color: #3F4F5B;">asociados activos</span></div>
+    <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 40px; font-weight: 800; color: #1E6652;">[N]</span><span style="font-size: 16px; color: #3F4F5B;">créditos aprobados este año</span></div>
+    <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 40px; font-weight: 800; color: #1E6652;">[TIEMPO]</span><span style="font-size: 16px; color: #3F4F5B;">respuesta promedio</span></div>
+  </section>
+
+  <section id="c-apoyos" style="padding: 88px 64px 64px; display: flex; flex-direction: column; gap: 32px;">
+    <h2 style="margin: 0; font-size: 40px; font-weight: 800; letter-spacing: -0.01em; color: #1A3C57;">Tres apoyos, una cooperativa</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;">
+      <article style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="height: 200px; border-radius: 14px; background: #E6ECF0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; color: #4A5F6E;">[Foto]</div>
+        <h3 style="margin: 0; font-size: 22px; font-weight: 800;">Microcréditos</h3>
+        <p style="margin: 0; font-size: 16px; line-height: 1.55; color: #3F4F5B;">Montos según tu grado, modalidad 50% o 100%, todo en línea.</p>
+      </article>
+      <article style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="height: 200px; border-radius: 14px; background: #E6ECF0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; color: #4A5F6E;">[Foto]</div>
+        <h3 style="margin: 0; font-size: 22px; font-weight: 800;">Orientación financiera</h3>
+        <p style="margin: 0; font-size: 16px; line-height: 1.55; color: #3F4F5B;">Una conversación para ordenar tus cuentas antes de endeudarte.</p>
+      </article>
+      <article style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="height: 200px; border-radius: 14px; background: #E6ECF0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; color: #4A5F6E;">[Foto]</div>
+        <h3 style="margin: 0; font-size: 22px; font-weight: 800;">Apoyo legal</h3>
+        <p style="margin: 0; font-size: 16px; line-height: 1.55; color: #3F4F5B;">Acompañamiento en trámites para ti y tu familia.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="c-historias" style="padding: 64px; background: #1A3C57; color: #FFFFFF; display: flex; flex-direction: column; gap: 32px;">
+    <h2 style="margin: 0; font-size: 40px; font-weight: 800; letter-spacing: -0.01em;">Lo que hicieron con su crédito</h2>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+      <figure style="margin: 0; background: #22496A; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 16px;">
+        <blockquote style="margin: 0; font-size: 21px; line-height: 1.5;">[Testimonio real de un asociado: qué necesitaba y qué logró.]</blockquote>
+        <figcaption style="font-size: 16px; color: #C9D6E0;">[Nombre], [grado] · asociado desde [año]</figcaption>
+      </figure>
+      <figure style="margin: 0; background: #22496A; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 16px;">
+        <blockquote style="margin: 0; font-size: 21px; line-height: 1.5;">[Testimonio real de un asociado: qué necesitaba y qué logró.]</blockquote>
+        <figcaption style="font-size: 16px; color: #C9D6E0;">[Nombre], [grado] · asociado desde [año]</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="c-convenios" style="padding: 80px 64px; background: #F3F6F4; display: flex; flex-direction: column; gap: 28px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 48px;">
+      <div style="display: flex; flex-direction: column; gap: 10px; max-width: 640px;">
+        <h2 style="margin: 0; font-size: 40px; font-weight: 800; letter-spacing: -0.01em; color: #1A3C57;">Empresas en convenio</h2>
+        <p style="margin: 0; font-size: 17px; line-height: 1.55; color: #3F4F5B;">Condiciones preferenciales para asociados, con el respaldo de la cooperativa en cada compra o servicio.</p>
+      </div>
+      <a href="Ingreso-PC.dc.html" style="font-size: 16px; font-weight: 800;">Ver beneficios en mi cuenta</a>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px;">
+      <div style="background: #FFFFFF; border: 1px solid #DDE3DF; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+        <span aria-hidden="true" style="width: 52px; height: 52px; border-radius: 14px; background: #E3F0EA; display: flex; align-items: center; justify-content: center; font-size: 28px;">📱</span>
+        <strong style="font-size: 17px; font-weight: 800; line-height: 1.25; color: #14212B;">AMB Móvil S.A.S.</strong>
+        <span style="font-size: 14px; color: #3F4F5B;">Tecnología</span>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #DDE3DF; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+        <span aria-hidden="true" style="width: 52px; height: 52px; border-radius: 14px; background: #E3F0EA; display: flex; align-items: center; justify-content: center; font-size: 28px;">✈️</span>
+        <strong style="font-size: 17px; font-weight: 800; line-height: 1.25; color: #14212B;">Locos por los Viajes S.A.S.</strong>
+        <span style="font-size: 14px; color: #3F4F5B;">Viajes y turismo</span>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #DDE3DF; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+        <span aria-hidden="true" style="width: 52px; height: 52px; border-radius: 14px; background: #E3F0EA; display: flex; align-items: center; justify-content: center; font-size: 28px;">🦷</span>
+        <strong style="font-size: 17px; font-weight: 800; line-height: 1.25; color: #14212B;">Dr. Ribero Dental Group</strong>
+        <span style="font-size: 14px; color: #3F4F5B;">Odontología estética</span>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #DDE3DF; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+        <span aria-hidden="true" style="width: 52px; height: 52px; border-radius: 14px; background: #E3F0EA; display: flex; align-items: center; justify-content: center; font-size: 28px;">🏞️</span>
+        <strong style="font-size: 17px; font-weight: 800; line-height: 1.25; color: #14212B;">Racing Tours Villa de Leyva</strong>
+        <span style="font-size: 14px; color: #3F4F5B;">Tours en Villa de Leyva</span>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #DDE3DF; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+        <span aria-hidden="true" style="width: 52px; height: 52px; border-radius: 14px; background: #E3F0EA; display: flex; align-items: center; justify-content: center; font-size: 28px;">🛂</span>
+        <strong style="font-size: 17px; font-weight: 800; line-height: 1.25; color: #14212B;">Dream &amp; Go Visas</strong>
+        <span style="font-size: 14px; color: #3F4F5B;">Trámite de visas</span>
+      </div>
+    </div>
+  </section>
+
+  <footer style="margin-top: auto; padding: 40px 64px; background: #F3F6F4; display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: #3F4F5B;">
+    <img src="/_blob/eacd9b98f530f56b249f5b76b3429954" alt="Cooperativa Green Alliance · Escudo y protección" style="width: 150px; height: auto; display: block;">
+    <span>WhatsApp [NÚMERO] · [correo]@greenallianceco.com · [Vigilada por Supersolidaria — confirmar]</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":2380}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

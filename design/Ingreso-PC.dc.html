@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Ingreso · paso 1 · escritorio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Manrope',system-ui,sans-serif;background:#FFFFFF;color:#14212B}
+a{color:#1E6652}a:hover{color:#14493A}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; display: flex; background: #FFFFFF;">
+  <aside style="width: 540px; flex-shrink: 0; box-sizing: border-box; padding: 48px 56px; background: #1E6652; color: #FFFFFF; display: flex; flex-direction: column; gap: 32px;">
+    <a href="Main.dc.html" aria-label="Ir al inicio" style="display: block; width: 240px; height: 44px;"><dc-import name="Logo" tone="light" hint-size="240px,44px"></dc-import></a>
+    <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 56px;">
+      <h1 style="margin: 0; font-size: 46px; font-weight: 800; line-height: 1.08; letter-spacing: -0.02em;">Hola de nuevo</h1>
+      <p style="margin: 0; font-size: 18px; line-height: 1.55; color: #DCEFE6;">Entra con tu cédula y un código que te llega al correo. Sin contraseñas que recordar.</p>
+    </div>
+    <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; font-size: 17px;">
+      <li style="display: flex; gap: 12px; align-items: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CDE8DC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10"></path></svg>Pide tu crédito según tu grado</li>
+      <li style="display: flex; gap: 12px; align-items: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CDE8DC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10"></path></svg>Mira el estado de tu solicitud</li>
+      <li style="display: flex; gap: 12px; align-items: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CDE8DC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10"></path></svg>Usa los convenios para asociados</li>
+    </ul>
+    <span style="margin-top: auto; font-size: 15px; color: #DCEFE6;">Ayuda por WhatsApp [NÚMERO]</span>
+  </aside>
+  <main style="flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 48px;">
+    <form style="width: 440px; display: flex; flex-direction: column; gap: 20px;">
+      <div style="display: flex; gap: 6px;"><span style="flex-grow: 1; height: 5px; border-radius: 3px; background: #1E6652;"></span><span style="flex-grow: 1; height: 5px; border-radius: 3px; background: #E1E6E3;"></span></div>
+      <span style="font-size: 14px; font-weight: 700; color: #1E6652;">Paso 1 de 2</span>
+      <h2 style="margin: 0; font-size: 32px; font-weight: 800; color: #1A3C57;">Ingresa con tu cédula</h2>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label for="p-cc" style="font-size: 16px; font-weight: 700;">Número de cédula</label>
+        <input id="p-cc" type="text" inputmode="numeric" autocomplete="username" placeholder="Sin puntos ni espacios" style="height: 56px; border: 1.5px solid #B9C3CA; border-radius: 12px; padding: 0 16px; font: inherit; font-size: 20px; letter-spacing: 0.03em;">
+      </div>
+      <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #3F4F5B;">Si tu cédula está registrada, te enviamos un código de 6 números al correo que tienes en la cooperativa.</p>
+      <a href="Codigo-PC.dc.html" style="display: flex; align-items: center; justify-content: center; height: 54px; background: #1E6652; border-radius: 12px; color: #FFFFFF; font-size: 17px; font-weight: 800; text-decoration: none;">Enviarme el código</a>
+      <div style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: #52626E;"><span style="flex-grow: 1; height: 1px; background: #E1E6E3;"></span>¿Aún no eres asociado?<span style="flex-grow: 1; height: 1px; background: #E1E6E3;"></span></div>
+      <a href="Afiliacion-PC.dc.html" style="display: flex; align-items: center; justify-content: center; height: 54px; border: 1.5px solid #1A3C57; border-radius: 12px; color: #1A3C57; font-size: 16px; font-weight: 800; text-decoration: none;">Deseo afiliarme</a>
+    </form>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

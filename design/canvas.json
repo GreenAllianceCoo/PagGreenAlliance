@@ -1,0 +1,168 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Afiliacion-Movil.dc.html": {
+      "h": 1240,
+      "is_interactive": true,
+      "title": "Afiliación · celular",
+      "w": 390,
+      "x": 5440,
+      "y": 2800
+    },
+    "Afiliacion-PC.dc.html": {
+      "h": 1020,
+      "is_interactive": true,
+      "title": "Afiliación · escritorio",
+      "w": 1280,
+      "x": 5440,
+      "y": 0
+    },
+    "Afiliacion-Spec.dc.html": {
+      "h": 1480,
+      "title": "Afiliación · especificación",
+      "w": 1280,
+      "x": 0,
+      "y": 6860
+    },
+    "Codigo-Movil.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Ingreso 2 · código · celular",
+      "w": 390,
+      "x": 2720,
+      "y": 2800
+    },
+    "Codigo-PC.dc.html": {
+      "h": 800,
+      "is_interactive": true,
+      "title": "Ingreso 2 · código · escritorio",
+      "w": 1280,
+      "x": 2720,
+      "y": 0
+    },
+    "Enviada-Movil.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Afiliación enviada · celular",
+      "w": 390,
+      "x": 6800,
+      "y": 2800
+    },
+    "Enviada-PC.dc.html": {
+      "h": 800,
+      "is_interactive": true,
+      "title": "Afiliación enviada · escritorio",
+      "w": 1280,
+      "x": 6800,
+      "y": 0
+    },
+    "Ingreso-Movil.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Ingreso 1 · cédula · celular",
+      "w": 390,
+      "x": 1360,
+      "y": 2800
+    },
+    "Ingreso-PC.dc.html": {
+      "h": 800,
+      "is_interactive": true,
+      "title": "Ingreso 1 · cédula · escritorio",
+      "w": 1280,
+      "x": 1360,
+      "y": 0
+    },
+    "Inicio-Movil.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Inicio del asociado · celular",
+      "w": 390,
+      "x": 4080,
+      "y": 2800
+    },
+    "Inicio-PC.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "title": "Inicio del asociado · escritorio",
+      "w": 1280,
+      "x": 4080,
+      "y": 0
+    },
+    "Landing-Movil.dc.html": {
+      "h": 3640,
+      "is_interactive": true,
+      "title": "Landing · celular",
+      "w": 390,
+      "x": 0,
+      "y": 2800
+    },
+    "Logo.dc.html": {
+      "h": 44,
+      "title": "Componente · Logo",
+      "w": 240,
+      "x": 1360,
+      "y": 6860
+    },
+    "Main.dc.html": {
+      "h": 2380,
+      "is_interactive": true,
+      "title": "Landing · escritorio",
+      "w": 1280,
+      "x": 0,
+      "y": 0
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-23T04:18:31Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "tDoc": {
+      "kind": "title1",
+      "maxW": 1600,
+      "text": "Especificación y componentes",
+      "w": 240,
+      "x": 0,
+      "y": 6560
+    },
+    "tMov": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "Celular · 390 px",
+      "w": 240,
+      "x": 0,
+      "y": 2500
+    },
+    "tPC": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "Escritorio · 1280 px",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Ingreso-PC.dc.html",
+    "Codigo-PC.dc.html",
+    "Inicio-PC.dc.html",
+    "Afiliacion-PC.dc.html",
+    "Enviada-PC.dc.html",
+    "Landing-Movil.dc.html",
+    "Ingreso-Movil.dc.html",
+    "Codigo-Movil.dc.html",
+    "Inicio-Movil.dc.html",
+    "Afiliacion-Movil.dc.html",
+    "Enviada-Movil.dc.html",
+    "Afiliacion-Spec.dc.html",
+    "Logo.dc.html"
+  ],
+  "pages": [],
+  "title": "Green Alliance · Plataforma web"
+}
