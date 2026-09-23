@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
-import { Afiliacion } from "@/components/pantallas/Afiliacion";
-import { GRADOS_EJEMPLO } from "@/lib/mock";
+import { connection } from "next/server";
+import { gradosParaAfiliacion } from "@/lib/grados";
+import { FormularioAfiliacion } from "./FormularioAfiliacion";
 
 export const metadata: Metadata = {
   title: "Quiero afiliarme · Cooperativa Green Alliance",
 };
 
-export default function AfiliacionPage() {
-  // TODO(funcionalidad): cargar los grados desde la tabla `grados_credito`.
-  return <Afiliacion grados={GRADOS_EJEMPLO} />;
+export default async function AfiliacionPage() {
+  // Se genera en cada visita (no en el build): los grados salen de `grados_credito`.
+  await connection();
+  const grados = await gradosParaAfiliacion();
+  return <FormularioAfiliacion grados={grados} />;
 }

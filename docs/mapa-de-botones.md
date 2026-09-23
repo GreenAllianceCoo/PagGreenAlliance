@@ -74,7 +74,7 @@ Estados:
 | Campo trampa (honeypot) | Definido | Oculto a personas (no `display:none` simple; fuera de pantalla + `tabindex=-1` + `aria-hidden`). Si viene lleno → responder «éxito» sin guardar. |
 | Checkbox autorización de datos | Definido | Obligatorio; se guarda `acepto_datos_at = now()`. |
 | «política de datos» | **Pendiente** (texto) | → `/politica-de-datos` (página placeholder hasta tener el texto). |
-| «Enviar solicitud» | Definido | Server Action: valida → límite por IP y por cédula → verifica que no haya otra solicitud `pendiente` con esa cédula → insert con service role → 2 correos Resend (equipo + solicitante; si falla, se registra y **no** bloquea) → redirect a `/afiliacion/enviada`. Estado de carga y protección contra doble clic. |
+| «Enviar solicitud» | Definido | Server Action: valida → límite por IP y por cédula → verifica que no haya otra solicitud `pendiente` con esa cédula → insert con service role → redirect a `/afiliacion/enviada`. Estado de carga y protección contra doble clic. |
 
 ## 6. Afiliación enviada `/afiliacion/enviada`
 | Elemento | Estado | Comportamiento |

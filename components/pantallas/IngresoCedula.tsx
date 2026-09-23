@@ -7,10 +7,16 @@ import { ProgressSteps } from "@/components/ui/ProgressSteps";
 
 export type IngresoCedulaProps = {
   whatsapp: string;
+  /** Enlace https://wa.me/57<NÚMERO>; sin valor se muestra el texto sin enlace. */
+  whatsappUrl?: string | null;
   /** Error bajo el campo de cédula (validación de formato). */
   error?: string;
   /** Estado de carga del envío: «Enviando…». */
   cargando?: boolean;
+  /** Server Action del formulario (buscar cédula → enviar código). */
+  accion?: (formData: FormData) => void;
+  /** Valor inicial del campo (se conserva lo escrito si hubo error). */
+  valorCedula?: string;
 };
 
 const BENEFICIOS = [
@@ -20,7 +26,23 @@ const BENEFICIOS = [
 ];
 
 /** Ingreso paso 1 · cédula (design/Ingreso-PC.dc.html + Ingreso-Movil.dc.html). */
-export function IngresoCedula({ whatsapp, error, cargando = false }: IngresoCedulaProps) {
+export function IngresoCedula({
+  whatsapp,
+  whatsappUrl,
+  error,
+  cargando = false,
+  accion,
+  valorCedula,
+}: IngresoCedulaProps) {
+  // Número de WhatsApp: enlace solo si NEXT_PUBLIC_WHATSAPP existe (mapa §2).
+  const numero = whatsappUrl ? (
+    <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="underline">
+      {whatsapp}
+    </a>
+  ) : (
+    whatsapp
+  );
+
   return (
     <PanelIngreso
       titulo="Hola de nuevo"
@@ -42,14 +64,13 @@ export function IngresoCedula({ whatsapp, error, cargando = false }: IngresoCedu
           ))}
         </ul>
       }
-      // TODO(pendiente-spec): enlace https://wa.me/57<NÚMERO> cuando exista NEXT_PUBLIC_WHATSAPP.
-      pie={<>Ayuda por WhatsApp {whatsapp}</>}
+      // TODO(pendiente-spec): falta el número real (NEXT_PUBLIC_WHATSAPP); sin él, texto sin enlace.
+      pie={<>Ayuda por WhatsApp {numero}</>}
       pieInterlineado={false}
       // En el navegador no hay barra de estado del teléfono: panel sin el relleno extra.
       sinBarraEstado
     >
-      {/* TODO(funcionalidad): action = Server Action que busca la cédula y envía el código (mapa §2). */}
-      <form className={CLASES_FORM_INGRESO} noValidate>
+      <form action={accion} className={CLASES_FORM_INGRESO} noValidate>
         <ProgressSteps pasoActual={1} totalPasos={2} />
         <h2 className="m-0 hidden text-32 font-extrabold text-ga-navy lg:block">
           Ingresa con tu cédula
@@ -63,6 +84,7 @@ export function IngresoCedula({ whatsapp, error, cargando = false }: IngresoCedu
               inputMode="numeric"
               autoComplete="username"
               placeholder="Sin puntos ni espacios"
+              defaultValue={valorCedula}
             />
           )}
         </Field>
@@ -81,7 +103,7 @@ export function IngresoCedula({ whatsapp, error, cargando = false }: IngresoCedu
         <ButtonLink href="/afiliacion" variante="secundario">
           Deseo afiliarme
         </ButtonLink>
-        <PieIngresoMovil interlineado={false}>Ayuda por WhatsApp {whatsapp}</PieIngresoMovil>
+        <PieIngresoMovil interlineado={false}>Ayuda por WhatsApp {numero}</PieIngresoMovil>
       </form>
     </PanelIngreso>
   );

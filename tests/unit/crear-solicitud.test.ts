@@ -80,7 +80,7 @@ function crearSupabaseFalso(escenario: Escenario = {}) {
 
     const resultado = () => {
       if (tabla === "perfiles") {
-        return { data: sinPerfil ? null : { grado }, error: null };
+        return { data: sinPerfil ? null : { grado, nombre_completo: "Asociado Prueba" }, error: null };
       }
       if (tabla === "solicitudes_credito") {
         return { data: ultimaSolicitud ? [ultimaSolicitud] : [], error: null };
@@ -104,15 +104,21 @@ function crearSupabaseFalso(escenario: Escenario = {}) {
     consulta.single = vi.fn(async () => resultado());
     consulta.then = (ok: (v: unknown) => unknown, falla: (e: unknown) => unknown) =>
       Promise.resolve(resultado()).then(ok, falla);
-    consulta.insert = vi.fn(async (fila: Record<string, unknown>) => {
+    // await insert(...) devuelve { error } (la acción no pide la fila creada).
+    consulta.insert = vi.fn((fila: Record<string, unknown>) => {
       insertados.push(fila);
-      return { data: null, error: errorInsert };
+      return Promise.resolve({ data: null, error: errorInsert });
     });
     return consulta;
   });
 
   const cliente = {
-    auth: { getUser: vi.fn(async () => ({ data: { user: usuario }, error: null })) },
+    auth: {
+      getUser: vi.fn(async () => ({
+        data: { user: usuario ? { ...usuario, email: "asociado@prueba.test" } : null },
+        error: null,
+      })),
+    },
     from,
   };
 
@@ -167,7 +173,7 @@ describe("crearSolicitud · porcentaje de devolución", () => {
   it.each(["50", "100"])("acepta el porcentaje %s", async (porcentaje) => {
     const { insertados } = crearSupabaseFalso();
     const { redirigeA } = await enviar({ porcentaje, monto: "500000" });
-    expect(redirigeA).toBe("/dashboard");
+    expect(redirigeA).toBe("/cuenta");
     expect(insertados).toHaveLength(1);
   });
 });
@@ -203,14 +209,14 @@ describe("crearSolicitud · monto", () => {
   it("acepta el monto mínimo (100.000)", async () => {
     const { insertados } = crearSupabaseFalso({ grado: "PP" });
     const { redirigeA } = await enviar({ porcentaje: "50", monto: "100000" });
-    expect(redirigeA).toBe("/dashboard");
+    expect(redirigeA).toBe("/cuenta");
     expect(insertados).toHaveLength(1);
   });
 
   it("acepta monto igual al tope del grado (PP 50% = 1.000.000)", async () => {
     const { insertados } = crearSupabaseFalso({ grado: "PP" });
     const { redirigeA } = await enviar({ porcentaje: "50", monto: "1000000" });
-    expect(redirigeA).toBe("/dashboard");
+    expect(redirigeA).toBe("/cuenta");
     expect(insertados).toHaveLength(1);
     expect(insertados[0].monto_solicitado).toBe(1000000);
   });
@@ -232,7 +238,7 @@ describe("crearSolicitud · monto", () => {
   it("acepta monto igual al tope de OF 100% (4.200.000) para un OF", async () => {
     const { insertados } = crearSupabaseFalso({ grado: "OF" });
     const { redirigeA } = await enviar({ porcentaje: "100", monto: "4200000" });
-    expect(redirigeA).toBe("/dashboard");
+    expect(redirigeA).toBe("/cuenta");
     expect(insertados).toHaveLength(1);
   });
 });
@@ -278,7 +284,7 @@ describe("crearSolicitud · solicitud pendiente", () => {
   it.each(["aprobado", "rechazado"])("permite solicitar si la última está %s", async (estado) => {
     const { insertados } = crearSupabaseFalso({ ultimaSolicitud: { estado } });
     const { redirigeA } = await enviar({ porcentaje: "50", monto: "500000" });
-    expect(redirigeA).toBe("/dashboard");
+    expect(redirigeA).toBe("/cuenta");
     expect(insertados).toHaveLength(1);
   });
 });

@@ -30,10 +30,10 @@ Responde y comenta el código en español.
   - Migración nueva en `supabase/migrations/` para `solicitudes_afiliacion` (columnas de la spec, `estado` con check, RLS habilitado sin políticas públicas, política de lectura/actualización solo para admin, índice único parcial por `cedula` donde `estado='pendiente'`). **No la apliques a producción**: solo crea el archivo y avisa.
   - Columnas `emoji` y `especialidad` en `convenios` si no existen (en la misma o en otra migración).
   - Honeypot + límite por IP y por cédula (por ejemplo tabla o Upstash; si no hay nada configurado, implementa un limitador simple en la base de datos y explícalo).
-  - Resend: dos correos (equipo en `AFILIACION_EMAIL_EQUIPO`, copia al solicitante). Si Resend falla, la solicitud queda guardada y el error se registra con `console.error` estructurado; el usuario igual ve «Solicitud enviada».
+  - Sin correos al enviar la afiliación (ni al equipo ni al solicitante). Los únicos correos a asociados son los de `docs/resend-plantillas.md`: ingreso aceptado, código de ingreso (Supabase) y resultado del crédito.
   - Cédula, celular y correo se normalizan en servidor (quitar espacios/puntos, correo en minúsculas).
 - **UX de cada botón de envío:** deshabilitado mientras envía (`useFormStatus`/`useActionState`), texto de carga, sin doble envío, errores por campo con `aria-describedby`, foco al primer campo con error.
-- **Variables de entorno:** documenta cada una que uses en `.env.example` (sin valores reales): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `AFILIACION_EMAIL_EQUIPO`, `EMAIL_FROM`, `NEXT_PUBLIC_WHATSAPP`.
+- **Variables de entorno:** documenta cada una que uses en `.env.example` (sin valores reales): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `EMAIL_FROM`, `NEXT_PUBLIC_WHATSAPP`.
 - No hagas commits ni despliegues; no ejecutes migraciones contra el proyecto remoto.
 
 ## Cómo trabajar
@@ -45,3 +45,14 @@ Responde y comenta el código en español.
 Termina con una tabla:
 | Pantalla | Botón | Estado (Hecho / Pendiente-spec / Bloqueado) | Archivo |
 y luego: migraciones creadas (sin aplicar), variables de entorno nuevas, y preguntas abiertas para la cooperativa.
+
+## Reporte al supervisor de avances
+Al terminar una tarea importante (una pantalla, una migración, una auditoría, una tanda de pruebas, una revisión), agrega **al final** de `docs/avances/buzon.md` un reporte con este formato (es el único archivo fuera de tu alcance habitual que puedes tocar, y solo para agregar):
+```
+## AAAA-MM-DD · ga-funcionalidad-botones
+- Actividades: <IDs de la hoja Plan, p. ej. 2.5, 2.6; o P-xx>
+- Estado: Hecho | En curso | Bloqueado
+- Qué se hizo: <una o dos frases>
+- Bloqueos o trabajo nuevo: <qué falta y de quién, o «ninguno»>
+```
+Los IDs están en `docs/avances/plan.json`. Repite el mismo bloque al final de tu entrega para que la sesión principal invoque a `ga-supervisor-avances`.

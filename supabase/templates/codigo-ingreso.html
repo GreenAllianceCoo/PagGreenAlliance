@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<!--
+  Correo del código de ingreso (6 dígitos) · Cooperativa Green Alliance
+  - Local: lo usa supabase/config.toml ([auth.email.template.magic_link]).
+  - Producción: copiar TODO este archivo en Supabase → Authentication → Emails
+    → Templates → «Magic Link». Asunto: Tu código para entrar a Green Alliance
+  - {{ .Token }} es el código de 6 dígitos. No usar {{ .ConfirmationURL }}:
+    el ingreso es con código, no con enlace.
+  - Estilos en línea y tablas a propósito: Gmail y Outlook ignoran <style> y flexbox.
+-->
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <title>Tu código para entrar a Green Alliance</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f3f6f4;">
+  <!-- Texto de vista previa (se ve en la bandeja de entrada, no en el correo) -->
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#f3f6f4;">
+    Tu código es {{ .Token }}. Vence en 10 minutos.
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f6f4;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px;background-color:#ffffff;border:1px solid #e1e6e3;border-radius:12px;">
+
+          <!-- Encabezado verde -->
+          <tr>
+            <td align="center" style="background-color:#1e6652;border-radius:12px 12px 0 0;padding:24px 24px 22px;">
+              <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:16px;letter-spacing:2px;color:#cde8dc;font-weight:bold;">COOPERATIVA</p>
+              <p style="margin:2px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:22px;line-height:28px;letter-spacing:1px;color:#ffffff;font-weight:bold;">GREEN ALLIANCE</p>
+            </td>
+          </tr>
+
+          <!-- Cuerpo -->
+          <tr>
+            <td style="padding:32px 32px 8px;font-family:Arial,Helvetica,sans-serif;color:#14212b;">
+              <h1 style="margin:0 0 12px;font-size:22px;line-height:28px;font-weight:bold;color:#1a3c57;">Tu código para entrar</h1>
+              <p style="margin:0;font-size:16px;line-height:24px;color:#3f4f5b;">
+                Escribe estos 6 números en la página de ingreso para entrar a tu cuenta.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Código -->
+          <tr>
+            <td align="center" style="padding:24px 32px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="background-color:#e3f0ea;border:1px solid #cde8dc;border-radius:10px;">
+                <tr>
+                  <td align="center" style="padding:18px 28px;font-family:'Courier New',Courier,monospace;font-size:36px;line-height:40px;font-weight:bold;letter-spacing:10px;color:#14493a;">{{ .Token }}</td>
+                </tr>
+              </table>
+              <p style="margin:12px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:20px;color:#52626e;">
+                El código vence en <strong style="color:#14212b;">10 minutos</strong> y sirve una sola vez.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Seguridad -->
+          <tr>
+            <td style="padding:8px 32px 32px;font-family:Arial,Helvetica,sans-serif;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f6f4;border-radius:8px;">
+                <tr>
+                  <td style="padding:14px 16px;font-size:14px;line-height:20px;color:#3f4f5b;">
+                    <strong style="color:#14212b;">No compartas este código.</strong>
+                    Nadie de Green Alliance te lo va a pedir por teléfono, WhatsApp ni correo.
+                    Si no intentaste entrar, ignora este mensaje: tu cuenta sigue segura.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+
+        <!-- Pie -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px;">
+          <tr>
+            <td align="center" style="padding:20px 16px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#52626e;">
+              Cooperativa Green Alliance · Crédito para policías de Colombia<br>
+              Este es un correo automático; por favor no respondas a este mensaje.
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

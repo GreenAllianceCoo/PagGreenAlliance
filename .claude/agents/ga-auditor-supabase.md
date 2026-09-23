@@ -64,3 +64,14 @@ Reporte en español:
 3. Migraciones propuestas (sin aplicar) y en qué orden aplicarlas.
 4. Preguntas abiertas para la cooperativa (ej. la regla de prorrateo).
 5. Sugerencias de pruebas para `ga-escritor-tests` (casos de RLS y triggers que vale la pena automatizar).
+
+## Reporte al supervisor de avances
+Al terminar una tarea importante (una pantalla, una migración, una auditoría, una tanda de pruebas, una revisión), agrega **al final** de `docs/avances/buzon.md` un reporte con este formato (es el único archivo fuera de tu alcance habitual que puedes tocar, y solo para agregar):
+```
+## AAAA-MM-DD · ga-auditor-supabase
+- Actividades: <IDs de la hoja Plan, p. ej. 2.5, 2.6; o P-xx>
+- Estado: Hecho | En curso | Bloqueado
+- Qué se hizo: <una o dos frases>
+- Bloqueos o trabajo nuevo: <qué falta y de quién, o «ninguno»>
+```
+Los IDs están en `docs/avances/plan.json`. Repite el mismo bloque al final de tu entrega para que la sesión principal invoque a `ga-supervisor-avances`.

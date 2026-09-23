@@ -46,22 +46,10 @@ export const SOLICITUD_EJEMPLO = {
   ] satisfies PasoSolicitud[],
 };
 
-export type Convenio = {
-  emoji: string;
-  nombre: string;
-  /** Nombre corto que usa el diseño de /cuenta. */
-  nombreCorto: string;
-  especialidad: string;
-};
+export type { Convenio } from "./convenios";
 
-/** Convenios (spec §3). Luego vienen de la tabla `convenios`. */
-export const CONVENIOS_EJEMPLO: Convenio[] = [
-  { emoji: "📱", nombre: "AMB Móvil S.A.S.", nombreCorto: "AMB Móvil", especialidad: "Tecnología" },
-  { emoji: "✈️", nombre: "Locos por los Viajes S.A.S.", nombreCorto: "Locos por los Viajes", especialidad: "Viajes y turismo" },
-  { emoji: "🦷", nombre: "Dr. Ribero Dental Group", nombreCorto: "Dr. Ribero Dental", especialidad: "Odontología estética" },
-  { emoji: "🏞️", nombre: "Racing Tours Villa de Leyva", nombreCorto: "Racing Tours", especialidad: "Tours en Villa de Leyva" },
-  { emoji: "🛂", nombre: "Dream & Go Visas", nombreCorto: "Dream & Go Visas", especialidad: "Trámite de visas" },
-];
+/** Los convenios ya no son de ejemplo: viven en lib/convenios.ts (fijos por decisión del 23-sep). */
+export { CONVENIOS as CONVENIOS_EJEMPLO } from "./convenios";
 
 export type Grado = { id: string; nombre: string };
 

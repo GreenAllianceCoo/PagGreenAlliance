@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { IngresoCedula } from "@/components/pantallas/IngresoCedula";
-import { WHATSAPP_NUMERO } from "@/lib/config";
+import { WHATSAPP_NUMERO, WHATSAPP_URL } from "@/lib/config";
+import { FormularioIngreso } from "./FormularioIngreso";
 
 export const metadata: Metadata = {
   title: "Ingresar · Cooperativa Green Alliance",
 };
 
-// Nueva ruta de ingreso (reemplaza a /login, que queda intacta por ahora).
+// Ingreso paso 1 (reemplaza a /login, que queda intacta por ahora).
+// Con sesión activa, proxy.ts redirige a /cuenta antes de llegar aquí.
 export default function IngresarPage() {
-  return <IngresoCedula whatsapp={WHATSAPP_NUMERO} />;
+  return <FormularioIngreso whatsapp={WHATSAPP_NUMERO} whatsappUrl={WHATSAPP_URL} />;
 }

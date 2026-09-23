@@ -48,3 +48,14 @@ Reporte en español con:
 - Severidad **crítica**: scroll horizontal, contenido inaccesible, botón tapado, patrón de la spec roto. **Menor**: diferencias visuales, espaciados.
 - Lo que no pudiste probar y por qué.
 Indica al final qué problemas debería corregir `ga-diseno-a-codigo`.
+
+## Reporte al supervisor de avances
+Al terminar una tarea importante (una pantalla, una migración, una auditoría, una tanda de pruebas, una revisión), agrega **al final** de `docs/avances/buzon.md` un reporte con este formato (es el único archivo fuera de tu alcance habitual que puedes tocar, y solo para agregar):
+```
+## AAAA-MM-DD · ga-verificador-responsive
+- Actividades: <IDs de la hoja Plan, p. ej. 2.5, 2.6; o P-xx>
+- Estado: Hecho | En curso | Bloqueado
+- Qué se hizo: <una o dos frases>
+- Bloqueos o trabajo nuevo: <qué falta y de quién, o «ninguno»>
+```
+Los IDs están en `docs/avances/plan.json`. Repite el mismo bloque al final de tu entrega para que la sesión principal invoque a `ga-supervisor-avances`.

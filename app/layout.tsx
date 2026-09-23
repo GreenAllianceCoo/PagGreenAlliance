@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Manrope, Montserrat } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 
 // Manrope (400/600/700/800) para todo el texto.
@@ -10,13 +10,8 @@ const manrope = Manrope({
   display: "swap",
 });
 
-// Montserrat solo para el texto del logo (700 en «COOPERATIVA», 800 en «GREEN ALLIANCE»).
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  weight: ["700", "800"],
-  variable: "--font-montserrat",
-  display: "swap",
-});
+// El texto del logo ya no usa Montserrat: se dibuja con las letras del SVG oficial
+// (components/ui/Logo.tsx), así que no se descarga esa fuente.
 
 export const metadata: Metadata = {
   title: "Cooperativa Green Alliance",
@@ -33,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={`${manrope.variable} ${montserrat.variable}`}>
+    <html lang="es" className={manrope.variable}>
       <body>{children}</body>
     </html>
   );

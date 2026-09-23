@@ -26,3 +26,13 @@ next-env.d.ts
 # misc
 .DS_Store
 npm-debug.log*
+
+# pruebas e2e (Playwright): resultados y reportes generados
+/test-results/
+/playwright-report/
+
+# archivos temporales de Office (Excel abierto)
+~$*
+
+# caché de Python (docs/avances/generar_excel.py)
+__pycache__/

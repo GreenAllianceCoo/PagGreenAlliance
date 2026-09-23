@@ -38,9 +38,7 @@ Patrón responsive: en escritorio el ingreso usa panel verde a la izquierda + fo
 **Al enviar:**
 1. Server Action / Route Handler de Next.js valida con las mismas reglas.
 2. Inserta en la tabla nueva `solicitudes_afiliacion` con estado `pendiente`.
-3. Resend → correo al equipo de la cooperativa con los datos.
-4. Resend → copia al solicitante con los próximos pasos.
-5. Redirige a «Solicitud enviada». Si falla un correo, la solicitud queda guardada y se registra el error.
+3. Redirige a «Solicitud enviada». No se envían correos en este paso: el equipo revisa las solicitudes pendientes en la base y, si la aprueba, la persona recibe el correo «Ingreso aceptado» (ver `docs/resend-plantillas.md`).
 
 **Tabla `solicitudes_afiliacion`:** id uuid · nombre text · cedula text · grado_id → grados_credito · unidad text null · celular text · email text · mensaje text null · acepto_datos_at timestamptz · estado (pendiente | contactado | aprobada | rechazada) · created_at timestamptz.
 

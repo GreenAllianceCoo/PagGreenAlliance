@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Logo } from "@/components/ui/Logo";
 import { createClient } from "@/lib/supabase/server";
 import SolicitudForm from "./SolicitudForm";
 
@@ -9,7 +10,7 @@ export default async function SolicitarPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/ingresar");
 
   const { data: perfil } = await supabase
     .from("perfiles")
@@ -38,8 +39,11 @@ export default async function SolicitarPage() {
     <main className="min-h-screen px-4 py-6 flex justify-center">
       <div className="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-6">
         <div className="flex items-center justify-between mb-5">
-          <span className="text-sm font-bold text-navy">GREEN ALLIANCE</span>
-          <Link href="/dashboard" className="text-sm text-gray-500">
+          {/* Logo oficial en vez del texto «GREEN ALLIANCE» (pantalla sin maqueta). */}
+          <Link href="/" aria-label="Ir al inicio" className="block h-11 w-[200px] min-w-0">
+            <Logo tone="dark" />
+          </Link>
+          <Link href="/cuenta" className="text-sm text-gray-500">
             Volver
           </Link>
         </div>

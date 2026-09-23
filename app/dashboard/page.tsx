@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { Logo } from "@/components/ui/Logo";
 import { createClient } from "@/lib/supabase/server";
 import { formatTasa } from "@/lib/credito";
 
@@ -13,7 +15,7 @@ export default async function DashboardPage() {
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/ingresar");
 
   const { data: perfil } = await supabase
     .from("perfiles")
@@ -34,7 +36,10 @@ export default async function DashboardPage() {
     <main className="min-h-screen px-4 py-6 flex justify-center">
       <div className="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-6">
         <div className="flex items-center justify-between mb-5">
-          <span className="text-sm font-bold text-navy">GREEN ALLIANCE</span>
+          {/* Logo oficial en vez del texto «GREEN ALLIANCE» (pantalla sin maqueta). */}
+          <Link href="/" aria-label="Ir al inicio" className="block h-11 w-[200px] min-w-0">
+            <Logo tone="dark" />
+          </Link>
           <span className="text-sm text-gray-500">
             {perfil?.nombre_completo ?? "Asociado"}
           </span>

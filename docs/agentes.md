@@ -4,12 +4,12 @@
 Los agentes viven en `.claude/agents/` dentro del repo `PagGreenAlliance` (se suben a git, así tu compañero del backend también los tiene). Además necesitas:
 
 ```
-.claude/agents/   ← los 7 agentes
+.claude/agents/   ← los 8 agentes
 design/           ← pantallas del diseño (PC + celular)
 docs/             ← spec + mapa de botones (+ docs/auditorias/ que crea el auditor)
 ```
 
-Abre Claude Code en el repo y escribe `/agents` para confirmar que aparecen los 7.
+Abre Claude Code en el repo y escribe `/agents` para confirmar que aparecen los 8.
 
 ## Los agentes
 | Agente | Qué hace | Modifica la app | Dónde escribe |
@@ -21,6 +21,7 @@ Abre Claude Code en el repo y escribe `/agents` para confirmar que aparecen los 
 | `ga-revisor-seguridad` | Revisa el código buscando fugas de datos, bypass de auth y montos manipulables | No, solo reporta | — |
 | `ga-verificador-responsive` | Prueba de 320 a 1920 px y los patrones responsive | No, solo reporta | `tests/responsive/`, `test-results/` |
 | `ga-verificador-qa` | Prueba de punta a punta botones, validaciones, privacidad y fidelidad al diseño | No, solo reporta | `tests/e2e/`, `test-results/` |
+| `ga-supervisor-avances` | Recibe los reportes de los demás agentes y actualiza el Excel de avances (pendientes, plan, Gantt, bitácora) | No | `docs/avances/`, casillas de `PENDIENTES.md` |
 
 ## Orden recomendado
 

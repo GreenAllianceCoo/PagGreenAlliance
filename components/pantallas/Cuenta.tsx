@@ -19,6 +19,8 @@ export type CuentaProps = {
     monto: string;
     modalidad: string;
     plazo: string;
+    /** Tasa de interés mensual («7,9 %»). La cuota no se calcula. */
+    tasa?: string;
     pasos: PasoSolicitud[];
   } | null;
   convenios: Convenio[];
@@ -31,7 +33,18 @@ export type CuentaProps = {
   errorTelefono?: string;
   /** Estado de carga del botón «Guardar» de «Mis datos». */
   guardandoTelefono?: boolean;
+  /** Server Action de «Guardar» en «Mis datos» (solo perfiles.telefono). */
+  accionTelefono?: (formData: FormData) => void;
+  /** Mensaje para lectores de pantalla tras guardar el celular. */
+  mensajeTelefono?: string;
+  /** Server Action de «Salir» / cerrar sesión (signOut → /ingresar). */
+  accionSalir?: (formData: FormData) => void;
+  /** Enlace https://wa.me/57<NÚMERO>; sin valor, «Hablar con la cooperativa» queda sin enlace. */
+  whatsappUrl?: string | null;
 };
+
+/** Destino de «Nueva solicitud»: el formulario existente (decisión del 23-sep). */
+const RUTA_NUEVA_SOLICITUD = "/dashboard/solicitar";
 
 /**
  * Contenido de la tarjeta «Tu solicitud» cuando el asociado aún no tiene solicitudes.
@@ -63,11 +76,11 @@ function SolicitudVacia() {
             </p>
           </div>
         </div>
-        {/* TODO(pendiente-spec): flujo «Nueva solicitud» sin pantalla todavía (mapa de botones). */}
-        <a href="#" className={clasesBoton("primario", "gap-2 lg:self-start lg:px-9")}>
+        {/* El mapa lo marca Pendiente; por decisión del 23-sep va al formulario existente. */}
+        <Link href={RUTA_NUEVA_SOLICITUD} className={clasesBoton("primario", "gap-2 lg:self-start lg:px-9")}>
           <IconoMas tamano={22} grosor={2.2} />
           Nueva solicitud
-        </a>
+        </Link>
         <p className="m-0 rounded-10 bg-ga-fondo-suave p-3 text-14 leading-150 text-ga-texto-2 lg:px-3.5 lg:text-15 lg:leading-normal">
           Lo que puedes pedir depende de tu grado: revisa tu tope disponible.
         </p>
@@ -85,6 +98,9 @@ type MisDatosProps = {
   errorTelefono?: string;
   /** Estado de carga del botón «Guardar». */
   guardando?: boolean;
+  accion?: (formData: FormData) => void;
+  /** Mensaje para lectores de pantalla (p. ej. «Guardamos tu celular»). */
+  mensaje?: string;
 };
 
 /**
@@ -103,6 +119,8 @@ function MisDatos({
   telefono,
   errorTelefono,
   guardando = false,
+  accion,
+  mensaje,
 }: MisDatosProps) {
   const datosFijos = [
     { etiqueta: "Nombre", valor: nombre },
@@ -132,8 +150,8 @@ function MisDatos({
             </div>
           ))}
         </dl>
-        {/* TODO(funcionalidad): Server Action que actualiza perfiles.telefono (la base ya impide cambiar nombre, cédula, grado y rol). */}
-        <form className="flex flex-col gap-3 sm:flex-row sm:items-end lg:col-span-2" noValidate>
+        {/* Server Action: actualiza solo perfiles.telefono (la base impide cambiar nombre, cédula, grado y rol). */}
+        <form action={accion} className="flex flex-col gap-3 sm:flex-row sm:items-end lg:col-span-2" noValidate>
           <Field id="telefono" label="Celular" error={errorTelefono} className="grow">
             {(control) => (
               <Input
@@ -150,6 +168,10 @@ function MisDatos({
           <Button cargando={guardando} textoCargando="Guardando…" className="sm:h-13 sm:px-7">
             Guardar
           </Button>
+          {/* Solo para lectores de pantalla: confirma que se guardó (no hay diseño de éxito). */}
+          <p role="status" aria-live="polite" className="sr-only">
+            {mensaje}
+          </p>
         </form>
       </div>
     </section>
@@ -167,6 +189,10 @@ export function Cuenta({
   telefono,
   errorTelefono,
   guardandoTelefono,
+  accionTelefono,
+  mensajeTelefono,
+  accionSalir,
+  whatsappUrl,
 }: CuentaProps) {
   return (
     <div className="min-h-dvh bg-ga-fondo-suave">
@@ -174,7 +200,9 @@ export function Cuenta({
           en el navegador se usa 24 px, como en las demás pantallas. En tableta el header se
           alinea con el contenido centrado (max-w-2xl). */}
       <header className="flex items-center justify-between px-5 pt-6 md:mx-auto md:max-w-2xl lg:mx-0 lg:h-19 lg:max-w-none lg:border-b lg:border-ga-linea lg:bg-white lg:px-14 lg:pt-0">
-        <Logo tone="dark" />
+        <Link href="/" aria-label="Ir al inicio" className="block h-11 w-logo">
+          <Logo tone="dark" />
+        </Link>
         <nav aria-label="Principal" className="hidden gap-7 text-16 font-bold lg:flex">
           <Link
             href="/cuenta"
@@ -183,19 +211,19 @@ export function Cuenta({
           >
             Inicio
           </Link>
-          {/* TODO(pendiente-spec): flujo «Nueva solicitud» sin pantalla todavía. */}
-          <a href="#" className="text-ga-texto no-underline hover:text-ga-verde">
+          {/* El mapa lo marca Pendiente; por decisión del 23-sep va al formulario existente. */}
+          <Link href={RUTA_NUEVA_SOLICITUD} className="text-ga-texto no-underline hover:text-ga-verde">
             Nueva solicitud
-          </a>
-          {/* TODO(pendiente-spec): ¿scroll a «Tus convenios» o página propia? Por ahora #convenios. */}
+          </Link>
+          {/* Sección #convenios de esta página (decisión del 23-sep).
+              TODO(pendiente-spec): confirmar si «Convenios» tendrá página propia. */}
           <a href="#convenios" className="text-ga-texto no-underline hover:text-ga-verde">
             Convenios
           </a>
         </nav>
         <div className="hidden items-center gap-3.5 text-15 lg:flex">
           <span className="font-bold">{nombre}</span>
-          {/* TODO(funcionalidad): action = signOut() → /ingresar (mapa §4). */}
-          <form>
+          <form action={accionSalir}>
             <button
               type="submit"
               className="inline-flex h-10 items-center rounded-10 border-1.5 border-ga-borde px-3.5 font-bold text-ga-navy hover:bg-ga-fondo-suave"
@@ -214,8 +242,7 @@ export function Cuenta({
             </span>{" "}
             <span className="text-24 lg:text-32">{nombre}</span>
           </h1>
-          {/* TODO(funcionalidad): action = signOut() → /ingresar (mapa §4). */}
-          <form className="lg:hidden">
+          <form action={accionSalir} className="lg:hidden">
             <button
               type="submit"
               aria-label="Cerrar sesión"
@@ -255,6 +282,8 @@ export function Cuenta({
                 </div>
                 <PasosSolicitud pasos={solicitud.pasos} variante="cuenta" />
                 <p className="m-0 rounded-10 bg-ga-fondo-suave p-3 text-14 leading-150 text-ga-texto-2 lg:px-3.5 lg:text-15 lg:leading-normal">
+                  {/* La tasa se guarda en la solicitud y se muestra; la cuota no se calcula. */}
+                  {solicitud.tasa ? <>Interés mensual: {solicitud.tasa}. </> : null}
                   Te avisaremos por correo cuando cambie el estado.
                 </p>
               </>
@@ -269,15 +298,15 @@ export function Cuenta({
               <span className="text-26 font-extrabold lg:text-30">{tope}</span>
             </section>
             <nav aria-label="Accesos" className="grid grid-cols-2 gap-3 lg:grid-cols-1">
-              {/* TODO(pendiente-spec): flujo «Nueva solicitud» sin pantalla todavía. */}
-              <a
-                href="#"
+              {/* El mapa lo marca Pendiente; por decisión del 23-sep va al formulario existente. */}
+              <Link
+                href={RUTA_NUEVA_SOLICITUD}
                 className="flex flex-col gap-2.5 rounded-16 bg-white p-4.5 text-15 font-bold text-ga-texto no-underline hover:bg-ga-verde-tint lg:flex-row lg:items-center lg:gap-3 lg:p-5 lg:text-16 lg:font-extrabold"
               >
                 <IconoMas grosor={1.8} className="text-ga-verde" />
                 Nueva solicitud
-              </a>
-              {/* TODO(pendiente-spec): confirmar destino de «Convenios». Por ahora #convenios. */}
+              </Link>
+              {/* TODO(pendiente-spec): confirmar si «Convenios» tendrá página propia. Hoy: sección #convenios. */}
               <a
                 href="#convenios"
                 className="flex flex-col gap-2.5 rounded-16 bg-white p-4.5 text-15 font-bold text-ga-texto no-underline hover:bg-ga-verde-tint lg:hidden"
@@ -286,10 +315,22 @@ export function Cuenta({
                 Convenios
               </a>
             </nav>
-            {/* TODO(pendiente-spec): https://wa.me/57<NÚMERO> con NEXT_PUBLIC_WHATSAPP. */}
-            <a href="#" className={clasesBoton("terciario", "gap-2")}>
-              Hablar con la cooperativa
-            </a>
+            {/* https://wa.me/57<NÚMERO> con NEXT_PUBLIC_WHATSAPP. Sin número: sin enlace (aria-disabled).
+                TODO(pendiente-spec): falta el número real. */}
+            {whatsappUrl ? (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={clasesBoton("terciario", "gap-2")}
+              >
+                Hablar con la cooperativa
+              </a>
+            ) : (
+              <span aria-disabled="true" className={clasesBoton("terciario", "gap-2")}>
+                Hablar con la cooperativa
+              </span>
+            )}
           </div>
         </div>
 
@@ -313,6 +354,8 @@ export function Cuenta({
           telefono={telefono}
           errorTelefono={errorTelefono}
           guardando={guardandoTelefono}
+          accion={accionTelefono}
+          mensaje={mensajeTelefono}
         />
       </main>
     </div>

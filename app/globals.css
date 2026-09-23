@@ -18,7 +18,6 @@
   --ga-verde-tint: #e3f0ea;
 
   /* Nuevos, encontrados en el diseño */
-  --ga-navy-logo: #1f3a56; /* texto «COOPERATIVA / ALLIANCE» del logo */
   --ga-navy-claro: #22496a; /* tarjetas de testimonio sobre navy */
   --ga-navy-texto-suave: #c9d6e0; /* texto secundario sobre navy */
   --ga-verde-icono: #cde8dc; /* checks del panel verde de ingreso */
@@ -28,10 +27,9 @@
   --ga-gris-paso: #d5dce0; /* barra de paso pendiente (escritorio) */
   --ga-gris-circulo: #c3cbd1; /* círculo de paso pendiente */
   --ga-borde-tarjeta: #dde3df; /* borde de tarjetas de convenio */
-  --ga-foto-fondo: #dce7e2; /* placeholder de foto principal */
-  --ga-foto-texto: #3f5a50;
-  --ga-foto-fondo-2: #e6ecf0; /* placeholder de fotos de apoyos */
-  --ga-foto-texto-2: #4a5f6e;
+  /* Espacio de foto decorativo de la landing (components/ui/EspacioFoto.tsx) */
+  --ga-patron-punto: rgba(255, 255, 255, 0.1); /* puntos del patrón sobre verde/navy */
+  --ga-marca-agua: rgba(255, 255, 255, 0.12); /* círculo del ícono sobre el degradado */
   --ga-blanco-translucido: rgba(255, 255, 255, 0.14); /* botón volver sobre verde */
   --ga-sombra: rgba(20, 33, 43, 0.16);
 
@@ -54,5 +52,11 @@
   /* Enlace de texto: en el diseño todo <a> es verde y oscurece al pasar el mouse. */
   .enlace {
     @apply text-ga-verde underline hover:text-ga-verde-oscuro;
+  }
+
+  /* Patrón sutil de puntos para los espacios de foto decorativos. */
+  .patron-puntos {
+    background-image: radial-gradient(var(--ga-patron-punto) 1.2px, transparent 1.3px);
+    background-size: 18px 18px;
   }
 }

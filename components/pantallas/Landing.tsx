@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
 import { ConvenioCard } from "@/components/ui/ConvenioCard";
+import { EspacioFoto, type FotoReal, type IlustracionFoto } from "@/components/ui/EspacioFoto";
 import { Logo } from "@/components/ui/Logo";
 import { PasosSolicitud } from "@/components/ui/PasosSolicitud";
 import type { Convenio, Testimonio } from "@/lib/mock";
@@ -29,18 +30,39 @@ const PASOS_MUESTRA = [
   { etiqueta: "Desembolso", estado: "pendiente" as const },
 ];
 
-const APOYOS = [
+// TODO(pendiente-spec): foto real de asociados (con autorización de uso).
+// Para ponerla: copiar el archivo a /public/fotos/ y cambiar `null` por
+// { src: "/fotos/asociados.jpg", alt: "Descripción de la foto" }.
+const FOTO_HERO: FotoReal | null = null;
+
+// TODO(pendiente-spec): foto de cada apoyo. Igual que FOTO_HERO: reemplazar `foto: null`.
+const APOYOS: Array<{
+  titulo: string;
+  texto: string;
+  foto: FotoReal | null;
+  ilustracion: IlustracionFoto;
+  tono: "verde" | "navy" | "oscuro";
+}> = [
   {
     titulo: "Microcréditos",
     texto: "Montos según tu grado, modalidad 50% o 100%, todo en línea.",
+    foto: null,
+    ilustracion: "credito",
+    tono: "oscuro",
   },
   {
     titulo: "Orientación financiera",
     texto: "Una conversación para ordenar tus cuentas antes de endeudarte.",
+    foto: null,
+    ilustracion: "orientacion",
+    tono: "verde",
   },
   {
     titulo: "Apoyo legal",
     texto: "Acompañamiento en trámites para ti y tu familia.",
+    foto: null,
+    ilustracion: "legal",
+    tono: "navy",
   },
 ];
 
@@ -76,7 +98,7 @@ export function Landing({
           <Link href="/afiliacion" className={`hidden lg:inline ${ENLACE_NAV}`}>
             Afíliate
           </Link>
-          {/* TODO(funcionalidad): con sesión activa → /cuenta. */}
+          {/* Con sesión activa, proxy.ts redirige /ingresar → /cuenta. */}
           <Link
             href="/ingresar"
             className="inline-flex h-11 items-center rounded-10 bg-white px-4 text-15 font-extrabold text-ga-verde no-underline hover:bg-ga-verde-claro lg:px-5.5 lg:text-16"
@@ -99,7 +121,7 @@ export function Landing({
               tope desde el inicio y ves cada paso de tu solicitud.
             </p>
             <div className="flex flex-col gap-4.5 lg:flex-row lg:gap-3">
-              {/* TODO(funcionalidad): con sesión activa → /cuenta. */}
+              {/* Con sesión activa, proxy.ts redirige /ingresar → /cuenta. */}
               <ButtonLink href="/ingresar" className="lg:inline-flex lg:rounded-10 lg:px-7">
                 Solicitar crédito
               </ButtonLink>
@@ -116,10 +138,14 @@ export function Landing({
           </div>
 
           <div className="flex flex-col gap-4 px-5 pb-8 lg:relative lg:block lg:h-[520px] lg:p-0">
-            {/* TODO(pendiente-spec): foto real de asociados (con autorización de uso). */}
-            <div className="flex h-[230px] items-center justify-center rounded-18 bg-ga-foto-fondo p-6 text-center text-15 font-semibold text-ga-foto-texto lg:absolute lg:inset-0 lg:bottom-15 lg:right-15 lg:h-auto lg:rounded-20 lg:p-10 lg:text-16">
-              [Foto real de asociados — con autorización de uso]
-            </div>
+            {/* TODO(pendiente-spec): foto real de asociados → ver FOTO_HERO arriba. */}
+            <EspacioFoto
+              foto={FOTO_HERO}
+              ilustracion="asociados"
+              tono="verde"
+              sizes="(min-width: 1024px) 45vw, 100vw"
+              className="h-[230px] rounded-18 lg:absolute lg:inset-0 lg:bottom-15 lg:right-15 lg:h-auto lg:rounded-20"
+            />
             <div
               className="flex flex-col gap-3 rounded-16 border border-ga-borde-tarjeta bg-white p-4.5 lg:absolute lg:bottom-0 lg:right-0 lg:w-tarjeta-hero lg:gap-3.5 lg:border-0 lg:p-5.5 lg:shadow-tarjeta"
             >
@@ -182,10 +208,14 @@ export function Landing({
           <div className="flex flex-col gap-6 lg:grid lg:grid-cols-3">
             {APOYOS.map((apoyo) => (
               <article key={apoyo.titulo} className="flex flex-col gap-2.5 lg:gap-3.5">
-                {/* TODO(pendiente-spec): foto de cada apoyo. */}
-                <div className="flex h-40 items-center justify-center rounded-14 bg-ga-foto-fondo-2 text-14 font-semibold text-ga-foto-texto-2 lg:h-[200px] lg:text-15">
-                  [Foto]
-                </div>
+                {/* TODO(pendiente-spec): foto de cada apoyo → ver APOYOS arriba. */}
+                <EspacioFoto
+                  foto={apoyo.foto}
+                  ilustracion={apoyo.ilustracion}
+                  tono={apoyo.tono}
+                  sizes="(min-width: 1024px) 33vw, 100vw"
+                  className="h-40 rounded-14 lg:h-[200px]"
+                />
                 <h3 className="m-0 text-20 font-extrabold lg:text-22">{apoyo.titulo}</h3>
                 <p className="m-0 text-16 leading-150 text-ga-texto-2 lg:leading-155">{apoyo.texto}</p>
               </article>
@@ -231,7 +261,7 @@ export function Landing({
                 <span className="hidden lg:inline"> en cada compra o servicio</span>.
               </p>
             </div>
-            {/* TODO(funcionalidad): con sesión activa → /cuenta. */}
+            {/* Con sesión activa, proxy.ts redirige /ingresar → /cuenta. */}
             <Link href="/ingresar" className="enlace hidden text-16 font-extrabold lg:inline">
               Ver beneficios en mi cuenta
             </Link>

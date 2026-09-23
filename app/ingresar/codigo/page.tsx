@@ -1,21 +1,24 @@
 import type { Metadata } from "next";
-import { IngresoCodigo } from "@/components/pantallas/IngresoCodigo";
-import { WHATSAPP_NUMERO } from "@/lib/config";
-import { CORREO_ENMASCARADO_EJEMPLO, OTP_EJEMPLO, TIEMPO_REENVIO_EJEMPLO } from "@/lib/mock";
+import { redirect } from "next/navigation";
+import { WHATSAPP_NUMERO, WHATSAPP_URL } from "@/lib/config";
+import { leerCookieIngreso, segundosParaReenviar } from "@/lib/ingreso/servidor";
+import { FormularioCodigo } from "./FormularioCodigo";
 
 export const metadata: Metadata = {
   title: "Escribe el código · Cooperativa Green Alliance",
 };
 
-export default function IngresarCodigoPage() {
-  // TODO(funcionalidad): leer el correo enmascarado de la cookie del paso 1;
-  // si no hay cookie → redirect("/ingresar"). Quitar los datos de ejemplo.
+export default async function IngresarCodigoPage() {
+  // Sin la cookie del paso 1 (o vencida) no hay a quién verificar: volver a /ingresar.
+  const datos = await leerCookieIngreso();
+  if (!datos) redirect("/ingresar");
+
   return (
-    <IngresoCodigo
-      correoEnmascarado={CORREO_ENMASCARADO_EJEMPLO}
+    <FormularioCodigo
+      correoEnmascarado={datos.m}
       whatsapp={WHATSAPP_NUMERO}
-      digitos={OTP_EJEMPLO}
-      tiempoReenvio={TIEMPO_REENVIO_EJEMPLO}
+      whatsappUrl={WHATSAPP_URL}
+      segundosIniciales={segundosParaReenviar(datos)}
     />
   );
 }

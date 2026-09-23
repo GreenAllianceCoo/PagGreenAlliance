@@ -11,7 +11,10 @@ type PanelIngresoProps = {
   extraEscritorio?: ReactNode;
   /** Texto al pie del panel (solo escritorio; en celular va al final del formulario). */
   pie: ReactNode;
-  /** Destino del botón «Volver» del panel (solo celular). Sin valor, no se muestra. */
+  /**
+   * Destino del botón «Volver» del panel (solo celular). Sin valor, no se muestra.
+   * Es un <a> normal (navegación completa, sin prefetch).
+   */
   volverHref?: string;
   /**
    * Quita el relleno superior extra del panel en celular. La maqueta (390×844)
@@ -65,13 +68,15 @@ export function PanelIngreso({
             <Logo tone="light" />
           </Link>
           {volverHref ? (
-            <Link
+            // <a> normal (sin prefetch): en /ingresar/codigo apunta a /ingresar/cambiar,
+            // un Route Handler que borra la cookie del paso 1.
+            <a
               href={volverHref}
               aria-label="Volver"
               className="flex h-11 w-11 items-center justify-center rounded-full bg-ga-blanco-translucido text-white lg:hidden"
             >
               <IconoVolver tamano={22} />
-            </Link>
+            </a>
           ) : null}
         </div>
         <div className={cx("flex flex-col gap-1.5 lg:mt-14 lg:gap-3.5", COLUMNA_TABLETA)}>

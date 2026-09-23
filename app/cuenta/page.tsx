@@ -1,32 +1,59 @@
 import type { Metadata } from "next";
-import { Cuenta } from "@/components/pantallas/Cuenta";
-import { ASOCIADO_EJEMPLO, CONVENIOS_EJEMPLO, SOLICITUD_EJEMPLO } from "@/lib/mock";
+import { redirect } from "next/navigation";
+import { WHATSAPP_URL } from "@/lib/config";
+import { CONVENIOS } from "@/lib/convenios";
+import { textoTope, vistaSolicitud, type FilaSolicitud } from "@/lib/cuenta";
+import { createClient } from "@/lib/supabase/server";
+import { CuentaCliente } from "./CuentaCliente";
 
 export const metadata: Metadata = {
   title: "Mi cuenta · Cooperativa Green Alliance",
 };
 
-// Nueva ruta del inicio del asociado (reemplaza a /dashboard, que queda intacta por ahora).
-export default async function CuentaPage({ searchParams }: PageProps<"/cuenta">) {
-  // TODO(funcionalidad): ruta protegida (sin sesión → /ingresar; agregar /cuenta al matcher de proxy.ts).
-  // Cargar nombre (perfiles), última solicitud (solicitudes_credito), tope (grados_credito)
-  // y convenios (tabla convenios). Quitar los datos de ejemplo.
+// Inicio del asociado (reemplaza a /dashboard, que queda intacta por ahora).
+export default async function CuentaPage() {
+  const supabase = await createClient();
 
-  // Solo para revisar el diseño: /cuenta?vacio=1 muestra el estado sin solicitudes.
-  // TODO(funcionalidad): quitar este parámetro cuando la solicitud venga de Supabase
-  // (sin filas → `solicitud={null}`).
-  const { vacio } = await searchParams;
-  const mostrarVacio = vacio === "1";
+  // proxy.ts ya redirige sin sesión; se vuelve a comprobar aquí.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/ingresar");
+
+  // Todo con la sesión del usuario (RLS): solo ve lo suyo.
+  const [{ data: perfil }, { data: solicitudes }] = await Promise.all([
+    supabase
+      .from("perfiles")
+      .select("nombre_completo, cedula, grado, telefono")
+      .eq("id", user.id)
+      .single(),
+    supabase
+      .from("solicitudes_credito")
+      .select(
+        "estado, monto_solicitado, porcentaje_devolucion, plazo_meses, tasa_interes_mensual, fecha_solicitud, fecha_respuesta",
+      )
+      .eq("asociado_id", user.id)
+      .order("fecha_solicitud", { ascending: false })
+      .limit(1),
+  ]);
+
+  const { data: topes } = perfil?.grado
+    ? await supabase.from("grados_credito").select("capacidad_maxima").eq("grado", perfil.grado)
+    : { data: null };
+
+  const ultima = (solicitudes?.[0] as FilaSolicitud | undefined) ?? null;
 
   return (
-    <Cuenta
-      nombre={ASOCIADO_EJEMPLO.nombre}
-      tope={ASOCIADO_EJEMPLO.tope}
-      solicitud={mostrarVacio ? null : SOLICITUD_EJEMPLO}
-      convenios={CONVENIOS_EJEMPLO}
-      cedula={ASOCIADO_EJEMPLO.cedula}
-      grado={ASOCIADO_EJEMPLO.grado}
-      telefono={ASOCIADO_EJEMPLO.telefono}
+    <CuentaCliente
+      nombre={perfil?.nombre_completo ?? "Asociado"}
+      tope={textoTope(topes)}
+      solicitud={ultima ? vistaSolicitud(ultima) : null}
+      convenios={CONVENIOS}
+      cedula={perfil?.cedula ?? "—"}
+      // TODO(pendiente-spec): nombre completo del grado (hoy el código: PP, PT, SI, IT, OF).
+      grado={perfil?.grado ?? "Sin asignar"}
+      telefono={perfil?.telefono ?? ""}
+      whatsappUrl={WHATSAPP_URL}
     />
   );
 }

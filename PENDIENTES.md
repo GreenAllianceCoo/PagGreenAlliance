@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 23-sep-2026 (tarde)
+Actualizado: 23-sep-2026 (noche)
 
 ## Dónde quedamos
 
@@ -76,7 +76,7 @@ Busca `TODO(funcionalidad)` en el código para ver cada punto exacto.
 
 ### Ingreso con código (antes de programar `/ingresar`)
 Se decidió código por correo en vez de contraseña. Configurar en el panel de Supabase:
-- [ ] **SMTP propio con Resend** (Authentication → Emails → SMTP Settings). El correo por defecto de Supabase envía muy pocos por hora.
+- [x] **SMTP propio con Resend** (Authentication → Emails → SMTP Settings). El correo por defecto de Supabase envía muy pocos por hora.
 - [ ] **Plantilla del correo** con `{{ .Token }}` (el código), no el enlace.
 - [ ] Revisar el **límite de Resend** (plan gratis: unos 100 correos al día).
 
@@ -93,7 +93,7 @@ Se decidió código por correo en vez de contraseña. Configurar en el panel de 
 - [ ] «Cambiar cédula» y la flecha volver deben limpiar la cookie.
 
 ### `/afiliacion`
-- [ ] Server Action: validar con zod, poner límites por IP y por cédula, guardar en la base, enviar el correo con Resend y pasar a `/afiliacion/enviada`.
+- [x] Server Action: validar con zod, poner límites por IP y por cédula, guardar en la base y pasar a `/afiliacion/enviada`.
 - [ ] Cargar los grados desde la tabla `grados_credito`.
 - [ ] Campo trampa (honeypot): si viene lleno, responder «éxito» sin guardar.
 - [ ] Mostrar errores (prop `errores`) y el estado de carga.
@@ -115,7 +115,7 @@ Se decidió código por correo en vez de contraseña. Configurar en el panel de 
 ### Otros
 - [ ] Formulario de solicitud de crédito conectado a la nueva `/cuenta` (hoy vive en `/dashboard/solicitar`; ya muestra la tasa y exige mínimo 100.000).
 - [ ] Panel de administración `/admin`: listado de solicitudes, aprobar y rechazar (rechazar pide motivo; un admin no puede resolver su propia solicitud).
-- [ ] Correos con Resend cuando se crea o se resuelve una solicitud.
+- [ ] Correo con Resend del resultado del crédito (aprobado / no aprobado) al asociado cuando se resuelve una solicitud.
 - [ ] Importación de asociados desde Excel (cuando llegue).
 
 ## 4. Verificación y cierre
@@ -139,7 +139,7 @@ Se decidió código por correo en vez de contraseña. Configurar en el panel de 
   - En Next 16, `searchParams` es una promesa: se tipa con `PageProps<"/ruta">` y se lee con `await`.
 - **Compilar en WSL** (lo que se usó antes):
   ```bash
-  wsl -d Ubuntu -- bash -lc "cd '/mnt/c/Users/Sebastian/Documents/Guishe/Green Alliance/green-alliance-app' && source ~/.nvm/nvm.sh && nvm use 22 && npm run build"
+  cd '/mnt/c/Users/Sebastian/Documents/Guishe/Green Alliance/green-alliance-app' && source ~/.nvm/nvm.sh && nvm use 22 && npm run build
   ```
 - **Pruebas:**
   - Unitarias: `npm run test:unit`.

@@ -26,11 +26,24 @@ export type AfiliacionProps = {
   grados: Grado[];
   /** Errores por campo, en español (se muestran bajo cada control). */
   errores?: Partial<Record<CampoAfiliacion, string>>;
+  /** Error que no es de un campo (p. ej. límite de envíos). Mismo estilo que los errores de campo. */
+  errorGeneral?: string;
   cargando?: boolean;
+  /** Server Action del formulario (validar → guardar → correos → /afiliacion/enviada). */
+  accion?: (formData: FormData) => void;
+  /** Valores iniciales de los campos (se conserva lo escrito si hubo error). */
+  valores?: Partial<Record<Exclude<CampoAfiliacion, "acepto_datos">, string>> & { acepto_datos?: boolean };
 };
 
 /** Formulario «Deseo afiliarme» (design/Afiliacion-PC.dc.html + Afiliacion-Movil.dc.html). */
-export function Afiliacion({ grados, errores = {}, cargando = false }: AfiliacionProps) {
+export function Afiliacion({
+  grados,
+  errores = {},
+  errorGeneral,
+  cargando = false,
+  accion,
+  valores = {},
+}: AfiliacionProps) {
   return (
     <div className="min-h-dvh bg-white lg:bg-ga-fondo-suave">
       {/* Celular: la maqueta usa 52 px arriba para simular la barra de estado del teléfono;
@@ -79,9 +92,8 @@ export function Afiliacion({ grados, errores = {}, cargando = false }: Afiliacio
           />
         </aside>
 
-        {/* TODO(funcionalidad): action = Server Action (validación zod, límite por IP/cédula,
-            insert en solicitudes_afiliacion, correos Resend) → /afiliacion/enviada (mapa §5). */}
         <form
+          action={accion}
           noValidate
           className="grid grid-cols-1 gap-4.5 px-6 pb-6 pt-4.5 md:mx-auto md:w-full md:max-w-2xl lg:mx-0 lg:max-w-none lg:grow lg:grid-cols-2 lg:gap-x-6 lg:gap-y-5 lg:rounded-20 lg:bg-white lg:p-9"
         >
@@ -97,7 +109,9 @@ export function Afiliacion({ grados, errores = {}, cargando = false }: Afiliacio
                 id: "nombre",
                 contenido: (
                   <Field id="af-nombre" label="Nombres y apellidos" error={errores.nombre} className="lg:col-span-2">
-                    {(control) => <Input {...control} name="nombre" autoComplete="name" />}
+                    {(control) => (
+                      <Input {...control} name="nombre" autoComplete="name" defaultValue={valores.nombre} />
+                    )}
                   </Field>
                 ),
               },
@@ -111,6 +125,7 @@ export function Afiliacion({ grados, errores = {}, cargando = false }: Afiliacio
                         name="cedula"
                         inputMode="numeric"
                         placeholder="Sin puntos ni espacios"
+                        defaultValue={valores.cedula}
                       />
                     )}
                   </Field>
@@ -121,7 +136,15 @@ export function Afiliacion({ grados, errores = {}, cargando = false }: Afiliacio
                 contenido: (
                   <Field id="af-grado" label="Grado" error={errores.grado_id}>
                     {(control) => (
-                      <Select {...control} name="grado_id" defaultValue="">
+                      // `key`: React 19 reinicia el <form> tras cada acción y un <select> vuelve a
+                      // la opción de su primer render (defaultValue no cambia después). Al cambiar
+                      // el grado devuelto, el select se vuelve a montar con el valor escrito (F-01).
+                      <Select
+                        key={`grado-${valores.grado_id ?? ""}`}
+                        {...control}
+                        name="grado_id"
+                        defaultValue={valores.grado_id ?? ""}
+                      >
                         <option value="">Selecciona tu grado</option>
                         {grados.map((grado) => (
                           <option key={grado.id} value={grado.id}>
@@ -143,7 +166,7 @@ export function Afiliacion({ grados, errores = {}, cargando = false }: Afiliacio
                     error={errores.unidad}
                     className="lg:col-span-2 lg:row-start-4"
                   >
-                    {(control) => <Input {...control} name="unidad" />}
+                    {(control) => <Input {...control} name="unidad" defaultValue={valores.unidad} />}
                   </Field>
                 ),
               },
@@ -159,6 +182,7 @@ export function Afiliacion({ grados, errores = {}, cargando = false }: Afiliacio
                         autoComplete="tel"
                         inputMode="numeric"
                         placeholder="3001234567"
+                        defaultValue={valores.celular}
                       />
                     )}
                   </Field>
@@ -181,6 +205,7 @@ export function Afiliacion({ grados, errores = {}, cargando = false }: Afiliacio
                         type="email"
                         autoComplete="email"
                         placeholder="nombre@correo.com"
+                        defaultValue={valores.email}
                       />
                     )}
                   </Field>
@@ -195,29 +220,39 @@ export function Afiliacion({ grados, errores = {}, cargando = false }: Afiliacio
             error={errores.mensaje}
             className="lg:col-span-2"
           >
-            {(control) => <Textarea {...control} name="mensaje" rows={3} />}
+            {(control) => (
+              <Textarea {...control} name="mensaje" rows={3} defaultValue={valores.mensaje} />
+            )}
           </Field>
           <Checkbox
             id="af-datos"
             name="acepto_datos"
+            defaultChecked={valores.acepto_datos}
             error={errores.acepto_datos}
             className="text-14 lg:col-span-2 lg:text-15"
           >
             Autorizo a la Cooperativa Green Alliance a tratar mis datos personales para gestionar
             mi afiliación, según su{" "}
-            {/* TODO(pendiente-spec): texto de la política de datos (el mapa sugiere /politica-de-datos). */}
-            <a href="#" className="enlace font-bold">
+            {/* Abre en otra pestaña para no perder lo escrito en el formulario.
+                TODO(pendiente-spec): /politica-de-datos es un placeholder hasta tener el texto. */}
+            <a href="/politica-de-datos" target="_blank" rel="noopener" className="enlace font-bold">
               política de datos
             </a>{" "}
             (Ley 1581 de 2012).
           </Checkbox>
 
           {/* Campo trampa (honeypot): fuera de pantalla, sin foco ni lector de pantalla.
-              TODO(funcionalidad): si viene lleno, responder «éxito» sin guardar. */}
+              Si viene lleno, la Server Action responde «éxito» sin guardar. */}
           <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
             <label htmlFor="af-sitio">No llenar este campo</label>
             <input id="af-sitio" name="sitio_web" type="text" tabIndex={-1} autoComplete="off" />
           </div>
+
+          {errorGeneral ? (
+            <p role="alert" className="m-0 text-14 font-semibold text-ga-error lg:col-span-2">
+              {errorGeneral}
+            </p>
+          ) : null}
 
           <div className="flex flex-col gap-4.5 lg:col-span-2 lg:flex-row-reverse lg:items-center lg:justify-between lg:gap-6 lg:pt-1">
             <Button cargando={cargando} textoCargando="Enviando…" className="lg:inline-flex lg:px-9">

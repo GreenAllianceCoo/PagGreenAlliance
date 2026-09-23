@@ -27,7 +27,7 @@ export async function crearSolicitud(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/ingresar");
 
   const { data: perfil } = await supabase
     .from("perfiles")
@@ -76,5 +76,6 @@ export async function crearSolicitud(
     return { error: "No se pudo enviar la solicitud. Intenta de nuevo." };
   }
 
-  redirect("/dashboard");
+  // Vuelve al inicio del asociado (/cuenta), desde donde se llega con «Nueva solicitud».
+  redirect("/cuenta");
 }

@@ -24,7 +24,6 @@ const config: Config = {
           verde: "var(--ga-verde)",
           "verde-oscuro": "var(--ga-verde-oscuro)",
           navy: "var(--ga-navy)",
-          "navy-logo": "var(--ga-navy-logo)",
           "navy-claro": "var(--ga-navy-claro)",
           "navy-texto-suave": "var(--ga-navy-texto-suave)",
           texto: "var(--ga-texto)",
@@ -42,17 +41,13 @@ const config: Config = {
           "ambar-fondo": "var(--ga-ambar-fondo)",
           "gris-paso": "var(--ga-gris-paso)",
           "gris-circulo": "var(--ga-gris-circulo)",
-          "foto-fondo": "var(--ga-foto-fondo)",
-          "foto-texto": "var(--ga-foto-texto)",
-          "foto-fondo-2": "var(--ga-foto-fondo-2)",
-          "foto-texto-2": "var(--ga-foto-texto-2)",
           "blanco-translucido": "var(--ga-blanco-translucido)",
+          "marca-agua": "var(--ga-marca-agua)",
           error: "var(--ga-error)",
         },
       },
       fontFamily: {
         sans: ["var(--font-manrope)", "system-ui", "sans-serif"],
-        logo: ["var(--font-montserrat)", "system-ui", "sans-serif"],
       },
       // Tamaños de letra en px exactos del diseño: `text-15` = 15px.
       fontSize: {
@@ -92,8 +87,6 @@ const config: Config = {
         titulo: "-0.02em",
         subtitulo: "-0.01em",
         cedula: "0.03em",
-        "logo-sup": "0.14em",
-        logo: "0.01em",
       },
       borderRadius: {
         "3": "3px",
