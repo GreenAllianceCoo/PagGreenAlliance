@@ -33,7 +33,7 @@ Sobre la Server Action `crearSolicitud` (con el cliente de Supabase simulado con
 - Perfil sin grado / grado sin tope configurado → error.
 - Última solicitud `pendiente` → error.
 - Lo que se inserta usa `asociado_id` de la sesión aunque el `FormData` traiga otro `asociado_id`, `estado`, `cuota_mensual` o `plazo_meses` (se ignoran).
-- Cálculo del crédito (`lib/credito.ts`, copia de `public.calcular_credito()`): interés = round(monto × tasa), total = monto + interés × plazo, cuota = ceil(total / plazo). Casos fijos: tope completo de los 10 rangos y montos parciales; los mismos valores deben salir en pgTAP y en Vitest.
+- Tasa de interés mensual: cada grado y porcentaje tiene `tasa_interes_mensual`; la solicitud la guarda y la app la muestra con `formatTasa` (`lib/credito.ts`). La cuota no se calcula.
 - Mensajes de error sin datos internos (sin texto de Postgres).
 
 ### 3. Login con cédula (integración, cuando exista)

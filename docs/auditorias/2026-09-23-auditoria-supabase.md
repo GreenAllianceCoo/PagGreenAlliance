@@ -166,13 +166,13 @@ Vitest (unitario): extraer el cálculo de cuota (si se mantiene en la app) a `li
 
 ## Respuestas de la cooperativa y cambios (2026-09-23, tarde)
 
-Aplicado en `supabase/migrations/20260923160000_blindar_solicitudes_y_revisiones.sql`, `lib/credito.ts` y `app/dashboard/solicitar/`.
+Aplicado en `supabase/migrations/20260923160000_blindar_solicitudes_y_revisiones.sql` y `app/dashboard/`.
 
 | Pregunta | Respuesta | Qué se hizo |
 |---|---|---|
-| P-01 | La cuota es proporcional al monto pedido. Mínimo 100.000. | Monto entero entre 100.000 y el tope (base y app). |
-| P-02 | Se paga en 3 cuotas; cada rango tiene su interés. | Columna `grados_credito.tasa_interes_mensual` = `cuota_mensual / capacidad_maxima`. Interés = round(monto × tasa); total = monto + 3 × interés; cuota = ceil(total / 3). |
-| P-03 | Primero en llegar, primero en salir. No se baja el tope con pendientes. | La solicitud guarda grado, tasa, interés, cuota y total, y no cambian. Trigger `tr_proteger_topes` impide bajar o borrar un tope con pendientes. |
+| P-01 | Mínimo 100.000. | Monto entero entre 100.000 y el tope (base y app). |
+| P-02 | Cada rango tiene su porcentaje de interés; la app no calcula la cuota. | Columna `grados_credito.tasa_interes_mensual` = `cuota_mensual / capacidad_maxima`. Se muestra en su propio cuadro al pedir el crédito y en el dashboard. `solicitudes_credito.cuota_mensual` queda en null. |
+| P-03 | Primero en llegar, primero en salir. No se baja el tope con pendientes. | La solicitud guarda el grado y la tasa, y no cambian. Trigger `tr_proteger_topes` impide bajar o borrar un tope con pendientes. |
 | P-04 | Las cuentas no se crean por registro; si hay importación será por Excel. | Sin cambios. Registro público desactivado en el panel. |
 | P-05 | Conservar las solicitudes. | Se quitó la política `solicitudes_delete_admin`. |
 | P-06 | Motivo obligatorio al rechazar. | Constraint `solicitudes_motivo_rechazo_chk`. |
@@ -181,7 +181,7 @@ Aplicado en `supabase/migrations/20260923160000_blindar_solicitudes_y_revisiones
 | P-09 | Nadie resuelve su propia solicitud. | `sellar_revision_solicitud()` lo impide. |
 | P-10 | Sin respuesta. | — |
 
-**Tasas por rango** (interés mensual al tope = el de la tabla de la presentación):
+**Tasas por rango** (interés mensual de la tabla de la presentación ÷ tope):
 
 | Grado | 50 % | 100 % |
 |---|---|---|
@@ -191,6 +191,5 @@ Aplicado en `supabase/migrations/20260923160000_blindar_solicitudes_y_revisiones
 | IT | 5,05 % | 5,05 % |
 | OF | 5,40 % (0,05395349) | 6,33 % (0,06333333) |
 
-En 5 rangos el `total_credito` de la presentación es 1.000 o 2.000 pesos mayor que monto + 3 × interés (PP 50 %, PT 50 %, IT 50 %, IT 100 %, OF 50 %). Ese recargo no está en la regla; queda como referencia en `grados_credito.total_credito`.
 
 `supabase_schema.sql` se borró (H-26): el esquema vive solo en `supabase/migrations/`.

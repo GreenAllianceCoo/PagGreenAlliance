@@ -300,8 +300,8 @@ describe("crearSolicitud · datos que se insertan", () => {
     expect(fila.asociado_id).toBe(ID_SESION);
     expect(fila).not.toHaveProperty("estado");
     expect(fila).not.toHaveProperty("revisado_por");
-    // Cuota, plazo, tasa, interés y total los calcula la base.
-    for (const campo of ["cuota_mensual", "plazo_meses", "tasa_interes_mensual", "interes_mensual", "total_a_pagar", "grado"]) {
+    // Grado, tasa y plazo los pone la base.
+    for (const campo of ["cuota_mensual", "plazo_meses", "tasa_interes_mensual", "grado"]) {
       expect(fila).not.toHaveProperty(campo);
     }
   });

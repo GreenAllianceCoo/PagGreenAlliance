@@ -100,9 +100,9 @@ with d as (
 ) select is(count(*)::int, 0, 'A no puede borrar su solicitud') from d;
 
 select is(
-  (select estado::text || '|' || monto_solicitado::text || '|' || cuota_mensual::text
+  (select estado::text || '|' || monto_solicitado::text || '|' || tasa_interes_mensual::text
      from public.solicitudes_credito where id = '10000000-0000-4000-a000-00000000000a'),
-  'pendiente|500000|206167',
+  'pendiente|500000|0.07900000',
   'la solicitud de A queda intacta tras los intentos de modificarla'
 );
 

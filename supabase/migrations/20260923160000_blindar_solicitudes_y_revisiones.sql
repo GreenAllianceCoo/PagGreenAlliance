@@ -3,17 +3,15 @@
 -- hallazgos de la 2.ª auditoría (docs/auditorias/2026-09-23-auditoria-supabase.md).
 --
 -- Respuestas de la cooperativa que aplica:
---   P-01  La cuota es proporcional al monto pedido. Monto mínimo: 100.000.
---   P-02  El crédito se paga en 3 cuotas. Cada grado y porcentaje tiene su
---         tasa de interés mensual (tasa_interes_mensual), sacada de la tabla
---         de la presentación: tasa = cuota_mensual / capacidad_maxima.
---           interés mensual = monto × tasa
---           total a pagar   = monto + interés mensual × plazo
---           cuota mensual   = total a pagar / plazo (redondeada hacia arriba)
---   P-03  Primero en llegar, primero en salir: la solicitud guarda el grado,
---         la tasa y los valores con que se pidió, y no se pueden cambiar.
---         No se puede bajar ni borrar un tope mientras haya solicitudes
---         pendientes de ese grado y porcentaje.
+--   P-01  Monto mínimo de un crédito: 100.000.
+--   P-02  Cada grado y porcentaje tiene su tasa de interés mensual
+--         (tasa_interes_mensual), sacada de la tabla de la presentación:
+--         tasa = cuota_mensual / capacidad_maxima. La app la muestra; la
+--         cuota NO se calcula.
+--   P-03  Primero en llegar, primero en salir: la solicitud guarda el grado
+--         y la tasa con que se pidió, y no se pueden cambiar. No se puede
+--         bajar ni borrar un tope mientras haya solicitudes pendientes de
+--         ese grado y porcentaje.
 --   P-05  Las solicitudes se conservan: nadie las borra desde la API.
 --   P-06  El motivo es obligatorio al rechazar.
 --   P-09  Nadie resuelve su propia solicitud.
@@ -53,89 +51,53 @@ begin
 end $$;
 
 comment on column public.grados_credito.tasa_interes_mensual is
-  'Tasa de interés mensual (fracción: 0.079 = 7,9 %). Es la que usa el cálculo del crédito.';
+  'Tasa de interés mensual (fracción: 0.079 = 7,9 %).';
 comment on column public.grados_credito.cuota_mensual is
-  'Referencia de la presentación: interés mensual al tope. No lo usa el cálculo; usa tasa_interes_mensual.';
+  'Referencia de la presentación: interés mensual al tope.';
 comment on column public.grados_credito.total_credito is
-  'Referencia de la presentación: total a pagar al tope. No lo usa el cálculo.';
+  'Referencia de la presentación: total a pagar al tope.';
 
 -- ------------------------------------------------------------
--- 2. La solicitud guarda las condiciones con que se pidió (P-03)
+-- 2. La solicitud guarda el grado y la tasa con que se pidió (P-03).
+--    La cuota no se calcula: cuota_mensual queda en null (H-14).
 -- ------------------------------------------------------------
+drop function if exists public.calcular_cuota_credito(numeric, numeric, numeric);
+
 alter table public.solicitudes_credito
   add column if not exists grado public.grado_policial,
-  add column if not exists tasa_interes_mensual numeric(10, 8),
-  add column if not exists interes_mensual numeric,
-  add column if not exists total_a_pagar numeric;
+  add column if not exists tasa_interes_mensual numeric(10, 8);
+
+alter table public.solicitudes_credito
+  alter column cuota_mensual drop not null;
 
 comment on column public.solicitudes_credito.cuota_mensual is
-  'Lo que paga el asociado cada mes: (monto + interés mensual × plazo) / plazo.';
+  'Sin uso: la cuota no se calcula (null).';
 comment on column public.solicitudes_credito.grado is
   'Grado del asociado cuando pidió el crédito.';
 comment on column public.solicitudes_credito.tasa_interes_mensual is
   'Tasa vigente cuando pidió el crédito; no cambia si después cambia la tabla.';
-
--- ------------------------------------------------------------
--- 3. El cálculo vive en un solo lugar (H-14). lib/credito.ts lo replica
---    para la vista previa del formulario; las pruebas comparan ambos.
--- ------------------------------------------------------------
-drop function if exists public.calcular_cuota_credito(numeric, numeric, numeric);
-
-create or replace function public.calcular_credito(
-  p_monto numeric,
-  p_tasa numeric,
-  p_plazo int
-)
-returns table (interes_mensual numeric, cuota_mensual numeric, total_a_pagar numeric)
-language sql
-immutable
-security invoker
-set search_path = ''
-as $$
-  select i.interes,
-         ceil((p_monto + i.interes * p_plazo) / p_plazo),
-         p_monto + i.interes * p_plazo
-  from (select round(p_monto * p_tasa) as interes) i;
-$$;
-
-revoke all on function public.calcular_credito(numeric, numeric, int) from public, anon;
-grant execute on function public.calcular_credito(numeric, numeric, int) to authenticated, service_role;
-
-comment on function public.calcular_credito(numeric, numeric, int) is
-  'Cálculo del crédito: interés mensual = round(monto × tasa); total = monto + interés × plazo; cuota = ceil(total / plazo). Copia en lib/credito.ts.';
 
 -- Solicitudes que ya existan: se completan con la tabla vigente. Los triggers
 -- se apagan mientras tanto porque congelan las resueltas.
 alter table public.solicitudes_credito disable trigger user;
 
 update public.solicitudes_credito s
-   set grado                = x.grado,
-       tasa_interes_mensual = x.tasa_interes_mensual,
-       plazo_meses          = x.plazo_meses,
-       interes_mensual      = x.interes_mensual,
-       cuota_mensual        = x.cuota_mensual,
-       total_a_pagar        = x.total_a_pagar
-  from (
-    select s2.id, p.grado, gc.tasa_interes_mensual, gc.plazo_meses,
-           c.interes_mensual, c.cuota_mensual, c.total_a_pagar
-    from public.solicitudes_credito s2
-    join public.perfiles p on p.id = s2.asociado_id
-    join public.grados_credito gc on gc.grado = p.grado and gc.porcentaje = s2.porcentaje_devolucion
-    cross join lateral public.calcular_credito(s2.monto_solicitado, gc.tasa_interes_mensual, gc.plazo_meses) c
-    where s2.tasa_interes_mensual is null
-  ) x
- where s.id = x.id;
+   set grado                = p.grado,
+       tasa_interes_mensual = gc.tasa_interes_mensual
+  from public.perfiles p
+  join public.grados_credito gc on gc.grado = p.grado
+ where p.id = s.asociado_id
+   and gc.porcentaje = s.porcentaje_devolucion
+   and s.tasa_interes_mensual is null;
 
 alter table public.solicitudes_credito enable trigger user;
 
 alter table public.solicitudes_credito
   alter column grado set not null,
-  alter column tasa_interes_mensual set not null,
-  alter column interes_mensual set not null,
-  alter column total_a_pagar set not null;
+  alter column tasa_interes_mensual set not null;
 
 -- ------------------------------------------------------------
--- 4. Validación y cálculo al crear; condiciones fijas después (H-21, P-01)
+-- 3. Validación al crear; condiciones fijas después (H-21, P-01)
 -- ------------------------------------------------------------
 create or replace function public.validar_monto_solicitud()
 returns trigger
@@ -146,7 +108,6 @@ as $$
 declare
   v_grado public.grado_policial;
   v_tope  public.grados_credito%rowtype;
-  v_calc  record;
 begin
   if tg_op = 'UPDATE' then
     -- Resueltas: las congela sellar_revision_solicitud.
@@ -155,10 +116,10 @@ begin
     end if;
     -- Pendiente: solo se resuelve. Para cambiar condiciones, se rechaza y se pide otra.
     if (new.monto_solicitado, new.porcentaje_devolucion, new.grado, new.tasa_interes_mensual,
-        new.plazo_meses, new.interes_mensual, new.cuota_mensual, new.total_a_pagar)
+        new.plazo_meses, new.cuota_mensual)
        is distinct from
        (old.monto_solicitado, old.porcentaje_devolucion, old.grado, old.tasa_interes_mensual,
-        old.plazo_meses, old.interes_mensual, old.cuota_mensual, old.total_a_pagar) then
+        old.plazo_meses, old.cuota_mensual) then
       raise exception 'Las condiciones de una solicitud no se pueden modificar; recházela y cree una nueva';
     end if;
     return new;
@@ -196,15 +157,10 @@ begin
   end if;
 
   -- Condiciones: SIEMPRE las pone el servidor (se ignora lo que mande el cliente).
-  select * into v_calc
-  from public.calcular_credito(new.monto_solicitado, v_tope.tasa_interes_mensual, v_tope.plazo_meses);
-
   new.grado                := v_grado;
   new.tasa_interes_mensual := v_tope.tasa_interes_mensual;
   new.plazo_meses          := v_tope.plazo_meses;
-  new.interes_mensual      := v_calc.interes_mensual;
-  new.cuota_mensual        := v_calc.cuota_mensual;
-  new.total_a_pagar        := v_calc.total_a_pagar;
+  new.cuota_mensual        := null;
   return new;
 end;
 $$;
@@ -217,7 +173,7 @@ create trigger chk_monto_solicitud
   for each row execute function public.validar_monto_solicitud();
 
 -- ------------------------------------------------------------
--- 5. Toda solicitud creada desde la API nace pendiente (H-22)
+-- 4. Toda solicitud creada desde la API nace pendiente (H-22)
 -- ------------------------------------------------------------
 create or replace function public.fijar_fecha_solicitud()
 returns trigger
@@ -240,7 +196,7 @@ revoke all on function public.fijar_fecha_solicitud() from public, anon, authent
 -- El trigger tr_fijar_fecha_solicitud (before insert) ya apunta a esta función.
 
 -- ------------------------------------------------------------
--- 6. Resueltas congeladas y sin auto-aprobación (H-23, P-09)
+-- 5. Resueltas congeladas y sin auto-aprobación (H-23, P-09)
 -- ------------------------------------------------------------
 create or replace function public.sellar_revision_solicitud()
 returns trigger
@@ -258,11 +214,11 @@ begin
       raise exception 'Una solicitud ya resuelta no puede cambiar de estado';
     end if;
     if (new.monto_solicitado, new.porcentaje_devolucion, new.grado, new.tasa_interes_mensual,
-        new.plazo_meses, new.interes_mensual, new.cuota_mensual, new.total_a_pagar,
+        new.plazo_meses, new.cuota_mensual,
         new.motivo_rechazo, new.revisado_por, new.fecha_respuesta, new.fecha_solicitud)
        is distinct from
        (old.monto_solicitado, old.porcentaje_devolucion, old.grado, old.tasa_interes_mensual,
-        old.plazo_meses, old.interes_mensual, old.cuota_mensual, old.total_a_pagar,
+        old.plazo_meses, old.cuota_mensual,
         old.motivo_rechazo, old.revisado_por, old.fecha_respuesta, old.fecha_solicitud) then
       raise exception 'Una solicitud ya resuelta no se puede modificar';
     end if;
@@ -284,7 +240,7 @@ $$;
 revoke all on function public.sellar_revision_solicitud() from public, anon, authenticated;
 
 -- ------------------------------------------------------------
--- 7. Motivo obligatorio al rechazar (P-06)
+-- 6. Motivo obligatorio al rechazar (P-06)
 -- ------------------------------------------------------------
 do $$
 begin
@@ -298,12 +254,12 @@ end $$;
 alter table public.solicitudes_credito validate constraint solicitudes_motivo_rechazo_chk;
 
 -- ------------------------------------------------------------
--- 8. Las solicitudes se conservan (P-05)
+-- 7. Las solicitudes se conservan (P-05)
 -- ------------------------------------------------------------
 drop policy if exists "solicitudes_delete_admin" on public.solicitudes_credito;
 
 -- ------------------------------------------------------------
--- 9. No se baja ni se borra un tope con solicitudes pendientes (P-03, H-16)
+-- 8. No se baja ni se borra un tope con solicitudes pendientes (P-03, H-16)
 -- ------------------------------------------------------------
 create or replace function public.proteger_topes_con_pendientes()
 returns trigger
@@ -340,7 +296,7 @@ create trigger tr_proteger_topes
   for each row execute function public.proteger_topes_con_pendientes();
 
 -- ------------------------------------------------------------
--- 10. solicitudes_afiliacion: el sello de revisión solo lo pone el servidor (H-24)
+-- 9. solicitudes_afiliacion: el sello de revisión solo lo pone el servidor (H-24)
 -- ------------------------------------------------------------
 create or replace function public.proteger_solicitud_afiliacion()
 returns trigger
@@ -376,7 +332,7 @@ $$;
 revoke all on function public.proteger_solicitud_afiliacion() from public, anon, authenticated;
 
 -- ------------------------------------------------------------
--- 11. perfiles: id y created_at inmutables desde la API (H-25)
+-- 10. perfiles: id y created_at inmutables desde la API (H-25)
 -- ------------------------------------------------------------
 create or replace function public.proteger_campos_perfil()
 returns trigger

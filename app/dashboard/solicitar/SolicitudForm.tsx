@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { crearSolicitud, type EstadoSolicitud } from "./actions";
-import { calcularCredito, formatTasa, MONTO_MINIMO } from "@/lib/credito";
+import { formatTasa, MONTO_MINIMO } from "@/lib/credito";
 
 type Paquete = {
   porcentaje: "50" | "100";
@@ -31,12 +31,6 @@ export default function SolicitudForm({ paquetes }: { paquetes: Paquete[] }) {
     setPorcentaje(nuevo.porcentaje);
     setMonto(nuevo.capacidad_maxima);
   }
-
-  const { interesMensual, cuotaMensual, totalAPagar } = calcularCredito(
-    monto,
-    paquete.tasa_interes_mensual,
-    paquete.plazo_meses
-  );
 
   return (
     <form action={formAction} className="flex flex-col gap-6">
@@ -82,17 +76,8 @@ export default function SolicitudForm({ paquetes }: { paquetes: Paquete[] }) {
 
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-surface-muted rounded-xl p-4">
-          <p className="text-xs text-gray-500 font-semibold">Cuota mensual estimada</p>
-          <p className="text-lg font-bold">{formatCOP(cuotaMensual)}</p>
-        </div>
-        <div className="bg-surface-muted rounded-xl p-4">
-          <p className="text-xs text-gray-500 font-semibold">Total estimado a pagar</p>
-          <p className="text-lg font-bold">{formatCOP(totalAPagar)}</p>
-        </div>
-        <div className="bg-surface-muted rounded-xl p-4">
           <p className="text-xs text-gray-500 font-semibold">Interes mensual</p>
-          <p className="text-lg font-bold">{formatCOP(interesMensual)}</p>
-          <p className="text-xs text-gray-500">Tasa {formatTasa(paquete.tasa_interes_mensual)}</p>
+          <p className="text-lg font-bold">{formatTasa(paquete.tasa_interes_mensual)}</p>
         </div>
         <div className="bg-surface-muted rounded-xl p-4">
           <p className="text-xs text-gray-500 font-semibold">Plazo</p>

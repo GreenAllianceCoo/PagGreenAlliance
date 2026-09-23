@@ -39,7 +39,7 @@ Para cada tabla del esquema `public`:
 
 ### C. Funciones y triggers
 - Funciones `security definer`: tienen `set search_path = ''` (o fijo) y nombres calificados (`public.tabla`). Sin eso = **alto**.
-- `chk_monto_solicitud`: valida monto entero, ≥ 100.000 y ≤ `capacidad_maxima` del grado y porcentaje; toma el grado desde `perfiles` (no del cliente) y guarda en la solicitud grado, tasa, plazo, interés, cuota y total calculados en servidor con `calcular_credito()` (copia en `lib/credito.ts`: verifica que coincidan). Una pendiente no cambia de condiciones; no se baja ni borra un tope con pendientes (`tr_proteger_topes`).
+- `chk_monto_solicitud`: valida monto entero, ≥ 100.000 y ≤ `capacidad_maxima` del grado y porcentaje; toma el grado desde `perfiles` (no del cliente) y guarda en la solicitud el grado, la tasa (`tasa_interes_mensual`) y el plazo. La cuota no se calcula (`cuota_mensual` en null). Una pendiente no cambia de condiciones; no se baja ni borra un tope con pendientes (`tr_proteger_topes`).
 - Trigger en `auth.users` que crea el perfil: no permite que los metadatos del registro fijen `rol` o `grado`.
 - Qué pasa si cambian los topes en `grados_credito` con solicitudes pendientes.
 

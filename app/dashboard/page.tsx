@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { formatTasa } from "@/lib/credito";
 
 const CONVENIOS = [
   { titulo: "Hoteleria", icono: "\u{1F3E8}" },
@@ -55,9 +56,9 @@ export default async function DashboardPage() {
               </p>
             </div>
             <div className="bg-surface-muted rounded-xl p-4">
-              <p className="text-xs text-gray-500 font-semibold">Cuota mes</p>
+              <p className="text-xs text-gray-500 font-semibold">Interes mensual</p>
               <p className="text-lg font-bold">
-                ${ultimaSolicitud.cuota_mensual.toLocaleString("es-CO")}
+                {formatTasa(ultimaSolicitud.tasa_interes_mensual)}
               </p>
             </div>
             <div className="col-span-2 bg-surface-muted rounded-xl p-4">

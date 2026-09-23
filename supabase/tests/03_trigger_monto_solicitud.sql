@@ -9,7 +9,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(26);
+select plan(23);
 
 -- ------------------------------------------------------------
 -- Datos de prueba
@@ -101,56 +101,46 @@ select throws_ok(
 );
 
 -- ------------------------------------------------------------
--- Aceptación y cálculo en servidor
---   interés = round(monto × tasa); total = monto + interés × 3; cuota = ceil(total / 3)
+-- Tasa de interés mensual por grado y porcentaje (PP 100% se borró arriba)
+-- ------------------------------------------------------------
+select is(
+  (select string_agg(grado::text || porcentaje::text || '=' || tasa_interes_mensual::text, ' ' order by grado, porcentaje)
+     from public.grados_credito),
+  'PP50=0.07900000 PT50=0.05076923 PT100=0.03740741 SI50=0.08200000 SI100=0.08200000 IT50=0.05050000 IT100=0.05050000 OF50=0.05395349 OF100=0.06333333',
+  'cada grado y porcentaje tiene su tasa de interés mensual (interés de la tabla / tope)'
+);
+
+-- ------------------------------------------------------------
+-- Aceptación: grado, tasa y plazo los pone el servidor; la cuota no se calcula
 -- ------------------------------------------------------------
 select lives_ok(
-  $$ insert into public.solicitudes_credito (id, asociado_id, porcentaje_devolucion, monto_solicitado, cuota_mensual, plazo_meses, grado, tasa_interes_mensual, interes_mensual, total_a_pagar)
-     values ('20000000-0000-4000-a000-000000000001', '00000000-0000-4000-a000-00000000000a', '50', 1000000, 1, 99, 'OF', 0.00000001, 1, 1) $$,
+  $$ insert into public.solicitudes_credito (id, asociado_id, porcentaje_devolucion, monto_solicitado, cuota_mensual, plazo_meses, grado, tasa_interes_mensual)
+     values ('20000000-0000-4000-a000-000000000001', '00000000-0000-4000-a000-00000000000a', '50', 1000000, 1, 99, 'OF', 0.00000001) $$,
   'acepta monto igual al tope del grado (PP 50% = 1.000.000)'
 );
 
 select is(
-  (select grado::text || '|' || tasa_interes_mensual::text || '|' || plazo_meses::text || '|'
-          || interes_mensual::text || '|' || cuota_mensual::text || '|' || total_a_pagar::text
+  (select grado::text || '|' || tasa_interes_mensual::text || '|' || plazo_meses::text || '|' || coalesce(cuota_mensual::text, 'null')
      from public.solicitudes_credito where id = '20000000-0000-4000-a000-000000000001'),
-  'PP|0.07900000|3|79000|412334|1237000',
-  'grado, tasa, plazo, interés, cuota y total los pone el servidor aunque el insert mande otros'
+  'PP|0.07900000|3|null',
+  'grado, tasa y plazo los pone el servidor aunque el insert mande otros; la cuota queda en null'
 );
 
 delete from public.solicitudes_credito;
 
-with i as (
-  insert into public.solicitudes_credito (asociado_id, porcentaje_devolucion, monto_solicitado, cuota_mensual)
-  values ('00000000-0000-4000-a000-00000000000a', '50', 500000, 0) returning cuota_mensual
-) select is(cuota_mensual, 206167::numeric, 'PP 50% 500.000 → interés 39.500, cuota 206.167') from i;
-
-with i as (
-  insert into public.solicitudes_credito (asociado_id, porcentaje_devolucion, monto_solicitado, cuota_mensual)
-  values ('00000000-0000-4000-a000-00000000000d', '100', 1350000, 0) returning cuota_mensual
-) select is(cuota_mensual, 500500::numeric, 'PT 100% 1.350.000 → interés 50.500, cuota 500.500') from i;
-
-with i as (
-  insert into public.solicitudes_credito (asociado_id, porcentaje_devolucion, monto_solicitado, cuota_mensual)
-  values ('00000000-0000-4000-a000-00000000000b', '100', 1000000, 0) returning total_a_pagar::text || '|' || cuota_mensual::text
-) select is((select * from i), '1189999|396667', 'OF 100% 1.000.000 → total 1.189.999, cuota 396.667 (redondea hacia arriba)');
-
-with i as (
-  insert into public.solicitudes_credito (asociado_id, porcentaje_devolucion, monto_solicitado, cuota_mensual)
-  values ('00000000-0000-4000-a000-00000000000e', '100', 4000000, 0) returning interes_mensual::text || '|' || total_a_pagar::text
-) select is((select * from i), '202000|4606000', 'IT 100% al tope → interés de la tabla (202.000)');
+insert into public.solicitudes_credito (asociado_id, porcentaje_devolucion, monto_solicitado) values
+  ('00000000-0000-4000-a000-00000000000a', '50', 500000),
+  ('00000000-0000-4000-a000-00000000000d', '100', 1350000);
 
 select is(
-  (select array_agg(c.interes_mensual order by g.grado, g.porcentaje)
-     from public.grados_credito g
-     cross join lateral public.calcular_credito(g.capacidad_maxima, g.tasa_interes_mensual, g.plazo_meses) c),
-  (select array_agg(g.cuota_mensual order by g.grado, g.porcentaje) from public.grados_credito g),
-  'al tope, el interés calculado con la tasa es el de la tabla de la presentación en todos los rangos'
+  (select tasa_interes_mensual from public.solicitudes_credito where asociado_id = '00000000-0000-4000-a000-00000000000d'),
+  0.03740741::numeric,
+  'la solicitud guarda la tasa de su grado y porcentaje (PT 100%)'
 );
 
 -- ------------------------------------------------------------
 -- Solicitud pendiente: condiciones fijas (primero en llegar, primero en salir)
--- Quedan pendientes: A (PP 50%), D (PT 100%), B (OF 100%), E (IT 100%).
+-- Quedan pendientes: A (PP 50%) y D (PT 100%).
 -- ------------------------------------------------------------
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"00000000-0000-4000-a000-0000000000ad","role":"authenticated"}';
@@ -195,10 +185,10 @@ select lives_ok(
 );
 
 select is(
-  (select tasa_interes_mensual::text || '|' || cuota_mensual::text from public.solicitudes_credito
+  (select tasa_interes_mensual::text from public.solicitudes_credito
     where asociado_id = '00000000-0000-4000-a000-00000000000a'),
-  '0.07900000|206167',
-  'la pendiente conserva la tasa y la cuota con que se pidió'
+  '0.07900000',
+  'la pendiente conserva la tasa con que se pidió'
 );
 
 select lives_ok(
