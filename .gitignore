@@ -20,7 +20,8 @@ next-env.d.ts
 .vercel
 
 # claude code local skill symlinks (regenerate with `npx skills add`)
-/.claude/
+/.claude/skills/
+/.claude/settings.local.json
 
 # misc
 .DS_Store

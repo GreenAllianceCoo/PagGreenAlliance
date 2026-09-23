@@ -2,16 +2,15 @@
 
 import { useActionState, useState } from "react";
 import { crearSolicitud, type EstadoSolicitud } from "./actions";
+import { calcularCredito, formatTasa, MONTO_MINIMO } from "@/lib/credito";
 
 type Paquete = {
   porcentaje: "50" | "100";
   capacidad_maxima: number;
-  cuota_mensual: number;
-  total_credito: number;
+  tasa_interes_mensual: number;
   plazo_meses: number;
 };
 
-const MONTO_MINIMO = 100000;
 const PASO = 50000;
 
 function formatCOP(valor: number) {
@@ -33,9 +32,11 @@ export default function SolicitudForm({ paquetes }: { paquetes: Paquete[] }) {
     setMonto(nuevo.capacidad_maxima);
   }
 
-  const proporcion = monto / paquete.capacidad_maxima;
-  const cuotaEstimada = Math.round((proporcion * paquete.cuota_mensual) / 1000) * 1000;
-  const totalEstimado = Math.round((proporcion * paquete.total_credito) / 1000) * 1000;
+  const { interesMensual, cuotaMensual, totalAPagar } = calcularCredito(
+    monto,
+    paquete.tasa_interes_mensual,
+    paquete.plazo_meses
+  );
 
   return (
     <form action={formAction} className="flex flex-col gap-6">
@@ -82,13 +83,18 @@ export default function SolicitudForm({ paquetes }: { paquetes: Paquete[] }) {
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-surface-muted rounded-xl p-4">
           <p className="text-xs text-gray-500 font-semibold">Cuota mensual estimada</p>
-          <p className="text-lg font-bold">{formatCOP(cuotaEstimada)}</p>
+          <p className="text-lg font-bold">{formatCOP(cuotaMensual)}</p>
         </div>
         <div className="bg-surface-muted rounded-xl p-4">
           <p className="text-xs text-gray-500 font-semibold">Total estimado a pagar</p>
-          <p className="text-lg font-bold">{formatCOP(totalEstimado)}</p>
+          <p className="text-lg font-bold">{formatCOP(totalAPagar)}</p>
         </div>
-        <div className="col-span-2 bg-surface-muted rounded-xl p-4">
+        <div className="bg-surface-muted rounded-xl p-4">
+          <p className="text-xs text-gray-500 font-semibold">Interes mensual</p>
+          <p className="text-lg font-bold">{formatCOP(interesMensual)}</p>
+          <p className="text-xs text-gray-500">Tasa {formatTasa(paquete.tasa_interes_mensual)}</p>
+        </div>
+        <div className="bg-surface-muted rounded-xl p-4">
           <p className="text-xs text-gray-500 font-semibold">Plazo</p>
           <p className="text-lg font-bold">{paquete.plazo_meses} meses</p>
         </div>

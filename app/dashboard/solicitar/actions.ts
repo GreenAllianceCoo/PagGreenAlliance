@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { MONTO_MINIMO } from "@/lib/credito";
 
 export type EstadoSolicitud = { error?: string };
 
@@ -15,8 +16,11 @@ export async function crearSolicitud(
   }
 
   const monto = Number(formData.get("monto"));
-  if (!Number.isFinite(monto) || monto <= 0) {
+  if (!Number.isInteger(monto) || monto <= 0) {
     return { error: "Ingresa un monto valido." };
+  }
+  if (monto < MONTO_MINIMO) {
+    return { error: "El monto minimo de un credito es $100.000." };
   }
 
   const supabase = await createClient();
@@ -48,7 +52,7 @@ export async function crearSolicitud(
 
   const { data: paquete } = await supabase
     .from("grados_credito")
-    .select("capacidad_maxima, cuota_mensual, plazo_meses")
+    .select("capacidad_maxima")
     .eq("grado", perfil.grado)
     .eq("porcentaje", porcentaje)
     .single();
@@ -61,15 +65,11 @@ export async function crearSolicitud(
     return { error: "El monto supera el tope permitido para tu grado." };
   }
 
-  const proporcion = monto / paquete.capacidad_maxima;
-  const cuotaMensual = Math.round((proporcion * paquete.cuota_mensual) / 1000) * 1000;
-
+  // Tasa, interés, cuota, total y plazo los calcula la base (trigger chk_monto_solicitud).
   const { error } = await supabase.from("solicitudes_credito").insert({
     asociado_id: user.id,
     porcentaje_devolucion: porcentaje,
     monto_solicitado: monto,
-    cuota_mensual: cuotaMensual,
-    plazo_meses: paquete.plazo_meses,
   });
 
   if (error) {
