@@ -15,8 +15,8 @@ export const metadata: Metadata = {
 export default function PoliticaDeDatosPage() {
   return (
     <div className="min-h-dvh bg-white">
-      <header className="flex items-center justify-between border-b border-ga-linea px-6 pb-5 pt-6 lg:h-19 lg:px-14 lg:py-0">
-        <Link href="/" aria-label="Ir al inicio" className="block h-11 w-logo">
+      <header className="flex items-center justify-between gap-3 border-b border-ga-linea px-6 pb-5 pt-6 lg:h-19 lg:px-14 lg:py-0">
+        <Link href="/" aria-label="Ir al inicio" className="block h-11 w-logo min-w-0 shrink">
           <Logo tone="dark" />
         </Link>
       </header>

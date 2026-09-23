@@ -229,7 +229,7 @@ test.describe("A · Cuenta", () => {
 
       await page.goto("/cuenta");
       await nav.getByRole("link", { name: "Nueva solicitud" }).click();
-      await expect(page).toHaveURL(/\/dashboard\/solicitar$/);
+      await expect(page).toHaveURL(/\/cuenta\/solicitar$/);
     } else {
       const accesos = page.getByRole("navigation", { name: "Accesos" });
       await accesos.getByRole("link", { name: "Convenios" }).click();
@@ -239,9 +239,9 @@ test.describe("A · Cuenta", () => {
 
     await page.goto("/cuenta");
     await page.getByRole("navigation", { name: "Accesos" }).getByRole("link", { name: "Nueva solicitud" }).click();
-    await expect(page).toHaveURL(/\/dashboard\/solicitar$/);
+    await expect(page).toHaveURL(/\/cuenta\/solicitar$/);
     // El formulario de solicitud vuelve a /cuenta.
-    await page.getByRole("link", { name: /volver|cuenta|inicio/i }).first().click();
+    await page.getByRole("link", { name: "Volver", exact: true }).click();
     await expect(page).toHaveURL(/\/cuenta$/);
 
     // Tarjetas de convenio (Pendiente, href="#"): no rompen la página.

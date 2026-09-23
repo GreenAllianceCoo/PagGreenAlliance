@@ -5,7 +5,7 @@ import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { ConvenioCard } from "@/components/ui/ConvenioCard";
 import { IconoConvenios, IconoDocumento, IconoMas, IconoSalir } from "@/components/ui/Iconos";
-import { Logo } from "@/components/ui/Logo";
+import { EncabezadoCuenta, RUTA_NUEVA_SOLICITUD } from "@/components/pantallas/EncabezadoCuenta";
 import { PasosSolicitud } from "@/components/ui/PasosSolicitud";
 import type { Convenio, PasoSolicitud } from "@/lib/mock";
 
@@ -43,9 +43,6 @@ export type CuentaProps = {
   whatsappUrl?: string | null;
 };
 
-/** Destino de «Nueva solicitud»: el formulario existente (decisión del 23-sep). */
-const RUTA_NUEVA_SOLICITUD = "/dashboard/solicitar";
-
 /**
  * Contenido de la tarjeta «Tu solicitud» cuando el asociado aún no tiene solicitudes.
  * No hay maqueta: reutiliza el título, los tamaños de texto, el cuadro gris claro
@@ -76,7 +73,7 @@ function SolicitudVacia() {
             </p>
           </div>
         </div>
-        {/* El mapa lo marca Pendiente; por decisión del 23-sep va al formulario existente. */}
+        {/* → /cuenta/solicitar (formulario de solicitud de crédito). */}
         <Link href={RUTA_NUEVA_SOLICITUD} className={clasesBoton("primario", "gap-2 lg:self-start lg:px-9")}>
           <IconoMas tamano={22} grosor={2.2} />
           Nueva solicitud
@@ -196,43 +193,7 @@ export function Cuenta({
 }: CuentaProps) {
   return (
     <div className="min-h-dvh bg-ga-fondo-suave">
-      {/* Celular: la maqueta deja 48 px arriba para simular la barra de estado del teléfono;
-          en el navegador se usa 24 px, como en las demás pantallas. En tableta el header se
-          alinea con el contenido centrado (max-w-2xl). */}
-      <header className="flex items-center justify-between px-5 pt-6 md:mx-auto md:max-w-2xl lg:mx-0 lg:h-19 lg:max-w-none lg:border-b lg:border-ga-linea lg:bg-white lg:px-14 lg:pt-0">
-        <Link href="/" aria-label="Ir al inicio" className="block h-11 w-logo">
-          <Logo tone="dark" />
-        </Link>
-        <nav aria-label="Principal" className="hidden gap-7 text-16 font-bold lg:flex">
-          <Link
-            href="/cuenta"
-            aria-current="page"
-            className="border-b-2 border-ga-verde pb-1 text-ga-verde no-underline"
-          >
-            Inicio
-          </Link>
-          {/* El mapa lo marca Pendiente; por decisión del 23-sep va al formulario existente. */}
-          <Link href={RUTA_NUEVA_SOLICITUD} className="text-ga-texto no-underline hover:text-ga-verde">
-            Nueva solicitud
-          </Link>
-          {/* Sección #convenios de esta página (decisión del 23-sep).
-              TODO(pendiente-spec): confirmar si «Convenios» tendrá página propia. */}
-          <a href="#convenios" className="text-ga-texto no-underline hover:text-ga-verde">
-            Convenios
-          </a>
-        </nav>
-        <div className="hidden items-center gap-3.5 text-15 lg:flex">
-          <span className="font-bold">{nombre}</span>
-          <form action={accionSalir}>
-            <button
-              type="submit"
-              className="inline-flex h-10 items-center rounded-10 border-1.5 border-ga-borde px-3.5 font-bold text-ga-navy hover:bg-ga-fondo-suave"
-            >
-              Salir
-            </button>
-          </form>
-        </div>
-      </header>
+      <EncabezadoCuenta nombre={nombre} seccion="inicio" accionSalir={accionSalir} />
 
       <main className="flex flex-col gap-4 px-5 pb-6 pt-4 md:mx-auto md:max-w-2xl lg:max-w-none lg:gap-6 lg:px-14 lg:py-10">
         <div className="flex items-center justify-between">
@@ -298,7 +259,7 @@ export function Cuenta({
               <span className="text-26 font-extrabold lg:text-30">{tope}</span>
             </section>
             <nav aria-label="Accesos" className="grid grid-cols-2 gap-3 lg:grid-cols-1">
-              {/* El mapa lo marca Pendiente; por decisión del 23-sep va al formulario existente. */}
+              {/* → /cuenta/solicitar (formulario de solicitud de crédito). */}
               <Link
                 href={RUTA_NUEVA_SOLICITUD}
                 className="flex flex-col gap-2.5 rounded-16 bg-white p-4.5 text-15 font-bold text-ga-texto no-underline hover:bg-ga-verde-tint lg:flex-row lg:items-center lg:gap-3 lg:p-5 lg:text-16 lg:font-extrabold"

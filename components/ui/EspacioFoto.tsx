@@ -64,10 +64,11 @@ export function EspacioFoto({
         width={512}
         height={512}
         className={cx(
-          "pointer-events-none absolute h-auto opacity-10",
+          "pointer-events-none absolute h-auto",
+          // Hero: esquina contraria a la ilustración y más tenue, para que no se vea cargado.
           esHero
-            ? "-left-10 -top-12 w-[260px] lg:-left-16 lg:-top-16 lg:w-[420px]"
-            : "-bottom-10 -right-8 w-[170px] lg:w-[200px]",
+            ? "-bottom-16 -left-12 w-[170px] opacity-[0.07] lg:-right-16 lg:-top-20 lg:bottom-auto lg:left-auto lg:w-[300px]"
+            : "-bottom-10 -right-8 w-[170px] opacity-10 lg:w-[200px]",
         )}
       />
       <div

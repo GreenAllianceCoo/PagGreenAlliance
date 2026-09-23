@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 23-sep-2026 (noche)
+Actualizado: 23-sep-2026 (noche, tras la verificación responsive)
 
 ## Dónde quedamos
 
@@ -19,7 +19,7 @@ La parte visual está terminada: las 6 pantallas están maquetadas, se ven bien 
 
 Las pantallas todavía **no hacen nada**: los botones no envían, no hay sesión y los datos son de ejemplo (`lib/mock.ts`).
 
-- `/login` y `/dashboard` (las rutas viejas) siguen existiendo. `/ingresar` y `/cuenta` las reemplazan; se pueden borrar cuando lo nuevo funcione.
+- `/login` y `/dashboard` (las rutas viejas) se borraron el 23-sep. La solicitud de crédito vive ahora en `/cuenta/solicitar`.
 - **Git:** la base de datos, las pruebas, los agentes y los documentos ya están en commits (`03a963f` y `9ae9607`, rama `develop`, sin subir). Las pantallas nuevas **todavía no**: `app/afiliacion`, `app/cuenta`, `app/ingresar`, `components/`, `design/`, `public/`, `lib/config.ts`, `lib/mock.ts` y los cambios de estilos.
 
 ### Base de datos y reglas del crédito (hecho el 23-sep)
@@ -65,7 +65,7 @@ Van en `lib/config.ts` (o en una variable de entorno) y en `lib/mock.ts` → dat
 - [ ] **Correo de contacto** (`CORREO_CONTACTO`).
 - [ ] **Texto de vigilancia de Supersolidaria** (`TEXTO_VIGILANCIA`).
 - [ ] **Política de datos**: el texto y la ruta (se sugiere `/politica-de-datos`); hoy el enlace es `href="#"`.
-- [ ] **Destino de «Nueva solicitud»** (nav y acceso rápido de `/cuenta`): hoy es `href="#"`.
+- [x] **Destino de «Nueva solicitud»** (nav, acceso rápido y estado vacío de `/cuenta`): → `/cuenta/solicitar`.
 - [ ] **Fotos reales** de asociados y apoyos, **cifras** y **testimonios** para la landing.
 - [ ] **Tiempo de respuesta** real para la landing (hoy dice `[TIEMPO]`, y `[T]` en celular).
 - [ ] **Correos reales de los asociados**: el ingreso con código los necesita. Hoy las cuentas usan un correo inventado (`cedula@asociados…`). Deben venir en el Excel de importación.
@@ -113,15 +113,15 @@ Se decidió código por correo en vez de contraseña. Configurar en el panel de 
 - [ ] Convenios: por ahora se quedan fijos en la landing (no desde la tabla `convenios`).
 
 ### Otros
-- [ ] Formulario de solicitud de crédito conectado a la nueva `/cuenta` (hoy vive en `/dashboard/solicitar`; ya muestra la tasa y exige mínimo 100.000).
+- [x] Formulario de solicitud de crédito conectado a la nueva `/cuenta`: vive en `/cuenta/solicitar` (muestra la tasa y exige mínimo 100.000).
 - [ ] Panel de administración `/admin`: listado de solicitudes, aprobar y rechazar (rechazar pide motivo; un admin no puede resolver su propia solicitud).
 - [ ] Correo con Resend del resultado del crédito (aprobado / no aprobado) al asociado cuando se resuelve una solicitud.
 - [ ] Importación de asociados desde Excel (cuando llegue).
 
 ## 4. Verificación y cierre
 
-- [ ] Correr `ga-verificador-qa` y `ga-verificador-responsive` cuando haya funcionalidad.
-- [ ] Borrar `/login` y `/dashboard` cuando `/ingresar` y `/cuenta` funcionen.
+- [x] Correr `ga-verificador-qa` y `ga-verificador-responsive` cuando haya funcionalidad.
+- [x] Borrar `/login` y `/dashboard` (hecho el 23-sep).
 - [ ] Hacer commit de las pantallas nuevas, subir a GitHub y desplegar en Vercel.
 
 ---

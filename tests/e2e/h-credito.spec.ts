@@ -3,7 +3,7 @@ import fs from "node:fs";
 import { adminRest, ingresarPorUI, opcionesContexto, USUARIOS } from "./utils";
 
 /**
- * H. Solicitud de crédito (app/dashboard/solicitar): la asociada 1234567891
+ * H. Solicitud de crédito (app/cuenta/solicitar): la asociada 1234567891
  * (sin solicitudes) entra con código, va a «Nueva solicitud», elige 50 %,
  * envía el monto por defecto y vuelve a /cuenta con la solicitud pendiente y
  * la tasa. Cubre el insert(...).select("id").single() + after() de actions.ts.
@@ -32,9 +32,9 @@ test.describe("H · Solicitud de crédito", () => {
 
     // «Nueva solicitud» del estado vacío.
     await page.locator("main section").first().getByRole("link", { name: "Nueva solicitud" }).click();
-    await expect(page).toHaveURL(/\/dashboard\/solicitar$/);
+    await expect(page).toHaveURL(/\/cuenta\/solicitar$/);
 
-    await page.getByRole("button", { name: "50% de devolucion" }).click();
+    await page.getByRole("radio", { name: "50% de devolución" }).check();
     // Monto por defecto = tope del grado SI al 50 % ($1.500.000); tasa 8,2 %.
     await expect(page.getByText("$1.500.000").first()).toBeVisible();
     await expect(page.getByText("8,2 %")).toBeVisible();
@@ -56,11 +56,11 @@ test.describe("H · Solicitud de crédito", () => {
     expect(cuerpo).toEqual([{ estado: "pendiente", monto_solicitado: 1500000, porcentaje_devolucion: "50" }]);
 
     // Una segunda solicitud con otra pendiente se rechaza.
-    // Con otra pendiente, /dashboard/solicitar ya no deja pedir otra.
-    await page.goto("/dashboard/solicitar");
-    await expect(page.getByText(/Ya tienes una solicitud pendiente de revision/)).toBeVisible();
+    // Con otra pendiente, /cuenta/solicitar ya no deja pedir otra.
+    await page.goto("/cuenta/solicitar");
+    await expect(page.getByText(/Ya tienes una solicitud pendiente de revisión/)).toBeVisible();
     await expect(page.getByRole("button", { name: "Enviar solicitud" })).toHaveCount(0);
-    await expect(page).toHaveURL(/\/dashboard\/solicitar$/);
+    await expect(page).toHaveURL(/\/cuenta\/solicitar$/);
     await ctx.close();
 
     // Con QA_DEV_LOG (p. ej. .next/dev/logs/next-development.log) se revisa que el aviso

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "Mi cuenta · Cooperativa Green Alliance",
 };
 
-// Inicio del asociado (reemplaza a /dashboard, que queda intacta por ahora).
+// Inicio del asociado.
 export default async function CuentaPage() {
   const supabase = await createClient();
 

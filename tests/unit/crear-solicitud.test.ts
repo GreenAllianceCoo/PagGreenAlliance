@@ -1,6 +1,6 @@
 /**
  * Reglas del crédito sobre la Server Action `crearSolicitud`
- * (app/dashboard/solicitar/actions.ts).
+ * (app/cuenta/solicitar/actions.ts).
  *
  * El cliente de Supabase y `redirect` de Next.js se simulan: estas pruebas
  * nunca hablan con una base real. La base de datos tiene sus propias
@@ -36,7 +36,7 @@ vi.mock("@/lib/supabase/server", () => ({
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { crearSolicitud } from "@/app/dashboard/solicitar/actions";
+import { crearSolicitud } from "@/app/cuenta/solicitar/actions";
 
 // Copia de los datos de grados_credito de la migración 20260922000000 (la acción solo usa el tope).
 const GRADOS: Record<string, Record<string, { capacidad_maxima: number; cuota_mensual: number; plazo_meses: number }>> = {

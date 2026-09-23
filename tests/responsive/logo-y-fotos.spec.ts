@@ -13,7 +13,7 @@ const SALIDA = path.join(RAIZ, "test-results", "responsive");
 const AUTH = path.join(RAIZ, "test-results", ".auth");
 fs.mkdirSync(SALIDA, { recursive: true });
 
-const ANCHOS = [320, 360, 390, 414, 768, 834, 1024, 1280, 1440, 1920];
+const ANCHOS = [320, 354, 360, 390, 414, 768, 834, 1024, 1050, 1075, 1280, 1440, 1920];
 const ALTO = 900;
 const PROPORCION_WORDMARK = 4118 / 669;
 
@@ -25,8 +25,7 @@ const RUTAS: Array<{ ruta: string; sesion: Sesion }> = [
   { ruta: "/afiliacion", sesion: "ninguna" },
   { ruta: "/politica-de-datos", sesion: "ninguna" },
   { ruta: "/cuenta", sesion: "cuenta" },
-  { ruta: "/dashboard", sesion: "cuenta" },
-  { ruta: "/dashboard/solicitar", sesion: "cuenta" },
+  { ruta: "/cuenta/solicitar", sesion: "cuenta" },
 ];
 
 const nombreRuta = (r: string) => (r === "/" ? "landing" : r.slice(1).replace(/\//g, "_"));
@@ -153,11 +152,8 @@ async function scrollHorizontal(page: Page) {
   });
 }
 
-const resumen: unknown[] = [];
+const resumen = { push: (x: unknown) => fs.appendFileSync(path.join(SALIDA, "logo-y-fotos.jsonl"), JSON.stringify(x) + "\n") };
 
-test.afterAll(() => {
-  fs.writeFileSync(path.join(SALIDA, "logo-y-fotos.json"), JSON.stringify(resumen, null, 2));
-});
 
 for (const { ruta, sesion } of RUTAS) {
   test(`Logo · ${ruta}`, async ({ browser }) => {

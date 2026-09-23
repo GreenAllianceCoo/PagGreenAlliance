@@ -14,12 +14,6 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Colores heredados del código anterior (/login, /dashboard). No borrar
-        // mientras esas rutas existan.
-        navy: "#1A3C57",
-        green: "#1E6652",
-        "surface-muted": "#F4F6F4",
-
         ga: {
           verde: "var(--ga-verde)",
           "verde-oscuro": "var(--ga-verde-oscuro)",

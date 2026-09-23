@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Ingresar · Cooperativa Green Alliance",
 };
 
-// Ingreso paso 1 (reemplaza a /login, que queda intacta por ahora).
+// Ingreso paso 1.
 // Con sesión activa, proxy.ts redirige a /cuenta antes de llegar aquí.
 export default function IngresarPage() {
   return <FormularioIngreso whatsapp={WHATSAPP_NUMERO} whatsappUrl={WHATSAPP_URL} />;

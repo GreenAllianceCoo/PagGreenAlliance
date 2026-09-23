@@ -81,11 +81,11 @@ export function Landing({
     <div className="flex min-h-dvh flex-col bg-white">
       {/* Encabezado. Celular: la maqueta deja 48 px arriba para simular la barra de estado
           del teléfono; en el navegador se usa 24 px, como en las demás pantallas. */}
-      <header className="flex items-center justify-between bg-ga-verde px-5 pb-4 pt-6 text-white lg:h-19 lg:px-16 lg:py-0">
-        <Link href="/" aria-label="Cooperativa Green Alliance, inicio" className="block h-11 w-logo">
+      <header className="flex items-center justify-between gap-3 bg-ga-verde px-5 pb-4 pt-6 text-white lg:h-19 lg:px-16 lg:py-0">
+        <Link href="/" aria-label="Cooperativa Green Alliance, inicio" className="block h-11 w-logo min-w-0 shrink">
           <Logo tone="light" />
         </Link>
-        <nav aria-label="Principal" className="flex items-center gap-7 text-16 font-semibold">
+        <nav aria-label="Principal" className="flex shrink-0 items-center gap-7 text-16 font-semibold">
           <a href="#c-apoyos" className={`hidden lg:inline ${ENLACE_NAV}`}>
             Apoyos
           </a>

@@ -14,6 +14,7 @@ Estados:
 | `Ingreso-PC.dc.html` / `Ingreso-Movil.dc.html` | `/ingresar` |
 | `Codigo-PC.dc.html` / `Codigo-Movil.dc.html` | `/ingresar/codigo` |
 | `Inicio-PC.dc.html` / `Inicio-Movil.dc.html` | `/cuenta` (protegida) |
+| (sin diseño; usa los componentes y tokens de Inicio) | `/cuenta/solicitar` (protegida) |
 | `Afiliacion-PC.dc.html` / `Afiliacion-Movil.dc.html` | `/afiliacion` |
 | `Enviada-PC.dc.html` / `Enviada-Movil.dc.html` | `/afiliacion/enviada` |
 | `Afiliacion-Spec.dc.html` | (no es pantalla; es documentación) |
@@ -59,10 +60,22 @@ Estados:
 | [TOPE] | Definido | Tope según `grados_credito` del grado del perfil. |
 | «Inicio» (nav) | Definido | → `/cuenta` |
 | «Salir» (escritorio) / icono cerrar sesión (celular) | Definido | `supabase.auth.signOut()` → `/ingresar` |
-| «Nueva solicitud» (nav + acceso rápido) | **Pendiente** | Flujo de solicitud de crédito aún sin pantalla. `href="#"` + TODO. |
+| «Nueva solicitud» (nav + acceso rápido + estado vacío) | Definido (23-sep) | → `/cuenta/solicitar`. |
 | «Convenios» (nav + acceso rápido) | **Pendiente** | ¿Scroll a la sección «Tus convenios» o página propia? Por ahora scroll a `#convenios`. Confirmar. |
 | «Hablar con la cooperativa» | Pendiente (número) | `https://wa.me/57<NÚMERO>` con `NEXT_PUBLIC_WHATSAPP`. |
 | Tarjetas de convenios | **Pendiente** | Solo lectura; no hay página de detalle definida. |
+
+## 4b. Solicitud de crédito `/cuenta/solicitar` (requiere sesión; sin sesión → `/ingresar`)
+Sin maqueta: usa el encabezado, las tarjetas y los cuadros grises de `/cuenta`. Las rutas viejas `/login` y `/dashboard` (incluida `/dashboard/solicitar`) se borraron el 23-sep.
+| Elemento | Estado | Comportamiento |
+|---|---|---|
+| Encabezado (logo, «Inicio», «Nueva solicitud», «Convenios», «Salir») | Definido | Igual que en `/cuenta`; «Nueva solicitud» marcada como actual; «Convenios» → `/cuenta#convenios`. |
+| Flecha volver | Definido | → `/cuenta` |
+| «50% / 100% de devolución» | Definido | Elige el paquete de `grados_credito` del grado del perfil; pone el monto en el tope de ese paquete. |
+| Monto (deslizador) | Definido | Mínimo $100.000, máximo el tope del paquete, pasos de $50.000. |
+| Interés mensual y plazo | Definido | Del paquete elegido (`tasa_interes_mensual`, `plazo_meses`). No se calcula la cuota. |
+| «Enviar solicitud» | Definido | Server Action `crearSolicitud`: valida porcentaje, monto mínimo, tope y que no haya otra pendiente → insert con la sesión (RLS; el trigger `chk_monto_solicitud` vuelve a validar) → redirect a `/cuenta`. Deshabilitado mientras envía; error bajo el campo o general, con foco. |
+| Sin grado / con solicitud pendiente / sin topes | Definido | Muestra el aviso y «Volver a mi cuenta» (→ `/cuenta`) en lugar del formulario. |
 
 ## 5. Afiliación `/afiliacion`
 | Elemento | Estado | Comportamiento |

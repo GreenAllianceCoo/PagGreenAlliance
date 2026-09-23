@@ -4,7 +4,7 @@ import { contextoConSesion, esEscritorio, tokenDeUsuario, USUARIOS, usuarioRest 
 /** C. /cuenta: protección, datos propios, «Mis datos» y «Salir». */
 
 test.describe("C1 · Sin sesión", () => {
-  for (const ruta of ["/cuenta", "/dashboard/solicitar"]) {
+  for (const ruta of ["/cuenta", "/cuenta/solicitar"]) {
     test(`${ruta} sin sesión → /ingresar`, async ({ page }) => {
       await page.goto(ruta);
       await expect(page).toHaveURL(/\/ingresar$/);
@@ -53,9 +53,9 @@ test.describe("C2 · Con sesión: datos del propio usuario", () => {
     expect(texto).not.toContain(USUARIOS.conSolicitud.nombre);
     // Tope SI = 3.000.000.
     expect(texto).toContain("$ 3.000.000");
-    // «Nueva solicitud» del estado vacío → /dashboard/solicitar.
+    // «Nueva solicitud» del estado vacío → /cuenta/solicitar.
     await page.locator("main section").first().getByRole("link", { name: "Nueva solicitud" }).click();
-    await expect(page).toHaveURL(/\/dashboard\/solicitar$/);
+    await expect(page).toHaveURL(/\/cuenta\/solicitar$/);
     await ctx.close();
   });
 

@@ -41,7 +41,8 @@ manualmente:
    `TUCEDULA@asociados.greenallianceco.com` y una contrasena.
 2. El perfil se crea solo. En el **SQL Editor**, hazlo admin:
    `update public.perfiles set rol = 'admin' where id = '<id del usuario>';`
-3. Ya puedes entrar en `/login` con esa cedula y contrasena.
+3. Ya puedes entrar en `/ingresar` con esa cedula: llega un codigo al correo del
+   usuario (el ingreso con contrasena y `/login` ya no existen).
 
 ## 5. Desplegar en Vercel
 
@@ -54,8 +55,6 @@ manualmente:
 
 ## Que falta (siguiente con Claude Code)
 
-- Formulario de solicitud de credito (`/dashboard/solicitar`): elegir 50/100,
-  monto segun tope, envio.
 - Notificacion por correo via Resend cuando se crea o resuelve una solicitud.
 - Panel de administracion (`/admin`): listado de solicitudes, aprobar/rechazar.
 - Registro publico de nuevos asociados.

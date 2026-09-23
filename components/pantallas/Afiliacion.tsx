@@ -48,14 +48,14 @@ export function Afiliacion({
     <div className="min-h-dvh bg-white lg:bg-ga-fondo-suave">
       {/* Celular: la maqueta usa 52 px arriba para simular la barra de estado del teléfono;
           en el navegador se deja en 24 px (mismo margen lateral), como en /ingresar. */}
-      <header className="flex items-center justify-between border-b border-ga-linea px-6 pb-5 pt-6 lg:h-19 lg:bg-white lg:px-14 lg:py-0">
-        <Link href="/" aria-label="Ir al inicio" className="block h-11 w-logo">
+      <header className="flex items-center justify-between gap-3 border-b border-ga-linea px-6 pb-5 pt-6 lg:h-19 lg:bg-white lg:px-14 lg:py-0">
+        <Link href="/" aria-label="Ir al inicio" className="block h-11 w-logo min-w-0 shrink">
           <Logo tone="dark" />
         </Link>
         <Link
           href="/ingresar"
           aria-label="Volver al ingreso"
-          className="flex h-11 w-11 items-center justify-center rounded-full bg-ga-fondo-suave text-ga-navy lg:hidden"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ga-fondo-suave text-ga-navy lg:hidden"
         >
           <IconoVolver tamano={22} />
         </Link>

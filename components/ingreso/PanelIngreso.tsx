@@ -63,8 +63,8 @@ export function PanelIngreso({
           "lg:h-auto lg:min-h-dvh lg:w-panel-ingreso lg:justify-start lg:gap-8 lg:px-14 lg:py-12",
         )}
       >
-        <div className={cx("flex items-center justify-between", COLUMNA_TABLETA)}>
-          <Link href="/" aria-label="Ir al inicio" className="block h-11 w-logo">
+        <div className={cx("flex items-center justify-between gap-3", COLUMNA_TABLETA)}>
+          <Link href="/" aria-label="Ir al inicio" className="block h-11 w-logo min-w-0 shrink">
             <Logo tone="light" />
           </Link>
           {volverHref ? (
@@ -73,7 +73,7 @@ export function PanelIngreso({
             <a
               href={volverHref}
               aria-label="Volver"
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-ga-blanco-translucido text-white lg:hidden"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ga-blanco-translucido text-white lg:hidden"
             >
               <IconoVolver tamano={22} />
             </a>
@@ -97,7 +97,8 @@ export function PanelIngreso({
           {pie}
         </span>
       </aside>
-      <main className="flex grow flex-col lg:items-center lg:justify-center lg:p-12">
+      {/* Entre 1024 y 1279 px el relleno baja a 32 px: con el panel de 540 px no caben 48 + 440 + 48. */}
+      <main className="flex grow flex-col lg:min-w-0 lg:items-center lg:justify-center lg:p-8 xl:p-12">
         {children}
       </main>
     </div>
@@ -110,10 +111,11 @@ export function PanelIngreso({
  * - ≥ 640 px (`sm`): columna centrada de 440 px (el ancho del formulario en la versión PC),
  *   para que no se estire en tabletas pequeñas / celulares horizontales. Desde 640 px siempre
  *   sobran ≥ 200 px, así que el margen lateral de 24 px ya no hace falta (`sm:px-0`).
- * - ≥ 1024 px (`lg`): ancho fijo de 440 px centrado a la derecha del panel verde.
+ * - ≥ 1024 px (`lg`): hasta 440 px centrado a la derecha del panel verde (se angosta un poco
+ *   entre 1024 y ~1110 px para no provocar scroll horizontal).
  */
 export const CLASES_FORM_INGRESO =
-  "flex w-full grow flex-col gap-4.5 p-6 sm:mx-auto sm:max-w-form-ingreso sm:px-0 lg:w-form-ingreso lg:grow-0 lg:gap-5 lg:p-0";
+  "flex w-full grow flex-col gap-4.5 p-6 sm:mx-auto sm:max-w-form-ingreso sm:px-0 lg:w-full lg:max-w-form-ingreso lg:grow-0 lg:gap-5 lg:p-0";
 
 /** Texto de WhatsApp al final del formulario (solo celular). */
 export function PieIngresoMovil({

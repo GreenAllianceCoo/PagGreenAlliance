@@ -3,7 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 
 /**
  * - Refresca la sesión de Supabase (cookies).
- * - /cuenta y /dashboard requieren sesión: sin sesión → /ingresar.
+ * - /cuenta y sus subrutas (p. ej. /cuenta/solicitar) requieren sesión:
+ *   sin sesión → /ingresar.
  * - /ingresar (y sus pasos) con sesión → /cuenta. Así los botones de la landing
  *   que apuntan a /ingresar («Mi cuenta», «Ingresar», «Solicitar crédito»,
  *   «Ver beneficios en mi cuenta») llevan a /cuenta cuando ya hay sesión.
@@ -45,9 +46,7 @@ export async function proxy(request: NextRequest) {
     return redireccion;
   };
 
-  const esPrivada =
-    ruta === "/cuenta" || ruta.startsWith("/cuenta/") ||
-    ruta === "/dashboard" || ruta.startsWith("/dashboard/");
+  const esPrivada = ruta === "/cuenta" || ruta.startsWith("/cuenta/");
   if (!user && esPrivada) return redirigir("/ingresar");
 
   const esIngreso = ruta === "/ingresar" || ruta.startsWith("/ingresar/");
@@ -57,5 +56,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/cuenta/:path*", "/dashboard/:path*", "/ingresar/:path*"],
+  // "/cuenta/:path*" cubre /cuenta y /cuenta/solicitar.
+  matcher: ["/cuenta/:path*", "/ingresar/:path*"],
 };
