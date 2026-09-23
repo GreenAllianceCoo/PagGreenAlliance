@@ -1,6 +1,13 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+const CONVENIOS = [
+  { titulo: "Hoteleria", icono: "\u{1F3E8}" },
+  { titulo: "Odontologia", icono: "\u{1F9B7}" },
+  { titulo: "Viajes", icono: "✈️" },
+  { titulo: "Tecnologia", icono: "\u{1F4F1}" },
+];
+
 export default async function DashboardPage() {
   const supabase = await createClient();
 
@@ -63,6 +70,19 @@ export default async function DashboardPage() {
             Aun no tienes solicitudes de credito activas.
           </p>
         )}
+
+        <h2 className="text-sm font-bold text-navy mt-2 mb-3">Convenios</h2>
+        <div className="flex flex-col gap-2">
+          {CONVENIOS.map((convenio) => (
+            <div
+              key={convenio.titulo}
+              className="bg-surface-muted rounded-xl px-4 py-3 flex items-center gap-3"
+            >
+              <span className="text-lg">{convenio.icono}</span>
+              <span className="font-semibold text-sm">{convenio.titulo}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </main>
   );
