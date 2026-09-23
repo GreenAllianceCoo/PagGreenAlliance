@@ -1,5 +1,5 @@
 // Reglas del crédito que la app necesita conocer. La base las vuelve a
-// validar (trigger chk_monto_solicitud, migración 20260923160000).
+// validar (trigger chk_monto_solicitud, migración 20260923173355).
 
 export const MONTO_MINIMO = 100000;
 

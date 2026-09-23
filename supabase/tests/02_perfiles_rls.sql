@@ -4,7 +4,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(13);
+select plan(15);
 
 -- ------------------------------------------------------------
 -- Datos de prueba
@@ -43,6 +43,18 @@ select throws_ok(
   $$ update public.perfiles set cedula = '1000000009' where id = '00000000-0000-4000-a000-00000000000a' $$,
   'P0001', 'No puede modificar su número de cédula',
   'A no puede cambiarse la cédula'
+);
+
+select throws_ok(
+  $$ update public.perfiles set nombre_completo = 'Otro Nombre' where id = '00000000-0000-4000-a000-00000000000a' $$,
+  'P0001', 'No puede modificar su nombre; solicítelo a la administración',
+  'A no puede cambiarse el nombre'
+);
+
+select throws_ok(
+  $$ update public.perfiles set created_at = '2000-01-01' where id = '00000000-0000-4000-a000-00000000000a' $$,
+  'P0001', 'No se puede cambiar la fecha de creación del perfil',
+  'A no puede cambiar la fecha de creación de su perfil'
 );
 
 select lives_ok(

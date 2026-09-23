@@ -74,4 +74,4 @@ Después de cada corrección, vuelve a correr **solo** el agente que encontró e
 - Copia los logos a `public/logos/`.
 - Instala Supabase CLI + Docker y corre `supabase start`: lo usan `ga-escritor-tests` (pgTAP) y `ga-verificador-qa` (login y afiliación). Ningún agente toca el proyecto de producción.
 - Conecta el MCP de Supabase en Claude Code con el nombre `supabase` para que el auditor pueda leer la base remota.
-- Regla del crédito confirmada (2026-09-23): tasa de interés mensual por grado y porcentaje (se muestra, no se calcula cuota), monto mínimo 100.000. Ver la migración `20260923160000_blindar_solicitudes_y_revisiones.sql`.
+- Regla del crédito confirmada (2026-09-23): tasa de interés mensual por grado y porcentaje (se muestra, no se calcula cuota), monto mínimo 100.000. Ver la migración `20260923173355_blindar_solicitudes_y_revisiones.sql`.

@@ -166,7 +166,7 @@ Vitest (unitario): extraer el cálculo de cuota (si se mantiene en la app) a `li
 
 ## Respuestas de la cooperativa y cambios (2026-09-23, tarde)
 
-Aplicado en `supabase/migrations/20260923160000_blindar_solicitudes_y_revisiones.sql` y `app/dashboard/`.
+Aplicado en `supabase/migrations/20260923173355_blindar_solicitudes_y_revisiones.sql` y `app/dashboard/`.
 
 | Pregunta | Respuesta | Qué se hizo |
 |---|---|---|

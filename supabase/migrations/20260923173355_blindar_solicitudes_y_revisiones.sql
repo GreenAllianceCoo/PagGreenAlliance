@@ -15,6 +15,7 @@
 --   P-05  Las solicitudes se conservan: nadie las borra desde la API.
 --   P-06  El motivo es obligatorio al rechazar.
 --   P-09  Nadie resuelve su propia solicitud.
+--   P-10  El asociado no cambia su nombre; sí su teléfono.
 --
 -- Hallazgos que corrige: H-14, H-16, H-21, H-22, H-23, H-24, H-25.
 --
@@ -332,7 +333,7 @@ $$;
 revoke all on function public.proteger_solicitud_afiliacion() from public, anon, authenticated;
 
 -- ------------------------------------------------------------
--- 10. perfiles: id y created_at inmutables desde la API (H-25)
+-- 10. perfiles: id y created_at inmutables desde la API (H-25); el asociado no cambia su nombre (P-10)
 -- ------------------------------------------------------------
 create or replace function public.proteger_campos_perfil()
 returns trigger
@@ -349,6 +350,8 @@ begin
       if new.rol is distinct from old.rol then raise exception 'No puede modificar su propio rol'; end if;
       if new.grado is distinct from old.grado then raise exception 'No puede modificar su propio grado; solicítelo a la administración'; end if;
       if new.cedula is distinct from old.cedula then raise exception 'No puede modificar su número de cédula'; end if;
+      -- P-10: el asociado solo puede cambiar su teléfono.
+      if new.nombre_completo is distinct from old.nombre_completo then raise exception 'No puede modificar su nombre; solicítelo a la administración'; end if;
     end if;
   end if;
   return new;
