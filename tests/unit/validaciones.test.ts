@@ -250,6 +250,19 @@ describe("esquemaAfiliacion", () => {
     expect(errorDe("email", conCambio({ institucion, email }))).toBeUndefined();
   });
 
+  // BUG reproducido con tests/e2e/d-afiliacion.spec.ts (D4): en el formulario
+  // real, con la autorización sin marcar Y el correo con el dominio
+  // equivocado a la vez, el error de "email" no aparecía (solo el de
+  // "acepto_datos"). Aquí se reproduce solo con zod (sin navegador) para
+  // aislar si es el esquema o el envoltorio de FormularioAfiliacion.tsx.
+  it("correo institucional: el dominio equivocado se detecta aunque TAMBIÉN falte la autorización", () => {
+    const r = errorDe(
+      "email",
+      conCambio({ institucion: "policia", email: "juan@gmail.com", acepto_datos: false }),
+    );
+    expect(r).toMatch(/institucional.*@policia\.gov\.co/);
+  });
+
   it("asesor: opcional (vacío → null), si viene debe ser un uuid", () => {
     expect(esquemaAfiliacion.parse(conCambio({ asesor_id: "" })).asesor_id).toBeNull();
     expect(errorDe("asesor_id", conCambio({ asesor_id: "no-es-un-uuid" }))).toMatch(/asesor válido/);

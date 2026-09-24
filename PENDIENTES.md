@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 23-sep-2026 (noche, tras la verificación responsive)
+Actualizado: 24-sep-2026 (fase 2: afiliación v2, admin, asesor y sorteo)
 
 ## Dónde quedamos
 
@@ -60,15 +60,15 @@ Las pantallas todavía **no hacen nada**: los botones no envían, no hay sesión
 
 Van en `lib/config.ts` (o en una variable de entorno) y en `lib/mock.ts` → datos reales.
 
-- [ ] Número de **WhatsApp** (`NEXT_PUBLIC_WHATSAPP`), para los enlaces `wa.me/57<NÚMERO>`.
-- [ ] **[N] días hábiles** de respuesta (`DIAS_RESPUESTA`).
-- [ ] **Correo de contacto** (`CORREO_CONTACTO`).
+- [x] Número de **WhatsApp** (`NEXT_PUBLIC_WHATSAPP`), para los enlaces `wa.me/57<NÚMERO>`. 24-sep: 311 724 1942.
+- [x] **[N] días hábiles** de respuesta (`DIAS_RESPUESTA`). 24-sep: la cooperativa dio «4 horas o menos» en su lugar.
+- [x] **Correo de contacto** (`CORREO_CONTACTO`). 24-sep: soporte@greenallianceco.com.
 - [ ] **Texto de vigilancia de Supersolidaria** (`TEXTO_VIGILANCIA`).
 - [ ] **Política de datos**: el texto y la ruta (se sugiere `/politica-de-datos`); hoy el enlace es `href="#"`.
 - [x] **Destino de «Nueva solicitud»** (nav, acceso rápido y estado vacío de `/cuenta`): → `/cuenta/solicitar`.
 - [ ] **Fotos reales** de asociados y apoyos, **cifras** y **testimonios** para la landing.
-- [ ] **Tiempo de respuesta** real para la landing (hoy dice `[TIEMPO]`, y `[T]` en celular).
-- [ ] **Correos reales de los asociados**: el ingreso con código los necesita. Hoy las cuentas usan un correo inventado (`cedula@asociados…`). Deben venir en el Excel de importación.
+- [x] **Tiempo de respuesta** real para la landing (hoy dice `[TIEMPO]`, y `[T]` en celular). 24-sep: «4 horas o menos».
+- [x] ~~**Correos reales de los asociados**: el ingreso con código los necesita. Hoy las cuentas usan un correo inventado (`cedula@asociados…`). Deben venir en el Excel de importación.~~ Ya no aplica: decisión de la cooperativa 24-sep, no habrá importación de Excel (la afiliación v2 + aprobación en /admin lo reemplaza).
 
 ## 3. Funcionalidad (siguiente agente: `ga-funcionalidad-botones`)
 
@@ -114,9 +114,9 @@ Se decidió código por correo en vez de contraseña. Configurar en el panel de 
 
 ### Otros
 - [x] Formulario de solicitud de crédito conectado a la nueva `/cuenta`: vive en `/cuenta/solicitar` (muestra la tasa y exige mínimo 100.000).
-- [ ] Panel de administración `/admin`: listado de solicitudes, aprobar y rechazar (rechazar pide motivo; un admin no puede resolver su propia solicitud).
-- [ ] Correo con Resend del resultado del crédito (aprobado / no aprobado) al asociado cuando se resuelve una solicitud.
-- [ ] Importación de asociados desde Excel (cuando llegue).
+- [x] Panel de administración `/admin`: listado de solicitudes, aprobar y rechazar (rechazar pide motivo; un admin no puede resolver su propia solicitud). 24-sep: implementado y probado en local (commits 235ffbe, a13c2de).
+- [ ] Correo con Resend del resultado del crédito (aprobado / no aprobado) al asociado cuando se resuelve una solicitud. 24-sep: código conectado, falta el SMTP/Resend de producción.
+- [x] ~~Importación de asociados desde Excel (cuando llegue).~~ Ya no aplica: decisión de la cooperativa 24-sep.
 
 ## 4. Verificación y cierre
 

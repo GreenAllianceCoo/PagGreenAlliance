@@ -131,22 +131,26 @@ export const esquemaAfiliacion = z
       error: "Debes autorizar el tratamiento de tus datos para enviar la solicitud.",
     }),
   })
-  .check((ctx) => {
-    // Correo institucional según la institución elegida (spec-fase-2 §2): solo se
-    // valida si los dos campos ya son individualmente válidos (si no, ya hay un
-    // error propio en cada uno y este no aporta nada nuevo).
-    const { institucion, email } = ctx.value;
-    if (!institucion || !email) return;
-    const regla = DOMINIO_INSTITUCION[institucion];
-    if (!regla.patron.test(email)) {
-      ctx.issues.push({
-        code: "custom",
-        message: `El correo debe ser institucional: termina en ${regla.texto}.`,
-        path: ["email"],
-        input: ctx.value,
-      });
-    }
-  });
+  .superRefine(
+    ({ institucion, email }, ctx) => {
+      // Correo institucional según la institución elegida (spec-fase-2 §2).
+      const regla = DOMINIO_INSTITUCION[institucion];
+      if (!regla.patron.test(email)) {
+        ctx.addIssue({
+          code: "custom",
+          message: `El correo debe ser institucional: termina en ${regla.texto}.`,
+          path: ["email"],
+        });
+      }
+    },
+    {
+      // Por defecto zod omite esta regla si CUALQUIER campo falló (p. ej. la
+      // autorización sin marcar). Solo se omite si institución o correo ya
+      // tienen su propio error: ahí este no aporta nada nuevo.
+      when: (payload) =>
+        !payload.issues.some((issue) => issue.path?.[0] === "institucion" || issue.path?.[0] === "email"),
+    },
+  );
 
 export type DatosAfiliacion = z.output<typeof esquemaAfiliacion>;
 export type CampoAfiliacion = keyof z.input<typeof esquemaAfiliacion>;
