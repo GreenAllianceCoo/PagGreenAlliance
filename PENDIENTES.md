@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 24-sep-2026 (fase 2: afiliación v2, admin, asesor y sorteo)
+Actualizado: 24-sep-2026 (fase 2: afiliación v2, admin, asesor y sorteo; encargo de Carlos Pardo)
 
 ## Dónde quedamos
 
@@ -123,6 +123,17 @@ Se decidió código por correo en vez de contraseña. Configurar en el panel de 
 - [x] Correr `ga-verificador-qa` y `ga-verificador-responsive` cuando haya funcionalidad.
 - [x] Borrar `/login` y `/dashboard` (hecho el 23-sep).
 - [ ] Hacer commit de las pantallas nuevas, subir a GitHub y desplegar en Vercel.
+
+## 5. Encargo de Carlos Pardo (500.000 COP)
+
+Desarrollador externo, trabaja en su propia rama y entrega por PR a `develop`; cada PR lo revisa un agente `ga-*` antes de fusionar.
+
+- [ ] Dashboard de clientes en `/admin` (métricas, lista con buscador/filtros, detalle y reasignar asesor).
+- [ ] Dashboard del asesor en `/asesor` (métricas de sus clientes, detalle sin celular/correo/Nequi/fotos).
+- [ ] Convenios administrables desde `/admin` (crear, editar, ocultar, ordenar, logo en Storage).
+- [ ] Ley 1581: borrado automático de fotos de afiliaciones rechazadas y motivo de rechazo en `/admin`.
+- [ ] Pruebas en celulares reales (Android e iPhone) con informe y capturas.
+- [ ] Actualizar `tests/e2e` b-ingreso, i-despliegue y j-produccion al formato nuevo de máscara de correo.
 
 ---
 
