@@ -4,6 +4,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { MONTO_MINIMO } from "@/lib/credito";
 
+/** F-06: el deslizador de SolicitudForm.tsx avanza en pasos de $50.000. */
+const PASO_MONTO = 50000;
+
 export type EstadoSolicitud = {
   error?: string;
   /** Campo al que corresponde el error (para enlazarlo y mover el foco). Sin campo = error general. */
@@ -30,6 +33,11 @@ export async function crearSolicitud(
   }
   if (monto < MONTO_MINIMO) {
     return { error: "El monto mínimo de un crédito es $100.000.", campo: "monto" };
+  }
+  // F-06: el servidor aceptaba cualquier monto entero (p. ej. $123.457) con el
+  // formulario manipulado, aunque el deslizador solo permite pasos de $50.000.
+  if (monto % PASO_MONTO !== 0) {
+    return { error: "El monto debe ser un múltiplo de $50.000.", campo: "monto" };
   }
 
   const supabase = await createClient();

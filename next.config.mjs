@@ -22,5 +22,24 @@ export default function configuracion(phase) {
       );
     }
   }
-  return {};
+  return {
+    // F-05: protección contra clickjacking (que no se pueda incrustar
+    // /ingresar, /cuenta, etc. en un iframe de otro sitio) y otras cabeceras
+    // de seguridad básicas, en todas las rutas.
+    async headers() {
+      return [
+        {
+          source: "/:path*",
+          headers: [
+            // Redundante con la CSP de abajo, pero la mantenemos porque
+            // algunos navegadores viejos solo entienden X-Frame-Options.
+            { key: "X-Frame-Options", value: "DENY" },
+            { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+            { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+            { key: "X-Content-Type-Options", value: "nosniff" },
+          ],
+        },
+      ];
+    },
+  };
 }

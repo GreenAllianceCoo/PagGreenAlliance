@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { EncabezadoCuenta } from "@/components/pantallas/EncabezadoCuenta";
 import { ButtonLink } from "@/components/ui/Button";
-import { IconoVolver } from "@/components/ui/Iconos";
+import { IconoSalir, IconoVolver } from "@/components/ui/Iconos";
 import { createClient } from "@/lib/supabase/server";
 import { cerrarSesion } from "../actions";
 import SolicitudForm from "./SolicitudForm";
@@ -64,16 +64,27 @@ export default async function SolicitarPage() {
       />
 
       <main className="flex flex-col gap-4 px-5 pb-6 pt-4 md:mx-auto md:max-w-2xl lg:gap-6 lg:py-10">
-        <div className="flex items-center gap-3">
-          {/* Mismo botón redondo que «Cerrar sesión» en /cuenta (celular). */}
-          <Link
-            href="/cuenta"
-            aria-label="Volver"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-ga-navy"
-          >
-            <IconoVolver tamano={22} grosor={1.8} />
-          </Link>
-          <h1 className="m-0 text-24 font-extrabold text-ga-navy lg:text-32">Nueva solicitud</h1>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/cuenta"
+              aria-label="Volver"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-ga-navy"
+            >
+              <IconoVolver tamano={22} grosor={1.8} />
+            </Link>
+            <h1 className="m-0 text-24 font-extrabold text-ga-navy lg:text-32">Nueva solicitud</h1>
+          </div>
+          {/* F-03: en celular también debe haber «Cerrar sesión», como en /cuenta. */}
+          <form action={cerrarSesion} className="lg:hidden">
+            <button
+              type="submit"
+              aria-label="Cerrar sesión"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-ga-navy"
+            >
+              <IconoSalir tamano={22} grosor={1.8} />
+            </button>
+          </form>
         </div>
 
         <section

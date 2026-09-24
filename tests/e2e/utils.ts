@@ -24,6 +24,8 @@ function leerEnvLocal() {
 }
 
 const ENV = leerEnvLocal();
+/** Variables de .env.development.local (solo local; para calcular claves de límites y cookies en pruebas). */
+export const ENV_LOCAL: Readonly<Record<string, string>> = ENV;
 export const SUPABASE_URL = ENV.NEXT_PUBLIC_SUPABASE_URL ?? "";
 export const ANON_KEY = ENV.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
 const SERVICE_KEY = ENV.SUPABASE_SERVICE_ROLE_KEY ?? "";

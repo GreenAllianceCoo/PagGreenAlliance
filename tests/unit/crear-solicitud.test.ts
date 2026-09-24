@@ -243,6 +243,31 @@ describe("crearSolicitud · monto", () => {
   });
 });
 
+// F-06: el deslizador solo avanza de $50.000 en $50.000; el servidor debe
+// exigirlo también, aunque el formulario se manipule (docs/verificaciones/
+// 2026-09-23-verificacion-3.md).
+describe("crearSolicitud · monto múltiplo de $50.000 (F-06)", () => {
+  it.each(["123457", "100001", "500050", "999999", "1000050"])(
+    "rechaza un monto que no es múltiplo de $50.000 (%s) y no inserta",
+    async (monto) => {
+      const { insertados } = crearSupabaseFalso({ grado: "OF" });
+      const { resultado } = await enviar({ porcentaje: "50", monto });
+      expect(resultado?.error).toBeTruthy();
+      expect(insertados).toHaveLength(0);
+    }
+  );
+
+  it.each(["100000", "150000", "500000", "1000000"])(
+    "acepta un monto múltiplo de $50.000 (%s)",
+    async (monto) => {
+      const { insertados } = crearSupabaseFalso({ grado: "OF" });
+      const { redirigeA } = await enviar({ porcentaje: "50", monto });
+      expect(redirigeA).toBe("/cuenta");
+      expect(insertados).toHaveLength(1);
+    }
+  );
+});
+
 describe("crearSolicitud · sesión y perfil", () => {
   it("sin sesión redirige al ingreso y no inserta", async () => {
     const { insertados } = crearSupabaseFalso({ usuario: null });

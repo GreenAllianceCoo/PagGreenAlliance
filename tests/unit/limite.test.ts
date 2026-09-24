@@ -11,9 +11,10 @@ vi.mock("next/headers", () => ({ headers: vi.fn() }));
 vi.mock("@/lib/servidor/registro", () => ({ registrar: vi.fn() }));
 vi.mock("@/lib/supabase/admin", () => ({ crearClienteAdmin: vi.fn() }));
 
+import { headers } from "next/headers";
 import { registrar } from "@/lib/servidor/registro";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
-import { claveHmac, dentroDelLimite } from "@/lib/servidor/limite";
+import { claveHmac, dentroDelLimite, ipDelCliente } from "@/lib/servidor/limite";
 
 const SECRETO = "s".repeat(32);
 const CEDULA = "1234567891";
@@ -79,5 +80,43 @@ describe("dentroDelLimite", () => {
     rpcFalsa({ data: null, error: { message: "PGRST202" } });
     await expect(dentroDelLimite("otp-ip", "1.2.3.4", 20, 900)).resolves.toBe(true);
     expect(registrar).toHaveBeenCalledWith("error", expect.objectContaining({ evento: "limite_de_intentos_fallo" }));
+  });
+});
+
+/**
+ * O-01: `ipDelCliente` solo es confiable detrás de un proxy que sobrescriba
+ * estos encabezados (Vercel lo hace); en local, o detrás de un proxy que no
+ * los limpie, cualquiera puede mandarlos con el valor que quiera.
+ */
+describe("ipDelCliente (O-01: solo confiable detrás de Vercel)", () => {
+  function headersFalsos(valores: Record<string, string>) {
+    vi.mocked(headers).mockResolvedValue({
+      get: (nombre: string) => valores[nombre] ?? null,
+    } as never);
+  }
+
+  it("usa el primer valor de x-forwarded-for cuando hay varios (proxys encadenados)", async () => {
+    headersFalsos({ "x-forwarded-for": "203.0.113.5, 10.0.0.1, 10.0.0.2" });
+    await expect(ipDelCliente()).resolves.toBe("203.0.113.5");
+  });
+
+  it("recorta espacios alrededor del valor", async () => {
+    headersFalsos({ "x-forwarded-for": "  198.51.100.7  , 10.0.0.1" });
+    await expect(ipDelCliente()).resolves.toBe("198.51.100.7");
+  });
+
+  it("sin x-forwarded-for usa x-real-ip", async () => {
+    headersFalsos({ "x-real-ip": "198.51.100.9" });
+    await expect(ipDelCliente()).resolves.toBe("198.51.100.9");
+  });
+
+  it("sin ningún encabezado devuelve «desconocida» (no null ni vacío)", async () => {
+    headersFalsos({});
+    await expect(ipDelCliente()).resolves.toBe("desconocida");
+  });
+
+  it("x-forwarded-for vacío cae a x-real-ip", async () => {
+    headersFalsos({ "x-forwarded-for": "", "x-real-ip": "198.51.100.11" });
+    await expect(ipDelCliente()).resolves.toBe("198.51.100.11");
   });
 });

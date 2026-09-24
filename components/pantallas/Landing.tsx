@@ -109,7 +109,9 @@ export function Landing({
         </nav>
       </header>
 
-      <main className="flex grow flex-col">
+      {/* Entre 640 y 1023 px, mismo ancho máximo centrado que /afiliacion y /cuenta:
+          evita que los botones y las franjas se estiren de lado a lado. */}
+      <main className="flex grow flex-col md:mx-auto md:w-full md:max-w-2xl lg:max-w-none">
         {/* Hero */}
         <section className="flex flex-col lg:grid lg:grid-cols-2 lg:items-center lg:gap-12 lg:p-16">
           <div className="flex flex-col gap-4.5 px-5 pb-7 pt-8 lg:gap-5.5 lg:p-0">
@@ -122,7 +124,7 @@ export function Landing({
             </p>
             <div className="flex flex-col gap-4.5 lg:flex-row lg:gap-3">
               {/* Con sesión activa, proxy.ts redirige /ingresar → /cuenta. */}
-              <ButtonLink href="/ingresar" className="lg:inline-flex lg:rounded-10 lg:px-7">
+              <ButtonLink href="/ingresar" className="lg:inline-flex lg:whitespace-nowrap lg:rounded-10 lg:px-7">
                 Solicitar crédito
               </ButtonLink>
               <ButtonLink href="/afiliacion" variante="secundario" className="lg:hidden">
@@ -130,7 +132,7 @@ export function Landing({
               </ButtonLink>
               <a
                 href="#c-apoyos"
-                className="hidden h-13.5 items-center rounded-10 border-1.5 border-ga-navy px-6 text-17 font-bold text-ga-navy no-underline hover:bg-ga-fondo-suave lg:inline-flex"
+                className="hidden h-13.5 items-center whitespace-nowrap rounded-10 border-1.5 border-ga-navy px-6 text-17 font-bold text-ga-navy no-underline hover:bg-ga-fondo-suave lg:inline-flex"
               >
                 Conocer la cooperativa
               </a>
@@ -262,7 +264,7 @@ export function Landing({
               </p>
             </div>
             {/* Con sesión activa, proxy.ts redirige /ingresar → /cuenta. */}
-            <Link href="/ingresar" className="enlace hidden text-16 font-extrabold lg:inline">
+            <Link href="/ingresar" className="enlace hidden whitespace-nowrap text-16 font-extrabold lg:inline">
               Ver beneficios en mi cuenta
             </Link>
           </div>

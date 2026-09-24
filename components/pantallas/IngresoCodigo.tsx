@@ -105,7 +105,8 @@ export function IngresoCodigo({
             type="submit"
             formAction={accionReenviar}
             disabled={reenviarDeshabilitado}
-            className="enlace font-extrabold disabled:cursor-not-allowed"
+            // min-h-11: área de toque de al menos 44 px, sin cambiar el aspecto de enlace.
+            className="enlace inline-flex min-h-11 items-center px-1 font-extrabold disabled:cursor-not-allowed"
           >
             Reenviar código
           </button>

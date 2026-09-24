@@ -69,15 +69,19 @@ select ok(
   'anon no puede ejecutar es_admin'
 );
 
--- Las funciones de trigger no se pueden llamar por RPC desde la API
+-- Las funciones de trigger no se pueden llamar por RPC desde la API.
+-- Excepciones a propósito:
+--   es_admin(): cualquier authenticated puede saber si ES admin (no revela nada de otros).
+--   resumen_clientes_asesor(): se autofiltra por auth.uid(); un asesor solo ve
+--     lo suyo, cualquier otro rol recibe 0 filas (ver 07_asesor_rls.sql).
 select is_empty(
   $$ select p.proname::text
        from pg_proc p join pg_namespace n on n.oid = p.pronamespace
       where n.nspname = 'public' and p.prosecdef
-        and p.proname <> 'es_admin'
+        and p.proname not in ('es_admin', 'resumen_clientes_asesor')
         and (has_function_privilege('authenticated', p.oid, 'execute')
              or has_function_privilege('anon', p.oid, 'execute')) $$,
-  'ninguna función security definer (salvo es_admin) es ejecutable por anon o authenticated'
+  'ninguna función security definer (salvo es_admin y resumen_clientes_asesor) es ejecutable por anon o authenticated'
 );
 
 select * from finish();

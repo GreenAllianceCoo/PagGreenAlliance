@@ -5,33 +5,56 @@
 import { describe, expect, it } from "vitest";
 import { enlaceWhatsapp } from "@/lib/config";
 import { formatearPesos, textoTope, vistaSolicitud, type FilaSolicitud } from "@/lib/cuenta";
-import { correoDeRelleno, enmascararCorreo } from "@/lib/mascara";
+import { correoDeRelleno, DOMINIOS_ASOCIADOS, enmascararCorreo } from "@/lib/mascara";
 
 describe("enmascararCorreo", () => {
-  it("deja 2 letras del usuario y el dominio", () => {
-    expect(enmascararCorreo("juan.perez@correo.com")).toBe("ju•••@correo.com");
-    expect(enmascararCorreo("  JUAN@Correo.com ")).toBe("ju•••@correo.com");
+  it("deja 2 letras del usuario y solo el primer bloque + TLD del dominio (F-01)", () => {
+    expect(enmascararCorreo("juan.perez@policia.gov.co")).toBe("ju•••@po•••.co");
+    expect(enmascararCorreo("  JUAN.PEREZ@Policia.Gov.Co ")).toBe("ju•••@po•••.co");
   });
-  it("usuarios cortos muestran solo 1 letra", () => {
-    expect(enmascararCorreo("ab@correo.com")).toBe("a•••@correo.com");
-    expect(enmascararCorreo("a@correo.com")).toBe("a•••@correo.com");
+  it("usuarios y dominios cortos muestran solo 1 letra", () => {
+    expect(enmascararCorreo("ab@ej.co")).toBe("a•••@e•••.co");
+    expect(enmascararCorreo("a@ejercito.mil.co")).toBe("a•••@ej•••.co");
   });
-  it("nunca devuelve el correo completo", () => {
-    const correo = "asociado.prueba@greenalliance.test";
+  it("nunca devuelve el correo completo, ni el dominio completo", () => {
+    const correo = "asociado.prueba@buzonejercito.mil.co";
     expect(enmascararCorreo(correo)).not.toContain("asociado.prueba");
+    expect(enmascararCorreo(correo)).not.toContain("buzonejercito");
+    // Tampoco delata el segundo nivel (gov/mil), solo el TLD final.
+    expect(enmascararCorreo(correo)).not.toContain("mil");
   });
   it("texto sin @ no rompe", () => {
     expect(enmascararCorreo("no-es-correo")).toBe("•••");
   });
+  it("dominio sin punto (sin TLD reconocible) no rompe", () => {
+    expect(enmascararCorreo("juan@localhost")).toBe("ju•••@•••");
+  });
 });
 
-describe("correoDeRelleno", () => {
-  it("tiene la misma forma que un correo enmascarado real", () => {
-    expect(correoDeRelleno(new Uint8Array([0, 1, 2]))).toMatch(/^[a-z]{2}•••@[a-z]+\.com$/);
+describe("correoDeRelleno (F-01: relleno indistinguible de un correo real)", () => {
+  it("tiene EXACTAMENTE la misma forma que enmascararCorreo() sobre un dominio real", () => {
+    const relleno = correoDeRelleno(new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7]));
+    expect(relleno).toMatch(/^[a-z]{1,2}•••@[a-z]{1,2}•••\.[a-z]+$/);
   });
-  it("es estable para los mismos bytes", () => {
-    const b = new Uint8Array([7, 9, 3]);
+  it("solo usa los dominios reales de los asociados (nunca gmail ni otro dominio de relleno)", () => {
+    for (let semilla = 0; semilla < 50; semilla++) {
+      const bytes = new Uint8Array(8).map((_, i) => (semilla * 7 + i * 13) % 256);
+      const relleno = correoDeRelleno(bytes);
+      const tld = relleno.split(".").pop();
+      const tldsReales = DOMINIOS_ASOCIADOS.map((d) => d.split(".").pop());
+      expect(tldsReales).toContain(tld);
+    }
+  });
+  it("es estable para los mismos bytes (la misma cédula siempre muestra lo mismo)", () => {
+    const b = new Uint8Array([7, 9, 3, 1, 8, 2, 4, 6]);
     expect(correoDeRelleno(b)).toBe(correoDeRelleno(b));
+  });
+  it("un correo real y uno de relleno pueden coincidir en forma exacta (no hay forma de distinguirlos)", () => {
+    // Con los 3 dominios institucionales, ambos casos producen "xx•••@yy•••.co".
+    const real = enmascararCorreo("maria.gomez@policia.gov.co");
+    const relleno = correoDeRelleno(new Uint8Array([12, 4, 17, 0, 3, 8, 9, 1]));
+    expect(real).toMatch(/^[a-z]{2}•••@[a-z]{2}•••\.co$/);
+    expect(relleno).toMatch(/^[a-z]{1,2}•••@[a-z]{1,2}•••\.co$/);
   });
 });
 

@@ -63,19 +63,12 @@ test.describe("H · Solicitud de crédito", () => {
     await expect(page).toHaveURL(/\/cuenta\/solicitar$/);
     await ctx.close();
 
-    // Con QA_DEV_LOG (p. ej. .next/dev/logs/next-development.log) se revisa que el aviso
-    // por correo se intentó (sin RESEND_API_KEY queda registrado) y sin datos personales.
+    // docs/resend-plantillas.md (23-sep): la solicitud de crédito NO envía correo (solo el
+    // resultado, desde el flujo del administrador). Con QA_DEV_LOG se revisa que el log de
+    // next dev no tenga el correo del asociado.
     const log = process.env.QA_DEV_LOG;
     if (log && fs.existsSync(log)) {
-      await expect
-        .poll(() => fs.readFileSync(log, "utf8"), { timeout: 10_000 })
-        .toMatch(/\?"evento\?":\?"credito_(aviso_equipo_no_enviado|correo_fallo|correo_excepcion)/);
-      const lineas = fs.readFileSync(log, "utf8").split(/\r?\n/).filter((l) => /evento\?":\?"credito_/.test(l));
-      for (const l of lineas) {
-        expect(l).not.toContain(u.correo);
-        expect(l).not.toContain(u.cedula);
-      }
+      expect(fs.readFileSync(log, "utf8")).not.toContain(u.correo);
     }
-
   });
 });

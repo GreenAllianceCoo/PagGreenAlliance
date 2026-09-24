@@ -114,7 +114,7 @@ test.describe("E · Landing /", () => {
           "Somos una cooperativa hecha por y para la familia policial. Pides en línea, sabes tu tope desde el inicio y ves cada paso de tu solicitud.",
           "Solicitar crédito",
           "Conocer la cooperativa",
-          "[Foto real de asociados — con autorización de uso]",
+          // «[Foto real de asociados…]» del diseño: reemplazado por el espacio de foto de marca decorativo (plan 5.7, aria-hidden).
           "Tu solicitud",
           "En revisión",
           "Enviada",
@@ -138,7 +138,7 @@ test.describe("E · Landing /", () => {
           "Somos una cooperativa hecha por y para la familia policial. Pides en línea, sabes tu tope desde el inicio y ves cada paso de tu solicitud.",
           "Solicitar crédito",
           "Quiero afiliarme",
-          "[Foto real de asociados — con autorización de uso]",
+          // «[Foto real de asociados…]» del diseño: reemplazado por el espacio de foto de marca decorativo (plan 5.7, aria-hidden).
           "Así ves tu solicitud",
           "En revisión",
           "Enviada",

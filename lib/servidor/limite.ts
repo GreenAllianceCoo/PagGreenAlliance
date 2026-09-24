@@ -22,7 +22,23 @@ import { crearClienteAdmin } from "@/lib/supabase/admin";
 /** Largo mínimo del secreto (el mismo criterio que INGRESO_COOKIE_SECRET). */
 export const LARGO_MINIMO_SECRETO = 32;
 
-/** IP del cliente según los encabezados del proxy (Vercel pone x-forwarded-for). */
+/**
+ * IP del cliente según los encabezados que pone el proxy.
+ *
+ * O-01: esto SOLO es confiable detrás de Vercel. Vercel sobrescribe
+ * `x-forwarded-for` y `x-real-ip` en cada request que llega a la función
+ * (ver https://vercel.com/docs/edge-network/headers#x-forwarded-for): un
+ * cliente no puede falsificarlos porque Vercel los reemplaza antes de que la
+ * app los lea. Si esta app se desplegara en otro proveedor (o detrás de un
+ * proxy propio que no limpie esos encabezados), cualquiera podría enviarlos
+ * y saltarse el límite por IP escribiendo un valor distinto en cada intento.
+ * En local (`next dev`), donde no hay proxy, también se pueden falsificar:
+ * las pruebas E2E de límites lo aprovechan a propósito (I3).
+ *
+ * Se usa el PRIMER valor de `x-forwarded-for` (la IP del cliente; si hay más
+ * de un proxy en la cadena, los siguientes valores son de esos proxys, no del
+ * cliente), y si no viene, `x-real-ip` como respaldo.
+ */
 export async function ipDelCliente() {
   const h = await headers();
   const reenviada = h.get("x-forwarded-for")?.split(",")[0]?.trim();

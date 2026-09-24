@@ -5,6 +5,8 @@ import { cookies } from "next/headers";
 import { correoDeRelleno, enmascararCorreo } from "@/lib/mascara";
 import { crearClienteAdmin, crearClienteAnonimoSinSesion } from "@/lib/supabase/admin";
 import { dentroDelLimite, ipDelCliente } from "@/lib/servidor/limite";
+// Reexportado para quien ya importaba este mensaje desde aquí (Server Action).
+export { MENSAJE_LIMITE_VERIFICACION } from "@/lib/validaciones/ingreso";
 
 /**
  * Ingreso con cédula + código (docs/spec-afiliacion-y-login.md §1).
@@ -20,6 +22,44 @@ export const COOKIE_INGRESO = "ga_ingreso";
 export const VIDA_COOKIE_SEGUNDOS = 10 * 60;
 /** Tiempo mínimo entre dos códigos para la misma cédula. */
 export const ESPERA_REENVIO_SEGUNDOS = 45;
+
+/**
+ * F-02: tope de intentos al VERIFICAR el código (antes no existía: se podían
+ * probar códigos sin límite). Dos topes, iguales al patrón que ya usa
+ * `enviarCodigo` (otp-ip / otp-cedula), para que un intento equivocado no
+ * bloquee de inmediato a alguien que solo se equivocó una vez, pero sí frene
+ * la fuerza bruta:
+ * - Por cédula: pocos intentos, porque un dueño real del código rara vez se
+ *   equivoca más de un par de veces.
+ * - Por IP: más intentos, porque una IP compartida (oficina, wifi público)
+ *   puede tener varias personas ingresando a la vez.
+ * Se cuenta CADA intento (acierte o no), y para cédulas registradas y no
+ * registradas por igual: así el límite en sí mismo no delata si la cédula
+ * existe (mismo comportamiento, mismo mensaje).
+ */
+export const LIMITE_VERIFICAR_POR_CEDULA = 5;
+export const LIMITE_VERIFICAR_POR_IP = 30;
+const VENTANA_VERIFICAR_SEGUNDOS = 15 * 60;
+
+/**
+ * true si todavía se puede intentar verificar el código (cédula e IP dentro
+ * del tope). Se apoya en `dentroDelLimite` (HMAC + tabla en Supabase, igual
+ * que el resto de los límites de esta app). Mismo estilo que `enviarCodigo`:
+ * corto circuito con `&&` (si la IP ya está bloqueada no hace falta gastar
+ * cupo de la cédula).
+ */
+export async function dentroDelLimiteDeVerificacion(cedula: string) {
+  const ip = await ipDelCliente();
+  return (
+    (await dentroDelLimite("otp-verificar-ip", ip, LIMITE_VERIFICAR_POR_IP, VENTANA_VERIFICAR_SEGUNDOS)) &&
+    (await dentroDelLimite(
+      "otp-verificar-cedula",
+      cedula,
+      LIMITE_VERIFICAR_POR_CEDULA,
+      VENTANA_VERIFICAR_SEGUNDOS,
+    ))
+  );
+}
 /**
  * Tiempo mínimo de respuesta del envío. Iguala el tiempo exista o no la
  * cédula (buscar + enviar tarda más que solo buscar).

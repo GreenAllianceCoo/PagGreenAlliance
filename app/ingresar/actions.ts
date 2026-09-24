@@ -12,10 +12,12 @@ import {
 import {
   borrarCookieIngreso,
   correoDeCedula,
+  dentroDelLimiteDeVerificacion,
   ESPERA_REENVIO_SEGUNDOS,
   enviarCodigo,
   guardarCookieIngreso,
   leerCookieIngreso,
+  MENSAJE_LIMITE_VERIFICACION,
   segundosParaReenviar,
 } from "@/lib/ingreso/servidor";
 import { createClient } from "@/lib/supabase/server";
@@ -67,6 +69,13 @@ export async function verificarCodigoIngreso(
 
   const codigo = esquemaCodigo.safeParse(leerCodigo(formData));
   if (!codigo.success) return { error: MENSAJE_CODIGO_INVALIDO };
+
+  // F-02: tope de intentos (por cédula y por IP) antes de gastar un intento
+  // real contra Supabase. Se revisa para cédulas registradas y no
+  // registradas por igual, así el límite no delata si la cédula existe.
+  if (!(await dentroDelLimiteDeVerificacion(datos.c))) {
+    return { error: MENSAJE_LIMITE_VERIFICACION };
+  }
 
   const correo = await correoDeCedula(datos.c);
   if (!correo) {

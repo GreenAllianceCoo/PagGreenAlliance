@@ -3,25 +3,28 @@
  * Reemplazar los valores entre corchetes cuando la cooperativa los confirme.
  */
 
-// TODO(pendiente-spec): número de WhatsApp. Se lee de NEXT_PUBLIC_WHATSAPP (sin +57).
-export const WHATSAPP_NUMERO = process.env.NEXT_PUBLIC_WHATSAPP || "[NÚMERO]";
+// Número de WhatsApp de la cooperativa (sin +57). NEXT_PUBLIC_WHATSAPP lo reemplaza si existe.
+const WHATSAPP_DIGITOS = (process.env.NEXT_PUBLIC_WHATSAPP || "3117241942").replace(/D/g, "");
+
+/** Número para mostrar: «311 724 1942». */
+export const WHATSAPP_NUMERO = WHATSAPP_DIGITOS.replace(/^(d{3})(d{3})(d{4})$/, "$1 $2 $3");
 
 /**
  * Enlace https://wa.me/57<NÚMERO> (mapa de botones §2–§4). Si la variable no
  * existe o no es un número de 10 dígitos, `null`: se muestra el texto sin enlace.
  */
-export function enlaceWhatsapp(numero = process.env.NEXT_PUBLIC_WHATSAPP) {
+export function enlaceWhatsapp(numero: string | undefined) {
   const digitos = (numero ?? "").replace(/\D/g, "");
   return /^[0-9]{10}$/.test(digitos) ? `https://wa.me/57${digitos}` : null;
 }
 
-export const WHATSAPP_URL = enlaceWhatsapp();
+export const WHATSAPP_URL = enlaceWhatsapp(WHATSAPP_DIGITOS);
 
-// TODO(pendiente-spec): días hábiles de respuesta a una solicitud de afiliación.
-export const DIAS_RESPUESTA = "[N]";
+// Tiempo de respuesta a una solicitud de afiliación (confirmado por la cooperativa).
+export const TIEMPO_RESPUESTA = "4 horas o menos";
 
-// TODO(pendiente-spec): correo de contacto público.
-export const CORREO_CONTACTO = "[correo]@greenallianceco.com";
+// Correo de contacto público.
+export const CORREO_CONTACTO = "soporte@greenallianceco.com";
 
 // TODO(pendiente-spec): texto legal de vigilancia.
 export const TEXTO_VIGILANCIA = "[Vigilada por Supersolidaria — confirmar]";

@@ -164,17 +164,11 @@ test.describe("D5/D3 · Envío válido", () => {
     expect(f.acepto_datos_at).not.toBeNull();
     expect(Math.abs(Date.parse(f.acepto_datos_at!) - antes)).toBeLessThan(60_000);
 
-    // Correos (spec §2 pasos 3 y 4): con QA_DEV_LOG se revisa que se intentaron para ESTA
-    // solicitud (sin RESEND_API_KEY quedan registrados como no enviados) y sin datos personales.
+    // Spec §2 (23-sep): en este paso NO se envían correos; el equipo revisa las pendientes.
+    // Con QA_DEV_LOG se revisa que ningún registro lleve datos personales de esta solicitud.
     const log = process.env.QA_DEV_LOG;
     if (log && fs.existsSync(log)) {
-      await expect
-        .poll(() => fs.readFileSync(log, "utf8").split(/\r?\n/).filter((l) => l.includes(f.id) && /evento\?":\?"afiliacion_correo/.test(l)).length, {
-          timeout: 10_000,
-          message: "registro del envío (o intento) de los correos de afiliación",
-        })
-        .toBeGreaterThan(0);
-      for (const l of fs.readFileSync(log, "utf8").split(/\r?\n/).filter((x) => x.includes(f.id))) {
+      for (const l of fs.readFileSync(log, "utf8").split(/\r?\n/).filter((x) => x.includes(f.id) || x.includes(cedula))) {
         expect(l).not.toContain("laura.qa@correo.com");
         expect(l).not.toContain(cedula);
         expect(l).not.toContain("3104567890");

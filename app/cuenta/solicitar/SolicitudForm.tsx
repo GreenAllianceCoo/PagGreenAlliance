@@ -74,7 +74,7 @@ export default function SolicitudForm({ paquetes }: { paquetes: Paquete[] }) {
                 aria-describedby={errorPorcentaje ? "porcentaje-error" : undefined}
                 className="peer sr-only"
               />
-              <span className="flex h-13.5 items-center justify-center rounded-12 border-1.5 border-ga-borde bg-white text-16 font-extrabold text-ga-texto transition-colors peer-checked:border-ga-verde peer-checked:bg-ga-verde-tint peer-checked:text-ga-verde peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ga-verde">
+              <span className="flex min-h-13.5 items-center justify-center rounded-12 border-1.5 border-ga-borde bg-white px-3 py-2 text-center text-16 font-extrabold leading-tight text-ga-texto transition-colors peer-checked:border-ga-verde peer-checked:bg-ga-verde-tint peer-checked:text-ga-verde peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ga-verde">
                 {p.porcentaje}% de devolución
               </span>
             </label>
@@ -108,7 +108,8 @@ export default function SolicitudForm({ paquetes }: { paquetes: Paquete[] }) {
           aria-valuetext={formatCOP(monto)}
           aria-invalid={errorMonto ? true : undefined}
           aria-describedby={["monto-ayuda", errorMonto ? "monto-error" : null].filter(Boolean).join(" ")}
-          className="w-full accent-ga-verde"
+          // h-11: área de toque de al menos 44 px de alto (el track visual sigue delgado).
+          className="h-11 w-full accent-ga-verde"
         />
         <div id="monto-ayuda" className="flex justify-between text-13 text-ga-texto-3">
           <span>Mínimo {formatCOP(montoMinimo)}</span>

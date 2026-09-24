@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { IngresoCodigo } from "@/components/pantallas/IngresoCodigo";
-import { LONGITUD_CODIGO } from "@/lib/validaciones/ingreso";
+import { LONGITUD_CODIGO, MENSAJE_LIMITE_VERIFICACION } from "@/lib/validaciones/ingreso";
 import {
   reenviarCodigoIngreso,
   verificarCodigoIngreso,
@@ -28,12 +28,18 @@ type Props = {
 export function FormularioCodigo({ correoEnmascarado, whatsapp, whatsappUrl, segundosIniciales }: Props) {
   const [digitos, setDigitos] = useState<string[]>(VACIO);
   const [restantes, setRestantes] = useState(segundosIniciales);
+  // F-02: una vez se supera el tope de intentos, «Entrar» queda deshabilitado
+  // (obliga a pedir un código nuevo) hasta que «Reenviar» responda bien. No
+  // basta con mirar el error de `estado` porque ese valor no se borra solo:
+  // por eso es un estado aparte, que sí se apaga en un reenvío exitoso.
+  const [limiteAlcanzado, setLimiteAlcanzado] = useState(false);
 
   const [estado, accionEntrar, entrando] = useActionState(
     async (previo: EstadoIngresoCodigo, formData: FormData) => {
       const resultado = await verificarCodigoIngreso(previo, formData);
       // Código equivocado o vencido: casillas vacías para escribirlo de nuevo.
       if (resultado.error) setDigitos(VACIO);
+      setLimiteAlcanzado(resultado.error === MENSAJE_LIMITE_VERIFICACION);
       return resultado;
     },
     {},
@@ -41,9 +47,16 @@ export function FormularioCodigo({ correoEnmascarado, whatsapp, whatsappUrl, seg
 
   const [reenvio, accionReenviar, reenviando] = useActionState<EstadoReenvio>(
     async () => {
+      // F-08: el código viejo deja de servir en cuanto se PIDE el reenvío
+      // (no cuando el servidor responde, que tarda ≥ 1,5 s a propósito). Si
+      // se borrara al terminar, se perdería lo que la persona haya pegado o
+      // escrito mientras tanto. Se borra aquí, antes del `await`, así lo que
+      // se escriba durante la espera queda intacto.
+      setDigitos(VACIO);
+      // Código nuevo en camino: se puede volver a intentar.
+      setLimiteAlcanzado(false);
       const resultado = await reenviarCodigoIngreso();
       if (typeof resultado.segundos === "number") setRestantes(resultado.segundos);
-      setDigitos(VACIO);
       return resultado;
     },
     {},
@@ -73,7 +86,7 @@ export function FormularioCodigo({ correoEnmascarado, whatsapp, whatsappUrl, seg
       cargando={entrando}
       accion={accionEntrar}
       accionReenviar={accionReenviar}
-      entrarDeshabilitado={!completo || reenviando}
+      entrarDeshabilitado={!completo || reenviando || limiteAlcanzado}
       reenviarDeshabilitado={restantes > 0 || reenviando || entrando}
       tiempoReenvio={restantes > 0 ? formatoTiempo(restantes) : undefined}
       mensajeEstado={reenviando ? "Enviando un código nuevo…" : reenvio.mensaje}

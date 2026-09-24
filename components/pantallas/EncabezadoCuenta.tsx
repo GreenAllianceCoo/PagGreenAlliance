@@ -28,7 +28,9 @@ export function EncabezadoCuenta({ nombre, seccion, accionSalir }: EncabezadoCue
       <Link href="/" aria-label="Ir al inicio" className="block h-11 w-logo min-w-0 shrink">
         <Logo tone="dark" />
       </Link>
-      <nav aria-label="Principal" className="hidden gap-7 text-16 font-bold lg:flex">
+      {/* whitespace-nowrap: con nombres largos entre 1024 y ~1150 px, «Nueva solicitud»
+          no debe partirse en 2 líneas (se hereda a los enlaces de adentro). */}
+      <nav aria-label="Principal" className="hidden gap-7 whitespace-nowrap text-16 font-bold lg:flex">
         <Link
           href="/cuenta"
           aria-current={seccion === "inicio" ? "page" : undefined}
@@ -50,7 +52,8 @@ export function EncabezadoCuenta({ nombre, seccion, accionSalir }: EncabezadoCue
         </a>
       </nav>
       <div className="hidden items-center gap-3.5 text-15 lg:flex">
-        <span className="font-bold">{nombre}</span>
+        {/* Nombre largo: no debe partir el header en 2 líneas entre 1024 y ~1150 px. */}
+        <span className="max-w-[160px] truncate font-bold">{nombre}</span>
         <form action={accionSalir}>
           <button
             type="submit"

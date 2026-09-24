@@ -60,9 +60,9 @@ export const GRADOS_EJEMPLO: Grado[] = [];
 export const ESTADISTICAS_EJEMPLO = {
   asociados: "+200",
   creditosAprobados: "[N]",
-  tiempoRespuesta: "[TIEMPO]",
+  tiempoRespuesta: "4 horas o menos",
   /** El diseño de celular abrevia el placeholder a «[T]» por falta de espacio. */
-  tiempoRespuestaCorto: "[T]",
+  tiempoRespuestaCorto: "≤ 4 h",
 };
 
 export type Testimonio = { texto: string; autor: string };

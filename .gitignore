@@ -36,3 +36,6 @@ npm-debug.log*
 
 # caché de Python (docs/avances/generar_excel.py)
 __pycache__/
+
+# capturas de las verificaciones (pesadas; el reporte .md sí se versiona)
+docs/verificaciones/**/*.png
