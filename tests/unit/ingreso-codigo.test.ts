@@ -57,9 +57,23 @@ function formularioCodigo(codigo: string) {
   return fd;
 }
 
-function verifyOtpFalso(respuesta: { error: { status?: number; code?: string; message?: string } | null }) {
+/**
+ * `rol`: el que devuelve `perfiles.rol` tras iniciar sesión, para la
+ * redirección final por rol (admin → /admin, asesor → /asesor, asociado →
+ * /cuenta). Por defecto "asociado" (el caso de la mayoría de estas pruebas).
+ */
+function verifyOtpFalso(
+  respuesta: { error: { status?: number; code?: string; message?: string } | null },
+  rol: string | null = "asociado",
+) {
   const verifyOtp = vi.fn().mockResolvedValue(respuesta);
-  vi.mocked(createClient).mockResolvedValue({ auth: { verifyOtp } } as never);
+  const getUser = vi.fn().mockResolvedValue({ data: { user: respuesta.error ? null : { id: "u1" } } });
+  const from = vi.fn(() => ({
+    select: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    single: vi.fn().mockResolvedValue({ data: rol ? { rol } : null }),
+  }));
+  vi.mocked(createClient).mockResolvedValue({ auth: { verifyOtp, getUser }, from } as never);
   return verifyOtp;
 }
 
@@ -122,5 +136,23 @@ describe("verificarCodigoIngreso · tope de intentos (F-02)", () => {
     const resultado = await verificarCodigoIngreso({}, formularioCodigo("000000"));
     expect(verifyOtp).toHaveBeenCalled();
     expect(resultado.error).toBe(MENSAJE_CODIGO_INVALIDO);
+  });
+});
+
+describe("verificarCodigoIngreso · redirección por rol", () => {
+  it.each([
+    ["admin", "/admin"],
+    ["asesor", "/asesor"],
+    ["asociado", "/cuenta"],
+  ] as const)("rol %s → %s", async (rol, destino) => {
+    verifyOtpFalso({ error: null }, rol);
+    const { redirigeA } = await verificar("123456");
+    expect(redirigeA).toBe(destino);
+  });
+
+  it("si no se puede leer el perfil, manda a /cuenta (destino de siempre)", async () => {
+    verifyOtpFalso({ error: null }, null);
+    const { redirigeA } = await verificar("123456");
+    expect(redirigeA).toBe("/cuenta");
   });
 });

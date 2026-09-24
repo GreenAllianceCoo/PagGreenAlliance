@@ -5,6 +5,10 @@ import { NextResponse, type NextRequest } from "next/server";
  * - Refresca la sesión de Supabase (cookies).
  * - /cuenta y sus subrutas (p. ej. /cuenta/solicitar) requieren sesión:
  *   sin sesión → /ingresar.
+ * - /admin y /asesor también requieren sesión (sin sesión → /ingresar). El
+ *   ROL (admin / asesor) no se comprueba aquí: cada página y cada Server
+ *   Action de esas dos áreas lo vuelven a comprobar con `exigirAdmin()` (o el
+ *   equivalente del asesor), porque el proxy no es la única barrera.
  * - /ingresar (y sus pasos) con sesión → /cuenta. Así los botones de la landing
  *   que apuntan a /ingresar («Mi cuenta», «Ingresar», «Solicitar crédito»,
  *   «Ver beneficios en mi cuenta») llevan a /cuenta cuando ya hay sesión.
@@ -46,7 +50,10 @@ export async function proxy(request: NextRequest) {
     return redireccion;
   };
 
-  const esPrivada = ruta === "/cuenta" || ruta.startsWith("/cuenta/");
+  const esPrivada =
+    ruta === "/cuenta" || ruta.startsWith("/cuenta/") ||
+    ruta === "/admin" || ruta.startsWith("/admin/") ||
+    ruta === "/asesor" || ruta.startsWith("/asesor/");
   if (!user && esPrivada) return redirigir("/ingresar");
 
   const esIngreso = ruta === "/ingresar" || ruta.startsWith("/ingresar/");
@@ -56,6 +63,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // "/cuenta/:path*" cubre /cuenta y /cuenta/solicitar.
-  matcher: ["/cuenta/:path*", "/ingresar/:path*"],
+  // "/cuenta/:path*" cubre /cuenta y /cuenta/solicitar. "/admin/:path*" y
+  // "/asesor/:path*" solo exigen sesión aquí; el rol lo valida cada página.
+  matcher: ["/cuenta/:path*", "/ingresar/:path*", "/admin/:path*", "/asesor/:path*"],
 };

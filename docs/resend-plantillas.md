@@ -1,12 +1,13 @@
 # Correos a los asociados · Green Alliance
 
-La plataforma envía tres correos a los asociados:
+La plataforma envía cuatro correos a los asociados:
 
 | # | Correo | Quién lo envía | Estado |
 |---|---|---|---|
-| 1 | Ingreso aceptado | Resend (plantilla) | **Falta programarlo**: la plantilla se puede crear ya, pero la app todavía no lo envía |
+| 1 | Ingreso aceptado | Resend (plantilla) | **Programado** (2026-09-24, `ga-funcionalidad-botones`): se envía al aprobar una afiliación desde `/admin` |
 | 2 | Código de 6 dígitos para ingresar | Supabase Auth (con Resend como SMTP) | **Funciona** en local; en producción falta configurar el panel |
 | 3 | Resultado del crédito (se puede desembolsar o no) | Resend (dos plantillas: aprobado / rechazado) | **Código listo, falta conectarlo**: no existe todavía la pantalla del administrador para aprobar o rechazar |
+| 4 | Número de boleta del sorteo mensual | Resend (plantilla) | **Funciona** (`lib/correo/sorteo.ts`, `app/cuenta/actions-sorteo.ts`); falta crear y publicar la plantilla en Resend |
 
 Reglas comunes para las plantillas de Resend:
 
@@ -33,7 +34,7 @@ Contenido sugerido:
 > Desde tu cuenta podrás solicitar un crédito y ver el estado de tus solicitudes.  
 > Si no solicitaste la afiliación, comunícate con el equipo de Green Alliance.
 
-**Pendiente en la app:** falta la acción del administrador que aprueba la afiliación, crea el usuario en Supabase Auth y el perfil (cédula, grado, correo) y envía este correo. `URL_INGRESO` es la página `/ingresar` del dominio de producción.
+**Programado** (2026-09-24, `ga-funcionalidad-botones`): al pulsar «Aprobar» en `/admin/afiliaciones/[id]` (`app/admin/afiliaciones/actions.ts#aprobarAfiliacion`), que crea el usuario en Supabase Auth (correo institucional, cédula y grado en `app_metadata`), completa el perfil (asesor y teléfono) y envía este correo. `URL_INGRESO` se arma con el host de la petición (`x-forwarded-host`/`host`), así que apunta siempre al dominio real (local o producción) sin necesitar una variable de entorno nueva. Si Resend falla, la cuenta queda creada igual y el error se registra (no bloquea la aprobación).
 
 ---
 
@@ -87,3 +88,26 @@ Contenido sugerido:
 > Si tienes preguntas, comunícate con el equipo de Green Alliance.
 
 **Pendiente en la app:** el código que envía estos correos ya existe, pero nadie lo llama, porque todavía no hay pantalla del administrador para aprobar o rechazar. La base exige un motivo al rechazar (migración `blindar_solicitudes_y_revisiones`, aún no aplicada en producción), y ese motivo es el que va en `MOTIVO`.
+
+---
+
+## 4. Número de boleta del sorteo
+
+Se envía cuando un asociado pulsa «Quiero participar» en el sorteo mensual de `/cuenta` (docs/spec-fase-2.md §4, `participar_sorteo()`). Es el único momento en el que el número de boleta existe fuera de la base: la Server Action lo manda por este correo y nunca lo devuelve al navegador (`app/cuenta/actions-sorteo.ts`, `lib/correo/sorteo.ts`). El asociado lo escribe de vuelta en el paso 2 del modal para confirmar su participación.
+
+**Nombre:** `ga-sorteo-boleta`
+**Entorno:** `RESEND_TEMPLATE_SORTEO_BOLETA`
+**Asunto:** ¡Ya tienes tu boleta para el sorteo de {{{MES}}}! · Cooperativa Green Alliance
+**Variables:** `NOMBRE`, `NUMERO_BOLETA`, `MES`.
+
+Contenido sugerido (tono alegre, coherente con la celebración de la pantalla):
+
+> ¡Hola, {{{NOMBRE}}}! 🎉 Ya estás a un paso de participar en el sorteo de {{{MES}}} de la Cooperativa Green Alliance.
+>
+> Tu número de boleta es **{{{NUMERO_BOLETA}}}**.
+>
+> Vuelve a la pestaña de «Sorteo del mes» en tu cuenta y escribe este número para confirmar tu participación. El ganador se anunciará por los canales oficiales de Green Alliance.
+>
+> Si tú no pediste participar en el sorteo, ignora este correo.
+
+**Nota (local / desarrollo):** si `RESEND_TEMPLATE_SORTEO_BOLETA` no está configurada (o el envío falla), la app NO se cae: registra el número en el log estructurado del servidor (`registrar("info"/"error", { evento: "sorteo_boleta_..." })`) para poder probar el flujo de confirmación sin depender de Resend. Ese número nunca llega a la interfaz ni a la respuesta HTTP.

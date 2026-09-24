@@ -3,7 +3,11 @@
  * Casos válidos e inválidos de cada campo + normalización.
  */
 import { describe, expect, it } from "vitest";
-import { esquemaAfiliacion, leerFormularioAfiliacion } from "@/lib/validaciones/afiliacion";
+import {
+  esquemaAfiliacion,
+  leerFormularioAfiliacion,
+  valoresDeTextoAfiliacion,
+} from "@/lib/validaciones/afiliacion";
 import {
   erroresPorCampo,
   esquemaCedula,
@@ -125,15 +129,27 @@ describe("ingreso", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Afiliación
+// Afiliación (spec-fase-2 §2: nombres/apellidos, institución, Nequi, asesor, fotos)
 // ---------------------------------------------------------------------------
+
+/** Archivo de prueba válido (jpeg, 10 bytes: muy por debajo del límite de 5 MB). */
+function fotoValida(nombre = "foto.jpg", tipo = "image/jpeg", bytes = 10) {
+  return new File([new Uint8Array(bytes)], nombre, { type: tipo });
+}
+
 const VALIDO = {
-  nombre: "  Juan   Pérez  ",
+  nombres: "  Juan   Carlos  ",
+  apellidos: "  Pérez   Gómez  ",
   cedula: "1.234.567.890",
   grado_id: "PT",
-  unidad: "",
+  institucion: "policia",
+  nequi: "301 000 0000",
   celular: "300 123 4567",
-  email: "Juan@Correo.com",
+  email: "Juan.Perez@Policia.Gov.Co",
+  asesor_id: "",
+  foto_cedula_frente: fotoValida("frente.jpg"),
+  foto_cedula_reverso: fotoValida("reverso.jpg"),
+  foto_selfie: fotoValida("selfie.jpg"),
   mensaje: "   ",
   acepto_datos: true,
 };
@@ -150,24 +166,36 @@ function errorDe(campo: string, entrada: unknown) {
 
 describe("esquemaAfiliacion", () => {
   it("acepta un formulario válido y normaliza", () => {
-    expect(esquemaAfiliacion.parse(VALIDO)).toEqual({
-      nombre: "Juan Pérez",
+    const datos = esquemaAfiliacion.parse(VALIDO);
+    expect(datos).toMatchObject({
+      nombres: "Juan Carlos",
+      apellidos: "Pérez Gómez",
       cedula: "1234567890",
       grado_id: "PT",
-      unidad: null,
+      institucion: "policia",
+      nequi: "3010000000",
       celular: "3001234567",
-      email: "juan@correo.com",
+      email: "juan.perez@policia.gov.co",
+      asesor_id: null,
       mensaje: null,
       acepto_datos: true,
     });
+    expect(datos.foto_cedula_frente).toBeInstanceOf(File);
   });
 
-  it("nombre: 3–120 caracteres", () => {
-    expect(errorDe("nombre", conCambio({ nombre: "" }))).toBe("Escribe tus nombres y apellidos.");
-    expect(errorDe("nombre", conCambio({ nombre: "Al" }))).toMatch(/al menos 3/);
-    expect(errorDe("nombre", conCambio({ nombre: "A".repeat(121) }))).toMatch(/máximo 120/);
-    expect(errorDe("nombre", conCambio({ nombre: "Ana" }))).toBeUndefined();
-    expect(errorDe("nombre", conCambio({ nombre: "A".repeat(120) }))).toBeUndefined();
+  it("nombres: solo letras (con tildes y ñ) y espacios, 2 a 60 caracteres", () => {
+    expect(errorDe("nombres", conCambio({ nombres: "" }))).toBe("Escribe tus nombres.");
+    expect(errorDe("nombres", conCambio({ nombres: "A" }))).toMatch(/al menos 2/);
+    expect(errorDe("nombres", conCambio({ nombres: "A".repeat(61) }))).toMatch(/máximo 60/);
+    expect(errorDe("nombres", conCambio({ nombres: "Juan2" }))).toMatch(/solo puede tener letras/);
+    expect(errorDe("nombres", conCambio({ nombres: "José Ñáñez" }))).toBeUndefined();
+    expect(errorDe("nombres", conCambio({ nombres: "An" }))).toBeUndefined();
+  });
+
+  it("apellidos: misma regla que nombres, con su propio mensaje de vacío", () => {
+    expect(errorDe("apellidos", conCambio({ apellidos: "" }))).toBe("Escribe tus apellidos.");
+    expect(errorDe("apellidos", conCambio({ apellidos: "Ruiz-Gómez" }))).toMatch(/solo puede tener letras/);
+    expect(errorDe("apellidos", conCambio({ apellidos: "Ruiz Gómez" }))).toBeUndefined();
   });
 
   it("cédula: 6–10 dígitos", () => {
@@ -183,10 +211,18 @@ describe("esquemaAfiliacion", () => {
     expect(errorDe("grado_id", conCambio({ grado_id: grado }))).toBe("Selecciona tu grado.");
   });
 
-  it("unidad: opcional, hasta 120", () => {
-    expect(errorDe("unidad", conCambio({ unidad: "" }))).toBeUndefined();
-    expect(errorDe("unidad", conCambio({ unidad: "U".repeat(120) }))).toBeUndefined();
-    expect(errorDe("unidad", conCambio({ unidad: "U".repeat(121) }))).toMatch(/máximo 120/);
+  it.each(["policia", "ejercito"])("institución: acepta %s", (institucion) => {
+    expect(errorDe("institucion", conCambio({ institucion }))).toBeUndefined();
+  });
+  it.each(["", "armada", "Policia"])("institución: rechaza %j", (institucion) => {
+    expect(errorDe("institucion", conCambio({ institucion }))).toBe("Selecciona tu institución.");
+  });
+
+  it("Nequi: 10 dígitos que empiezan por 3, con su propio mensaje de vacío", () => {
+    expect(errorDe("nequi", conCambio({ nequi: "" }))).toBe("Escribe tu número Nequi.");
+    expect(errorDe("nequi", conCambio({ nequi: "2001234567" }))).toMatch(/empezar por 3/);
+    expect(errorDe("nequi", conCambio({ nequi: "300123456" }))).toMatch(/10 dígitos/);
+    expect(errorDe("nequi", conCambio({ nequi: "300 123 4567" }))).toBeUndefined();
   });
 
   it("celular: 10 dígitos que empiezan por 3", () => {
@@ -195,9 +231,50 @@ describe("esquemaAfiliacion", () => {
     expect(errorDe("celular", conCambio({ celular: "300123456" }))).toMatch(/10 dígitos/);
   });
 
-  it("correo: obligatorio y con formato", () => {
-    expect(errorDe("email", conCambio({ email: "" }))).toBe("Escribe tu correo electrónico.");
+  it("correo institucional: obligatorio, con formato y dominio según la institución", () => {
+    expect(errorDe("email", conCambio({ email: "" }))).toBe("Escribe tu correo institucional.");
     expect(errorDe("email", conCambio({ email: "no-es-correo" }))).toMatch(/Revisa el correo/);
+    // Formato válido pero dominio equivocado para la institución elegida.
+    expect(errorDe("email", conCambio({ institucion: "policia", email: "juan@gmail.com" }))).toMatch(
+      /institucional.*@policia\.gov\.co/,
+    );
+    expect(
+      errorDe("email", conCambio({ institucion: "ejercito", email: "juan@policia.gov.co" })),
+    ).toMatch(/institucional.*ejercito\.mil\.co/);
+  });
+  it.each([
+    ["policia", "juan.perez@policia.gov.co"],
+    ["ejercito", "juan.perez@ejercito.mil.co"],
+    ["ejercito", "juan.perez@buzonejercito.mil.co"],
+  ])("correo institucional: acepta %s con %s", (institucion, email) => {
+    expect(errorDe("email", conCambio({ institucion, email }))).toBeUndefined();
+  });
+
+  it("asesor: opcional (vacío → null), si viene debe ser un uuid", () => {
+    expect(esquemaAfiliacion.parse(conCambio({ asesor_id: "" })).asesor_id).toBeNull();
+    expect(errorDe("asesor_id", conCambio({ asesor_id: "no-es-un-uuid" }))).toMatch(/asesor válido/);
+    expect(
+      errorDe("asesor_id", conCambio({ asesor_id: "550e8400-e29b-41d4-a716-446655440000" })),
+    ).toBeUndefined();
+  });
+
+  it.each(["foto_cedula_frente", "foto_cedula_reverso", "foto_selfie"] as const)(
+    "%s: obligatoria",
+    (campo) => {
+      expect(errorDe(campo, conCambio({ [campo]: null }))).toBeTruthy();
+    },
+  );
+  it("fotos: rechaza un tipo que no sea jpeg/png/webp", () => {
+    expect(
+      errorDe("foto_cedula_frente", conCambio({ foto_cedula_frente: fotoValida("f.gif", "image/gif") })),
+    ).toMatch(/JPG, PNG o WEBP/);
+  });
+  it("fotos: rechaza más de 5 MB", () => {
+    const pesada = fotoValida("f.jpg", "image/jpeg", 5 * 1024 * 1024 + 1);
+    expect(errorDe("foto_cedula_frente", conCambio({ foto_cedula_frente: pesada }))).toMatch(/5 MB/);
+  });
+  it.each(["image/jpeg", "image/png", "image/webp"])("fotos: acepta %s", (tipo) => {
+    expect(errorDe("foto_selfie", conCambio({ foto_selfie: fotoValida("f", tipo) }))).toBeUndefined();
   });
 
   it("mensaje: opcional, hasta 500", () => {
@@ -212,31 +289,63 @@ describe("esquemaAfiliacion", () => {
 
   it("reporta un error por cada campo inválido", () => {
     const r = esquemaAfiliacion.safeParse({
-      nombre: "",
+      nombres: "",
+      apellidos: "",
       cedula: "",
       grado_id: "",
-      unidad: "",
+      institucion: "",
+      nequi: "",
       celular: "",
       email: "",
+      asesor_id: "no-es-un-uuid",
+      foto_cedula_frente: null,
+      foto_cedula_reverso: null,
+      foto_selfie: null,
       mensaje: "",
       acepto_datos: false,
     });
     expect(r.success).toBe(false);
     if (!r.success) {
       expect(Object.keys(erroresPorCampo(r.error)).sort()).toEqual(
-        ["acepto_datos", "cedula", "celular", "email", "grado_id", "nombre"].sort(),
+        [
+          "acepto_datos",
+          "apellidos",
+          "asesor_id",
+          "cedula",
+          "celular",
+          "email",
+          "foto_cedula_frente",
+          "foto_cedula_reverso",
+          "foto_selfie",
+          "grado_id",
+          "institucion",
+          "nequi",
+          "nombres",
+        ].sort(),
       );
     }
   });
 
-  it("lee el FormData del formulario (checkbox marcado = «on»)", () => {
+  it("lee el FormData del formulario (checkbox marcado = «on», fotos como File)", () => {
     const fd = new FormData();
-    fd.append("nombre", "Ana Ruiz");
+    fd.append("nombres", "Ana");
     fd.append("acepto_datos", "on");
+    fd.append("foto_selfie", fotoValida("selfie.jpg"));
     const entrada = leerFormularioAfiliacion(fd);
-    expect(entrada.nombre).toBe("Ana Ruiz");
+    expect(entrada.nombres).toBe("Ana");
     expect(entrada.cedula).toBe("");
     expect(entrada.acepto_datos).toBe(true);
+    expect(entrada.foto_selfie).toBeInstanceOf(File);
+    expect(entrada.foto_cedula_frente).toBeNull();
     expect(leerFormularioAfiliacion(new FormData()).acepto_datos).toBe(false);
+  });
+
+  it("valoresDeTextoAfiliacion: quita las 3 fotos y deja el resto de campos", () => {
+    const entrada = leerFormularioAfiliacion(new FormData());
+    const valores = valoresDeTextoAfiliacion(entrada);
+    expect(valores).not.toHaveProperty("foto_cedula_frente");
+    expect(valores).not.toHaveProperty("foto_cedula_reverso");
+    expect(valores).not.toHaveProperty("foto_selfie");
+    expect(valores).toMatchObject({ nombres: "", cedula: "", acepto_datos: false });
   });
 });

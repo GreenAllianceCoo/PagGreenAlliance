@@ -133,11 +133,46 @@ insert into public.solicitudes_afiliacion (
   nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
   asesor_id, foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
 ) values (
-  'Camilo', 'Restrepo Gil', '1234567899', 'PT', 'policia', '3009998877', '3009998877',
+  'Camilo', 'Restrepo Gil', '1234567898', 'PT', 'policia', '3009998877', '3009998877',
   'camilo.restrepo@policia.gov.co',
   '9f2e6a1c-6b3d-4a2e-9c7a-1d2e3f4a5b6c',
-  'afiliacion-documentos/1234567899/cedula-frente.jpg',
-  'afiliacion-documentos/1234567899/cedula-reverso.jpg',
-  'afiliacion-documentos/1234567899/selfie.jpg',
+  'afiliacion-documentos/1234567898/cedula-frente.jpg',
+  'afiliacion-documentos/1234567898/cedula-reverso.jpg',
+  'afiliacion-documentos/1234567898/selfie.jpg',
   now()
 );
+
+-- ============================================================
+-- Fase 2 · Admin de prueba (rol admin, ingresa igual que un asociado: cédula
+-- + código a Mailpit). Cédula 1234567899.
+-- ============================================================
+insert into auth.users (
+  instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+  raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+  confirmation_token, recovery_token, email_change, email_change_token_new
+) values (
+  '00000000-0000-0000-0000-000000000000',
+  'bd8bb056-286f-4b75-89e1-cc07b6c7c0f8',
+  'authenticated', 'authenticated',
+  'admin.prueba@greenalliance.test',
+  extensions.crypt('Prueba123!', extensions.gen_salt('bf')),
+  now(),
+  '{"provider":"email","providers":["email"],"cedula":"1234567899"}',
+  '{"nombre_completo":"Admin de Prueba"}',
+  now(), now(), '', '', '', ''
+);
+
+insert into auth.identities (
+  id, user_id, provider_id, provider, identity_data, last_sign_in_at, created_at, updated_at
+) values (
+  gen_random_uuid(),
+  'bd8bb056-286f-4b75-89e1-cc07b6c7c0f8',
+  'bd8bb056-286f-4b75-89e1-cc07b6c7c0f8',
+  'email',
+  '{"sub":"bd8bb056-286f-4b75-89e1-cc07b6c7c0f8","email":"admin.prueba@greenalliance.test","email_verified":true}',
+  now(), now(), now()
+);
+
+update public.perfiles
+   set cedula = '1234567899', rol = 'admin'
+ where id = 'bd8bb056-286f-4b75-89e1-cc07b6c7c0f8';

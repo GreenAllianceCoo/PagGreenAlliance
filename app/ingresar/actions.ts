@@ -95,7 +95,21 @@ export async function verificarCodigoIngreso(
   }
 
   await borrarCookieIngreso();
-  redirect("/cuenta");
+
+  // Redirección por rol (admin → /admin, asesor → /asesor, asociado → /cuenta).
+  // Si por lo que sea no se puede leer el perfil, se manda a /cuenta (el destino
+  // de siempre); /admin y /asesor exigen su propio rol con exigirAdmin() y su
+  // equivalente, así que un asociado nunca llega ahí por error.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  let destino = "/cuenta";
+  if (user) {
+    const { data: perfil } = await supabase.from("perfiles").select("rol").eq("id", user.id).single();
+    if (perfil?.rol === "admin") destino = "/admin";
+    else if (perfil?.rol === "asesor") destino = "/asesor";
+  }
+  redirect(destino);
 }
 
 // ---------------------------------------------------------------------------

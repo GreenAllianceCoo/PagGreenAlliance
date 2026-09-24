@@ -2,22 +2,31 @@
 
 import { useActionState, useEffect } from "react";
 import { Afiliacion } from "@/components/pantallas/Afiliacion";
-import { esquemaAfiliacion, leerFormularioAfiliacion, type CampoAfiliacion } from "@/lib/validaciones/afiliacion";
-import { erroresPorCampo } from "@/lib/validaciones/comunes";
+import type { Asesor } from "@/lib/afiliacion/asesores";
 import type { Grado } from "@/lib/mock";
+import {
+  esquemaAfiliacion,
+  leerFormularioAfiliacion,
+  valoresDeTextoAfiliacion,
+  type CampoAfiliacion,
+} from "@/lib/validaciones/afiliacion";
+import { erroresPorCampo } from "@/lib/validaciones/comunes";
 import { enviarAfiliacion, type EstadoAfiliacion } from "./actions";
 
 const ESTADO_INICIAL: EstadoAfiliacion = {};
 
 /** Conecta /afiliacion con su Server Action: validación previa, carga, errores y foco. */
-export function FormularioAfiliacion({ grados }: { grados: Grado[] }) {
+export function FormularioAfiliacion({ grados, asesores }: { grados: Grado[]; asesores: Asesor[] }) {
   const [estado, accion, enviando] = useActionState(
     async (previo: EstadoAfiliacion, formData: FormData): Promise<EstadoAfiliacion> => {
-      // Mismo esquema zod que el servidor: si algo falla, no se envía.
+      // Mismo esquema zod que el servidor: si algo falla, no se envía (ni se suben las fotos).
       const entrada = leerFormularioAfiliacion(formData);
       const local = esquemaAfiliacion.safeParse(entrada);
       if (!local.success) {
-        return { errores: erroresPorCampo<CampoAfiliacion>(local.error), valores: entrada };
+        return {
+          errores: erroresPorCampo<CampoAfiliacion>(local.error),
+          valores: valoresDeTextoAfiliacion(entrada),
+        };
       }
       return enviarAfiliacion(previo, formData);
     },
@@ -34,6 +43,7 @@ export function FormularioAfiliacion({ grados }: { grados: Grado[] }) {
   return (
     <Afiliacion
       grados={grados}
+      asesores={asesores}
       accion={accion}
       cargando={enviando}
       errores={estado.errores}

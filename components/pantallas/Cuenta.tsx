@@ -7,6 +7,7 @@ import { ConvenioCard } from "@/components/ui/ConvenioCard";
 import { IconoConvenios, IconoDocumento, IconoMas, IconoSalir } from "@/components/ui/Iconos";
 import { EncabezadoCuenta, RUTA_NUEVA_SOLICITUD } from "@/components/pantallas/EncabezadoCuenta";
 import { PasosSolicitud } from "@/components/ui/PasosSolicitud";
+import { SorteoDelMes, type SorteoDelMesProps } from "@/components/sorteo/SorteoDelMes";
 import type { Convenio, PasoSolicitud } from "@/lib/mock";
 
 export type CuentaProps = {
@@ -24,6 +25,8 @@ export type CuentaProps = {
     pasos: PasoSolicitud[];
   } | null;
   convenios: Convenio[];
+  /** «Sorteo del mes» (docs/spec-fase-2.md §4): botón + modal, ver components/sorteo/SorteoDelMes. */
+  sorteo: SorteoDelMesProps;
   /** Datos de solo lectura de «Mis datos». */
   cedula: string;
   grado: string;
@@ -181,6 +184,7 @@ export function Cuenta({
   tope,
   solicitud,
   convenios,
+  sorteo,
   cedula,
   grado,
   telefono,
@@ -275,6 +279,11 @@ export function Cuenta({
                 <IconoConvenios grosor={1.8} className="text-ga-verde" />
                 Convenios
               </a>
+              {/* Sorteo mensual (docs/spec-fase-2.md §4): botón + modal en un solo
+                  componente autocontenido (ver components/sorteo/SorteoDelMes.tsx).
+                  TODO(diseño): no hay maqueta para este acceso; revisar ubicación,
+                  copy e ícono con ga-diseno-a-codigo. */}
+              <SorteoDelMes {...sorteo} />
             </nav>
             {/* https://wa.me/57<NÚMERO> con NEXT_PUBLIC_WHATSAPP. Sin número: sin enlace (aria-disabled).
                 TODO(pendiente-spec): falta el número real. */}
