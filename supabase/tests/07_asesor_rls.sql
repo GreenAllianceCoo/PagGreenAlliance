@@ -6,7 +6,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(19);
+select plan(20);
 
 -- ------------------------------------------------------------
 -- Datos de prueba
@@ -185,6 +185,23 @@ select set_eq(
   $$ select origen from public.resumen_clientes_asesor() $$,
   array[]::text[],
   'resumen_clientes_asesor() sin auth.uid() (service role) no devuelve filas de nadie'
+);
+
+-- ------------------------------------------------------------
+-- F2-03 (20260924000700): un asesor al que se le quita el rol deja de ver
+-- a sus antiguos clientes (antes, resumen_clientes_asesor() solo filtraba
+-- por asesor_id, sin revisar el rol ACTUAL de quien llama).
+-- ------------------------------------------------------------
+reset role;
+set local request.jwt.claims = '';
+update public.perfiles set rol = 'asociado' where id = '00000000-0000-4000-a000-0000000000e1';
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"00000000-0000-4000-a000-0000000000e1","role":"authenticated"}';
+
+select is_empty(
+  $$ select * from public.resumen_clientes_asesor() $$,
+  'un asesor degradado a asociado ya no ve a sus antiguos clientes (F2-03)'
 );
 
 select * from finish();

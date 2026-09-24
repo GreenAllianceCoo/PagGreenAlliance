@@ -78,6 +78,13 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
         <p className="m-0 text-13 text-ga-texto-3">
           Los enlaces vencen a los pocos minutos; recarga la página si ya no abren.
         </p>
+        {/* S-07 (revisión de seguridad 2026-09-24): el correo completo se
+            repite aquí, junto a las fotos, para compararlo sin desplazarse
+            hasta «Datos de la solicitud». */}
+        <p className="m-0 text-15">
+          <span className="font-bold text-ga-texto-3">Correo institucional: </span>
+          <span className="font-bold text-ga-texto">{solicitud.email || "—"}</span>
+        </p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {[
             { etiqueta: "Cédula (frente)", url: fotos.frente },
@@ -105,6 +112,20 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
 
       <section className="flex flex-col gap-4 rounded-18 bg-white p-5 lg:p-7">
         <h2 className="m-0 text-18 font-extrabold">Cambiar estado</h2>
+        {/* S-07 (revisión de seguridad 2026-09-24): aviso antes de Aprobar/Rechazar.
+            No agrega un paso de verificación por código: es solo un recordatorio
+            visible para que el admin revise antes de decidir. */}
+        <div
+          role="alert"
+          className="flex flex-col gap-1.5 rounded-14 bg-ga-ambar-fondo p-4 text-14 leading-150 text-ga-ambar-texto"
+        >
+          <span className="font-extrabold">Antes de aprobar</span>
+          <p className="m-0">
+            Confirma que el nombre del correo institucional corresponde a la persona, y que la cédula
+            (frente y reverso) y la selfie son de la misma persona. Si tienes dudas, contáctala por
+            WhatsApp antes de aprobar.
+          </p>
+        </div>
         <AccionesAfiliacion id={solicitud.id} estado={solicitud.estado} />
       </section>
     </AdminShell>

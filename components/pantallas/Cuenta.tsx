@@ -25,8 +25,13 @@ export type CuentaProps = {
     pasos: PasoSolicitud[];
   } | null;
   convenios: Convenio[];
-  /** «Sorteo del mes» (docs/spec-fase-2.md §4): botón + modal, ver components/sorteo/SorteoDelMes. */
-  sorteo: SorteoDelMesProps;
+  /**
+   * «Sorteo del mes» (docs/spec-fase-2.md §4): botón + modal, ver
+   * components/sorteo/SorteoDelMes. `null` cuando quien ve /cuenta no es
+   * asociado (S-13, revisión de seguridad 2026-09-24): admins y asesores no
+   * participan en el sorteo, así que ni se muestra el acceso.
+   */
+  sorteo: SorteoDelMesProps | null;
   /** Datos de solo lectura de «Mis datos». */
   cedula: string;
   grado: string;
@@ -282,8 +287,10 @@ export function Cuenta({
               {/* Sorteo mensual (docs/spec-fase-2.md §4): botón + modal en un solo
                   componente autocontenido (ver components/sorteo/SorteoDelMes.tsx).
                   TODO(diseño): no hay maqueta para este acceso; revisar ubicación,
-                  copy e ícono con ga-diseno-a-codigo. */}
-              <SorteoDelMes {...sorteo} />
+                  copy e ícono con ga-diseno-a-codigo.
+                  S-13: solo se renderiza para asociados (sorteo === null para
+                  el resto de roles, decidido en app/cuenta/page.tsx). */}
+              {sorteo ? <SorteoDelMes {...sorteo} /> : null}
             </nav>
             {/* https://wa.me/57<NÚMERO> con NEXT_PUBLIC_WHATSAPP. Sin número: sin enlace (aria-disabled).
                 TODO(pendiente-spec): falta el número real. */}

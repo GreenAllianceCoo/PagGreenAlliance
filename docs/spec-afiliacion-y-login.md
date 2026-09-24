@@ -40,6 +40,8 @@ Patrón responsive: en escritorio el ingreso usa panel verde a la izquierda + fo
 2. Inserta en la tabla nueva `solicitudes_afiliacion` con estado `pendiente`.
 3. Redirige a «Solicitud enviada». No se envían correos en este paso: el equipo revisa las solicitudes pendientes en la base y, si la aprueba, la persona recibe el correo «Ingreso aceptado» (ver `docs/resend-plantillas.md`).
 
+**Cédula con otra solicitud `pendiente` (S-06, revisión de seguridad 2026-09-24):** la respuesta es **idéntica** a la de un envío exitoso (mismo redirect a «Solicitud enviada», mismo tiempo aproximado, sin ningún mensaje distinto bajo el campo Cédula). No se guarda una segunda fila: lo impide el índice único parcial de la base sobre `cedula` mientras `estado = 'pendiente'`. El equipo puede ver el intento en el registro del servidor (evento `afiliacion_duplicada`, sin cédula ni datos personales), pero la persona que llena el formulario no puede distinguir, ni por el mensaje ni por cuánto tarda la respuesta, si esa cédula ya está en trámite.
+
 **Tabla `solicitudes_afiliacion`:** id uuid · nombre text · cedula text · grado_id → grados_credito · unidad text null · celular text · email text · mensaje text null · acepto_datos_at timestamptz · estado (pendiente | contactado | aprobada | rechazada) · created_at timestamptz.
 
 **Seguridad:** insert solo desde el servidor (service role); RLS sin acceso público; el admin lee y cambia el estado. Límite de envíos por IP y cédula + campo trampa (honeypot).

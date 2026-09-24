@@ -17,10 +17,12 @@ function mesActualBogota() {
   return { anio, mes };
 }
 
+/** Forma que devuelve la RPC boletas_confirmadas_sorteo (F2-01, 20260924000600). */
 type FilaBoleta = {
   numero: string;
   fecha_confirmacion: string | null;
-  perfiles: { nombre_completo: string; cedula: string } | null;
+  nombre_completo: string | null;
+  cedula: string | null;
 };
 
 /** Boletas confirmadas del mes elegido (mapa §Admin · Sorteo). */
@@ -36,15 +38,12 @@ export default async function SorteoPage({
   const mesNum = Number(mesCrudo);
   const mes = mesNum >= 1 && mesNum <= 12 ? mesNum : actual.mes;
 
-  const { data, error } = await supabase
-    .from("boletas_sorteo")
-    .select("numero, fecha_confirmacion, perfiles:asociado_id(nombre_completo, cedula)")
-    .eq("anio", anio)
-    .eq("mes", mes)
-    .eq("estado", "confirmada")
-    .order("fecha_confirmacion", { ascending: true });
+  // F2-01 (20260924000600): la columna `numero` ya no se puede leer por
+  // select directo (ni el admin): solo por esta RPC, que se autofiltra por
+  // es_admin() dentro (quien no sea admin recibe 0 filas).
+  const { data, error } = await supabase.rpc("boletas_confirmadas_sorteo", { p_anio: anio, p_mes: mes });
 
-  const boletas = (data ?? []) as unknown as FilaBoleta[];
+  const boletas = (data ?? []) as FilaBoleta[];
   // Rango razonable para el selector: desde que existe la app hasta el año siguiente.
   const anios = Array.from({ length: 5 }, (_, i) => actual.anio - 3 + i);
 
@@ -76,8 +75,8 @@ export default async function SorteoPage({
               {boletas.map((b) => (
                 <tr key={b.numero} className="border-b border-ga-linea last:border-0">
                   <td className="p-4 font-mono font-bold tracking-cedula">{b.numero}</td>
-                  <td className="p-4">{b.perfiles?.nombre_completo ?? "—"}</td>
-                  <td className="p-4">{b.perfiles?.cedula ?? "—"}</td>
+                  <td className="p-4">{b.nombre_completo ?? "—"}</td>
+                  <td className="p-4">{b.cedula ?? "—"}</td>
                   <td className="p-4 text-ga-texto-3">
                     {b.fecha_confirmacion
                       ? new Date(b.fecha_confirmacion).toLocaleString("es-CO", { dateStyle: "short", timeStyle: "short" })

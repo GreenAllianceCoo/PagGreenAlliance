@@ -182,7 +182,7 @@ test.describe("D5/D3 · Envío válido", () => {
 });
 
 test.describe("D6 · Segunda solicitud con la misma cédula pendiente", () => {
-  test("Rechazada con mensaje claro y sin fila nueva", async ({ page }) => {
+  test("Responde igual que un envío exitoso, sin fila nueva (S-06: mensaje neutro)", async ({ page }) => {
     const cedula = cedulaUnica();
     creadas.push(cedula);
     await page.goto("/afiliacion");
@@ -194,16 +194,12 @@ test.describe("D6 · Segunda solicitud con la misma cédula pendiente", () => {
     await page.goto("/afiliacion");
     await llenarAfiliacion(page, { ...datosValidos(cedula), email: "otro.correo@correo.com" });
     await enviar(page);
-    await expect(page.locator(ERROR.cedula)).toHaveText(
-      "Ya tenemos una solicitud pendiente con esta cédula. El equipo te contactará pronto.",
-    );
-    await expect(page).toHaveURL(/\/afiliacion$/);
+    // S-06 (revisión de seguridad 2026-09-24): ya NO hay un mensaje distinto
+    // ni se queda en /afiliacion; responde exactamente como un envío exitoso,
+    // para no delatar por el mensaje (ni por el tiempo de respuesta) que esa
+    // cédula ya tiene una solicitud pendiente.
+    await expect(page).toHaveURL(/\/afiliacion\/enviada$/);
     expect(await afiliacionesPorCedula(cedula)).toHaveLength(1);
-    // F-01: con un error del servidor se conserva lo escrito, incluido «Grado».
-    await expect(page.getByLabel("Grado")).toHaveValue("PT");
-    await expect(page.getByLabel("Número de cédula")).toHaveValue(cedula);
-    await expect(page.getByLabel("Correo electrónico")).toHaveValue("otro.correo@correo.com");
-    await expect(page.locator("#af-datos")).toBeChecked();
   });
 });
 

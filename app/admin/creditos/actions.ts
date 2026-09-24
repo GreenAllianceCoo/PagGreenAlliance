@@ -51,11 +51,27 @@ export async function resolverCredito(
       ? { estado: "aprobado" as const, motivo_rechazo: null }
       : { estado: "rechazado" as const, motivo_rechazo: datos.motivo };
 
-  const { error } = await supabase.from("solicitudes_credito").update(cambios).eq("id", datos.id);
+  // S-11 (revisión de seguridad 2026-09-24): el `select` de arriba ya
+  // comprobó `estado === 'pendiente'`, pero entre ese select y este update
+  // otro admin podría haberla resuelto (carrera). El trigger
+  // sellar_revision_solicitud también lo bloquea, pero aquí se filtra
+  // ADEMÁS por estado en el propio update: si otra transacción ganó la
+  // carrera, este update afecta 0 filas (`.select()` lo confirma) y no se
+  // manda el correo de un resultado que ya se había resuelto distinto.
+  const { data: actualizada, error } = await supabase
+    .from("solicitudes_credito")
+    .update(cambios)
+    .eq("id", datos.id)
+    .eq("estado", "pendiente")
+    .select("id")
+    .maybeSingle();
   if (error) {
     // No exponemos el texto de Postgres (puede traer montos o nombres de constraint).
     registrar("error", { evento: "credito_resolver_fallo", codigo: error.code, mensaje: error.message, solicitud_id: datos.id });
     return { error: "No pudimos guardar la decisión. Intenta de nuevo." };
+  }
+  if (!actualizada) {
+    return { error: "Esta solicitud ya fue resuelta." };
   }
 
   // Correo del resultado (lib/correo/credito.ts, ya existente): busca nombre y

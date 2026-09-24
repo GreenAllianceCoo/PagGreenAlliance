@@ -40,8 +40,19 @@ export async function cambiarEstadoAfiliacion(
   return { mensaje: `Estado actualizado a «${estado}».` };
 }
 
-/** URL absoluta de /ingresar del dominio actual, para el correo «Ingreso aceptado». */
+/**
+ * URL absoluta de /ingresar para el correo «Ingreso aceptado».
+ * S-12 (revisión de seguridad 2026-09-24): antes salía siempre del encabezado
+ * `host` de la petición, que en teoría se puede falsificar (Host header
+ * injection) si algún día esto queda detrás de un proxy que no lo limpie.
+ * Ahora sale de SITIO_URL (variable de servidor, .env.example) y el host de
+ * la petición queda solo como respaldo para desarrollo local, donde SITIO_URL
+ * normalmente no está configurada.
+ */
 async function urlIngreso() {
+  const sitio = process.env.SITIO_URL?.trim();
+  if (sitio) return `${sitio.replace(/\/+$/, "")}/ingresar`;
+
   const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
   const proto = h.get("x-forwarded-proto") ?? (host.includes("localhost") ? "http" : "https");

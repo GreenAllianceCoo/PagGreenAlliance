@@ -7,7 +7,12 @@ import { mesSorteoActual, textoProximaApertura, ventanaSorteoAbierta } from "./f
 
 export type EstadoBoletaSorteo = "sin-participar" | "enviada" | "confirmada";
 
-export type FilaBoletaSorteo = { estado: "enviada" | "confirmada"; numero: string } | null;
+/**
+ * Fila que devuelve `mi_boleta_sorteo()` (F2-01, migración 20260924000600):
+ * `numero` ya viene null del servidor cuando la boleta sigue "enviada" (antes
+ * de confirmar). Esta función solo decide qué pasa a las props del cliente.
+ */
+export type FilaBoletaSorteo = { estado: "enviada" | "confirmada"; numero: string | null } | null;
 
 export type SorteoProps = {
   ventanaAbierta: boolean;
@@ -31,6 +36,6 @@ export function vistaSorteo(fila: FilaBoletaSorteo, ahora: Date = new Date()): S
     mesTexto: mesSorteoActual(ahora),
     textoProximaApertura: textoProximaApertura(ahora),
     estadoInicial,
-    numeroInicial: estadoInicial === "confirmada" && fila ? fila.numero : null,
+    numeroInicial: estadoInicial === "confirmada" && fila ? (fila.numero ?? null) : null,
   };
 }

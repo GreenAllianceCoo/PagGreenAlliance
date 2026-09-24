@@ -39,6 +39,12 @@ type Escenario = {
   estadoSolicitud?: "pendiente" | "aprobado" | "rechazado";
   asociadoId?: string;
   errorUpdate?: { code?: string; message: string } | null;
+  /**
+   * S-11 (revisión de seguridad 2026-09-24): simula la carrera en la que otro
+   * admin ya resolvió la solicitud ENTRE el select y el update (el update,
+   * que ahora también filtra por `estado = 'pendiente'`, afecta 0 filas).
+   */
+  filaActualizada?: boolean;
 };
 
 function crearSupabaseFalso(escenario: Escenario = {}) {
@@ -47,6 +53,7 @@ function crearSupabaseFalso(escenario: Escenario = {}) {
     estadoSolicitud = "pendiente",
     asociadoId = ID_ASOCIADO,
     errorUpdate = null,
+    filaActualizada = true,
   } = escenario;
 
   const actualizaciones: Record<string, unknown>[] = [];
@@ -76,8 +83,14 @@ function crearSupabaseFalso(escenario: Escenario = {}) {
     consulta.single = vi.fn(async () => resultado());
     consulta.update = vi.fn((cambios: Record<string, unknown>) => {
       actualizaciones.push({ tabla, ...cambios });
+      // S-11: el update real encadena .eq("id", …).eq("estado", "pendiente").select("id").maybeSingle().
       const encadenable: Record<string, unknown> = {};
-      encadenable.eq = vi.fn(async () => ({ data: null, error: errorUpdate }));
+      encadenable.eq = vi.fn(() => encadenable);
+      encadenable.select = vi.fn(() => encadenable);
+      encadenable.maybeSingle = vi.fn(async () => ({
+        data: errorUpdate ? null : filaActualizada ? { id: ID_SOLICITUD } : null,
+        error: errorUpdate,
+      }));
       return encadenable;
     });
     return consulta;
@@ -161,5 +174,14 @@ describe("resolverCredito · aprobar", () => {
     const { resultado } = await enviar({ id: ID_SOLICITUD, decision: "aprobado" });
     expect(resultado?.mensaje).toBeTruthy();
     expect(actualizaciones[0]).toMatchObject({ estado: "aprobado", motivo_rechazo: null });
+  });
+});
+
+describe("resolverCredito · S-11 (carrera: otro admin ya la resolvió entre el select y el update)", () => {
+  it("si el update afecta 0 filas, responde error y NO envía el correo de resultado", async () => {
+    crearSupabaseFalso({ filaActualizada: false });
+    const { resultado } = await enviar({ id: ID_SOLICITUD, decision: "aprobado" });
+    expect(resultado?.error).toBeTruthy();
+    expect(enviarResultadoCredito).not.toHaveBeenCalled();
   });
 });

@@ -12,9 +12,19 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { OtpInput } from "@/components/ui/OtpInput";
 import { cx } from "@/components/ui/cx";
-import { confirmarBoletaSorteo, participarSorteo, type EstadoConfirmarSorteo } from "@/app/cuenta/actions-sorteo";
+import {
+  confirmarBoletaSorteo,
+  participarSorteo,
+  reenviarBoletaSorteo,
+  type EstadoConfirmarSorteo,
+} from "@/app/cuenta/actions-sorteo";
 import { generarConfeti } from "./confeti";
 import css from "./confeti.module.css";
+
+/** Código que acepta la vista previa de desarrollo (?sorteo=demo, ver lib/sorteo/demo.ts). */
+const CODIGO_DEMO = "123456";
+/** Correo y número de mentira de la vista previa: nunca sale de la base ni de Resend. */
+const CORREO_DEMO = "ju•••@po•••.co";
 
 /** Íconos propios (trazo, 24×24, `currentColor`) para no tocar components/ui/Iconos.tsx. */
 function IconoRegalo({ tamano = 24, className }: { tamano?: number; className?: string }) {
@@ -94,6 +104,20 @@ export type SorteoDelMesProps = {
   estadoInicial: EstadoBoletaSorteo;
   /** Solo si `estadoInicial === "confirmada"` (nunca antes de confirmar). */
   numeroInicial: string | null;
+  /**
+   * Correo enmascarado calculado en el servidor (app/cuenta/page.tsx), para
+   * poder mostrar el paso «confirmar» de una boleta "enviada" en sesiones
+   * anteriores (F2-04, «Reenviar mi boleta»), sin depender de que el paso 1
+   * se haya ejecutado en ESTA carga de la página.
+   */
+  correoEnmascarado?: string | null;
+  /**
+   * Vista previa SOLO de desarrollo (`/cuenta?sorteo=demo`, ver
+   * lib/sorteo/demo.ts): abre el modal con datos simulados y nunca llama a
+   * las Server Actions reales. `app/cuenta/page.tsx` ya se encarga de que
+   * esto sea siempre `false` en producción.
+   */
+  demo?: boolean;
 };
 
 type Paso = "inicio" | "confirmar" | "celebracion";
@@ -104,19 +128,30 @@ export function SorteoDelMes({
   textoProximaApertura,
   estadoInicial,
   numeroInicial,
+  correoEnmascarado: correoEnmascaradoInicial = null,
+  demo = false,
 }: SorteoDelMesProps) {
   const router = useRouter();
   const yaParticipaba = estadoInicial === "confirmada";
-  const puedeAbrir = ventanaAbierta || yaParticipaba;
+  // F2-04: una boleta ya "enviada" (correo mandado, sin confirmar todavía)
+  // abre directo en el paso de confirmar, con «Reenviar mi boleta» a mano en
+  // vez de mandar de vuelta a «Quiero participar» (que fallaría: ya tiene boleta).
+  const yaEnviada = estadoInicial === "enviada";
+  const puedeAbrir = demo || ventanaAbierta || yaParticipaba || yaEnviada;
 
-  const [abierto, setAbierto] = useState(false);
-  const [paso, setPaso] = useState<Paso>(yaParticipaba ? "celebracion" : "inicio");
+  const [abierto, setAbierto] = useState(demo);
+  const [paso, setPaso] = useState<Paso>(yaParticipaba ? "celebracion" : yaEnviada ? "confirmar" : "inicio");
   // Solo se anima la celebración justo después de confirmar en esta sesión;
   // si el modal se abre directo en «ya estás participando», queda quieta.
   const [animarCelebracion, setAnimarCelebracion] = useState(false);
-  const [correoEnmascarado, setCorreoEnmascarado] = useState<string | null>(null);
+  const [correoEnmascarado, setCorreoEnmascarado] = useState<string | null>(
+    demo ? CORREO_DEMO : correoEnmascaradoInicial,
+  );
   const [numero, setNumero] = useState<string | null>(numeroInicial);
   const [digitos, setDigitos] = useState<string[]>(VACIO);
+  const [reenviando, setReenviando] = useState(false);
+  const [mensajeReenvio, setMensajeReenvio] = useState<string | undefined>(undefined);
+  const [restanteReenvio, setRestanteReenvio] = useState(0);
 
   const botonAbrirRef = useRef<HTMLButtonElement | null>(null);
   const botonCerrarRef = useRef<HTMLButtonElement | null>(null);
@@ -129,6 +164,13 @@ export function SorteoDelMes({
   );
 
   const [estadoParticipar, accionParticipar, participando] = useActionState(async () => {
+    if (demo) {
+      // Vista previa: nunca llama a la base ni a Resend (lib/sorteo/demo.ts).
+      setCorreoEnmascarado(CORREO_DEMO);
+      setDigitos(VACIO);
+      setPaso("confirmar");
+      return { ok: true, correoEnmascarado: CORREO_DEMO };
+    }
     const resultado = await participarSorteo();
     if (resultado.ok) {
       setCorreoEnmascarado(resultado.correoEnmascarado ?? null);
@@ -140,6 +182,19 @@ export function SorteoDelMes({
 
   const [estadoConfirmar, accionConfirmar, confirmando] = useActionState(
     async (previo: EstadoConfirmarSorteo, formData: FormData) => {
+      if (demo) {
+        // Solo el código fijo "123456" pasa la vista previa; cualquier otro
+        // se trata igual que un número que no coincide (sin tocar la base).
+        const escrito = Array.from({ length: 6 }, (_, i) => String(formData.get(`numero-${i + 1}`) ?? "")).join("");
+        if (escrito === CODIGO_DEMO) {
+          setNumero(CODIGO_DEMO);
+          setAnimarCelebracion(true);
+          setPaso("celebracion");
+          return { ok: true, numero: CODIGO_DEMO };
+        }
+        setDigitos(VACIO);
+        return { error: "El número no coincide con tu boleta.", intentosRestantes: 4 };
+      }
       const resultado = await confirmarBoletaSorteo(previo, formData);
       if (resultado.ok) {
         setNumero(resultado.numero ?? null);
@@ -153,6 +208,29 @@ export function SorteoDelMes({
     },
     {},
   );
+
+  /** F2-04: reenvía el correo con el mismo número (sin generar uno nuevo). */
+  async function alReenviar() {
+    if (demo || reenviando || restanteReenvio > 0) return;
+    setReenviando(true);
+    setMensajeReenvio(undefined);
+    const resultado = await reenviarBoletaSorteo();
+    setReenviando(false);
+    if (resultado.ok) {
+      setCorreoEnmascarado(resultado.correoEnmascarado ?? correoEnmascarado);
+      setMensajeReenvio(`Te lo volvimos a enviar a ${resultado.correoEnmascarado ?? "tu correo"}.`);
+      setRestanteReenvio(45);
+    } else {
+      setMensajeReenvio(resultado.error);
+    }
+  }
+
+  // Cuenta regresiva de 45 s para «Reenviar mi boleta» (mismo criterio que
+  // «Reenviar código» de /ingresar/codigo: un solo intervalo, siempre corriendo).
+  useEffect(() => {
+    const id = setInterval(() => setRestanteReenvio((s) => (s > 0 ? s - 1 : 0)), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   function abrir() {
     setAbierto(true);
@@ -303,6 +381,29 @@ export function SorteoDelMes({
                   <p role="status" className="m-0 text-13 text-ga-texto-3">
                     Te quedan {estadoConfirmar.intentosRestantes} intentos.
                   </p>
+                ) : null}
+                {/* F2-04: para quien ya tiene boleta "enviada" pero el correo se
+                    perdió (o llegó tarde) y no quiere esperar un reintento manual. */}
+                {!demo ? (
+                  <div className="flex flex-col items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={alReenviar}
+                      disabled={reenviando || restanteReenvio > 0}
+                      className="text-14 font-bold text-ga-verde underline decoration-1 underline-offset-2 disabled:cursor-not-allowed disabled:text-ga-texto-3 disabled:no-underline"
+                    >
+                      {reenviando
+                        ? "Reenviando…"
+                        : restanteReenvio > 0
+                          ? `Reenviar mi boleta (${restanteReenvio}s)`
+                          : "Reenviar mi boleta"}
+                    </button>
+                    {mensajeReenvio ? (
+                      <p role="status" className="m-0 text-13 text-ga-texto-3">
+                        {mensajeReenvio}
+                      </p>
+                    ) : null}
+                  </div>
                 ) : null}
               </>
             ) : null}

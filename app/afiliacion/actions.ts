@@ -23,15 +23,23 @@ export type EstadoAfiliacion = {
   valores?: ValoresAfiliacion;
 };
 
-const MENSAJE_PENDIENTE =
-  "Ya tenemos una solicitud pendiente con esta cédula. El equipo te contactará pronto.";
-
 /**
  * «Enviar solicitud» (docs/spec-fase-2.md §2 + mapa de botones §5), en este orden:
- * trampa → validación → límite por IP y por cédula → sin otra pendiente → subir
- * las 3 fotos → insert (service role) → /afiliacion/enviada.
+ * trampa → validación → límite por IP y por cédula → subir las 3 fotos →
+ * insert (service role) → /afiliacion/enviada.
  * Sin correos al enviar la afiliación (los únicos correos a asociados son los de
  * docs/resend-plantillas.md: ingreso aceptado, código de ingreso y crédito).
+ *
+ * S-06 (revisión de seguridad 2026-09-24): antes, una cédula con solicitud
+ * pendiente recibía un mensaje distinto y una respuesta más rápida (se
+ * detectaba ANTES de subir fotos) que un envío normal; eso deja adivinar,
+ * por el mensaje y por el tiempo de respuesta, si una cédula ya está en
+ * trámite. Ahora no hay una comprobación previa aparte: se sigue el MISMO
+ * camino que un envío exitoso (sube las 3 fotos e intenta el insert) y el
+ * índice único parcial de la base (`solicitudes_afiliacion`, `estado =
+ * 'pendiente'`) es quien de verdad decide. Si choca, se responde EXACTAMENTE
+ * como un envío exitoso (mismo flash, mismo redirect) y no se guarda una
+ * fila duplicada.
  */
 export async function enviarAfiliacion(
   _previo: EstadoAfiliacion,
@@ -70,19 +78,6 @@ export async function enviarAfiliacion(
   }
 
   const admin = crearClienteAdmin();
-
-  // Sin otra solicitud pendiente con la misma cédula (la base también lo impide).
-  const { data: pendientes, error: errorConsulta } = await admin
-    .from("solicitudes_afiliacion")
-    .select("id")
-    .eq("cedula", datos.cedula)
-    .eq("estado", "pendiente")
-    .limit(1);
-  if (errorConsulta) {
-    registrar("error", { evento: "afiliacion_consulta_fallo", codigo: errorConsulta.code, mensaje: errorConsulta.message });
-  } else if (pendientes && pendientes.length > 0) {
-    return { errores: { cedula: MENSAJE_PENDIENTE }, valores };
-  }
 
   // 2. Subir las 3 fotos al bucket privado (service role). Si algo falla, no se
   // guarda la solicitud y las fotos que ya se hubieran subido se borran (ver
@@ -129,7 +124,14 @@ export async function enviarAfiliacion(
     // El insert no quedó: no dejar las fotos huérfanas en el bucket.
     await borrarFotosAfiliacion(admin, fotos.rutas);
     if (error?.code === "23505") {
-      return { errores: { cedula: MENSAJE_PENDIENTE }, valores };
+      // S-06: ya existe una solicitud pendiente con esta cédula (índice único
+      // parcial de la base). Se responde EXACTAMENTE igual que un envío
+      // exitoso: mismo flash, mismo redirect, sin decir por qué. Solo el
+      // evento queda en el registro del servidor, sin cédula ni nombre ni
+      // correo (el equipo lo puede seguir viendo con QA_DEV_LOG si hace falta).
+      registrar("warn", { evento: "afiliacion_duplicada" });
+      await guardarFlashAfiliacion(datos.email);
+      redirect("/afiliacion/enviada");
     }
     registrar("error", { evento: "afiliacion_insert_fallo", codigo: error?.code, mensaje: error?.message });
     return {

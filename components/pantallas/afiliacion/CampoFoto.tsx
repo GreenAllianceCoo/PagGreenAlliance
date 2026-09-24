@@ -11,6 +11,15 @@ const TIPOS_PERMITIDOS = ["image/jpeg", "image/png", "image/webp"];
 const TAMANO_MAXIMO = 5 * 1024 * 1024;
 /** Lado más largo tras comprimir, en píxeles: de sobra para leer un documento. */
 const LADO_MAXIMO_PX = 1600;
+/**
+ * S-03 (revisión de seguridad 2026-09-24): con 3 fotos de celular sin
+ * comprimir (3-4 MB cada una) el envío completo supera el límite de 4,5 MB
+ * de Vercel para Server Actions. Por eso AHORA se comprime SIEMPRE (no solo
+ * cuando pesa más de TAMANO_MAXIMO), apuntando a este peso objetivo; junto
+ * con `experimental.serverActions.bodySizeLimit` en next.config.mjs, el
+ * envío de las 3 fotos queda muy por debajo del límite de Vercel.
+ */
+const PESO_OBJETIVO = 300 * 1024;
 
 type CampoFotoProps = {
   id: string;
@@ -68,7 +77,7 @@ export function CampoFoto({ id, name, label, ayuda, capture, error }: CampoFotoP
       return;
     }
 
-    const final = await comprimirSiHaceFalta(elegido);
+    const final = await comprimirSiempre(elegido);
     if (final.size > TAMANO_MAXIMO) {
       setErrorLocal("La foto pesa demasiado (máximo 5 MB).");
       if (inputRef.current) inputRef.current.value = "";
@@ -139,9 +148,14 @@ export function CampoFoto({ id, name, label, ayuda, capture, error }: CampoFotoP
   );
 }
 
-/** Redimensiona a máx. 1600 px de lado y reconvierte a JPEG (calidad 0.8) si la foto pesa más de 5 MB. */
-async function comprimirSiHaceFalta(archivo: File): Promise<File> {
-  if (archivo.size <= TAMANO_MAXIMO) return archivo;
+/**
+ * S-03: redimensiona SIEMPRE a máx. 1600 px de lado y reconvierte a JPEG,
+ * bajando la calidad hasta acercarse a PESO_OBJETIVO (~300 KB) o hasta agotar
+ * los intentos. Si por lo que sea el resultado no pesa menos que el original
+ * (fotos ya pequeñas), se conserva el original tal cual: nunca se sube algo
+ * más pesado de lo que el usuario eligió.
+ */
+async function comprimirSiempre(archivo: File): Promise<File> {
   try {
     const bitmap = await createImageBitmap(archivo);
     const escala = Math.min(1, LADO_MAXIMO_PX / Math.max(bitmap.width, bitmap.height));
@@ -153,10 +167,19 @@ async function comprimirSiHaceFalta(archivo: File): Promise<File> {
     const contexto = lienzo.getContext("2d");
     if (!contexto) return archivo;
     contexto.drawImage(bitmap, 0, 0, ancho, alto);
-    const blob = await new Promise<Blob | null>((resolver) => lienzo.toBlob(resolver, "image/jpeg", 0.8));
-    if (!blob) return archivo;
-    const nombre = `${archivo.name.replace(/\.\w+$/, "")}.jpg`;
-    const comprimido = new File([blob], nombre, { type: "image/jpeg" });
+
+    // Baja la calidad JPEG en pasos hasta acercarse al peso objetivo.
+    let comprimido: File | null = null;
+    for (const calidad of [0.82, 0.7, 0.55, 0.4]) {
+      const blob = await new Promise<Blob | null>((resolver) => lienzo.toBlob(resolver, "image/jpeg", calidad));
+      if (!blob) continue;
+      const nombre = `${archivo.name.replace(/\.\w+$/, "")}.jpg`;
+      comprimido = new File([blob], nombre, { type: "image/jpeg" });
+      if (comprimido.size <= PESO_OBJETIVO) break;
+    }
+    if (!comprimido) return archivo;
+    // Si el original ya era más liviano que el resultado (foto ya chica),
+    // no tiene sentido "engordarla": se conserva el original.
     return comprimido.size < archivo.size ? comprimido : archivo;
   } catch {
     return archivo;

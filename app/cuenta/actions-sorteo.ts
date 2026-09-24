@@ -10,12 +10,17 @@
  */
 import { revalidatePath } from "next/cache";
 import { registrar } from "@/lib/servidor/registro";
+import { dentroDelLimite } from "@/lib/servidor/limite";
 import { enviarBoletaSorteo } from "@/lib/correo/sorteo";
 import { enmascararCorreo } from "@/lib/mascara";
 import { fechaBogota, nombreMes } from "@/lib/sorteo/fecha";
 import { createClient } from "@/lib/supabase/server";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { esquemaNumeroBoleta, leerNumeroBoleta, MENSAJE_NUMERO_BOLETA_INVALIDO } from "@/lib/validaciones/sorteo";
+
+/** F2-04: tope de reenvíos del correo con el número, por asociado y por día. */
+const MAX_REENVIOS_POR_DIA = 3;
+const VENTANA_REENVIO_SEGUNDOS = 24 * 60 * 60;
 
 /** Debe coincidir con `v_max_intentos` de confirmar_boleta_sorteo() en la migración. */
 const MAX_INTENTOS_CONFIRMACION = 5;
@@ -66,7 +71,18 @@ export async function participarSorteo(): Promise<EstadoParticiparSorteo> {
     return { error: MENSAJE_ERROR_GENERICO };
   }
 
-  const { data: perfil } = await supabase.from("perfiles").select("nombre_completo").eq("id", user.id).single();
+  // S-13 (revisión de seguridad 2026-09-24): solo los asociados participan en
+  // el sorteo. La pantalla ya oculta el botón para otros roles (app/cuenta/page.tsx),
+  // pero la Server Action es la barrera real: nadie participa llamándola directo.
+  const { data: perfil } = await supabase
+    .from("perfiles")
+    .select("nombre_completo, rol")
+    .eq("id", user.id)
+    .single();
+  if (perfil?.rol !== "asociado") {
+    registrar("warn", { evento: "sorteo_participar_rol_no_asociado", rol: perfil?.rol });
+    return { error: MENSAJE_ERROR_GENERICO };
+  }
   const nombre = perfil?.nombre_completo ?? "Asociado";
 
   const { data, error } = await crearClienteAdmin().rpc("participar_sorteo", { p_asociado_id: user.id });
@@ -137,13 +153,72 @@ export async function confirmarBoletaSorteo(
     };
   }
 
-  const { data: fila } = await supabase
-    .from("boletas_sorteo")
-    .select("numero")
-    .eq("anio", anio)
-    .eq("mes", mes)
+  // F2-01 (20260924000600): la columna `numero` ya no se puede leer por
+  // select directo (el grant a `authenticated` no la incluye); ahora que la
+  // boleta quedó "confirmada" sí es seguro pedirla por esta RPC. Sin tipos
+  // generados de Supabase para esta RPC: se castea a la forma real.
+  const { data: filaCruda } = await supabase
+    .rpc("mi_boleta_sorteo", { p_anio: anio, p_mes: mes })
     .maybeSingle();
+  const fila = filaCruda as { numero: string | null } | null;
 
   revalidatePath("/cuenta");
-  return { ok: true, numero: fila?.numero };
+  return { ok: true, numero: fila?.numero ?? resultado.data };
+}
+
+export type EstadoReenviarSorteo = {
+  ok?: boolean;
+  error?: string;
+  correoEnmascarado?: string;
+};
+
+/**
+ * F2-04 (auditoría 2026-09-24): «Reenviar mi boleta». Si el correo del paso 1
+ * falla (Resend con timeout, etc.) el asociado se queda con una boleta
+ * "enviada" pero sin conocer el número, y `participar_sorteo()` ya no lo deja
+ * volver a intentarlo ("Ya tienes una boleta"). Este reenvío NO vuelve a
+ * generar un número: relee el mismo con service_role (que sí puede leer la
+ * columna `numero`, a diferencia de `authenticated`) y lo reenvía por correo.
+ * Tope: 3 reenvíos por asociado cada 24 h (lib/servidor/limite.ts).
+ */
+export async function reenviarBoletaSorteo(): Promise<EstadoReenviarSorteo> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: MENSAJE_SIN_SESION };
+
+  const correo = user.email;
+  if (!correo) {
+    registrar("error", { evento: "sorteo_reenviar_sin_correo" });
+    return { error: MENSAJE_ERROR_GENERICO };
+  }
+
+  const dentro = await dentroDelLimite("sorteo_reenviar", user.id, MAX_REENVIOS_POR_DIA, VENTANA_REENVIO_SEGUNDOS);
+  if (!dentro) {
+    return { error: "Ya reenviaste tu boleta varias veces hoy. Intenta más tarde o escríbele a la cooperativa." };
+  }
+
+  const { anio, mes } = fechaBogota();
+  const admin = crearClienteAdmin();
+
+  const [{ data: fila }, { data: perfil }] = await Promise.all([
+    admin
+      .from("boletas_sorteo")
+      .select("numero, estado")
+      .eq("asociado_id", user.id)
+      .eq("anio", anio)
+      .eq("mes", mes)
+      .maybeSingle(),
+    supabase.from("perfiles").select("nombre_completo").eq("id", user.id).single(),
+  ]);
+
+  if (!fila) {
+    return { error: "No tienes una boleta para el sorteo de este mes." };
+  }
+
+  const nombre = perfil?.nombre_completo ?? "Asociado";
+  await enviarBoletaSorteo({ correo, nombre, numero: fila.numero, mes: nombreMes(mes) });
+
+  return { ok: true, correoEnmascarado: enmascararCorreo(correo) };
 }

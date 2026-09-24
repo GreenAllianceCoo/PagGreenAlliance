@@ -74,14 +74,18 @@ select ok(
 --   es_admin(): cualquier authenticated puede saber si ES admin (no revela nada de otros).
 --   resumen_clientes_asesor(): se autofiltra por auth.uid(); un asesor solo ve
 --     lo suyo, cualquier otro rol recibe 0 filas (ver 07_asesor_rls.sql).
+--   mi_boleta_sorteo(): se autofiltra por auth.uid() (la boleta propia); el
+--     número solo sale si ya está confirmada (F2-01, 20260924000600).
+--   boletas_confirmadas_sorteo(): se autofiltra por es_admin(); quien no sea
+--     admin recibe 0 filas (F2-01, 20260924000600).
 select is_empty(
   $$ select p.proname::text
        from pg_proc p join pg_namespace n on n.oid = p.pronamespace
       where n.nspname = 'public' and p.prosecdef
-        and p.proname not in ('es_admin', 'resumen_clientes_asesor')
+        and p.proname not in ('es_admin', 'resumen_clientes_asesor', 'mi_boleta_sorteo', 'boletas_confirmadas_sorteo')
         and (has_function_privilege('authenticated', p.oid, 'execute')
              or has_function_privilege('anon', p.oid, 'execute')) $$,
-  'ninguna función security definer (salvo es_admin y resumen_clientes_asesor) es ejecutable por anon o authenticated'
+  'ninguna función security definer (salvo es_admin, resumen_clientes_asesor, mi_boleta_sorteo y boletas_confirmadas_sorteo) es ejecutable por anon o authenticated'
 );
 
 select * from finish();

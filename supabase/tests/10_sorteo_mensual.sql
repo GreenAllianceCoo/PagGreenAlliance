@@ -12,7 +12,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(17);
+select plan(26);
 
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('00000000-0000-4000-a000-00000000000a', 'asociado.a@prueba.test', '{"cedula":"1000000001","grado":"PP"}', '{"nombre_completo":"Asociado A"}'),
@@ -149,6 +149,76 @@ select is(
 select ok(
   not has_function_privilege('authenticated', 'public.participar_sorteo(uuid)', 'execute'),
   'authenticated no puede ejecutar participar_sorteo'
+);
+
+-- ------------------------------------------------------------
+-- F2-01 (20260924000600): el número de boleta no se puede leer por columna
+-- antes de confirmar; solo por mi_boleta_sorteo() y ya confirmada.
+-- ------------------------------------------------------------
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"00000000-0000-4000-a000-00000000000a","role":"authenticated"}';
+
+select throws_ok(
+  $$ select numero from public.boletas_sorteo where asociado_id = '00000000-0000-4000-a000-00000000000a' $$,
+  '42501', null,
+  'authenticated no puede leer la columna numero de boletas_sorteo (ni siquiera la propia)'
+);
+
+select lives_ok(
+  $$ select estado, intentos from public.boletas_sorteo where asociado_id = '00000000-0000-4000-a000-00000000000a' $$,
+  'authenticated sí puede leer estado e intentos de su propia boleta'
+);
+
+-- mi_boleta_sorteo(): 'enviada' -> numero null (asociado A, boleta de sep/2026)
+select is(
+  (select numero from public.mi_boleta_sorteo(2026::smallint, 9::smallint)),
+  null,
+  'mi_boleta_sorteo no revela el número mientras la boleta está "enviada"'
+);
+
+select is(
+  (select estado::text from public.mi_boleta_sorteo(2026::smallint, 9::smallint)),
+  'enviada',
+  'mi_boleta_sorteo sí informa el estado aunque no esté confirmada'
+);
+
+-- mi_boleta_sorteo(): 'confirmada' -> numero real (asociado B, boleta de sep/2026)
+set local request.jwt.claims = '{"sub":"00000000-0000-4000-a000-00000000000b","role":"authenticated"}';
+
+select is(
+  (select numero from public.mi_boleta_sorteo(2026::smallint, 9::smallint)),
+  '333333',
+  'mi_boleta_sorteo revela el número una vez la boleta está "confirmada"'
+);
+
+-- No devuelve la boleta de otro asociado (aunque exista para ese mes).
+set local request.jwt.claims = '{"sub":"00000000-0000-4000-a000-00000000000a","role":"authenticated"}';
+
+select is_empty(
+  $$ select * from public.mi_boleta_sorteo(2099::smallint, 1::smallint) $$,
+  'mi_boleta_sorteo no devuelve nada si el asociado no tiene boleta ese año/mes'
+);
+
+-- ------------------------------------------------------------
+-- boletas_confirmadas_sorteo(): 0 filas para un asociado, N para el admin.
+-- ------------------------------------------------------------
+select is_empty(
+  $$ select * from public.boletas_confirmadas_sorteo(2026::smallint, 9::smallint) $$,
+  'un asociado no ve nada con boletas_confirmadas_sorteo (solo admin)'
+);
+
+set local request.jwt.claims = '{"sub":"00000000-0000-4000-a000-0000000000ad","role":"authenticated"}';
+
+select is(
+  (select count(*)::int from public.boletas_confirmadas_sorteo(2026::smallint, 9::smallint)),
+  1,
+  'el admin ve las boletas confirmadas del mes (la de B, ya confirmada)'
+);
+
+select is(
+  (select numero from public.boletas_confirmadas_sorteo(2026::smallint, 9::smallint) limit 1),
+  '333333',
+  'boletas_confirmadas_sorteo sí incluye el número (es el admin, y ya está confirmada)'
 );
 
 select * from finish();
