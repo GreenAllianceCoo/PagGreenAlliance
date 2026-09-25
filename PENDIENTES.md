@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 24-sep-2026 (fase 2: afiliación v2, admin, asesor y sorteo; encargo de Carlos Pardo)
+Actualizado: 24-sep-2026 (borrador de política de datos y plantillas de Resend; Test QA borrado y dominio conectado)
 
 ## Dónde quedamos
 

@@ -31,7 +31,8 @@ export async function enviarResultadoCredito(datos: {
       plantilla,
       variables: {
         NOMBRE: datos.nombre,
-        MONTO: datos.monto,
+        // Con puntos de miles (1.500.000): la plantilla le antepone «$».
+        MONTO: Math.round(datos.monto).toLocaleString("es-CO"),
         MOTIVO: datos.motivo ?? "",
       },
     });

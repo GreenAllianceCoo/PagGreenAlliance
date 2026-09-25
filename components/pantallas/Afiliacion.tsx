@@ -304,7 +304,7 @@ export function Afiliacion({
             de mi cédula (frente y reverso) y mi selfie como dato sensible, para gestionar mi
             afiliación, según su{" "}
             {/* Abre en otra pestaña para no perder lo escrito en el formulario.
-                TODO(pendiente-spec): /politica-de-datos es un placeholder hasta tener el texto. */}
+                /politica-de-datos es un borrador con datos <Pendiente> por confirmar. */}
             <a href="/politica-de-datos" target="_blank" rel="noopener" className="enlace font-bold">
               política de datos
             </a>{" "}
