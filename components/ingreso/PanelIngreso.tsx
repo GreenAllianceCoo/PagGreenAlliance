@@ -58,12 +58,20 @@ export function PanelIngreso({
     <div className="flex min-h-dvh flex-col bg-white lg:flex-row">
       <aside
         className={cx(
-          "flex shrink-0 flex-col justify-between bg-ga-verde px-6 pb-7 text-white",
+          "relative flex shrink-0 flex-col justify-between overflow-hidden bg-ga-verde px-6 pb-7 text-white",
           sinBarraEstado ? "h-55.5 pt-6" : "h-62.5 pt-13",
           "lg:h-auto lg:min-h-dvh lg:w-panel-ingreso lg:justify-start lg:gap-8 lg:px-14 lg:py-12",
         )}
       >
-        <div className={cx("flex items-center justify-between gap-3", COLUMNA_TABLETA)}>
+        {/* Mancha orgánica decorativa (pieza 3b): más sobria que la de la landing,
+            «el ingreso es una pantalla de trámite, no de venta». Primero en el DOM
+            para que el contenido (después) pinte encima sin z-index. */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-[70px] -right-[50px] h-[170px] w-[190px] bg-ga-verde-oscuro lg:-bottom-20 lg:-right-15 lg:h-[240px] lg:w-[260px]"
+          style={{ borderRadius: "52% 48% 44% 56% / 55% 45% 55% 45%" }}
+        />
+        <div className={cx("relative flex items-center justify-between gap-3", COLUMNA_TABLETA)}>
           <Link href="/" aria-label="Ir al inicio" className="block h-11 w-logo min-w-0 shrink">
             <Logo tone="light" />
           </Link>
@@ -79,18 +87,19 @@ export function PanelIngreso({
             </a>
           ) : null}
         </div>
-        <div className={cx("flex flex-col gap-1.5 lg:mt-14 lg:gap-3.5", COLUMNA_TABLETA)}>
-          <h1 className="m-0 text-32 font-extrabold leading-110 lg:text-46 lg:leading-108 lg:tracking-titulo">
+        <div className={cx("relative flex flex-col gap-1.5 lg:mt-14 lg:gap-3.5", COLUMNA_TABLETA)}>
+          {/* Bricolage Grotesque (pieza 3a): títulos grandes, «Hola de nuevo» / «Revisa tu correo». */}
+          <h1 className="m-0 font-display text-32 font-extrabold leading-110 lg:text-46 lg:leading-108 lg:tracking-titular">
             {titulo}
           </h1>
           <p className="m-0 text-16 leading-145 text-ga-verde-claro lg:text-18 lg:leading-155">
             {subtitulo}
           </p>
         </div>
-        {extraEscritorio}
+        {extraEscritorio ? <div className="relative">{extraEscritorio}</div> : null}
         <span
           className={cx(
-            "mt-auto hidden text-15 text-ga-verde-claro lg:block",
+            "relative mt-auto hidden text-15 text-ga-verde-claro lg:block",
             pieInterlineado && "leading-150",
           )}
         >

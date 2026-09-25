@@ -36,6 +36,70 @@
   /* No está en el diseño: color para mensajes de error de formulario.
      TODO(pendiente-spec): confirmar con diseño. */
   --ga-error: #b3261e;
+
+  /* ---------------------------------------------------------------------
+   * Rediseño C+ (desde 25-sep-2026). Fuente: docs/Green Alliance C+.dc.html.
+   * Los nombres de arriba (base + «Nuevos, encontrados en el diseño») NO
+   * cambian de valor. Los nombres de aquí abajo siguen la pieza `3a`
+   * («Design system C+», agregada por ga-disenador-lienzo el 25-sep), que es
+   * la lista oficial de qué token es «igual» y cuál es «nuevo»; donde `3a`
+   * ya nombraba un color que yo había bautizado distinto en un borrador
+   * anterior de esta tanda, gana el nombre de `3a`.
+   * ------------------------------------------------------------------- */
+  --ga-superficie: #ffffff; /* superficie sobre --ga-fondo-suave (tarjetas blancas) */
+  --ga-linea-suave: #eef2f0; /* líneas más tenues que --ga-linea */
+  --ga-borde-input: #d5dce0; /* borde de input/select/checkbox del design system; distinto de --ga-borde */
+  --ga-gris-azulado: #e8edf2; /* fondo de tarjetas claras sobre navy (p. ej. «Orientación financiera»), chip «Enviada» */
+  --ga-menta: #8fd6b5; /* menta brillante: cifras y chips sobre navy */
+  --ga-menta-suave: #bfe3d2;
+  --ga-ambar-fondo-fuerte: #ffe3a8; /* resalte del titular «reglas claras», punto decorativo del hero */
+  --ga-ambar-fondo-suave: #fff8ea; /* fondo del sello redondo (isotipo) del comprobante */
+  --ga-ambar-texto-2: #5c3a00; /* texto «sedes» sobre --ga-ambar-fondo en celular */
+  --ga-error-fondo: #fbe4e2;
+  --ga-error-texto: #8c1d17;
+  /* No está en la lista de `3a` (que solo documenta el color de texto oscuro
+     --ga-admin-texto-3, #9fb1bd, para modo oscuro): el estado «Deshabilitado»
+     del input SÍ usa ese mismo tono en modo claro (fila «Input» de `3a`).
+     Se agrega con nombre propio para no reutilizar un token de admin fuera
+     de su contexto. */
+  --ga-deshabilitado-texto: #9fb1bd;
+
+  /* Extras de la landing (pieza 2a) sin nombre propio en `3a`: son manchas
+     y chips decorativos, no parte del sistema de color central. */
+  --ga-verde-borde-pendiente: #cfe3d9; /* borde del paso «pendiente» del comprobante vivo */
+  --ga-navy-chip-oscuro: #0e2233; /* texto del chip «Bogotá · sede principal» sobre menta */
+  --ga-blanco-chip: rgba(255, 255, 255, 0.1); /* chips de sedes sobre navy */
+  --ga-blob-oscuro: rgba(20, 33, 43, 0.05); /* mancha orgánica decorativa sobre tarjetas claras */
+  --ga-blob-claro: rgba(255, 255, 255, 0.06); /* mancha orgánica decorativa sobre tarjetas navy */
+
+  /* Movimiento (pieza 3a): duración representativa de cada categoría (el
+     lienzo da un rango; Tailwind usa estos valores en `duration-*`/`ease-spring`
+     de tailwind.config.ts, así que estas variables son para CSS a mano). */
+  --ga-dur-micro: 200ms; /* 120–250 ms: botón, chip, casilla OTP */
+  --ga-dur-entrada: 400ms; /* 300–500 ms: aparece contenido, comprobante */
+  --ga-dur-escalon: 70ms; /* 60–80 ms: retardo entre ítems de una lista */
+  --ga-ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+
+  /* Panel de administración en modo oscuro (pieza 2d + design system 3a).
+     Tokens listos para cuando se maquete /admin (pedido D-05,
+     docs/diseno/pedidos.md); no se usan todavía. */
+  --ga-admin-fondo: #0e1a22;
+  --ga-admin-menu: #0a141b; /* franja lateral */
+  --ga-admin-superficie: #15242e; /* tarjetas y filas */
+  --ga-admin-superficie-2: #1c2f3b; /* fila activa/hover, chip de dato */
+  --ga-admin-texto: #e8eef2;
+  --ga-admin-texto-2: #c5d2da;
+  --ga-admin-texto-3: #9fb1bd;
+  --ga-admin-verde: #6fcba3; /* botón «Aprobar», punto del historial */
+  --ga-admin-verde-2: #8fd6b5; /* texto destacado «Dentro del tope», chip «Aprobado este mes» */
+  --ga-admin-verde-claro: #bfebd6; /* extra de 2d: cuerpo del aviso «Dentro del tope» (no está en la lista de 3a) */
+  --ga-admin-ambar: #f5c67a;
+  --ga-admin-ambar-fondo: rgba(242, 181, 90, 0.18);
+  --ga-admin-rojo: #ff8a80; /* borde/botón «Rechazar» */
+  --ga-admin-rojo-2: #ffb4ab; /* texto del chip «No aprobado» */
+  --ga-admin-rojo-claro: #ffd3ce; /* extra de 2d: cuerpo del aviso «Supera el tope» (no está en la lista de 3a) */
+  --ga-admin-borde: rgba(255, 255, 255, 0.14);
+  --ga-admin-borde-sutil: rgba(255, 255, 255, 0.06);
 }
 
 @layer base {
@@ -58,5 +122,25 @@
   .patron-puntos {
     background-image: radial-gradient(var(--ga-patron-punto) 1.2px, transparent 1.3px);
     background-size: 18px 18px;
+  }
+}
+
+/* ---------------------------------------------------------------------
+ * Movimiento (rediseño C+): solo transform/opacity, curva «spring»
+ * cubic-bezier(.34,1.3,.64,1) (docs/Green Alliance C+.dc.html). Las
+ * utilidades `animate-ga-*` y `duration-*` viven en tailwind.config.ts;
+ * esta es la red de seguridad que exige la spec: con
+ * prefers-reduced-motion, cualquier animación o transición del sitio
+ * (las de Tailwind y las que agregue un componente a mano) termina de
+ * inmediato en su estado final.
+ * ------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
   }
 }

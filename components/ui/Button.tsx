@@ -4,10 +4,15 @@ import { cx } from "./cx";
 
 export type VarianteBoton = "primario" | "secundario" | "terciario";
 
+// Rediseño C+ (pieza 3a, docs/Green Alliance C+.dc.html): los botones pasan
+// de esquina de 12 px a píldora completa (radio 999px, «radios --ga-radius-*»).
+// El estado deshabilitado usa opacity .4 (antes .6) y el estado «cargando» se ve
+// distinto (opacity .85 + aro girando), tal como muestra la fila «Botón» del
+// design system.
 const BASE =
-  "flex items-center justify-center rounded-12 font-extrabold no-underline transition-colors " +
+  "relative flex items-center justify-center rounded-full font-extrabold no-underline transition-colors duration-200 " +
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde " +
-  "disabled:cursor-not-allowed disabled:opacity-60 aria-disabled:cursor-not-allowed aria-disabled:opacity-60";
+  "disabled:cursor-not-allowed disabled:opacity-40 aria-disabled:cursor-not-allowed aria-disabled:opacity-40";
 
 const VARIANTES: Record<VarianteBoton, string> = {
   // Verde relleno: acción principal (54 px).
@@ -26,9 +31,19 @@ export function clasesBoton(variante: VarianteBoton = "primario", className?: st
   return cx(BASE, VARIANTES[variante], className);
 }
 
+/** Aro girando del estado «cargando» (Enviando…, Entrando…), 14 px, hereda el color del texto. */
+function AroCargando() {
+  return (
+    <span
+      aria-hidden="true"
+      className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent opacity-70"
+    />
+  );
+}
+
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variante?: VarianteBoton;
-  /** Estado de carga: deshabilita el botón y muestra `textoCargando`. */
+  /** Estado de carga: deshabilita el botón, baja la opacidad a .85 y agrega el aro girando. */
   cargando?: boolean;
   textoCargando?: string;
 };
@@ -49,9 +64,10 @@ export function Button({
       type={type}
       disabled={disabled || cargando}
       aria-busy={cargando || undefined}
-      className={clasesBoton(variante, className)}
+      className={cx(clasesBoton(variante, className), cargando && "gap-2 opacity-85 disabled:opacity-85")}
       {...props}
     >
+      {cargando ? <AroCargando /> : null}
       {cargando && textoCargando ? textoCargando : children}
     </button>
   );

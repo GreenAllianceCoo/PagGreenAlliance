@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ClipboardEvent, type KeyboardEvent } from "react";
+import { useRef, useState, type ClipboardEvent, type KeyboardEvent } from "react";
 import { cx } from "./cx";
 
 type OtpInputProps = {
@@ -25,6 +25,28 @@ export function OtpInput({ name = "codigo", valores = [], longitud = 6, error, o
   const controlado = typeof onCambio === "function";
 
   const actuales = Array.from({ length: longitud }, (_, i) => valores[i] ?? "");
+
+  // MOVIMIENTO (pieza 3b): las 6 casillas se sacuden ±6 px, 3 veces, cuando
+  // llega un código inválido. Se detecta sin tocar la lógica del formulario:
+  // cada intento equivocado hace que el padre limpie las casillas MIENTRAS
+  // `error` sigue lleno (mismo render), así que esa combinación («hay error»
+  // + «las 6 casillas están vacías») solo aparece cuando hay un intento
+  // nuevo (entre uno y otro, la persona vuelve a escribir 6 dígitos). El
+  // estado se ajusta durante el render (patrón oficial de React para
+  // «adjusting state when a prop changes»: https://react.dev/learn/you-might-not-need-an-effect),
+  // no dentro de un useEffect, para no disparar el lint de «setState
+  // síncrono en un efecto» ni una vuelta extra de render. Cambiar la `key`
+  // del contenedor fuerza a que la animación se reproduzca cada vez, aunque
+  // el mensaje de error sea idéntico al del intento anterior. Con
+  // movimiento reducido, la regla global de app/globals.css deja la
+  // animación en 1 ms: solo se nota el borde rojo, como pide la pieza.
+  const señalError = error && actuales.every((d) => d === "") ? error : null;
+  const [sacudida, setSacudida] = useState(0);
+  const [señalAnterior, setSeñalAnterior] = useState<string | null>(null);
+  if (señalError !== señalAnterior) {
+    setSeñalAnterior(señalError);
+    if (señalError !== null) setSacudida((s) => s + 1);
+  }
 
   function enfocar(i: number) {
     const destino = casillas.current[Math.max(0, Math.min(longitud - 1, i))];
@@ -75,7 +97,12 @@ export function OtpInput({ name = "codigo", valores = [], longitud = 6, error, o
   return (
     <fieldset className="m-0 flex flex-col border-0 p-0" aria-describedby={idError}>
       <legend className="pb-2.5 text-16 font-bold">Código de 6 números</legend>
-      <div className="grid grid-cols-6 gap-2 lg:gap-2.5">
+      {/* `key`: cambia en cada código inválido para que la sacudida se reproduzca
+          de nuevo, aunque el mensaje de error sea el mismo que el intento anterior. */}
+      <div
+        key={sacudida}
+        className={cx("grid grid-cols-6 gap-1.5 lg:gap-2.5", error && "motion-safe:animate-ga-sacude")}
+      >
         {actuales.map((valor, i) => (
           <input
             key={i}
@@ -110,15 +137,18 @@ export function OtpInput({ name = "codigo", valores = [], longitud = 6, error, o
               : { defaultValue: valor })}
             aria-invalid={error ? true : undefined}
             className={cx(
-              "h-14.5 min-w-0 rounded-12 border-1.5 bg-white text-center text-24 font-extrabold text-ga-texto lg:h-16 lg:text-26",
+              "h-13 min-w-0 rounded-10 border-1.5 bg-white text-center text-20 font-extrabold text-ga-texto",
+              "lg:h-14.5 lg:rounded-12 lg:text-24",
+              "transition-[border-color,box-shadow] duration-150",
+              "focus:outline-none focus:border-ga-verde focus:shadow-[0_0_0_3px_rgba(30,102,82,0.15)]",
               "aria-[invalid=true]:border-ga-error",
-              valor ? "border-ga-verde" : "border-ga-borde",
+              valor ? "border-ga-verde" : "border-ga-borde-input",
             )}
           />
         ))}
       </div>
       {error ? (
-        <span id={idError} className="mt-2.5 text-14 font-semibold text-ga-error">
+        <span id={idError} className="mt-2.5 text-13 font-semibold text-ga-error">
           {error}
         </span>
       ) : null}

@@ -32,7 +32,12 @@ function Marcador({ estado, className }: { estado: EstadoPaso; className?: strin
     <span
       className={cx(
         "h-5.5 w-5.5 shrink-0 rounded-full",
-        estado === "actual" ? "border-6 border-ga-ambar" : "border-2 border-ga-gris-circulo",
+        // Pieza 3a («Línea de pasos»): el paso actual es un aro grueso ámbar
+        // sobre fondo ámbar claro; el pendiente usa el borde verde tenue
+        // --ga-verde-borde-pendiente (antes --ga-gris-circulo, sin tinte).
+        estado === "actual"
+          ? "border-6 border-ga-ambar bg-ga-ambar-fondo"
+          : "border-2 border-ga-verde-borde-pendiente bg-white",
         className,
       )}
     />

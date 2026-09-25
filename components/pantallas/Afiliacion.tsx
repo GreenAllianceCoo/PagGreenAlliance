@@ -47,7 +47,7 @@ function alEscribirSoloDigitos(evento: ChangeEvent<HTMLInputElement>) {
   evento.target.value = evento.target.value.replace(/[^0-9]/g, "");
 }
 
-/** Formulario «Deseo afiliarme» (design/Afiliacion-PC.dc.html + Afiliacion-Movil.dc.html, ajustado en Fase 2). */
+/** Formulario «Deseo afiliarme» (pieza 3c del rediseño C+, docs/Green Alliance C+.dc.html). */
 export function Afiliacion({
   grados,
   asesores,
@@ -80,7 +80,7 @@ export function Afiliacion({
       <main className="flex flex-col lg:flex-row lg:items-start lg:gap-12 lg:px-14 lg:py-12">
         <aside className="flex flex-col gap-4.5 px-6 pt-6 md:mx-auto md:w-full md:max-w-2xl lg:mx-0 lg:w-aside-afiliacion lg:max-w-none lg:shrink-0 lg:gap-5 lg:p-0">
           <div className="flex flex-col gap-2 lg:gap-5">
-            <h1 className="m-0 text-28 font-extrabold leading-115 text-ga-navy lg:text-40 lg:leading-110 lg:tracking-titulo">
+            <h1 className="m-0 font-display text-28 font-extrabold leading-115 text-ga-navy lg:text-40 lg:leading-110 lg:tracking-titular">
               Quiero afiliarme
             </h1>
             <p className="m-0 text-15 leading-150 text-ga-texto-2 lg:text-17 lg:leading-155">
@@ -252,7 +252,7 @@ export function Afiliacion({
           </Field>
 
           <div className="flex flex-col gap-4.5 xl:col-span-2">
-            <p className="m-0 text-15 font-bold text-ga-navy">Fotos de tu documento</p>
+            <p className="m-0 text-15 font-extrabold text-ga-navy">Fotos de tu documento</p>
             <div className="grid grid-cols-1 gap-4.5 sm:grid-cols-3">
               <CampoFoto
                 id="af-foto-frente"
@@ -315,7 +315,7 @@ export function Afiliacion({
           </div>
 
           {errorGeneral ? (
-            <p role="alert" className="m-0 text-14 font-semibold text-ga-error xl:col-span-2">
+            <p role="alert" className="m-0 text-13 font-semibold text-ga-error xl:col-span-2">
               {errorGeneral}
             </p>
           ) : null}

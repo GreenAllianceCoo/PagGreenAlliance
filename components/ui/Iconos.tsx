@@ -26,10 +26,17 @@ function Base({ tamano = 24, grosor = 2, children, ...props }: IconoProps) {
   );
 }
 
-export function IconoCheck(props: IconoProps) {
+export function IconoCheck({ trazo, ...props }: IconoProps & { trazo?: boolean }) {
   return (
     <Base {...props}>
-      <path d="M5 12l4 4 10-10" />
+      {/* `trazo`: el check se dibuja con stroke-dashoffset al entrar la pantalla
+          (pieza 3c, comprobante de «Solicitud enviada»). 32 alcanza de sobra el
+          largo real del trazo (≈20 en el sistema de coordenadas del viewBox). */}
+      <path
+        d="M5 12l4 4 10-10"
+        className={trazo ? "motion-safe:animate-ga-trazo" : undefined}
+        style={trazo ? { strokeDasharray: 32, strokeDashoffset: 0 } : undefined}
+      />
     </Base>
   );
 }

@@ -2,8 +2,7 @@ import type { ReactNode } from "react";
 import { cx } from "./cx";
 
 /**
- * Lista 1-2-3 con círculos numerados (aside de afiliación y «Qué sigue»).
- * Los primeros pasos van en navy y el último en verde, como en el diseño.
+ * Lista 1-2-3 con círculos numerados en verde (aside de afiliación y «Qué sigue»).
  */
 export function ListaNumerada({ items, className }: { items: ReactNode[]; className?: string }) {
   return (
@@ -15,12 +14,11 @@ export function ListaNumerada({ items, className }: { items: ReactNode[]; classN
     >
       {items.map((item, i) => (
         <li key={i} className="flex gap-2.5">
+          {/* Pieza 3c: los 3 círculos van en verde (antes el último era el único
+              verde y los demás navy); así se ve en el aside y en «Qué sigue». */}
           <span
             aria-hidden="true"
-            className={cx(
-              "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-13 font-extrabold text-white",
-              i === items.length - 1 ? "bg-ga-verde" : "bg-ga-navy",
-            )}
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ga-verde text-13 font-extrabold text-white"
           >
             {i + 1}
           </span>
