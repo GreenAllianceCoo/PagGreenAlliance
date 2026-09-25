@@ -20,7 +20,7 @@ export type CuentaProps = {
     monto: string;
     modalidad: string;
     plazo: string;
-    /** Tasa de interés mensual («7,9 %»). La cuota no se calcula. */
+    /** Tasa de interés mensual («7,9 %»). Uso interno: no se muestra al asociado (25-sep). */
     tasa?: string;
     pasos: PasoSolicitud[];
   } | null;
@@ -252,8 +252,7 @@ export function Cuenta({
                 </div>
                 <PasosSolicitud pasos={solicitud.pasos} variante="cuenta" />
                 <p className="m-0 rounded-10 bg-ga-fondo-suave p-3 text-14 leading-150 text-ga-texto-2 lg:px-3.5 lg:text-15 lg:leading-normal">
-                  {/* La tasa se guarda en la solicitud y se muestra; la cuota no se calcula. */}
-                  {solicitud.tasa ? <>Interés mensual: {solicitud.tasa}. </> : null}
+                  {/* La tasa se guarda en la solicitud pero NO se muestra al asociado (decisión 25-sep): es de uso interno. */}
                   Te avisaremos por correo cuando cambie el estado.
                 </p>
               </>

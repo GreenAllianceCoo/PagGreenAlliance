@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { crearSolicitud, type EstadoSolicitud } from "./actions";
-import { formatTasa, MONTO_MINIMO } from "@/lib/credito";
+import { MONTO_MINIMO } from "@/lib/credito";
 
 type Paquete = {
   porcentaje: "50" | "100";
@@ -122,12 +122,8 @@ export default function SolicitudForm({ paquetes }: { paquetes: Paquete[] }) {
         ) : null}
       </div>
 
-      {/* Mismos cuadros grises que «Mis datos» en /cuenta. La cuota no se calcula. */}
+      {/* Mismos cuadros grises que «Mis datos» en /cuenta. Sin la tasa de interés (pedido de Sebas, 25-sep); la cuota no se calcula. */}
       <dl className="m-0 grid grid-cols-2 gap-3">
-        <div className="flex flex-col gap-0.5 rounded-12 bg-ga-fondo-suave p-3.5">
-          <dt className="text-14 text-ga-texto-3">Interés mensual</dt>
-          <dd className="m-0 text-16 font-bold text-ga-texto">{formatTasa(paquete.tasa_interes_mensual)}</dd>
-        </div>
         <div className="flex flex-col gap-0.5 rounded-12 bg-ga-fondo-suave p-3.5">
           <dt className="text-14 text-ga-texto-3">Plazo</dt>
           <dd className="m-0 text-16 font-bold text-ga-texto">{paquete.plazo_meses} meses</dd>

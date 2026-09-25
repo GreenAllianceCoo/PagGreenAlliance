@@ -25,8 +25,8 @@ test.describe("C2 · Con sesión: datos del propio usuario", () => {
     expect(texto).toContain("En revisión");
     expect(texto).toContain("$ 500.000");
     expect(texto).toContain("50%");
-    // Decisión 23-sep: se muestra la tasa de interés mensual; la cuota NO se calcula.
-    expect(texto).toMatch(/Interés mensual: 7,9\s?%/);
+    // Decisión 25-sep: la tasa de interés es de uso interno, no se muestra; la cuota NO se calcula.
+    expect(texto).not.toContain("Interés");
     expect(texto.toLowerCase()).not.toContain("cuota");
     // Tope PP = 2.100.000 (máximo entre 50 % y 100 %).
     expect(texto).toContain("Tope disponible para tu grado");

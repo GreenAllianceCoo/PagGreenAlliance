@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 25-sep-2026 (cuenta de demostración para administradores en /admin/demo; máscara de correo oculta también el dominio; correcciones de HTML sin escapar en correos, espacios en WhatsApp y correo de cualquier dominio listas en local, falta desplegar)
+Actualizado: 25-sep-2026 (PR #2 desplegado a producción: cuenta de demostración para administradores en /admin/demo, correo de cualquier dominio, HTML escapado en correos de Resend y espacios de WhatsApp, todo confirmado en vivo)
 
 ## Dónde quedamos
 
