@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#ECEAE4;font-family:Manrope,system-ui,sans-serif;color:#14212B;-webkit-font-smoothing:antialiased}
+a{color:#1E6652}a:hover{color:#14493A}
+input::placeholder,textarea::placeholder{color:#7C8B96}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}.dv-tname{font:600 13px/1.2 system-ui,sans-serif;color:#1a1a1a}.dv-opts{display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start}.dv-opt{flex:none;display:flex;flex-direction:column;gap:12px;scroll-margin-top:16px}.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 system-ui,sans-serif;color:rgba(0,0,0,.55)}.dv-card{max-width:100%;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}.dv-opt:target .dv-oid{background:#2a78d6;color:#fff}.dv-next{margin:22px 0 0;font:12px/1.5 system-ui,sans-serif;color:rgba(0,0,0,.5)}
+@media (prefers-reduced-motion: reduce){*{transition-duration:1ms !important;animation-duration:1ms !important}}
+</style>
+</helmet>
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">Dirección C+ · base comunitaria (C) + sello/comprobante (A) + cifras grandes (B) · landing, asociado, asesor y admin</span><a href="Direcciones Green Alliance.dc.html" style="font:600 11px system-ui;margin-left:10px">← ver las 3 direcciones (turno 1)</a></div>
+
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,420px));gap:28px;margin:0 0 32px;font-size:14px;line-height:1.55;color:#2b3740">
+<div style="background:#fff;border-radius:8px;padding:20px 22px;border:1px solid rgba(0,0,0,.08)"><div style="font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;color:#1E6652;margin-bottom:8px">QUÉ DECIDÍ</div>
+<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px"><li>Formas orgánicas, píldoras y chips de C como lenguaje base; Bricolage para títulos y cifras, Manrope para la interfaz.</li><li>«Tu solicitud» es un <b>comprobante con sello</b> (A): perforación, muescas y sello del isotipo.</li><li>Energía por <b>cifras enormes</b> (B) y un bloque navy detrás de la ilustración.</li><li>Admin en <b>modo oscuro</b>, denso y sin formas decorativas.</li></ul></div>
+<div style="background:#fff;border-radius:8px;padding:20px 22px;border:1px solid rgba(0,0,0,.08)"><div style="font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;color:#B3261E;margin-bottom:8px">QUÉ DESCARTÉ</div>
+<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px"><li>Serif editorial de A: chocaba con la energía que pediste.</li><li>Hero oscuro y vidrio de B: caro en gama media y más «startup» que cooperativa.</li><li>Formas orgánicas en el admin: restan densidad a una herramienta de trabajo diario.</li></ul></div>
+<div style="background:#fff;border-radius:8px;padding:20px 22px;border:1px solid rgba(0,0,0,.08)"><div style="font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;color:#7a7a7a;margin-bottom:8px">PRUÉBALO</div>
+<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px"><li><b>Asesor:</b> toca las tarjetas de resumen o los chips para filtrar; busca por nombre.</li><li><b>Admin:</b> elige filas, aprueba (2 pasos) o rechaza (motivo obligatorio). Atajos: J/K para moverte, A aprobar, R rechazar, Esc cancelar.</li><li>Una fila nueva llega sola a los 3 s; puedes simular más.</li></ul></div>
+</div>
+
+<div class="dv-opts">
+
+<!-- ================= 2a LANDING ================= -->
+<div class="dv-opt" id="2a">
+<div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Landing · hero con comprobante vivo · 1280 y 390</div>
+<div class="dv-card" style="width:1280px">
+<div style="background:#F3F6F4;font-family:Manrope,sans-serif;color:#14212B;overflow:hidden">
+<header style="padding:16px 40px 0"><div style="height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 20px;background:#fff;border-radius:999px;box-shadow:0 6px 24px -12px rgba(20,33,43,.2)">
+<div style="display:flex;align-items:center;gap:10px;width:240px"><img src="logos/isotipo.svg" alt="" style="width:40px;height:40px"><img src="logos/wordmark.svg" alt="Cooperativa Green Alliance" style="width:170px"></div>
+<nav style="display:flex;align-items:center;gap:28px;font-size:16px;font-weight:700;color:#1A3C57"><span>Apoyos</span><span>Cómo funciona</span><span>Convenios</span><span>Afíliate</span><span style="height:48px;display:flex;align-items:center;padding:0 22px;background:#1E6652;color:#fff;border-radius:999px;font-weight:800">Mi cuenta</span></nav>
+</div></header>
+<section style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;padding:56px 64px 72px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:24px">
+<span style="align-self:flex-start;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:#fff;font-size:14px;font-weight:700;color:#1A3C57"><span style="width:8px;height:8px;border-radius:50%;background:#1E6652"></span>Policía Nacional · Ejército Nacional</span>
+<h1 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:76px;line-height:1;letter-spacing:-.035em;color:#1A3C57;text-wrap:balance">Crédito entre compañeros, con <span style="background:#FFE3A8;border-radius:20px;padding:0 12px;box-decoration-break:clone;-webkit-box-decoration-break:clone">reglas claras.</span></h1>
+<p style="margin:0;font-size:20px;line-height:1.55;color:#3F4F5B;max-width:520px;text-wrap:pretty">Somos una cooperativa hecha por y para la familia policial y militar. Pides en línea, sabes tu tope desde el inicio y ves cada paso de tu solicitud.</p>
+<div style="display:flex;gap:12px"><span style="height:58px;display:flex;align-items:center;padding:0 32px;background:#1E6652;color:#fff;border-radius:999px;font-size:17px;font-weight:800">Solicitar crédito</span><span style="height:58px;display:flex;align-items:center;padding:0 28px;background:#fff;color:#1A3C57;border-radius:999px;font-size:17px;font-weight:700;box-shadow:inset 0 0 0 1.5px #1A3C57">Conocer la cooperativa</span></div>
+<div style="display:flex;gap:40px;margin-top:8px">
+<div style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:64px;line-height:1;letter-spacing:-.04em;color:#1E6652">+200</span><span style="font-size:15px;color:#3F4F5B">asociados activos</span></div>
+<div style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:64px;line-height:1;letter-spacing:-.04em;color:#1A3C57">4 h</span><span style="font-size:15px;color:#3F4F5B">o menos de respuesta promedio</span></div>
+</div>
+</div>
+<div style="position:relative;height:640px">
+<div style="position:absolute;right:-70px;top:120px;width:420px;height:430px;background:#1A3C57;border-radius:44% 56% 62% 38% / 52% 40% 60% 48%"></div>
+<div style="position:absolute;right:0;top:0;width:440px;height:360px;background:#DCEFE6;border-radius:52% 48% 44% 56% / 55% 45% 55% 45%"></div><div style="position:absolute;right:50px;top:26px">{{ matrizL }}</div>
+<div style="position:absolute;left:40px;top:10px;width:96px;height:96px;background:#FFE3A8;border-radius:50%"></div>
+<div style="position:absolute;left:0;bottom:0;width:400px;background:#fff;border-radius:28px;box-shadow:0 30px 60px -28px rgba(20,33,43,.45);display:flex;flex-direction:column">
+<div style="position:absolute;top:-34px;right:-26px;width:92px;height:92px;border-radius:50%;border:2px dashed #E0A33A;background:#FFF8EA;display:flex;align-items:center;justify-content:center;transform:rotate(-10deg)"><img src="logos/isotipo.svg" alt="" style="width:46px;height:46px"></div>
+<div style="padding:24px 26px 18px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:#1A3C57;white-space:nowrap">Tu solicitud</span><span style="flex:none;white-space:nowrap;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:800;background:{{ bL.bg }};color:{{ bL.fg }}">{{ bL.t }}</span></div>
+<div style="display:flex;align-items:baseline;gap:8px"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:60px;line-height:1;letter-spacing:-.04em;color:#1A3C57">{{ nL }}</span><span style="font-size:17px;font-weight:700;color:#52626E">de 4 pasos</span></div>
+<div style="position:relative;display:grid;grid-template-columns:repeat(4,1fr)">
+<div style="position:absolute;left:12.5%;right:12.5%;top:15px;height:3px;background:#DCEFE6;border-radius:2px"></div>
+<div style="position:absolute;left:12.5%;right:12.5%;top:15px;height:3px;background:#1E6652;border-radius:2px;transform-origin:left;transform:{{ fillL }};transition:transform .5s cubic-bezier(.34,1.3,.64,1)"></div>
+<sc-for list="{{ l }}" as="st" hint-placeholder-count="4"><div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:14px;text-align:center;color:{{ st.fg }};font-weight:{{ st.fw }}"><span style="box-sizing:border-box;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;background:{{ st.bg }};border:{{ st.bw }} solid {{ st.bd }};color:{{ st.markFg }};transition:background-color .32s,border-color .32s">{{ st.mark }}</span>{{ st.label }}</div></sc-for>
+</div>
+</div>
+<div style="position:relative;height:0;border-top:2px dashed #E1E6E3;margin:0 22px"><span style="position:absolute;left:-34px;top:-13px;width:24px;height:24px;border-radius:50%;background:#F3F6F4"></span><span style="position:absolute;right:-34px;top:-13px;width:24px;height:24px;border-radius:50%;background:#F3F6F4"></span></div>
+<div style="padding:14px 26px 20px;font-size:15px;font-weight:600;color:#3F4F5B">{{ msgL }}</div>
+</div>
+</div>
+</section>
+<section style="padding:8px 64px 72px;display:flex;flex-direction:column;gap:24px">
+<span style="align-self:flex-start;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:#fff;font-size:14px;font-weight:700;color:#1A3C57"><img src="logos/isotipo.svg" alt="" style="width:20px;height:20px">Escudo y protección</span>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px">
+<article style="position:relative;overflow:hidden;background:#fff;border-radius:32px;padding:36px 38px;display:flex;flex-direction:column;gap:14px"><span style="position:absolute;right:-50px;top:-60px;width:200px;height:180px;background:#DCEFE6;border-radius:58% 42% 55% 45% / 48% 58% 42% 52%"></span><span style="position:relative;font-size:14px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#1E6652">Nuestra misión</span><p style="position:relative;margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:34px;line-height:1.1;letter-spacing:-.02em;color:#1A3C57;text-wrap:balance">Ser escudo y lazo solidario para la familia policial.</p><p style="position:relative;margin:0;font-size:17px;line-height:1.55;color:#3F4F5B;max-width:500px">Lo hacemos con microcréditos de fácil acceso, orientación financiera estratégica y acompañamiento jurídico integral, para que tu vocación de servicio también se traduzca en crecimiento económico.</p></article>
+<article style="position:relative;overflow:hidden;background:#1A3C57;border-radius:32px;padding:36px 38px;display:flex;flex-direction:column;gap:14px;color:#fff"><span style="position:absolute;right:-40px;bottom:-70px;width:220px;height:200px;background:#22496A;border-radius:44% 56% 62% 38% / 52% 40% 60% 48%"></span><span style="position:relative;font-size:14px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8FD6B5">Nuestra visión</span><p style="position:relative;margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:34px;line-height:1.1;letter-spacing:-.02em;text-wrap:balance">Liderar el cooperativismo colombiano por identidad y arraigo institucional.</p><p style="position:relative;margin:0;font-size:17px;line-height:1.55;color:#C9D6E0;max-width:500px">Con una organización moderna y de proyección internacional, capaz de asegurar el bienestar financiero de nuestros hombres y mujeres.</p></article>
+</div>
+</section>
+<section style="margin:0 64px;background:#fff;border-radius:36px;padding:48px;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:48px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:16px"><h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;line-height:1.05;letter-spacing:-.03em;color:#1A3C57;text-wrap:balance">Si hoy el banco te dice que no, aquí empezamos de nuevo.</h2><p style="margin:0;font-size:18px;line-height:1.55;color:#3F4F5B">Muchos compañeros quedan atrapados en deudas que terminan afectando su tranquilidad y su familia. Te proponemos una alternativa pensada para tu caso y te acompañamos de principio a fin.</p></div>
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:88px;line-height:.9;letter-spacing:-.05em;color:#1E6652;white-space:nowrap">3 años</span><span style="font-size:17px;font-weight:700;color:#3F4F5B">para volver al sistema financiero tradicional, sin rechazos</span></div>
+<ol style="margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+<li style="background:#F3F6F4;border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:6px"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#1A3C57">01</span><strong style="font-size:17px">Te afilias</strong><span style="font-size:15px;line-height:1.45;color:#3F4F5B">Revisamos tu caso y te explicamos cada paso con claridad.</span></li>
+<li style="background:#DCEFE6;border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:6px"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#1E6652">02</span><strong style="font-size:17px">Recibes alivio</strong><span style="font-size:15px;line-height:1.45;color:#3F4F5B">Embargo solidario, microcréditos y orientación mientras ordenas tus cuentas.</span></li>
+<li style="background:#FFF1D6;border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:6px"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#7A4A00">03</span><strong style="font-size:17px">Vuelves a empezar</strong><span style="font-size:15px;line-height:1.45;color:#3F4F5B">Con tu vida crediticia en orden, de vuelta a los bancos tradicionales.</span></li>
+</ol></div>
+</section>
+<section style="padding:80px 64px 0;display:flex;flex-direction:column;gap:24px">
+<h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;letter-spacing:-.03em;color:#1A3C57">Lo que encuentras en Green Alliance</h2>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px"><article style="position:relative;overflow:hidden;background:#DCEFE6;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:10px;min-height:220px"><span style="position:absolute;right:-30px;bottom:-40px;width:130px;height:120px;border-radius:58% 42% 55% 45% / 48% 58% 42% 52%;background:rgba(20,33,43,.05)"></span><span style="width:44px;height:44px;border-radius:50%;background:#1E6652"></span><strong style="position:relative;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:23px;line-height:1.15;color:#1A3C57">Microcréditos</strong><p style="position:relative;margin:0;font-size:16px;line-height:1.5;color:#3F4F5B">Pídelo en línea desde la plataforma, con modalidad del 50 % o 100 % y un tope claro según tu grado.</p></article><article style="position:relative;overflow:hidden;background:#E8EDF2;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:10px;min-height:220px"><span style="position:absolute;right:-30px;bottom:-40px;width:130px;height:120px;border-radius:58% 42% 55% 45% / 48% 58% 42% 52%;background:rgba(20,33,43,.05)"></span><span style="width:44px;height:44px;border-radius:50%;background:#1A3C57"></span><strong style="position:relative;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:23px;line-height:1.15;color:#1A3C57">Orientación financiera</strong><p style="position:relative;margin:0;font-size:16px;line-height:1.5;color:#3F4F5B">Una conversación estratégica para ordenar tus cuentas y decidir mejor antes de endeudarte.</p></article><article style="position:relative;overflow:hidden;background:#FFF1D6;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:10px;min-height:220px"><span style="position:absolute;right:-30px;bottom:-40px;width:130px;height:120px;border-radius:58% 42% 55% 45% / 48% 58% 42% 52%;background:rgba(20,33,43,.05)"></span><span style="width:44px;height:44px;border-radius:50%;background:#E0A33A"></span><strong style="position:relative;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:23px;line-height:1.15;color:#1A3C57">Apoyo legal</strong><p style="position:relative;margin:0;font-size:16px;line-height:1.5;color:#3F4F5B">Acompañamiento jurídico integral en trámites para ti y tu familia.</p></article><article style="position:relative;overflow:hidden;background:#1A3C57;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:10px;min-height:220px"><span style="position:absolute;right:-30px;bottom:-40px;width:130px;height:120px;border-radius:58% 42% 55% 45% / 48% 58% 42% 52%;background:rgba(255,255,255,.06)"></span><span style="width:44px;height:44px;border-radius:50%;background:#8FD6B5"></span><strong style="position:relative;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:23px;line-height:1.15;color:#fff">Embargo solidario a 36 meses</strong><p style="position:relative;margin:0;font-size:16px;line-height:1.5;color:#DCE6EE">Un alivio financiero pensado para que, con el tiempo, recuperes tu vida comercial ante los bancos.</p></article></div>
+</section>
+<section style="padding:80px 64px 0;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px"><div style="display:flex;flex-direction:column;gap:8px"><h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;letter-spacing:-.03em;color:#1A3C57">Empresas en convenio</h2><p style="margin:0;font-size:17px;color:#3F4F5B">Condiciones preferenciales y el respaldo de la cooperativa en cada compra o servicio.</p></div><span style="flex:none;height:48px;display:flex;align-items:center;padding:0 20px;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1.5px #1E6652;color:#1E6652;font-size:16px;font-weight:800">Ver beneficios en mi cuenta</span></div>
+<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px"><article style="background:#fff;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px"><span style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#1E6652">Tecnología</span><strong style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;line-height:1.15;color:#1A3C57">AMB Móvil S.A.S.</strong><ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:15px;color:#3F4F5B"><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Celulares nuevos y usados</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Retoma de tu equipo</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Servicio técnico</li></ul></article><article style="background:#fff;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px"><span style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#1E6652">Viajes y turismo</span><strong style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;line-height:1.15;color:#1A3C57">Locos por los Viajes</strong><ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:15px;color:#3F4F5B"><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Planes a la medida</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Vuelos nacionales e internacionales</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Cruceros</li></ul></article><article style="background:#fff;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px"><span style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#1E6652">Odontología</span><strong style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;line-height:1.15;color:#1A3C57">Dr. Ribero Dental Group</strong><ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:15px;color:#3F4F5B"><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Estética dental</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Implantología</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Endodoncia</li></ul><span style="font-size:14px;color:#52626E">Bogotá y Bucaramanga</span></article><article style="background:#fff;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px"><span style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#1E6652">Aventura</span><strong style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;line-height:1.15;color:#1A3C57">Racing Tours Villa de Leyva</strong><ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:15px;color:#3F4F5B"><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Cuatrimoto</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Cabalgata</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Buggy y termales</li></ul><span style="font-size:14px;color:#52626E">Villa de Leyva, Boyacá</span></article><article style="background:#fff;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px"><span style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#1E6652">Trámite de visas</span><strong style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;line-height:1.15;color:#1A3C57">Dream &amp; Go Visas</strong><ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:15px;color:#3F4F5B"><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Visa americana</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Visa canadiense</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Revisión de tu perfil</li></ul></article></div>
+</section>
+<section style="padding:80px 64px 72px;display:grid;grid-template-columns:minmax(0,1fr);gap:20px">
+<article style="position:relative;overflow:hidden;background:#1A3C57;color:#fff;border-radius:32px;padding:36px 38px;display:flex;flex-direction:column;gap:16px"><span style="position:absolute;right:-60px;top:-70px;width:260px;height:230px;background:#22496A;border-radius:52% 48% 44% 56% / 55% 45% 55% 45%"></span><div style="position:relative;display:flex;align-items:baseline;gap:14px"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:80px;line-height:.9;letter-spacing:-.05em;color:#8FD6B5">5</span><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px">sedes para atenderte</span></div><p style="position:relative;margin:0;font-size:17px;line-height:1.55;color:#C9D6E0">Sede principal en Bogotá y cuatro sucursales en la región.</p><div style="position:relative;display:flex;gap:8px;flex-wrap:wrap"><span style="padding:7px 12px;border-radius:999px;background:#8FD6B5;color:#0E2233;font-size:14px;font-weight:700">Bogotá · sede principal</span><span style="padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.1);color:#fff;font-size:14px;font-weight:700">Valledupar, Cesar</span><span style="padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.1);color:#fff;font-size:14px;font-weight:700">Bosconia, Cesar</span><span style="padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.1);color:#fff;font-size:14px;font-weight:700">La Jagua de Ibirico, Cesar</span><span style="padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.1);color:#fff;font-size:14px;font-weight:700">Hatonuevo, La Guajira</span></div></article>
+</section>
+<footer style="margin:0 40px 24px;background:#fff;border-radius:999px;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:15px;color:#3F4F5B"><div style="display:flex;align-items:center;gap:10px"><img src="logos/isotipo.svg" alt="" style="width:34px;height:34px"><img src="logos/wordmark.svg" alt="Cooperativa Green Alliance" style="width:150px"></div><span>WhatsApp 311 724 1942 · soporte@greenallianceco.com</span><span style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:#1E6652"></span>Tus datos protegidos · Ley 1581 de 2012</span></footer>
+</div>
+</div>
+
+<div style="display:flex;gap:28px;align-items:flex-start">
+<div class="dv-card" style="width:390px;border-radius:28px">
+<div style="background:#F3F6F4;font-family:Manrope,sans-serif;color:#14212B;overflow:hidden">
+<header style="padding:12px 12px 0"><div style="height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 14px;background:#fff;border-radius:999px"><div style="display:flex;align-items:center;gap:8px"><img src="logos/isotipo.svg" alt="" style="width:34px;height:34px"><img src="logos/wordmark.svg" alt="Cooperativa Green Alliance" style="width:136px"></div><span style="height:44px;display:flex;align-items:center;padding:0 16px;background:#1E6652;color:#fff;border-radius:999px;font-size:15px;font-weight:800">Ingresar</span></div></header>
+<div style="padding:26px 20px 28px;display:flex;flex-direction:column;gap:18px">
+<span style="align-self:flex-start;display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:#fff;font-size:13px;font-weight:700;color:#1A3C57"><span style="width:7px;height:7px;border-radius:50%;background:#1E6652"></span>Policía · Ejército</span>
+<h1 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;line-height:1.02;letter-spacing:-.035em;color:#1A3C57">Crédito entre compañeros, con <span style="background:#FFE3A8;border-radius:12px;padding:0 6px;box-decoration-break:clone;-webkit-box-decoration-break:clone">reglas claras.</span></h1>
+<p style="margin:0;font-size:17px;line-height:1.55;color:#3F4F5B">Pides en línea, sabes tu tope desde el inicio y ves cada paso.</p>
+<span style="height:56px;display:flex;align-items:center;justify-content:center;background:#1E6652;color:#fff;border-radius:999px;font-size:17px;font-weight:800">Solicitar crédito</span>
+<span style="height:56px;display:flex;align-items:center;justify-content:center;background:#fff;color:#1A3C57;border-radius:999px;font-size:17px;font-weight:700;box-shadow:inset 0 0 0 1.5px #1A3C57">Quiero afiliarme</span>
+<div style="display:flex;gap:28px"><div><div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;line-height:1;color:#1E6652">+200</div><div style="font-size:14px;color:#3F4F5B">asociados activos</div></div><div><div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;line-height:1;color:#1A3C57">4 h</div><div style="font-size:14px;color:#3F4F5B">o menos de respuesta</div></div></div>
+<div style="position:relative;height:240px"><div style="position:absolute;right:-40px;bottom:20px;width:170px;height:170px;background:#1A3C57;border-radius:44% 56% 62% 38% / 52% 40% 60% 48%"></div><div style="position:absolute;inset:0 0 40px 20px;background:#DCEFE6;border-radius:58% 42% 55% 45% / 48% 58% 42% 52%"></div><div style="position:absolute;left:50%;top:12px;margin-left:-73px">{{ matrizM }}</div><div style="position:absolute;left:0;top:6px;width:56px;height:56px;border-radius:50%;background:#FFE3A8"></div></div>
+<div style="position:relative;margin-top:-44px;background:#fff;border-radius:26px;box-shadow:0 20px 40px -24px rgba(20,33,43,.4)">
+<div style="position:absolute;top:-24px;right:14px;width:62px;height:62px;border-radius:50%;border:2px dashed #E0A33A;background:#FFF8EA;display:flex;align-items:center;justify-content:center;transform:rotate(-10deg)"><img src="logos/isotipo.svg" alt="" style="width:30px;height:30px"></div>
+<div style="padding:20px 20px 14px;display:flex;flex-direction:column;gap:12px">
+<span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;color:#1A3C57">Así ves tu solicitud</span>
+<div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:40px;line-height:1;color:#1A3C57">{{ nL }}</span><span style="font-size:15px;font-weight:700;color:#52626E">de 4</span><span style="flex:none;white-space:nowrap;padding:5px 11px;border-radius:999px;font-size:13px;font-weight:800;background:{{ bL.bg }};color:{{ bL.fg }}">{{ bL.t }}</span></div>
+<div style="position:relative;display:grid;grid-template-columns:repeat(4,1fr)">
+<div style="position:absolute;left:12.5%;right:12.5%;top:15px;height:3px;background:#DCEFE6"></div>
+<div style="position:absolute;left:12.5%;right:12.5%;top:15px;height:3px;background:#1E6652;transform-origin:left;transform:{{ fillL }};transition:transform .5s cubic-bezier(.34,1.3,.64,1)"></div>
+<sc-for list="{{ l }}" as="st" hint-placeholder-count="4"><div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;line-height:1.25;text-align:center;color:{{ st.fg }};font-weight:{{ st.fw }}"><span style="box-sizing:border-box;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;background:{{ st.bg }};border:{{ st.bw }} solid {{ st.bd }};color:{{ st.markFg }};transition:background-color .32s">{{ st.mark }}</span>{{ st.label }}</div></sc-for>
+</div>
+</div>
+<div style="height:0;border-top:2px dashed #E1E6E3;margin:0 18px"></div>
+<div style="padding:12px 20px 16px;font-size:15px;font-weight:600;color:#3F4F5B">{{ msgL }}</div>
+</div>
+<article style="position:relative;overflow:hidden;background:#fff;border-radius:26px;padding:22px;display:flex;flex-direction:column;gap:10px;margin-top:10px"><span style="position:absolute;right:-40px;top:-50px;width:140px;height:130px;background:#DCEFE6;border-radius:58% 42% 55% 45% / 48% 58% 42% 52%"></span><span style="position:relative;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#1E6652">Nuestra misión</span><p style="position:relative;margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;line-height:1.1;color:#1A3C57">Ser escudo y lazo solidario para la familia policial.</p><p style="position:relative;margin:0;font-size:16px;line-height:1.5;color:#3F4F5B">Microcréditos de fácil acceso, orientación financiera y acompañamiento jurídico integral.</p></article>
+<article style="position:relative;overflow:hidden;background:#1A3C57;color:#fff;border-radius:26px;padding:22px;display:flex;flex-direction:column;gap:10px"><span style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8FD6B5">Nuestra visión</span><p style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;line-height:1.12">Liderar el cooperativismo colombiano por identidad y arraigo institucional.</p></article>
+<article style="background:#fff;border-radius:26px;padding:22px;display:flex;flex-direction:column;gap:10px"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:56px;line-height:.9;color:#1E6652">3 años</span><p style="margin:0;font-size:16px;line-height:1.5;color:#3F4F5B">para volver al sistema financiero tradicional, con el embargo solidario a 36 meses y acompañamiento de principio a fin.</p></article>
+<article style="background:#FFF1D6;border-radius:26px;padding:22px;display:flex;flex-direction:column;gap:10px"><div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:48px;line-height:.9;color:#7A4A00">5</span><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:#5C3A00">sedes</span></div><div style="display:flex;gap:6px;flex-wrap:wrap"><span style="padding:7px 12px;border-radius:999px;background:#fff;color:#5C3A00;font-size:14px;font-weight:700">Bogotá</span><span style="padding:7px 12px;border-radius:999px;background:#fff;color:#5C3A00;font-size:14px;font-weight:700">Valledupar</span><span style="padding:7px 12px;border-radius:999px;background:#fff;color:#5C3A00;font-size:14px;font-weight:700">Bosconia</span><span style="padding:7px 12px;border-radius:999px;background:#fff;color:#5C3A00;font-size:14px;font-weight:700">La Jagua de Ibirico</span><span style="padding:7px 12px;border-radius:999px;background:#fff;color:#5C3A00;font-size:14px;font-weight:700">Hatonuevo</span></div></article>
+</div>
+</div>
+</div>
+<div style="flex:1;max-width:560px;display:flex;flex-direction:column;gap:14px;font-size:14px;line-height:1.55;color:#2b3740">
+<div style="background:#fff;border-radius:8px;padding:20px 22px;border:1px solid rgba(0,0,0,.08)"><div style="font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;color:#7a7a7a;margin-bottom:8px">MOVIMIENTO EN ESTA PIEZA</div>
+<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px"><li>Titular entra por líneas (translateY 12px → 0 + opacity, 400 ms, 70 ms entre líneas).</li><li>El sello aparece con giro de −18° a −10° y un rebote suave (spring, 500 ms).</li><li>El comprobante avanza solo: la línea se llena con scaleX y el paso actual cambia de color (320 ms). Se pausa si sale de pantalla.</li><li>Las cifras suben de 0 al entrar en vista (animation-timeline: view()).</li><li>Reducido: todo aparece en su estado final; el comprobante muestra «2 de 4» fijo.</li></ul></div>
+<div style="background:#fff;border-radius:8px;padding:20px 22px;border:1px solid rgba(0,0,0,.08)"><div style="font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;color:#7a7a7a;margin-bottom:8px">NOTAS</div>Sin fotos de personas ni montos, como pide la regla de la landing. La ilustración hay que encargarla: escudo y manos, trazo verde/navy, sin rostros. El bloque navy detrás le da la energía que pediste sin volver oscuro el hero.</div>
+</div>
+</div>
+</div>
+
+<!-- ================= 2b ASOCIADO ================= -->
+<div class="dv-opt" id="2b">
+<div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Panel del asociado · /cuenta · comprobante con estados (cámbialo en Tweaks)</div>
+<div class="dv-card" style="width:1280px">
+<div style="background:#F3F6F4;font-family:Manrope,sans-serif;color:#14212B">
+<header style="padding:14px 40px 0"><div style="height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 20px;background:#fff;border-radius:999px">
+<div style="display:flex;align-items:center;gap:10px;width:240px"><img src="logos/isotipo.svg" alt="" style="width:38px;height:38px"><img src="logos/wordmark.svg" alt="Cooperativa Green Alliance" style="width:160px"></div>
+<nav style="display:flex;gap:8px;font-size:16px;font-weight:700;color:#3F4F5B"><span style="color:#14493A;background:#DCEFE6;padding:10px 18px;border-radius:999px">Inicio</span><span style="padding:10px 18px">Nueva solicitud</span><span style="padding:10px 18px">Convenios</span></nav>
+<div style="display:flex;align-items:center;gap:12px;font-size:15px;font-weight:700">Laura Camacho<span style="height:44px;display:flex;align-items:center;padding:0 18px;background:#F3F6F4;border-radius:999px">Salir</span></div>
+</div></header>
+<div style="padding:36px 56px 48px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;align-items:center;justify-content:space-between"><h1 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;letter-spacing:-.03em;color:#1A3C57">Hola, Laura</h1><span style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:#FFF1D6;color:#7A4A00;font-size:15px;font-weight:700"><span style="width:8px;height:8px;border-radius:50%;background:#E0A33A"></span>Sorteo de octubre: abre el 1 de octubre</span></div>
+<div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:24px;align-items:start">
+<section style="position:relative;background:#fff;border-radius:28px;display:flex;flex-direction:column">
+<div style="position:absolute;top:24px;right:28px;width:88px;height:88px;border-radius:50%;border:2px dashed #E0A33A;background:#FFF8EA;display:flex;align-items:center;justify-content:center;transform:rotate(-10deg)"><img src="logos/isotipo.svg" alt="" style="width:44px;height:44px"></div>
+<div style="padding:28px 32px 24px;display:flex;flex-direction:column;gap:22px">
+<div style="display:flex;align-items:center;gap:12px"><h2 style="margin:0;white-space:nowrap;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#1A3C57">Tu solicitud</h2><span style="flex:none;white-space:nowrap;padding:6px 12px;border-radius:999px;font-size:14px;font-weight:800;background:{{ bP.bg }};color:{{ bP.fg }}">{{ bP.t }}</span></div>
+<div style="display:flex;flex-direction:column;gap:10px"><span style="font-size:15px;color:#52626E">Monto solicitado</span><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:72px;line-height:.95;letter-spacing:-.045em;color:#1A3C57">$ 2.500.000</span>
+<div style="display:flex;gap:8px;margin-top:6px"><span style="padding:8px 14px;border-radius:999px;background:#F3F6F4;font-size:15px;font-weight:700">Modalidad 100 %</span><span style="padding:8px 14px;border-radius:999px;background:#F3F6F4;font-size:15px;font-weight:700">12 meses</span></div></div>
+<div style="position:relative;display:grid;grid-template-columns:repeat(4,1fr);margin-top:6px">
+<div style="position:absolute;left:12.5%;right:12.5%;top:19px;height:4px;background:#DCEFE6;border-radius:2px"></div>
+<div style="position:absolute;left:12.5%;right:12.5%;top:19px;height:4px;background:{{ pFillC }};border-radius:2px;transform-origin:left;transform:{{ pFill }};transition:transform .6s cubic-bezier(.34,1.3,.64,1)"></div>
+<sc-for list="{{ p }}" as="st" hint-placeholder-count="4"><div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center"><span style="box-sizing:border-box;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;background:{{ st.bg }};border:{{ st.bw }} solid {{ st.bd }};color:{{ st.markFg }}">{{ st.mark }}</span><span style="font-size:16px;color:{{ st.fg }};font-weight:{{ st.fw }}">{{ st.label }}</span><span style="font-size:14px;color:#52626E">{{ st.fecha }}</span></div></sc-for>
+</div>
+</div>
+<div style="position:relative;height:0;border-top:2px dashed #E1E6E3;margin:0 26px"><span style="position:absolute;left:-40px;top:-14px;width:26px;height:26px;border-radius:50%;background:#F3F6F4"></span><span style="position:absolute;right:-40px;top:-14px;width:26px;height:26px;border-radius:50%;background:#F3F6F4"></span></div>
+<div style="padding:18px 32px 24px">
+<sc-if value="{{ noRej }}" hint-placeholder-val="{{ true }}"><p style="margin:0;font-size:16px;line-height:1.5;font-weight:600;color:#3F4F5B">{{ msgP }}</p></sc-if>
+<sc-if value="{{ rej }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px"><div style="display:flex;flex-direction:column;gap:4px"><strong style="font-size:16px;color:#8C1D17">Por qué no se aprobó</strong><span style="font-size:16px;line-height:1.5;color:#3F4F5B">{{ motivo }}</span></div><span style="flex:none;height:48px;display:flex;align-items:center;padding:0 20px;border-radius:999px;box-shadow:inset 0 0 0 1.5px #1A3C57;color:#1A3C57;font-size:15px;font-weight:800">Hablar con la cooperativa</span></div></sc-if>
+</div>
+</section>
+<div style="display:flex;flex-direction:column;gap:16px">
+<section style="position:relative;overflow:hidden;background:#1E6652;color:#fff;border-radius:28px;padding:24px 26px;display:flex;flex-direction:column;gap:12px">
+<div style="position:absolute;right:-40px;bottom:-60px;width:190px;height:170px;background:#14493A;border-radius:58% 42% 55% 45% / 48% 58% 42% 52%"></div>
+<span style="position:relative;font-size:15px;color:#DCEFE6">Tope disponible para tu grado</span>
+<span style="position:relative;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:46px;line-height:1;letter-spacing:-.04em">$ 3.000.000</span>
+<div style="position:relative;height:10px;border-radius:5px;background:rgba(255,255,255,.18);overflow:hidden"><div style="height:100%;background:#FFE3A8;border-radius:5px;transform-origin:left;transform:{{ medidor }};transition:transform .9s cubic-bezier(.34,1.3,.64,1)"></div></div>
+<span style="position:relative;font-size:14px;color:#DCEFE6">Tu solicitud usa $ 2.500.000 · Intendente</span>
+</section>
+<section style="position:relative;overflow:hidden;background:#FFF1D6;border-radius:28px;padding:22px 24px;display:flex;flex-direction:column;gap:8px">
+<div style="position:absolute;right:-30px;top:-40px;width:130px;height:120px;background:#FFE3A8;border-radius:44% 56% 62% 38% / 52% 40% 60% 48%"></div>
+<span style="position:relative;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:#7A4A00">Sorteo del mes</span>
+<span style="position:relative;font-size:15px;line-height:1.5;color:#5C3A00">Participa del 1 al 5 de cada mes. Si sales elegida, ese mes quedas exenta del descuento del 30 % y solo pagas el cheque.</span>
+<span style="position:relative;align-self:flex-start;margin-top:4px;height:44px;display:flex;align-items:center;padding:0 18px;border-radius:999px;background:#fff;color:#7A4A00;font-size:15px;font-weight:800">Avisarme el 1 de octubre</span>
+</section>
+<span style="height:54px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1.5px #1E6652;color:#1E6652;font-size:16px;font-weight:800">Hablar con la cooperativa</span>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:24px">
+<section style="background:#fff;border-radius:28px;padding:26px 30px;display:flex;flex-direction:column;gap:16px"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px"><div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;color:#1A3C57">Tu camino a la estabilidad</h2><span style="font-size:15px;color:#52626E">Embargo solidario · cuenta desde tu primer descuento en el desprendible</span></div><div style="display:flex;align-items:baseline;gap:6px;flex:none"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:64px;line-height:.9;letter-spacing:-.04em;color:#1E6652">4</span><span style="font-size:17px;font-weight:700;color:#52626E">de 36 meses</span></div></div>
+<div style="position:relative;height:12px;border-radius:6px;background:#DCEFE6;overflow:hidden"><div style="height:100%;background:#1E6652;border-radius:6px;transform-origin:left;transform:{{ camino }};transition:transform 1s cubic-bezier(.34,1.3,.64,1)"></div></div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);font-size:14px;color:#52626E"><span><b style="color:#14212B">Inicio</b> · jun 2026</span><span style="text-align:center"><b style="color:#14212B">Mitad</b> · mes 18</span><span style="text-align:right"><b style="color:#14212B">De vuelta a los bancos</b> · jun 2029</span></div></section>
+<section style="position:relative;overflow:hidden;background:#14493A;color:#fff;border-radius:28px;padding:22px 24px;display:flex;flex-direction:column;gap:10px"><span style="position:absolute;right:-40px;top:-50px;width:170px;height:150px;background:#1E6652;border-radius:52% 48% 44% 56% / 55% 45% 55% 45%"></span><div style="position:relative;display:flex;justify-content:space-between;align-items:center"><img src="logos/isotipo-blanco.svg" alt="" style="width:40px;height:40px"><span style="padding:5px 11px;border-radius:999px;background:#8FD6B5;color:#0E2233;font-size:13px;font-weight:800">Asociada activa</span></div><span style="position:relative;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#BFE3D2">Carné de asociada</span><strong style="position:relative;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px">Laura Camacho Rincón</strong><span style="position:relative;font-size:14px;color:#DCEFE6;font-variant-numeric:tabular-nums">C.C. 1.0••.•••.321 · Intendente · Policía Nacional</span><span style="position:relative;font-size:14px;color:#BFE3D2">Muéstralo en cada empresa en convenio.</span></section>
+</div>
+<section style="display:flex;flex-direction:column;gap:14px"><h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;color:#1A3C57">Tus convenios</h2><div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px"><article style="background:#fff;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px"><span style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#1E6652">Tecnología</span><strong style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;line-height:1.15;color:#1A3C57">AMB Móvil S.A.S.</strong><ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:15px;color:#3F4F5B"><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Celulares nuevos y usados</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Retoma de tu equipo</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Servicio técnico</li></ul><span style="margin-top:auto;font-size:15px;font-weight:800;color:#1E6652">Ver beneficio</span></article><article style="background:#fff;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px"><span style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#1E6652">Viajes y turismo</span><strong style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;line-height:1.15;color:#1A3C57">Locos por los Viajes</strong><ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:15px;color:#3F4F5B"><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Planes a la medida</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Vuelos nacionales e internacionales</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Cruceros</li></ul><span style="margin-top:auto;font-size:15px;font-weight:800;color:#1E6652">Ver beneficio</span></article><article style="background:#fff;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px"><span style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#1E6652">Odontología</span><strong style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;line-height:1.15;color:#1A3C57">Dr. Ribero Dental Group</strong><ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:15px;color:#3F4F5B"><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Estética dental</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Implantología</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Endodoncia</li></ul><span style="font-size:14px;color:#52626E">Bogotá y Bucaramanga</span><span style="margin-top:auto;font-size:15px;font-weight:800;color:#1E6652">Ver beneficio</span></article><article style="background:#fff;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px"><span style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#1E6652">Aventura</span><strong style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;line-height:1.15;color:#1A3C57">Racing Tours Villa de Leyva</strong><ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:15px;color:#3F4F5B"><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Cuatrimoto</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Cabalgata</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Buggy y termales</li></ul><span style="font-size:14px;color:#52626E">Villa de Leyva, Boyacá</span><span style="margin-top:auto;font-size:15px;font-weight:800;color:#1E6652">Ver beneficio</span></article><article style="background:#fff;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px"><span style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#1E6652">Trámite de visas</span><strong style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;line-height:1.15;color:#1A3C57">Dream &amp; Go Visas</strong><ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:15px;color:#3F4F5B"><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Visa americana</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Visa canadiense</li><li style="display:flex;gap:8px;align-items:baseline"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#1E6652;transform:translateY(-2px)"></span>Revisión de tu perfil</li></ul><span style="margin-top:auto;font-size:15px;font-weight:800;color:#1E6652">Ver beneficio</span></article></div></section>
+</div>
+</div>
+</div>
+
+<div style="display:flex;gap:28px;align-items:flex-start">
+<div class="dv-card" style="width:390px;border-radius:28px">
+<div style="background:#F3F6F4;font-family:Manrope,sans-serif;color:#14212B;display:flex;flex-direction:column">
+<div style="padding:24px 16px 16px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:0 4px"><div style="display:flex;flex-direction:column"><span style="font-size:15px;color:#52626E">Hola,</span><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:30px;font-weight:800;letter-spacing:-.02em;color:#1A3C57">Laura Camacho</span></div><span style="width:48px;height:48px;border-radius:50%;background:#FFF1D6;display:flex;align-items:center;justify-content:center"><img src="logos/isotipo.svg" alt="" style="width:26px"></span></div>
+<section style="position:relative;background:#fff;border-radius:26px">
+<div style="position:absolute;top:16px;right:16px;width:58px;height:58px;border-radius:50%;border:2px dashed #E0A33A;background:#FFF8EA;display:flex;align-items:center;justify-content:center;transform:rotate(-10deg)"><img src="logos/isotipo.svg" alt="" style="width:28px"></div>
+<div style="padding:20px 20px 16px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;color:#1A3C57">Tu solicitud</h2><span style="white-space:nowrap;padding:5px 11px;border-radius:999px;font-size:13px;font-weight:800;background:{{ bP.bg }};color:{{ bP.fg }}">{{ bP.t }}</span></div>
+<div><div style="font-size:14px;color:#52626E">Monto solicitado</div><div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;line-height:1;letter-spacing:-.04em;color:#1A3C57">$ 2.500.000</div></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap"><span style="padding:6px 12px;border-radius:999px;background:#F3F6F4;font-size:14px;font-weight:700">100 %</span><span style="padding:6px 12px;border-radius:999px;background:#F3F6F4;font-size:14px;font-weight:700">12 meses</span></div>
+<div style="display:flex;flex-direction:column;gap:12px"><sc-for list="{{ p }}" as="st" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;font-size:16px;color:{{ st.fg }};font-weight:{{ st.fw }}"><span style="box-sizing:border-box;width:30px;height:30px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;background:{{ st.bg }};border:{{ st.bw }} solid {{ st.bd }};color:{{ st.markFg }}">{{ st.mark }}</span><span style="flex:1">{{ st.label }}</span><span style="font-size:14px;font-weight:500;color:#52626E">{{ st.fecha }}</span></div></sc-for></div>
+</div>
+<div style="height:0;border-top:2px dashed #E1E6E3;margin:0 16px"></div>
+<div style="padding:12px 20px 18px">
+<sc-if value="{{ noRej }}" hint-placeholder-val="{{ true }}"><p style="margin:0;font-size:15px;line-height:1.5;font-weight:600;color:#3F4F5B">{{ msgP }}</p></sc-if>
+<sc-if value="{{ rej }}" hint-placeholder-val="{{ false }}"><div style="font-size:15px;line-height:1.5;color:#3F4F5B"><strong style="color:#8C1D17">Por qué no se aprobó. </strong>{{ motivo }}</div></sc-if>
+</div>
+</section>
+<section style="position:relative;overflow:hidden;background:#1E6652;color:#fff;border-radius:24px;padding:18px 20px;display:flex;flex-direction:column;gap:10px"><div style="position:absolute;right:-30px;bottom:-50px;width:130px;height:120px;background:#14493A;border-radius:58% 42% 55% 45% / 48% 58% 42% 52%"></div><div style="position:relative;display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:14px;color:#DCEFE6">Tope para tu grado</span><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px">$ 3.000.000</span></div><div style="position:relative;height:8px;border-radius:4px;background:rgba(255,255,255,.18);overflow:hidden"><div style="height:100%;background:#FFE3A8;transform-origin:left;transform:{{ medidor }};transition:transform .9s cubic-bezier(.34,1.3,.64,1)"></div></div></section>
+<section style="background:#FFF1D6;border-radius:24px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;color:#7A4A00">Sorteo del mes</span><span style="font-size:14px;color:#5C3A00">Abre el 1 de octubre</span></div><span style="height:44px;display:flex;align-items:center;padding:0 16px;border-radius:999px;background:#fff;color:#7A4A00;font-size:14px;font-weight:800">Avisarme</span></section>
+<section style="background:#fff;border-radius:24px;padding:18px 20px;display:flex;flex-direction:column;gap:10px"><div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;color:#1A3C57">Tu camino a la estabilidad</span><span style="font-size:15px;font-weight:700;color:#52626E"><b style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#1E6652">4</b> de 36</span></div><div style="height:10px;border-radius:5px;background:#DCEFE6;overflow:hidden"><div style="height:100%;background:#1E6652;transform-origin:left;transform:{{ camino }};transition:transform 1s cubic-bezier(.34,1.3,.64,1)"></div></div><span style="font-size:14px;color:#52626E">Meta: de vuelta a los bancos en jun 2029</span></section>
+<section style="background:#14493A;color:#fff;border-radius:24px;padding:18px 20px;display:flex;align-items:center;gap:14px"><img src="logos/isotipo-blanco.svg" alt="" style="width:40px;height:40px"><div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:13px;font-weight:700;color:#BFE3D2">Carné de asociada · activa</span><strong style="font-size:16px">Laura Camacho Rincón</strong><span style="font-size:13px;color:#DCEFE6">1.0••.•••.321 · Intendente</span></div></section>
+</div>
+<nav style="margin:0 12px 14px;display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-radius:999px;padding:6px;box-shadow:0 8px 24px -12px rgba(20,33,43,.3)">
+<div style="height:52px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#14493A;background:#DCEFE6;border-radius:999px">Inicio</div>
+<div style="height:52px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#52626E">Solicitar</div>
+<div style="height:52px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#52626E">Sorteo</div>
+<div style="height:52px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#52626E">Mis datos</div>
+</nav>
+</div>
+</div>
+<div style="flex:1;max-width:560px;display:flex;flex-direction:column;gap:14px;font-size:14px;line-height:1.55;color:#2b3740">
+<div style="background:#fff;border-radius:8px;padding:20px 22px;border:1px solid rgba(0,0,0,.08)"><div style="font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;color:#7a7a7a;margin-bottom:8px">CAMBIOS FRENTE A HOY</div>
+<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px"><li>El monto es la cifra protagonista (72 px); el tope pasa a segundo plano con un medidor.</li><li>«Nueva solicitud» sale de los accesos repetidos: vive en la barra inferior (celular) y en el menú (escritorio).</li><li>Si no se aprueba, el motivo va en el pie del comprobante con la acción siguiente.</li><li>El sorteo tiene su tarjeta; fuera del 1 al 5 ofrece «Avisarme» en vez de un botón muerto.</li></ul></div>
+<div style="background:#fff;border-radius:8px;padding:20px 22px;border:1px solid rgba(0,0,0,.08)"><div style="font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;color:#7a7a7a;margin-bottom:8px">MOVIMIENTO</div>Al cargar, los pasos se encienden en orden (80 ms entre pasos) y la línea se llena; el medidor del tope se llena con un spring suave. Tocar el comprobante abre el detalle con una View Transition compartida.</div>
+<div style="background:#FFF8EA;border-radius:8px;padding:16px 20px;border:1px solid #F3DDB0"><b>Backend:</b> «Avisarme» del sorteo necesita guardar la preferencia (tabla nueva o campo en perfiles). Si no, lo cambio por un texto informativo. «Tu camino a la estabilidad» necesita la fecha del primer descuento del embargo solidario; el carné usa datos que ya existen.</div>
+</div>
+</div>
+</div>
+
+<!-- ================= 2c ASESOR ================= -->
+<div class="dv-opt" id="2c">
+<div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>Panel del asesor · /asesor + /asesor/demo · interactivo</div>
+<div class="dv-card" style="width:1280px">
+<div style="background:#F3F6F4;font-family:Manrope,sans-serif;color:#14212B">
+<header style="padding:14px 40px 0"><div style="height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 10px 0 20px;background:#fff;border-radius:999px">
+<div style="display:flex;align-items:center;gap:10px;width:240px"><img src="logos/isotipo.svg" alt="" style="width:38px;height:38px"><img src="logos/wordmark.svg" alt="Cooperativa Green Alliance" style="width:160px"></div>
+<nav style="display:flex;gap:8px;font-size:16px;font-weight:700"><span style="color:#14493A;background:#DCEFE6;padding:10px 18px;border-radius:999px">Mis clientes</span></nav>
+<div style="display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700"><span style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.2">Andrés Rojas<span style="font-size:13px;font-weight:600;color:#52626E">Asesor</span></span><span style="height:44px;display:flex;align-items:center;padding:0 18px;background:#FFF1D6;color:#7A4A00;border-radius:999px;font-weight:800">Ver cuenta de demostración</span><span style="height:44px;display:flex;align-items:center;padding:0 18px;background:#F3F6F4;border-radius:999px">Salir</span></div>
+</div></header>
+<div style="padding:36px 56px 48px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:6px"><h1 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;letter-spacing:-.03em;color:#1A3C57">Mis clientes</h1><p style="margin:0;font-size:17px;color:#3F4F5B">Las personas que referiste y los asociados que la cooperativa te asignó.</p></div>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+<sc-for list="{{ resumen }}" as="r" hint-placeholder-count="4"><button onClick="{{ r.onClick }}" style="all:unset;cursor:pointer;position:relative;overflow:hidden;border-radius:26px;padding:20px 22px;display:flex;flex-direction:column;gap:6px;background:{{ r.bg }};box-shadow:inset 0 0 0 2.5px {{ r.ring }};transition:box-shadow .2s"><span style="position:absolute;right:-26px;bottom:-40px;width:110px;height:100px;background:rgba(20,33,43,.05);border-radius:58% 42% 55% 45% / 48% 58% 42% 52%"></span><span style="position:relative;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:60px;line-height:1;letter-spacing:-.04em;color:{{ r.fg }}">{{ r.n }}</span><span style="position:relative;font-size:16px;font-weight:700;color:{{ r.fg }}">{{ r.k }}</span><span style="position:relative;font-size:13px;color:#3F4F5B">afiliación</span></button></sc-for>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+<div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ afChips }}" as="c" hint-placeholder-count="5"><button onClick="{{ c.onClick }}" style="all:unset;cursor:pointer;height:44px;display:flex;align-items:center;gap:8px;padding:0 16px;border-radius:999px;font-size:15px;font-weight:700;background:{{ c.bg }};color:{{ c.fg }};transition:background-color .2s,color .2s">{{ c.t }}<span style="font-size:13px;opacity:.75">{{ c.n }}</span></button></sc-for></div>
+<input value="{{ q }}" onChange="{{ onQ }}" placeholder="Buscar por nombre" style="width:300px;height:48px;box-sizing:border-box;border:1.5px solid #D5DCE0;border-radius:999px;padding:0 20px;font:500 16px Manrope,sans-serif;background:#fff;color:#14212B;outline-color:#1E6652">
+</div>
+<section style="background:#fff;border-radius:28px;padding:8px 8px 12px">
+<div style="display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1.3fr) minmax(0,1.4fr) minmax(0,1.2fr) minmax(0,1.2fr);gap:12px;padding:14px 20px;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#52626E"><span>Nombre</span><span>Cédula</span><span>Grado</span><span>Afiliación</span><span>Último crédito</span></div>
+<sc-for list="{{ lista }}" as="c" hint-placeholder-count="6"><div style="display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1.3fr) minmax(0,1.4fr) minmax(0,1.2fr) minmax(0,1.2fr);gap:12px;align-items:center;padding:14px 20px;border-top:1px solid #EEF2F0;font-size:16px"><span style="font-weight:800;color:#14212B">{{ c.n }}</span><span style="font-variant-numeric:tabular-nums;letter-spacing:.03em;color:#3F4F5B">{{ c.c }}</span><span style="color:#3F4F5B">{{ c.g }} · {{ c.i }}</span><span style="justify-self:start;padding:5px 12px;border-radius:999px;font-size:14px;font-weight:800;background:{{ c.afBg }};color:{{ c.afFg }}">{{ c.af }}</span><span style="justify-self:start;padding:5px 12px;border-radius:999px;font-size:14px;font-weight:800;background:{{ c.crBg }};color:{{ c.crFg }}">{{ c.cr }}</span></div></sc-for>
+<sc-if value="{{ vacio }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:20px;padding:36px 28px;border-top:1px solid #EEF2F0"><span style="flex:none;width:72px;height:72px;background:#DCEFE6;border-radius:58% 42% 55% 45% / 48% 58% 42% 52%;display:flex;align-items:center;justify-content:center"><img src="logos/isotipo.svg" alt="" style="width:34px"></span><div style="display:flex;flex-direction:column;gap:4px"><strong style="font-family:'Bricolage Grotesque',sans-serif;font-size:22px;color:#1A3C57">Nadie en este estado por ahora</strong><span style="font-size:16px;color:#3F4F5B">Cada compañero que refieras aparece aquí apenas envíe su afiliación. Pídele que escriba tu nombre en «¿Quién te refirió?».</span></div></div></sc-if>
+</section>
+<p style="margin:0;display:flex;align-items:center;gap:10px;font-size:15px;color:#3F4F5B"><span style="width:10px;height:10px;border-radius:50%;background:#1E6652"></span>Por la privacidad de tus clientes, aquí no se muestran celular, correo, Nequi ni fotos.</p>
+</div>
+</div>
+</div>
+
+<div style="display:flex;gap:28px;align-items:flex-start">
+<div class="dv-card" style="width:390px;border-radius:28px">
+<div style="background:#F3F6F4;font-family:Manrope,sans-serif;color:#14212B;display:flex;flex-direction:column">
+<div style="padding:24px 16px 16px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:0 4px"><div style="display:flex;flex-direction:column"><span style="font-size:15px;color:#52626E">Hola, Andrés</span><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:30px;font-weight:800;letter-spacing:-.02em;color:#1A3C57">Mis clientes</span></div><span style="height:44px;display:flex;align-items:center;padding:0 14px;background:#FFF1D6;color:#7A4A00;border-radius:999px;font-size:14px;font-weight:800">Demo</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><sc-for list="{{ resumen }}" as="r" hint-placeholder-count="4"><button onClick="{{ r.onClick }}" style="all:unset;cursor:pointer;border-radius:20px;padding:14px 16px;display:flex;align-items:baseline;gap:8px;background:{{ r.bg }};box-shadow:inset 0 0 0 2.5px {{ r.ring }}"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:36px;line-height:1;color:{{ r.fg }}">{{ r.n }}</span><span style="font-size:14px;font-weight:700;color:{{ r.fg }}">{{ r.k }}</span></button></sc-for></div>
+<input value="{{ q }}" onChange="{{ onQ }}" placeholder="Buscar por nombre" style="height:48px;box-sizing:border-box;border:1.5px solid #D5DCE0;border-radius:999px;padding:0 18px;font:500 16px Manrope,sans-serif;background:#fff;color:#14212B;outline-color:#1E6652">
+<div style="display:flex;flex-direction:column;gap:10px"><sc-for list="{{ lista }}" as="c" hint-placeholder-count="4"><div style="background:#fff;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;gap:8px"><strong style="font-size:16px">{{ c.n }}</strong></div><span style="font-size:14px;color:#52626E;font-variant-numeric:tabular-nums">{{ c.c }} · {{ c.g }}</span><div style="display:flex;gap:6px;flex-wrap:wrap"><span style="padding:4px 10px;border-radius:999px;font-size:13px;font-weight:800;background:{{ c.afBg }};color:{{ c.afFg }}">Afiliación: {{ c.af }}</span><span style="padding:4px 10px;border-radius:999px;font-size:13px;font-weight:800;background:{{ c.crBg }};color:{{ c.crFg }}">{{ c.cr }}</span></div></div></sc-for>
+<sc-if value="{{ vacio }}" hint-placeholder-val="{{ false }}"><div style="background:#fff;border-radius:20px;padding:20px;font-size:15px;line-height:1.5;color:#3F4F5B"><strong style="display:block;font-family:'Bricolage Grotesque',sans-serif;font-size:18px;color:#1A3C57">Nadie en este estado por ahora</strong>Cada compañero que refieras aparece aquí apenas envíe su afiliación.</div></sc-if></div>
+</div>
+<nav style="margin:0 12px 14px;display:grid;grid-template-columns:repeat(2,1fr);background:#fff;border-radius:999px;padding:6px;box-shadow:0 8px 24px -12px rgba(20,33,43,.3)">
+<div style="height:52px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#14493A;background:#DCEFE6;border-radius:999px">Clientes</div>
+<div style="height:52px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#52626E">Salir</div>
+</nav>
+</div>
+</div>
+
+<div class="dv-card" style="width:390px;border-radius:28px;border:0">
+<div style="background:#F3F6F4;font-family:Manrope,sans-serif;color:#14212B;display:flex;flex-direction:column;box-shadow:inset 0 0 0 4px #E0A33A;border-radius:28px">
+<div style="margin:4px 4px 0;background:#E0A33A;color:#14212B;border-radius:24px 24px 0 0;padding:10px 12px 10px 18px;display:flex;align-items:center;justify-content:space-between"><span style="display:flex;flex-direction:column;line-height:1.25"><strong style="font-size:15px">Modo presentación</strong><span style="font-size:13px;font-weight:600">Datos de ejemplo</span></span><span style="flex:none;white-space:nowrap;height:44px;display:flex;align-items:center;padding:0 14px;background:#14212B;color:#fff;border-radius:999px;font-size:14px;font-weight:800">Salir de la demo</span></div>
+<div style="padding:20px 16px 16px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;flex-direction:column;padding:0 4px"><span style="font-size:15px;color:#52626E">Hola,</span><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:30px;font-weight:800;letter-spacing:-.02em;color:#1A3C57">Sofía Ejemplo</span></div>
+<section style="position:relative;background:#fff;border-radius:26px">
+<div style="position:absolute;top:16px;right:16px;width:58px;height:58px;border-radius:50%;border:2px dashed #E0A33A;background:#FFF8EA;display:flex;align-items:center;justify-content:center;transform:rotate(-10deg)"><img src="logos/isotipo.svg" alt="" style="width:28px"></div>
+<div style="padding:20px 20px 16px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;color:#1A3C57">Tu solicitud</h2><span style="padding:5px 11px;border-radius:999px;font-size:13px;font-weight:800;background:#FFF1D6;color:#7A4A00">En revisión</span></div>
+<div><div style="font-size:14px;color:#52626E">Monto solicitado</div><div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;line-height:1;letter-spacing:-.04em;color:#1A3C57">$ 1.500.000</div></div>
+<div style="display:flex;flex-direction:column;gap:12px"><sc-for list="{{ demo }}" as="st" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;font-size:16px;color:{{ st.fg }};font-weight:{{ st.fw }}"><span style="box-sizing:border-box;width:30px;height:30px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;background:{{ st.bg }};border:{{ st.bw }} solid {{ st.bd }};color:{{ st.markFg }}">{{ st.mark }}</span><span style="flex:1">{{ st.label }}</span><span style="font-size:14px;font-weight:500;color:#52626E">{{ st.fecha }}</span></div></sc-for></div>
+</div>
+<div style="height:0;border-top:2px dashed #E1E6E3;margin:0 16px"></div>
+<div style="padding:12px 20px 18px;font-size:15px;font-weight:600;color:#3F4F5B">Esto suele tardar 4 horas o menos.</div>
+</section>
+<section style="background:#1E6652;color:#fff;border-radius:24px;padding:18px 20px;display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:14px;color:#DCEFE6">Tope para tu grado</span><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px">$ 2.000.000</span></section>
+<p style="margin:0;font-size:14px;line-height:1.5;color:#52626E;text-align:center">Nada de lo que hagas aquí se guarda ni se envía.</p>
+</div>
+</div>
+</div>
+
+<div style="flex:1;max-width:400px;display:flex;flex-direction:column;gap:14px;font-size:14px;line-height:1.55;color:#2b3740">
+<div style="background:#fff;border-radius:8px;padding:20px 22px;border:1px solid rgba(0,0,0,.08)"><div style="font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;color:#7a7a7a;margin-bottom:8px">DECISIONES</div>
+<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px"><li>Las tarjetas de resumen también filtran (tócalas); menos controles.</li><li>La tabla no tiene columnas de contacto: no queda espacio donde pudieran aparecer.</li><li>Demo: marco y franja ámbar, siempre visibles; «Salir de la demo» en el pulgar derecho; aviso de que nada se guarda.</li></ul></div>
+<div style="background:#fff;border-radius:8px;padding:20px 22px;border:1px solid rgba(0,0,0,.08)"><div style="font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;color:#7a7a7a;margin-bottom:8px">MOVIMIENTO</div>Los números del resumen aparecen escalonados (70 ms). Al filtrar, la lista cambia con una View Transition (fundido + 8 px, 200 ms) en lugar de saltar.</div>
+</div>
+</div>
+</div>
+
+<!-- ================= 2d ADMIN ================= -->
+<div class="dv-opt" id="2d">
+<div class="dv-olabel"><a class="dv-oid" href="#2d">2d</a>Panel del administrador · /admin · modo oscuro · interactivo<button onClick="{{ simular }}" style="margin-left:12px;height:28px;padding:0 12px;border-radius:999px;border:1px solid rgba(0,0,0,.2);background:#fff;font:600 12px system-ui;cursor:pointer">▶ Simular solicitud nueva</button></div>
+<div class="dv-card" style="width:1440px;border:0;position:relative">
+<div style="display:grid;grid-template-columns:248px minmax(0,1fr);background:#0E1A22;color:#E8EEF2;font-family:Manrope,sans-serif;min-height:940px">
+<aside style="background:#0A141B;border-right:1px solid rgba(255,255,255,.06);padding:22px 16px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;align-items:center;gap:10px;padding:0 8px"><img src="logos/isotipo-blanco.svg" alt="" style="width:34px;height:34px"><img src="logos/wordmark-blanco.svg" alt="Cooperativa Green Alliance" style="width:150px"></div>
+<nav style="display:flex;flex-direction:column;gap:4px;font-size:15px;font-weight:700">
+<span style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-radius:12px;color:#C5D2DA">Afiliaciones<span style="min-width:24px;height:22px;padding:0 7px;box-sizing:border-box;border-radius:999px;background:rgba(242,181,90,.18);color:#F5C67A;font-size:12px;display:flex;align-items:center;justify-content:center">4</span></span>
+<span style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-radius:12px;background:#1C2F3B;color:#fff">Créditos<span style="min-width:24px;height:22px;padding:0 7px;box-sizing:border-box;border-radius:999px;background:#6FCBA3;color:#0E1A22;font-size:12px;display:flex;align-items:center;justify-content:center">{{ kPend }}</span></span>
+<span style="height:44px;display:flex;align-items:center;padding:0 14px;border-radius:12px;color:#C5D2DA">Asesores</span>
+<span style="height:44px;display:flex;align-items:center;padding:0 14px;border-radius:12px;color:#C5D2DA">Sorteo</span>
+</nav>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:14px;background:#15242E"><span style="font-size:14px;font-weight:700">María Fernanda López</span><span style="font-size:13px;color:#9FB1BD">Administradora</span><span style="height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid rgba(255,255,255,.14);font-size:14px;font-weight:700">Salir</span></div>
+</aside>
+<main style="padding:26px 30px 30px;display:flex;flex-direction:column;gap:20px;min-width:0">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:20px">
+<h1 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:34px;letter-spacing:-.02em">Créditos</h1>
+<div style="display:flex;align-items:center;gap:14px">
+<input value="{{ aq }}" onChange="{{ onAq }}" placeholder="Buscar por nombre o cédula" style="width:320px;height:46px;box-sizing:border-box;border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:0 18px;font:500 16px Manrope,sans-serif;background:#15242E;color:#E8EEF2;outline-color:#6FCBA3"></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px">
+<div style="background:#15242E;border-radius:20px;padding:18px 20px;display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;color:#9FB1BD">Créditos pendientes</span><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:48px;line-height:1;color:#F5C67A">{{ kPend }}</span></div>
+<div style="background:#15242E;border-radius:20px;padding:18px 20px;display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;color:#9FB1BD">Afiliaciones pendientes</span><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:48px;line-height:1">4</span></div>
+<div style="background:#15242E;border-radius:20px;padding:18px 20px;display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;color:#9FB1BD">Aprobados este mes</span><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:48px;line-height:1;color:#8FD6B5">{{ kApr }}</span></div>
+<div style="background:#15242E;border-radius:20px;padding:18px 20px;display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;color:#9FB1BD">Monto aprobado este mes</span><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:38px;line-height:1.1;letter-spacing:-.02em;font-variant-numeric:tabular-nums">{{ kMonto }}</span></div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div style="display:flex;gap:4px;padding:4px;background:#15242E;border-radius:999px;font-size:15px;font-weight:700"><span style="padding:9px 18px;border-radius:999px;background:#E8EEF2;color:#0E1A22">Créditos</span><span style="padding:9px 18px;color:#C5D2DA">Afiliaciones</span></div>
+<div style="display:flex;gap:8px"><sc-for list="{{ filtChips }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onClick }}" style="all:unset;cursor:pointer;height:40px;display:flex;align-items:center;gap:8px;padding:0 16px;border-radius:999px;font-size:14px;font-weight:700;background:{{ c.bg }};color:{{ c.fg }};box-shadow:inset 0 0 0 1px {{ c.bd }}">{{ c.t }}<span style="opacity:.7">{{ c.n }}</span></button></sc-for></div>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 460px;gap:18px;align-items:start">
+<section style="background:#15242E;border-radius:20px;overflow:hidden">
+<div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,.9fr);gap:10px;padding:14px 18px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9FB1BD;border-bottom:1px solid rgba(255,255,255,.06)"><span>Asociado</span><span>Grado</span><span>Monto</span><span>Recibida</span><span>Estado</span></div>
+<sc-for list="{{ adminRows }}" as="r" hint-placeholder-count="4"><button onClick="{{ r.onClick }}" style="all:unset;cursor:pointer;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,.9fr);gap:10px;align-items:center;padding:13px 18px;border-bottom:1px solid rgba(255,255,255,.05);background:{{ r.bg }};transition:background-color 1.2s ease-out;width:100%;box-sizing:border-box"><span style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:15px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.n }}</span><span style="font-size:13px;color:#9FB1BD;letter-spacing:.03em">{{ r.c }}</span></span><span style="font-size:14px;color:#C5D2DA">{{ r.g }}</span><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums">{{ r.monto }}</span><span style="font-size:12px;font-weight:700;color:{{ r.topeFg }}">{{ r.tope }}</span></span><span style="font-size:14px;color:#C5D2DA">{{ r.f }}</span><span style="justify-self:start;white-space:nowrap;padding:5px 10px;border-radius:999px;font-size:13px;font-weight:800;background:{{ r.chip.bg }};color:{{ r.chip.fg }};transition:background-color .3s">{{ r.chip.t }}</span></button></sc-for>
+<sc-if value="{{ adminVacio }}" hint-placeholder-val="{{ false }}"><div style="padding:36px 20px;text-align:center;font-size:15px;color:#9FB1BD">Nada por aquí. Cuando llegue una solicitud la verás aparecer resaltada.</div></sc-if>
+</section>
+<section style="background:#15242E;border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="white-space:nowrap;padding:6px 12px;border-radius:999px;font-size:14px;font-weight:800;background:{{ det.chip.bg }};color:{{ det.chip.fg }};transition:background-color .3s">{{ det.chip.t }}</span><span style="font-size:13px;color:#9FB1BD">{{ det.f }}</span></div>
+<div style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;line-height:1.15">{{ det.n }}</span><span style="font-size:14px;color:#C5D2DA">C.C. {{ det.cc }} · {{ det.g }} · {{ det.i }}</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:14px"><div style="background:#1C2F3B;border-radius:12px;padding:10px 12px"><div style="color:#9FB1BD">Celular</div><div style="font-weight:700">{{ det.cel }}</div></div><div style="background:#1C2F3B;border-radius:12px;padding:10px 12px;min-width:0"><div style="color:#9FB1BD">Correo institucional</div><div style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ det.mail }}</div></div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;line-height:1;letter-spacing:-.03em">{{ det.monto }}</span><div style="display:flex;gap:6px"><span style="padding:5px 11px;border-radius:999px;background:#1C2F3B;font-size:13px;font-weight:700">{{ det.mod }}</span><span style="padding:5px 11px;border-radius:999px;background:#1C2F3B;font-size:13px;font-weight:700">{{ det.p }}</span></div></div>
+<sc-if value="{{ dentro }}" hint-placeholder-val="{{ true }}"><div style="border-radius:14px;padding:12px 14px;background:rgba(111,203,163,.12);font-size:14px;line-height:1.45;color:#BFEBD6"><strong style="color:#8FD6B5">Dentro del tope.</strong> Tope del grado: {{ det.tope }}.</div></sc-if>
+<sc-if value="{{ supera }}" hint-placeholder-val="{{ false }}"><div style="border-radius:14px;padding:12px 14px;background:rgba(255,138,128,.12);font-size:14px;line-height:1.45;color:#FFD3CE"><strong style="color:#FFB4AB">Supera el tope por {{ det.exceso }}.</strong> Tope del grado: {{ det.tope }}. No se puede aprobar; recházala con el motivo.</div></sc-if>
+<sc-if value="{{ showAct }}" hint-placeholder-val="{{ true }}"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><button onClick="{{ aprobar }}" title="{{ aprTitle }}" style="all:unset;box-sizing:border-box;height:50px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:#6FCBA3;color:#0E1A22;font-size:16px;font-weight:800;opacity:{{ aprOp }};cursor:{{ aprCur }}">Aprobar</button><button onClick="{{ rechazar }}" style="all:unset;box-sizing:border-box;cursor:pointer;height:50px;display:flex;align-items:center;justify-content:center;border-radius:999px;box-shadow:inset 0 0 0 1.5px #FF8A80;color:#FFB4AB;font-size:16px;font-weight:800">Rechazar</button></div></sc-if>
+<sc-if value="{{ showCA }}" hint-placeholder-val="{{ false }}"><div style="border-radius:16px;padding:16px;background:#1C2F3B;box-shadow:inset 0 0 0 1.5px #6FCBA3;display:flex;flex-direction:column;gap:12px"><span style="font-size:15px;line-height:1.5">¿Aprobar <strong>{{ det.monto }}</strong> a <strong>{{ det.n }}</strong>? Le enviaremos un correo con la aprobación.</span><div style="display:flex;gap:10px"><button onClick="{{ confirmarA }}" style="all:unset;cursor:pointer;flex:1;height:46px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:#6FCBA3;color:#0E1A22;font-size:15px;font-weight:800">Sí, aprobar</button><button onClick="{{ cancelar }}" style="all:unset;cursor:pointer;height:46px;padding:0 18px;display:flex;align-items:center;border-radius:999px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);font-size:15px;font-weight:700">Cancelar</button></div></div></sc-if>
+<sc-if value="{{ showCR }}" hint-placeholder-val="{{ false }}"><div style="border-radius:16px;padding:16px;background:#1C2F3B;box-shadow:inset 0 0 0 1.5px #FF8A80;display:flex;flex-direction:column;gap:10px"><label style="font-size:14px;font-weight:700">Motivo del rechazo <span style="font-weight:500;color:#9FB1BD">(obligatorio · lo verá el asociado)</span></label><textarea value="{{ motivoTxt }}" onChange="{{ onMotivo }}" rows="3" placeholder="Ej.: Tienes un crédito vigente con saldo pendiente." style="resize:none;box-sizing:border-box;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:#0E1A22;color:#E8EEF2;padding:10px 12px;font:500 16px/1.4 Manrope,sans-serif;outline-color:#FF8A80"></textarea><div style="display:flex;gap:10px"><button onClick="{{ confirmarR }}" style="all:unset;flex:1;height:46px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:#FF8A80;color:#0E1A22;font-size:15px;font-weight:800;opacity:{{ rechOp }};cursor:{{ rechCur }}">Rechazar crédito</button><button onClick="{{ cancelar }}" style="all:unset;cursor:pointer;height:46px;padding:0 18px;display:flex;align-items:center;border-radius:999px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);font-size:15px;font-weight:700">Cancelar</button></div></div></sc-if>
+<sc-if value="{{ showRes }}" hint-placeholder-val="{{ false }}"><div style="border-radius:14px;padding:12px 14px;background:#1C2F3B;font-size:14px;line-height:1.5;color:#C5D2DA">{{ resTxt }}</div></sc-if>
+<div style="display:flex;flex-direction:column;gap:8px"><label style="font-size:14px;font-weight:700">Nota interna <span style="font-weight:500;color:#9FB1BD">· solo la ve el equipo</span></label><textarea value="{{ nota }}" onChange="{{ onNota }}" rows="2" placeholder="Ej.: Llamó para confirmar el plazo." style="resize:none;box-sizing:border-box;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#0E1A22;color:#E8EEF2;padding:10px 12px;font:500 16px/1.4 Manrope,sans-serif;outline-color:#6FCBA3"></textarea></div>
+<div style="display:flex;flex-direction:column;gap:10px"><span style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9FB1BD">Historial</span><sc-for list="{{ det.hist }}" as="h" hint-placeholder-count="2"><div style="display:flex;gap:10px;font-size:14px;line-height:1.4"><span style="flex:none;margin-top:5px;width:8px;height:8px;border-radius:50%;background:#6FCBA3"></span><span style="display:flex;flex-direction:column"><span style="color:#E8EEF2;font-weight:700">{{ h.a }}</span><span style="color:#9FB1BD">{{ h.q }} · {{ h.f }}</span></span></div></sc-for></div>
+</section>
+</div>
+</main>
+</div>
+<sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;right:28px;bottom:28px;display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:16px;background:#E8EEF2;color:#0E1A22;font:700 15px Manrope,sans-serif;box-shadow:0 20px 40px -12px rgba(0,0,0,.5)"><span style="width:26px;height:26px;border-radius:50%;background:#1E6652;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px">✓</span>{{ toast }}</div></sc-if>
+</div>
+<div style="display:flex;gap:28px;max-width:1440px;font-size:14px;line-height:1.55;color:#2b3740">
+<div style="flex:1;background:#fff;border-radius:8px;padding:20px 22px;border:1px solid rgba(0,0,0,.08)"><div style="font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;color:#7a7a7a;margin-bottom:8px">DECISIONES</div>
+<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px"><li>Lista + detalle en la misma vista: se revisa sin perder el lugar.</li><li>Cédula enmascarada en la lista; completa, con celular y correo, solo en el detalle.</li><li>«Supera el tope» se ve en la fila y en el detalle; «Aprobar» queda deshabilitado.</li><li>Aprobar pide confirmación; rechazar exige motivo. Ambos terminan con un aviso (toast) y el chip cambia.</li></ul></div>
+<div style="flex:1;background:#fff;border-radius:8px;padding:20px 22px;border:1px solid rgba(0,0,0,.08)"><div style="font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;color:#7a7a7a;margin-bottom:8px">MOVIMIENTO</div>Fila nueva: entra desde arriba (translateY −8px → 0, 320 ms) y queda resaltada en verde 2,5 s antes de apagarse. KPIs: el número sale hacia arriba y entra el nuevo (200 ms). Toast: sube 12 px + fundido, se va a los 3 s.</div>
+<div style="flex:1;background:#fff;border-radius:8px;padding:20px 22px;border:1px solid rgba(0,0,0,.08)"><div style="font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;color:#7a7a7a;margin-bottom:8px">SIGUE</div>Detalle de afiliación (etapas, WhatsApp, visor de 3 fotos con enlace vencido), Asesores, Sorteo y la versión para celular del admin. Van en la siguiente etapa, junto con el design system.</div>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Sigue: «arma el design system con <a class="dv-oid" href="#2a">2a</a>–<a class="dv-oid" href="#2d">2d</a>» · «el admin en claro para comparar» · «más cercano/menos denso el asesor <a class="dv-oid" href="#2c">2c</a>»</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;autoplay&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Animación&quot;},&quot;estadoPanel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Pendiente&quot;,&quot;options&quot;:[&quot;Pendiente&quot;,&quot;Aprobada&quot;,&quot;Rechazada&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Panel del asociado&quot;}}">
+const LBL = ['Enviada', 'En revisión', 'Aprobada', 'Desembolso'];
+const fmt = n => '$ ' + n.toLocaleString('es-CO');
+const DOT = {
+  done: ['#1E6652', '#1E6652', '#fff', '2px', '✓'], ok: ['#1E6652', '#1E6652', '#fff', '2px', '✓'],
+  sent: ['#1A3C57', '#1A3C57', '#fff', '2px', '✓'], rev: ['#FFF1D6', '#E0A33A', '#7A4A00', '6px', ''],
+  pend: ['#fff', '#CFE3D9', 'transparent', '2px', ''], rej: ['#B3261E', '#B3261E', '#fff', '2px', '✕'],
+};
+function pasos(s, rej, fechas) {
+  return LBL.map((l, i) => {
+    const k = rej && i === 2 ? 'rej' : i < s ? 'done' : i === s ? (i === 0 ? 'sent' : i === 1 ? 'rev' : 'ok') : 'pend';
+    const d = DOT[k];
+    return { label: rej && i === 2 ? 'No aprobada' : l, fecha: fechas ? fechas[i] : '', bg: d[0], bd: d[1], markFg: d[2], bw: d[3], mark: d[4],
+      fg: k === 'pend' ? '#52626E' : k === 'rej' ? '#B3261E' : '#14212B', fw: i === s ? '800' : '600' };
+  });
+}
+const BADGE = { sent: ['#E8EDF2', '#1A3C57'], rev: ['#FFF1D6', '#7A4A00'], ok: ['#DCEFE6', '#14493A'], rej: ['#FBE4E2', '#8C1D17'] };
+const AF = { Pendiente: ['#FFF1D6', '#7A4A00'], Contactado: ['#E8EDF2', '#1A3C57'], Aprobada: ['#DCEFE6', '#14493A'], Rechazada: ['#FBE4E2', '#8C1D17'] };
+const CR = { 'En revisión': ['#FFF1D6', '#7A4A00'], 'Aprobado': ['#DCEFE6', '#14493A'], 'No aprobado': ['#FBE4E2', '#8C1D17'], 'Sin crédito': ['#EEF2F0', '#52626E'] };
+const CLIENTES = [
+  { n: 'Laura Camacho Rincón', c: '1.0••.•••.321', g: 'Intendente', i: 'Policía', af: 'Aprobada', cr: 'En revisión' },
+  { n: 'Jhon Fredy Ospina', c: '1.1••.•••.087', g: 'Patrullero', i: 'Policía', af: 'Aprobada', cr: 'Aprobado' },
+  { n: 'Diana Marcela Ruiz', c: '52.•••.914', g: 'Subintendente', i: 'Policía', af: 'Contactado', cr: 'Sin crédito' },
+  { n: 'Carlos Andrés Peña', c: '1.0••.•••.552', g: 'Cabo Primero', i: 'Ejército', af: 'Pendiente', cr: 'Sin crédito' },
+  { n: 'Yesica Paola Díaz', c: '1.0••.•••.208', g: 'Sargento Segundo', i: 'Ejército', af: 'Aprobada', cr: 'No aprobado' },
+  { n: 'Wilmer Gutiérrez Sáenz', c: '79.•••.640', g: 'Patrullero', i: 'Policía', af: 'Rechazada', cr: 'Sin crédito' },
+  { n: 'Natalia Vargas Mejía', c: '1.2••.•••.733', g: 'Intendente', i: 'Policía', af: 'Aprobada', cr: 'Aprobado' },
+  { n: 'Óscar Herrera Bautista', c: '1.0••.•••.419', g: 'Soldado Profesional', i: 'Ejército', af: 'Pendiente', cr: 'Sin crédito' },
+];
+const ADM = 'María Fernanda López';
+const MCOL = [
+  { bg: '#1E6652' }, { bg: '#1A3C57', logo: true }, { bg: '#E0A33A' }, { bg: '#8FD6B5' },
+  { bg: '#14493A' }, { bg: '#FFE3A8' }, { bg: '#fff', ring: true }, { bg: '#22496A' },
+];
+function Matriz({ cell, gap, speed }) {
+  const [st, setSt] = React.useState({ pos: [0, 1, 2, 3, 4, 5, 6, 7], hole: 8, last: -1 });
+  React.useEffect(() => {
+    if (!speed || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+    const id = setInterval(() => setSt(s => {
+      const h = s.hole, r = Math.floor(h / 3), c = h % 3, nb = [];
+      if (r > 0) nb.push(h - 3); if (r < 2) nb.push(h + 3); if (c > 0) nb.push(h - 1); if (c < 2) nb.push(h + 1);
+      const cand = nb.map(x => s.pos.indexOf(x)).filter(i => i !== s.last);
+      const i = cand[Math.floor(Math.random() * cand.length)];
+      const pos = s.pos.slice(); const from = pos[i]; pos[i] = h;
+      return { pos, hole: from, last: i };
+    }), speed);
+    return () => clearInterval(id);
+  }, [speed]);
+  const step = cell + gap, size = cell * 3 + gap * 2;
+  const xy = p => 'translate(' + ((p % 3) * step) + 'px, ' + (Math.floor(p / 3) * step) + 'px)';
+  const slots = [0, 1, 2, 3, 4, 5, 6, 7, 8].map(p => React.createElement('div', { key: 's' + p, style: { position: 'absolute', left: 0, top: 0, width: cell, height: cell, boxSizing: 'border-box', borderRadius: '50%', border: '2px dashed rgba(26,60,87,.18)', transform: xy(p) } }));
+  const dots = st.pos.map((p, i) => React.createElement('div', { key: i, style: { position: 'absolute', left: 0, top: 0, width: cell, height: cell, borderRadius: '50%', background: MCOL[i].bg, boxShadow: MCOL[i].ring ? 'inset 0 0 0 ' + Math.round(cell * 0.14) + 'px #1E6652' : '0 10px 20px -12px rgba(20,33,43,.45)', transform: xy(p), transition: 'transform 620ms cubic-bezier(.34,1.3,.64,1)', display: 'flex', alignItems: 'center', justifyContent: 'center', willChange: 'transform' } },
+    MCOL[i].logo ? React.createElement('img', { src: 'logos/isotipo-blanco.svg', alt: '', style: { width: cell * 0.52, height: cell * 0.52 } }) : null));
+  return React.createElement('div', { 'aria-hidden': true, style: { position: 'relative', width: size, height: size } }, slots, dots);
+}
+const h0 = (n, f) => [{ a: 'Envió la solicitud', q: n, f }];
+const ADMIN0 = [
+  { id: 1, n: 'Laura Camacho Rincón', c: '1.0••.•••.321', cc: '1.023.456.321', g: 'Intendente', i: 'Policía', m: 2500000, mod: '100 %', p: '12 meses', t: 3000000, f: 'Hoy, 9:12 a. m.', st: 'pendiente', cel: '310 555 0182', mail: 'laura.camacho@policia.gov.co' },
+  { id: 2, n: 'Edwin Mauricio Torres', c: '1.1••.•••.087', cc: '1.118.234.087', g: 'Patrullero', i: 'Policía', m: 1800000, mod: '50 %', p: '6 meses', t: 1500000, f: 'Hoy, 8:40 a. m.', st: 'pendiente', cel: '311 555 2290', mail: 'edwin.torres@policia.gov.co' },
+  { id: 3, n: 'Paula Andrea Castro', c: '52.•••.914', cc: '52.874.914', g: 'Subintendente', i: 'Policía', m: 2000000, mod: '100 %', p: '10 meses', t: 2500000, f: 'Ayer, 5:03 p. m.', st: 'pendiente', cel: '300 555 7731', mail: 'paula.castro@policia.gov.co' },
+  { id: 4, n: 'Natalia Vargas Mejía', c: '1.2••.•••.733', cc: '1.214.567.733', g: 'Intendente', i: 'Policía', m: 3000000, mod: '100 %', p: '12 meses', t: 3000000, f: 'Ayer, 11:20 a. m.', st: 'aprobado', cel: '315 555 9012', mail: 'natalia.vargas@policia.gov.co', extra: { a: 'Aprobó el crédito', q: ADM, f: 'Ayer, 2:15 p. m.' } },
+  { id: 5, n: 'Yesica Paola Díaz', c: '1.0••.•••.208', cc: '1.004.332.208', g: 'Sargento Segundo', i: 'Ejército', m: 1000000, mod: '50 %', p: '6 meses', t: 2800000, f: '22 sep', st: 'rechazado', motivoR: 'Tiene un crédito vigente con saldo pendiente.', cel: '316 555 4480', mail: 'yesica.diaz@buzonejercito.mil.co', extra: { a: 'Rechazó: tiene un crédito vigente con saldo pendiente', q: ADM, f: '22 sep' } },
+].map(r => ({ ...r, hist: [...h0(r.n, r.f), ...(r.extra ? [r.extra] : [])] }));
+const INCOMING = [
+  { n: 'Andrea Milena Suárez', c: '1.0••.•••.876', cc: '1.032.109.876', g: 'Patrullero', i: 'Policía', m: 1200000, mod: '100 %', p: '8 meses', t: 1500000, st: 'pendiente', cel: '301 555 6623', mail: 'andrea.suarez@policia.gov.co' },
+  { n: 'Luis Fernando Mora', c: '1.0••.•••.145', cc: '1.019.876.145', g: 'Cabo Segundo', i: 'Ejército', m: 2000000, mod: '50 %', p: '12 meses', t: 2200000, st: 'pendiente', cel: '318 555 3307', mail: 'luis.mora@buzonejercito.mil.co' },
+];
+const ST = { pendiente: ['rgba(242,181,90,.16)', '#F5C67A', 'En revisión'], aprobado: ['rgba(111,203,163,.16)', '#8FD6B5', 'Aprobado'], rechazado: ['rgba(255,138,128,.16)', '#FFB4AB', 'No aprobado'] };
+const chip = st => ({ bg: ST[st][0], fg: ST[st][1], t: ST[st][2] });
+
+class Component extends DCLogic {
+  state = { s: 1, m: 0, rows: ADMIN0, sel: 1, filt: 'Por atender', aq: '', confirm: null, motivo: '', nota: '', toast: null, fresh: null, nIn: 0, apr: 0, montoApr: 0, afFilt: 'Todos', q: '' };
+  componentDidMount() {
+    this.tick();
+    this.t1 = setTimeout(() => this.setState({ m: 1 }), 400);
+    this.t2 = setTimeout(() => this.simular(), 3000);
+  }
+  componentDidUpdate(p) { if (p.autoplay !== this.props.autoplay) this.tick(); }
+  componentWillUnmount() { clearInterval(this.t); [this.t1, this.t2, this.t3, this.t4].forEach(clearTimeout); }
+  tick() { clearInterval(this.t); if (!(this.props.autoplay ?? true)) return; this.t = setInterval(() => this.setState(st => ({ s: (st.s + 1) % 4 })), 2600); }
+  simular() {
+    const i = this.state.nIn;
+    const src = INCOMING[i % INCOMING.length];
+    const r = { ...src, id: 100 + i, f: 'Justo ahora', hist: h0(src.n, 'Justo ahora') };
+    this.setState(st => ({ rows: [r, ...st.rows], fresh: r.id, nIn: st.nIn + 1, filt: st.filt === 'Resueltas' ? 'Por atender' : st.filt }));
+    clearTimeout(this.t3);
+    this.t3 = setTimeout(() => this.setState({ fresh: null }), 2600);
+  }
+  showToast(t) { this.setState({ toast: t }); clearTimeout(this.t4); this.t4 = setTimeout(() => this.setState({ toast: null }), 3200); }
+  visibles() {
+    const { rows, filt, aq } = this.state;
+    const q = aq.trim().toLowerCase(), qd = q.replace(/\D/g, '');
+    return rows.filter(r => (filt === 'Todas' || (filt === 'Por atender' ? r.st === 'pendiente' : r.st !== 'pendiente'))
+      && (!q || r.n.toLowerCase().includes(q) || (qd && r.cc.replace(/\D/g, '').includes(qd))));
+  }
+  onKey(e) {
+    const tg = e.target && e.target.tagName;
+    if (tg === 'INPUT' || tg === 'TEXTAREA') { if (e.key === 'Escape') e.target.blur(); return; }
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const v = this.visibles(); const idx = v.findIndex(r => r.id === this.state.sel);
+    const k = e.key.toLowerCase();
+    if (k === 'j' && v.length) this.pick(v[Math.min(v.length - 1, idx + 1)].id);
+    else if (k === 'k' && v.length) this.pick(v[Math.max(0, idx - 1)].id);
+    else if (k === 'a') this.aprobar();
+    else if (k === 'r') this.rechazar();
+    else if (k === 'escape') this.setState({ confirm: null });
+  }
+  pick(id) { this.setState({ sel: id, confirm: null, motivo: '', nota: '' }); }
+  cur() { return this.state.rows.find(r => r.id === this.state.sel) || this.state.rows[0]; }
+  aprobar() { const d = this.cur(); if (d.st !== 'pendiente' || d.m > d.t) return; this.setState({ confirm: 'aprobar' }); }
+  rechazar() { const d = this.cur(); if (d.st !== 'pendiente') return; this.setState({ confirm: 'rechazar' }); }
+  resolver(st) {
+    const d = this.cur(); const motivo = this.state.motivo.trim();
+    if (st === 'rechazado' && !motivo) return;
+    const h = { a: st === 'aprobado' ? 'Aprobó el crédito' : 'Rechazó: ' + motivo, q: ADM, f: 'Justo ahora' };
+    this.setState(s => ({
+      rows: s.rows.map(r => r.id === d.id ? { ...r, st, motivoR: motivo, hist: [...r.hist, h] } : r),
+      confirm: null, motivo: '',
+      apr: s.apr + (st === 'aprobado' ? 1 : 0), montoApr: s.montoApr + (st === 'aprobado' ? d.m : 0),
+    }));
+    const nom = d.n.split(' ')[0];
+    this.showToast(st === 'aprobado' ? `Aprobaste el crédito de ${nom}. Le avisamos por correo.` : `Rechazaste la solicitud de ${nom}. Le enviamos el motivo.`);
+  }
+  renderVals() {
+    const S = this.state; const s = S.s;
+    const ep = this.props.estadoPanel ?? 'Pendiente';
+    const rej = ep === 'Rechazada'; const ps = ep === 'Pendiente' ? 1 : 2;
+    const fechas = ep === 'Pendiente' ? ['18 sep', '19 sep', '—', '—'] : ep === 'Aprobada' ? ['18 sep', '19 sep', '22 sep', 'Pronto'] : ['18 sep', '19 sep', '22 sep', '—'];
+    const lk = ['sent', 'rev', 'ok', 'ok'][s];
+    const pk = rej ? 'rej' : ps === 1 ? 'rev' : 'ok';
+    // asesor
+    const cnt = k => CLIENTES.filter(c => c.af === k).length;
+    const q = S.q.trim().toLowerCase(); const af = S.afFilt;
+    const lista = CLIENTES.filter(c => (af === 'Todos' || c.af === af) && (!q || c.n.toLowerCase().includes(q)))
+      .map(c => ({ ...c, afBg: AF[c.af][0], afFg: AF[c.af][1], crBg: CR[c.cr][0], crFg: CR[c.cr][1] }));
+    const setAf = k => this.setState({ afFilt: k });
+    // admin
+    const d = this.cur(); const sup = d.m > d.t; const pend = d.st === 'pendiente'; const cf = S.confirm;
+    const v = this.visibles();
+    const nPend = S.rows.filter(r => r.st === 'pendiente').length;
+    const cnts = { 'Todas': S.rows.length, 'Por atender': nPend, 'Resueltas': S.rows.length - nPend };
+    const motOk = !!S.motivo.trim();
+    return {
+      matrizL: React.createElement(Matriz, { cell: 92, gap: 12, speed: (this.props.autoplay ?? true) ? 1300 : 0 }),
+      matrizM: React.createElement(Matriz, { cell: 44, gap: 7, speed: (this.props.autoplay ?? true) ? 1300 : 0 }),
+      camino: 'scaleX(' + ((4 / 36) * S.m) + ')',
+      l: pasos(s, false), p: pasos(ps, rej, fechas), demo: pasos(1, false, ['2 sep', '3 sep', '—', '—']),
+      bL: { bg: BADGE[lk][0], fg: BADGE[lk][1], t: ['Enviada', 'En revisión', 'Aprobada', 'En desembolso'][s] },
+      bP: { bg: BADGE[pk][0], fg: BADGE[pk][1], t: rej ? 'No aprobada' : ps === 1 ? 'En revisión' : 'Aprobada' },
+      nL: String(s + 1), fillL: `scaleX(${s / 3})`,
+      pFill: `scaleX(${ps / 3})`, pFillC: rej ? '#B3261E' : '#1E6652',
+      msgL: ['Recibimos tu solicitud.', 'Esto suele tardar 4 horas o menos.', '¡Aprobada! Te avisamos por correo.', 'El desembolso va en camino.'][s],
+      msgP: ps === 1 ? 'Esto suele tardar 4 horas o menos. Te avisaremos por correo cuando cambie el estado.' : 'Te enviamos los detalles por correo. Sigue el desembolso.',
+      rej, noRej: !rej,
+      motivo: rej ? 'Tienes un crédito vigente con saldo pendiente. Podrás pedir otro cuando termines de pagarlo.' : '',
+      medidor: `scaleX(${0.833 * S.m})`,
+      resumen: ['Pendiente', 'Contactado', 'Aprobada', 'Rechazada'].map(k => ({ k, n: String(cnt(k)), bg: AF[k][0], fg: AF[k][1], ring: af === k ? AF[k][1] : 'transparent', onClick: () => setAf(af === k ? 'Todos' : k) })),
+      afChips: ['Todos', 'Pendiente', 'Contactado', 'Aprobada', 'Rechazada'].map(k => ({ t: k, n: String(k === 'Todos' ? CLIENTES.length : cnt(k)), bg: k === af ? '#1A3C57' : '#fff', fg: k === af ? '#fff' : '#1A3C57', onClick: () => setAf(k) })),
+      lista, vacio: lista.length === 0, q: S.q, onQ: e => this.setState({ q: e.target.value }),
+      kPend: String(nPend), kApr: String(23 + S.apr), kMonto: fmt(41500000 + S.montoApr),
+      filtChips: ['Todas', 'Por atender', 'Resueltas'].map(k => ({ t: k, n: String(cnts[k]), bg: k === S.filt ? '#E8EEF2' : 'transparent', fg: k === S.filt ? '#0E1A22' : '#C5D2DA', bd: k === S.filt ? '#E8EEF2' : 'rgba(255,255,255,.14)', onClick: () => this.setState({ filt: k }) })),
+      adminRows: v.map(r => ({ n: r.n, c: r.c, g: r.g, monto: fmt(r.m), f: r.f, chip: chip(r.st), bg: r.id === S.fresh ? 'rgba(111,203,163,.22)' : r.id === d.id ? '#1C2F3B' : 'transparent', tope: r.m > r.t ? 'Supera el tope' : 'Dentro del tope', topeFg: r.m > r.t ? '#FFB4AB' : '#9FB1BD', onClick: () => this.pick(r.id) })),
+      adminVacio: v.length === 0,
+      aq: S.aq, onAq: e => this.setState({ aq: e.target.value }),
+      det: { n: d.n, cc: d.cc, g: d.g, i: d.i, cel: d.cel, mail: d.mail, monto: fmt(d.m), mod: 'Modalidad ' + d.mod, p: d.p, f: 'Recibida: ' + d.f, chip: chip(d.st), tope: fmt(d.t), exceso: fmt(Math.max(0, d.m - d.t)), hist: d.hist },
+      dentro: !sup, supera: sup,
+      showAct: pend && !cf, showCA: pend && cf === 'aprobar', showCR: pend && cf === 'rechazar', showRes: !pend,
+      resTxt: d.st === 'aprobado' ? 'Crédito aprobado. El asociado ya recibió el correo.' : 'Solicitud rechazada. Motivo enviado: ' + (d.motivoR || ''),
+      aprOp: sup ? '.35' : '1', aprCur: sup ? 'not-allowed' : 'pointer', aprTitle: sup ? 'Supera el tope del grado' : 'Aprobar (A)',
+      rechOp: motOk ? '1' : '.4', rechCur: motOk ? 'pointer' : 'not-allowed',
+      motivoTxt: S.motivo,
+      onMotivo: e => this.setState({ motivo: e.target.value }), nota: S.nota, onNota: e => this.setState({ nota: e.target.value }),
+      aprobar: () => this.aprobar(), rechazar: () => this.rechazar(),
+      confirmarA: () => this.resolver('aprobado'), confirmarR: () => this.resolver('rechazado'),
+      cancelar: () => this.setState({ confirm: null, motivo: '' }),
+      simular: () => this.simular(),
+      toastOn: !!S.toast, toast: S.toast || '',
+    };
+  }
+}
+</script>
+</body>
+</html>

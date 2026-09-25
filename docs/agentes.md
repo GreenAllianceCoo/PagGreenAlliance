@@ -4,12 +4,12 @@
 Los agentes viven en `.claude/agents/` dentro del repo `PagGreenAlliance` (se suben a git, así tu compañero del backend también los tiene). Además necesitas:
 
 ```
-.claude/agents/   ← los 8 agentes
+.claude/agents/   ← los 9 agentes
 design/           ← pantallas del diseño (PC + celular)
 docs/             ← spec + mapa de botones (+ docs/auditorias/ que crea el auditor)
 ```
 
-Abre Claude Code en el repo y escribe `/agents` para confirmar que aparecen los 8.
+Abre Claude Code en el repo y escribe `/agents` para confirmar que aparecen los 9.
 
 ## Los agentes
 | Agente | Qué hace | Modifica la app | Dónde escribe |
@@ -21,6 +21,7 @@ Abre Claude Code en el repo y escribe `/agents` para confirmar que aparecen los 
 | `ga-revisor-seguridad` | Revisa el código buscando fugas de datos, bypass de auth y montos manipulables | No, solo reporta | — |
 | `ga-verificador-responsive` | Prueba de 320 a 1920 px y los patrones responsive | No, solo reporta | `tests/responsive/`, `test-results/` |
 | `ga-verificador-qa` | Prueba de punta a punta botones, validaciones, privacidad y fidelidad al diseño | No, solo reporta | `tests/e2e/`, `test-results/` |
+| `ga-disenador-lienzo` | Maqueta en el lienzo de Claude Design (`docs/Green Alliance C+.dc.html`) las pantallas o estados que falten, con la info que le pasan los otros agentes por `docs/diseno/pedidos.md`. Usa Sonnet | No | el lienzo, `docs/diseno/` |
 | `ga-supervisor-avances` | Recibe los reportes de los demás agentes y actualiza el Excel de avances (pendientes, plan, Gantt, bitácora) | No | `docs/avances/`, casillas de `PENDIENTES.md` |
 
 ## Orden recomendado
@@ -52,12 +53,18 @@ Empieza por `/ingresar` + `/ingresar/codigo` (login) y `/cuenta` + solicitud de 
 2. `Usa ga-revisor-seguridad para revisar todo el proyecto` (revisión completa, no solo el último cambio).
 3. `Usa ga-auditor-supabase para una última auditoría` si hubo migraciones nuevas.
 
+## Rediseño C+ (desde el 25-sep-2026)
+1. Si falta una pantalla, estado o sección en el lienzo, cualquier agente deja un pedido en `docs/diseno/pedidos.md`.
+2. `ga-disenador-lienzo` la maqueta en el lienzo (sección `t3`) y la anota en `docs/diseno/lienzo-indice.md`.
+3. `ga-diseno-a-codigo` la pasa a Next.js; luego sigue el ciclo normal (funcionalidad → tests + seguridad → QA + responsive → supervisor).
+
 ## Quién corrige qué
 Cada reporte indica el agente que debe corregir. Pásale el hallazgo tal cual:
 
 | Tipo de hallazgo | Lo reporta | Lo corrige |
 |---|---|---|
 | Visual, textos, responsive | responsive, QA | `ga-diseno-a-codigo` |
+| Falta la pantalla o el estado en el diseño | cualquiera (en `docs/diseno/pedidos.md`) | `ga-disenador-lienzo` |
 | Botón que no hace lo que dice la spec, validación en servidor, lógica | QA, seguridad, tests | `ga-funcionalidad-botones` |
 | RLS, triggers, índices, migraciones | auditor, seguridad, tests | `ga-auditor-supabase` propone → **tú** aplicas |
 | Código difícil de probar | tests | `ga-funcionalidad-botones` (extraer a `lib/`) |

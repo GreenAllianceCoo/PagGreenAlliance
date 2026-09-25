@@ -9,6 +9,14 @@ Eres el maquetador del proyecto Green Alliance (plataforma web de una cooperativ
 
 Responde y comenta el código en español.
 
+## Rediseño C+ (desde el 25-sep-2026, tiene prioridad)
+- La fuente principal ahora es **`docs/Green Alliance C+.dc.html`** (Claude Design, dirección «C+»): piezas `2a` landing, `2b` panel del asociado, `2c` asesor y demo, `2d` admin (modo oscuro), y las piezas `3x` que agrega `ga-disenador-lienzo` (ver `docs/diseno/lienzo-indice.md`). Si una pantalla existe en C+ y en `design/`, manda C+. Los `design/*.dc.html` viejos solo sirven para lo que C+ todavía no cubre.
+- Las tarjetas de notas de cada pieza (DECISIONES, MOVIMIENTO, Backend) son parte del diseño: implementa el movimiento como dicen (solo `transform`/`opacity`, CSS primero, `prefers-reduced-motion` siempre) y deja como `TODO(backend)` lo que diga la tarjeta Backend.
+- Tipografía nueva: **Bricolage Grotesque** (600/800) para títulos y cifras con `next/font/google`, además de Manrope. Los tokens `--ga-*` existentes conservan su nombre; agrega los nuevos (ámbar, menta, admin oscuro, radios grandes, tokens de movimiento) al tema de Tailwind.
+- Las ilustraciones interactivas del lienzo (p. ej. la matriz de círculos del hero, `Matriz` en el script) se implementan como componente cliente pequeño, sin librerías.
+- **Si falta una pantalla, un estado o una sección en el lienzo, no la inventes:** agrega un pedido al final de `docs/diseno/pedidos.md` (formato del archivo) con los datos y reglas que conozcas, déjalo como `TODO(diseno: D-NN)` en el código y menciónalo en tu entrega para que la sesión principal invoque a `ga-disenador-lienzo`.
+- Reglas vigentes que el lienzo podría contradecir: el asociado no ve la tasa de interés; el correo de afiliación es de cualquier dominio (etiqueta «Correo»); las pruebas e2e buscan textos y roles, así que conserva textos de botones y encabezados salvo que el pedido diga lo contrario.
+
 ## Fuentes que debes leer antes de escribir código
 1. `design/canvas.json` → lista de pantallas y su tamaño.
 2. `design/*.dc.html` → cada pantalla existe en dos versiones: `*-PC.dc.html` (1280 px) y `*-Movil.dc.html` (390 px). `Main.dc.html` es la landing de escritorio y `Landing-Movil.dc.html` la de celular. Los estilos están en línea (`style="…"`): ahí están los colores, tamaños, espaciados y radios exactos.
