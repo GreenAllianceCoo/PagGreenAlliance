@@ -78,7 +78,7 @@ export function IconoConvenios(props: IconoProps) {
   );
 }
 
-/** Hoja con renglones: estado vacío de «Tu solicitud» en /cuenta (no está en el diseño). */
+/** Hoja con renglones: estado vacío de «Tu solicitud» en /cuenta (pieza 3d). */
 export function IconoDocumento(props: IconoProps) {
   return (
     <Base {...props}>

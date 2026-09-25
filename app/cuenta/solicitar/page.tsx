@@ -13,9 +13,9 @@ export const metadata: Metadata = {
 };
 
 /**
- * Solicitud de crédito del asociado («Nueva solicitud» en /cuenta).
- * No hay maqueta de esta pantalla: usa el encabezado, el fondo, las tarjetas
- * blancas y los cuadros grises de /cuenta (design/Inicio-*.dc.html).
+ * Solicitud de crédito del asociado («Nueva solicitud» en /cuenta), pieza 3d
+ * de docs/Green Alliance C+.dc.html: usa el encabezado, el fondo, las
+ * tarjetas blancas y los cuadros grises de /cuenta.
  */
 export default async function SolicitarPage() {
   const supabase = await createClient();
@@ -69,18 +69,20 @@ export default async function SolicitarPage() {
             <Link
               href="/cuenta"
               aria-label="Volver"
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-ga-navy"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ga-fondo-suave text-ga-navy lg:h-11 lg:w-11"
             >
               <IconoVolver tamano={22} grosor={1.8} />
             </Link>
-            <h1 className="m-0 text-24 font-extrabold text-ga-navy lg:text-32">Nueva solicitud</h1>
+            <h1 className="m-0 font-display text-24 font-extrabold text-ga-navy lg:text-32">
+              Nueva solicitud
+            </h1>
           </div>
           {/* F-03: en celular también debe haber «Cerrar sesión», como en /cuenta. */}
           <form action={cerrarSesion} className="lg:hidden">
             <button
               type="submit"
               aria-label="Cerrar sesión"
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-ga-navy"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-ga-fondo-suave text-ga-navy"
             >
               <IconoSalir tamano={22} grosor={1.8} />
             </button>
@@ -89,9 +91,9 @@ export default async function SolicitarPage() {
 
         <section
           aria-labelledby="solicitud-titulo"
-          className="flex flex-col gap-4 rounded-18 bg-white p-5 lg:gap-5.5 lg:p-7"
+          className="flex flex-col gap-4 rounded-28 bg-white p-5 lg:gap-5.5 lg:p-9"
         >
-          <h2 id="solicitud-titulo" className="m-0 text-18 font-extrabold lg:text-20">
+          <h2 id="solicitud-titulo" className="m-0 font-display text-18 font-extrabold lg:text-20">
             Solicita tu crédito
           </h2>
           {aviso || !paquetes ? (

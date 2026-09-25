@@ -5,7 +5,7 @@
 import { describe, expect, it } from "vitest";
 import { enlaceWhatsapp } from "@/lib/config";
 import { formatearPesos, textoTope, vistaSolicitud, type FilaSolicitud } from "@/lib/cuenta";
-import { correoDeRelleno, enmascararCorreo } from "@/lib/mascara";
+import { correoDeRelleno, enmascararCedula, enmascararCorreo } from "@/lib/mascara";
 
 describe("enmascararCorreo", () => {
   it("deja 2 letras del usuario y oculta el dominio completo (F-01, correo de cualquier dominio)", () => {
@@ -37,6 +37,21 @@ describe("correoDeRelleno (F-01: relleno indistinguible de un correo real)", () 
   it("es estable para los mismos bytes (la misma cédula siempre muestra lo mismo)", () => {
     const b = new Uint8Array([7, 9, 3, 1, 8, 2, 4, 6]);
     expect(correoDeRelleno(b)).toBe(correoDeRelleno(b));
+  });
+});
+
+describe("enmascararCedula (carné de asociado, pieza 2b)", () => {
+  it("agrupa por miles y deja ver el primer grupo, 1 cifra del segundo y el último grupo", () => {
+    expect(enmascararCedula("1032109876")).toBe("1.0••.•••.876");
+    expect(enmascararCedula("1234567890")).toBe("1.2••.•••.890");
+  });
+  it("cédulas muy cortas (menos de 4 dígitos) se devuelven sin cambios: no hay nada que ocultar con sentido", () => {
+    expect(enmascararCedula("123")).toBe("123");
+  });
+  it("no toca lo que ya ve el propio asociado en «Mis datos»: es una función aparte de la cédula sin formato", () => {
+    // «Mis datos» sigue mostrando `perfiles.cedula` tal cual (sin puntos ni máscara);
+    // esta función es solo para el carné, que sí puede mostrarse en público.
+    expect(enmascararCedula("1234567890")).not.toBe("1234567890");
   });
 });
 

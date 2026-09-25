@@ -40,6 +40,32 @@ const LETRAS = "abcdefghijklmnopqrstuvwxyz";
  * servidor): la misma cédula siempre muestra lo mismo y no cambia entre
  * recargas, pero nadie más puede predecirlo sin el secreto.
  */
+/**
+ * Enmascara una cédula para el carné del asociado (pieza 2b): agrupa por
+ * miles y oculta el interior, dejando visible el primer grupo, la primera
+ * cifra del segundo grupo y el último grupo completo — el mismo patrón que
+ * muestra el diseño («1.0••.•••.321»). No es un dato nuevo ni más sensible:
+ * es la misma cédula que el propio asociado ya ve completa en «Mis datos»,
+ * solo que aquí se muestra pensada para enseñarla en público (empresas en
+ * convenio). NUNCA se usa esta función para «Mis datos»: ahí la cédula va
+ * completa y sin puntos, igual que la guarda la base (las pruebas e2e
+ * comparan ese texto tal cual contra `perfiles.cedula`).
+ */
+export function enmascararCedula(cedula: string) {
+  const digitos = cedula.replace(/\D/g, "");
+  if (digitos.length < 4) return cedula;
+  const grupos: string[] = [];
+  for (let i = digitos.length; i > 0; i -= 3) {
+    grupos.unshift(digitos.slice(Math.max(0, i - 3), i));
+  }
+  const enmascarados = grupos.map((grupo, indice) => {
+    if (indice === 0 || indice === grupos.length - 1) return grupo;
+    if (indice === 1) return grupo[0] + "•".repeat(grupo.length - 1);
+    return "•".repeat(grupo.length);
+  });
+  return enmascarados.join(".");
+}
+
 export function correoDeRelleno(bytes: Uint8Array) {
   const total = bytes.length > 0 ? bytes.length : 1;
   // Usuarios reales suelen ser "nombre.apellido": 3 a 8 letras (siempre > 2,

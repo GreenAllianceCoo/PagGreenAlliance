@@ -134,6 +134,51 @@
  * (las de Tailwind y las que agregue un componente a mano) termina de
  * inmediato en su estado final.
  * ------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------
+ * Deslizador de monto de /cuenta/solicitar (pieza 3d): «control visual
+ * extra que escribe en el mismo input existente», sobre el
+ * <input type="range" id="monto"> real de SolicitudForm.tsx (mismo name,
+ * min/max/step/value: nada de esto cambia cómo se envía el formulario, ni
+ * lo que miden tests/e2e/i-despliegue.spec.ts sobre ese input). Estas reglas
+ * solo quitan la pista nativa del navegador para dejar ver la pista + el
+ * relleno verde que dibuja SolicitudForm.tsx detrás, y dan forma al thumb
+ * (círculo blanco con borde verde, como en el diseño).
+ * ------------------------------------------------------------------- */
+.ga-deslizador {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+.ga-deslizador::-webkit-slider-runnable-track {
+  height: 10px;
+  background: transparent;
+}
+.ga-deslizador::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  margin-top: -8px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 2px solid var(--ga-verde);
+  box-shadow: 0 2px 6px rgba(20, 33, 43, 0.25);
+  cursor: pointer;
+}
+.ga-deslizador::-moz-range-track {
+  height: 10px;
+  background: transparent;
+}
+.ga-deslizador::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 2px solid var(--ga-verde);
+  box-shadow: 0 2px 6px rgba(20, 33, 43, 0.25);
+  cursor: pointer;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
