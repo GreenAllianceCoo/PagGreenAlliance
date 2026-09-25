@@ -7,6 +7,7 @@ const PESTANAS = [
   { href: "/admin/creditos", etiqueta: "Créditos" },
   { href: "/admin/asesores", etiqueta: "Asesores" },
   { href: "/admin/sorteo", etiqueta: "Sorteo" },
+  { href: "/admin/demo", etiqueta: "Demostración" },
 ] as const;
 
 const CLASE_ACTIVA = "border-b-2 border-ga-verde pb-1 text-ga-verde no-underline";
@@ -15,7 +16,7 @@ const CLASE_INACTIVA = "text-ga-texto no-underline hover:text-ga-verde";
 type EncabezadoAdminProps = {
   nombre: string;
   /** Sección actual, para subrayarla (coincide con el primer tramo de la ruta). */
-  seccion: "afiliaciones" | "creditos" | "asesores" | "sorteo";
+  seccion: "afiliaciones" | "creditos" | "asesores" | "sorteo" | "demo";
 };
 
 /**

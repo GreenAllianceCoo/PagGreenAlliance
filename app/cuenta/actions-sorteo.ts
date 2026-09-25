@@ -50,7 +50,7 @@ function mensajeConfirmarSorteo(mensajeBD?: string) {
 export type EstadoParticiparSorteo = {
   ok?: boolean;
   error?: string;
-  /** Correo enmascarado para el paso 2 del modal («Te enviamos tu boleta a ju•••@po•••.co»). */
+  /** Correo enmascarado para el paso 2 del modal («Te enviamos tu boleta a ju•••@•••»). */
   correoEnmascarado?: string;
 };
 

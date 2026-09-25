@@ -75,7 +75,7 @@ export default function PoliticaDeDatosPage() {
         <Seccion titulo="2. Qué datos recogemos">
           <p className={PARRAFO}>
             <strong>Cuando pides afiliarte:</strong> nombres y apellidos, cédula, grado, institución
-            (Policía o Ejército), correo institucional, celular, número Nequi, el asesor que te acompaña
+            (Policía o Ejército), correo electrónico, celular, número Nequi, el asesor que te acompaña
             (si lo eliges), el mensaje que nos escribas y tres fotos: tu cédula por el frente, por el
             reverso y una selfie.
           </p>

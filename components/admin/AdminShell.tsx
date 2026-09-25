@@ -3,7 +3,7 @@ import { EncabezadoAdmin } from "./EncabezadoAdmin";
 
 type AdminShellProps = {
   nombre: string;
-  seccion: "afiliaciones" | "creditos" | "asesores" | "sorteo";
+  seccion: "afiliaciones" | "creditos" | "asesores" | "sorteo" | "demo";
   children: ReactNode;
 };
 

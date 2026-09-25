@@ -32,6 +32,20 @@ test("admin entra a /admin y aprueba la afiliación de ejemplo", async ({ page }
     const r = await page.goto(ruta);
     expect(r?.status()).toBe(200);
   }
+  // Cuenta de demostración del admin: misma «cuenta fantasma» del asesor, con su encabezado.
+  await page.getByRole("link", { name: "Demostración" }).click();
+  await page.waitForURL("**/admin/demo");
+  await expect(page.getByText(/Modo demostración/i).first()).toBeVisible();
+  await page.getByLabel("Grado del cliente").selectOption("OF");
+  await expect(page.getByText(/Tope disponible para el grado OF/)).toBeVisible();
+  await page.getByRole("link", { name: "Volver al panel" }).first().click();
+  await page.waitForURL(/\/admin(\/afiliaciones)?$/);
+});
+
+test("asesor no entra a /admin/demo", async ({ page }) => {
+  await ingresar(page, "1234567892", "asesor.prueba@greenalliance.test", "/asesor");
+  await page.goto("/admin/demo");
+  expect(page.url()).not.toContain("/admin");
 });
 
 test("asesor entra a /asesor, ve a su cliente y la demo no guarda", async ({ page }) => {
@@ -50,7 +64,7 @@ test("asociado entra a /cuenta y ve el botón del sorteo", async ({ page }) => {
   expect(r?.status()).toBe(200);
 });
 
-test("afiliación nueva: valida el dominio y guarda con las 3 fotos", async ({ page }) => {
+test("afiliación nueva: acepta cualquier correo y guarda con las 3 fotos", async ({ page }) => {
   await limpiarLimites();
   // PNG 1×1 válido.
   const png = Buffer.from(
@@ -67,16 +81,12 @@ test("afiliación nueva: valida el dominio y guarda con las 3 fotos", async ({ p
   await page.getByLabel("Institución").selectOption("policia");
   await page.getByLabel("Celular").fill("3001112233");
   await page.getByLabel("Número Nequi").fill("3001112233");
-  await page.getByLabel("Correo institucional").fill("laura.gomez@gmail.com");
+  await page.getByLabel("Correo electrónico").fill("laura.gomez@gmail.com");
   await page.getByLabel("Asesor").selectOption({ index: 1 });
   await page.locator('input[name="foto_cedula_frente"]').setInputFiles(foto("frente.png"));
   await page.locator('input[name="foto_cedula_reverso"]').setInputFiles(foto("reverso.png"));
   await page.locator('input[name="foto_selfie"]').setInputFiles(foto("selfie.png"));
   await page.locator('input[name="acepto_datos"]').check();
-  await page.getByRole("button", { name: "Enviar solicitud" }).click();
-  await expect(page.getByText(/policia\.gov\.co/).first()).toBeVisible();
-
-  await page.getByLabel("Correo institucional").fill("laura.gomez@policia.gov.co");
   await page.getByRole("button", { name: "Enviar solicitud" }).click();
   await page.waitForURL("**/afiliacion/enviada", { timeout: 30_000 });
 });

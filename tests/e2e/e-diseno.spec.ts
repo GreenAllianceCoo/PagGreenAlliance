@@ -130,7 +130,7 @@ test.describe("E · Landing /", () => {
           "Ver beneficios en mi cuenta",
           ...CONVENIOS_LANDING,
           "WhatsApp [NÚMERO] · [correo]@greenallianceco.com",
-          "[Vigilada por Supersolidaria — confirmar]",
+          "Vigilada por Supersolidaria",
         ]
       : [
           "Ingresar",
@@ -153,7 +153,7 @@ test.describe("E · Landing /", () => {
           "Condiciones preferenciales para asociados, con el respaldo de la cooperativa.",
           ...CONVENIOS_LANDING,
           "WhatsApp [NÚMERO] · [correo]@greenallianceco.com",
-          "[Vigilada por Supersolidaria — confirmar]",
+          "Vigilada por Supersolidaria",
         ];
     await revisarTextos(page, esperados, "landing", testInfo);
     await revisarEstilos(

@@ -105,7 +105,7 @@ describe("participarSorteo · con sesión", () => {
       expect.objectContaining({ correo: USUARIO.email, nombre: "Juan Pérez", numero: "123456" }),
     );
     expect(resultado.ok).toBe(true);
-    expect(resultado.correoEnmascarado).toBe("ju•••@po•••.co");
+    expect(resultado.correoEnmascarado).toBe("ju•••@•••");
     // Nunca el número crudo en la respuesta al navegador.
     expect(JSON.stringify(resultado)).not.toContain("123456");
   });
@@ -239,7 +239,7 @@ describe("reenviarBoletaSorteo · F2-04 (auditoría 2026-09-24)", () => {
       expect.objectContaining({ correo: USUARIO.email, numero: "654321" }),
     );
     expect(resultado.ok).toBe(true);
-    expect(resultado.correoEnmascarado).toBe("ju•••@po•••.co");
+    expect(resultado.correoEnmascarado).toBe("ju•••@•••");
     // Nunca el número crudo en la respuesta al navegador.
     expect(JSON.stringify(resultado)).not.toContain("654321");
   });

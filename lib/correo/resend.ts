@@ -2,6 +2,28 @@ import "server-only";
 
 type VariablesPlantilla = Record<string, string | number>;
 
+const ENTIDADES_HTML: Record<string, string> = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;",
+};
+
+/**
+ * S-15: las plantillas usan `{{{VAR}}}` (sin escapar), así que el texto que
+ * viene de la base (nombre, motivo del rechazo) se escapa aquí. Si no, un
+ * nombre con `<a href=…>` saldría como enlace real en un correo de la cooperativa.
+ */
+export function escaparVariables(variables: VariablesPlantilla): VariablesPlantilla {
+  return Object.fromEntries(
+    Object.entries(variables).map(([clave, valor]) => [
+      clave,
+      typeof valor === "string" ? valor.replace(/[&<>"']/g, (c) => ENTIDADES_HTML[c]) : valor,
+    ]),
+  );
+}
+
 /** Envía una plantilla publicada en Resend sin exponer la llave al cliente. */
 export async function enviarPlantillaResend({
   para,
@@ -24,7 +46,7 @@ export async function enviarPlantillaResend({
     body: JSON.stringify({
       from: remitente,
       to: [para],
-      template: { id: plantilla, variables },
+      template: { id: plantilla, variables: escaparVariables(variables) },
       ...(responderA ? { reply_to: responderA } : {}),
     }),
     signal: AbortSignal.timeout(10_000),

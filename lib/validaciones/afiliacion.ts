@@ -14,25 +14,6 @@ export const NOMBRE_INSTITUCION: Record<CodigoInstitucion, string> = {
   ejercito: "Ejército Nacional",
 };
 
-/**
- * Dominio(s) de correo institucional exigido por institución (mismo `check` de
- * public.solicitudes_afiliacion, migración 20260924000200). `texto` es lo que se
- * muestra en el mensaje de error y en la ayuda del campo.
- */
-const DOMINIO_INSTITUCION: Record<CodigoInstitucion, { patron: RegExp; texto: string }> = {
-  policia: { patron: /@policia\.gov\.co$/, texto: "@policia.gov.co" },
-  ejercito: {
-    patron: /@(buzonejercito\.mil\.co|ejercito\.mil\.co)$/,
-    texto: "@buzonejercito.mil.co o @ejercito.mil.co",
-  },
-};
-
-/** Texto de ayuda bajo el campo «Correo institucional», según la institución elegida. */
-export function dominioEsperado(institucion: string) {
-  const regla = DOMINIO_INSTITUCION[institucion as CodigoInstitucion];
-  return regla ? `Debe terminar en ${regla.texto}.` : "Selecciona primero tu institución.";
-}
-
 /** Texto opcional: sin espacios sobrantes; vacío → null. */
 function textoOpcional(maximo: number, mensaje: string) {
   return z
@@ -72,14 +53,14 @@ function esquemaNumeroMovil(mensajeVacio: string) {
     );
 }
 
-/** Correo institucional: formato válido; el dominio se valida en el `.check` de abajo. */
-const esquemaCorreoInstitucional = z
-  .string({ error: "Escribe tu correo institucional." })
+/** Correo: formato válido, de cualquier dominio. */
+const esquemaCorreo = z
+  .string({ error: "Escribe tu correo." })
   .transform(normalizarCorreo)
   .pipe(
     z
       .string()
-      .min(1, { error: "Escribe tu correo institucional." })
+      .min(1, { error: "Escribe tu correo." })
       .max(254, { error: "Revisa el correo: no es válido." })
       .pipe(z.email({ error: "Revisa el correo: no es válido." })),
   );
@@ -121,7 +102,7 @@ export const esquemaAfiliacion = z
     institucion: z.enum(INSTITUCIONES, { error: "Selecciona tu institución." }),
     nequi: esquemaNumeroMovil("Escribe tu número Nequi."),
     celular: esquemaNumeroMovil("Escribe tu número de celular."),
-    email: esquemaCorreoInstitucional,
+    email: esquemaCorreo,
     asesor_id: esquemaAsesorId,
     foto_cedula_frente: esquemaFoto("Sube la foto de tu cédula (frente)."),
     foto_cedula_reverso: esquemaFoto("Sube la foto de tu cédula (reverso)."),
@@ -130,27 +111,7 @@ export const esquemaAfiliacion = z
     acepto_datos: z.literal(true, {
       error: "Debes autorizar el tratamiento de tus datos para enviar la solicitud.",
     }),
-  })
-  .superRefine(
-    ({ institucion, email }, ctx) => {
-      // Correo institucional según la institución elegida (spec-fase-2 §2).
-      const regla = DOMINIO_INSTITUCION[institucion];
-      if (!regla.patron.test(email)) {
-        ctx.addIssue({
-          code: "custom",
-          message: `El correo debe ser institucional: termina en ${regla.texto}.`,
-          path: ["email"],
-        });
-      }
-    },
-    {
-      // Por defecto zod omite esta regla si CUALQUIER campo falló (p. ej. la
-      // autorización sin marcar). Solo se omite si institución o correo ya
-      // tienen su propio error: ahí este no aporta nada nuevo.
-      when: (payload) =>
-        !payload.issues.some((issue) => issue.path?.[0] === "institucion" || issue.path?.[0] === "email"),
-    },
-  );
+  });
 
 export type DatosAfiliacion = z.output<typeof esquemaAfiliacion>;
 export type CampoAfiliacion = keyof z.input<typeof esquemaAfiliacion>;

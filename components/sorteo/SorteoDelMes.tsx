@@ -24,7 +24,7 @@ import css from "./confeti.module.css";
 /** Código que acepta la vista previa de desarrollo (?sorteo=demo, ver lib/sorteo/demo.ts). */
 const CODIGO_DEMO = "123456";
 /** Correo y número de mentira de la vista previa: nunca sale de la base ni de Resend. */
-const CORREO_DEMO = "ju•••@po•••.co";
+const CORREO_DEMO = "ju•••@•••";
 
 /** Íconos propios (trazo, 24×24, `currentColor`) para no tocar components/ui/Iconos.tsx. */
 function IconoRegalo({ tamano = 24, className }: { tamano?: number; className?: string }) {

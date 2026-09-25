@@ -40,14 +40,14 @@ export const USUARIOS = {
   conSolicitud: {
     cedula: "1234567890",
     correo: "asociado.prueba@greenalliance.test",
-    mascara: "as•••@greenalliance.test",
+    mascara: "as•••@•••",
     nombre: "Asociado de Prueba",
     grado: "PP",
   },
   sinSolicitudes: {
     cedula: "1234567891",
     correo: "sin.solicitudes@greenalliance.test",
-    mascara: "si•••@greenalliance.test",
+    mascara: "si•••@•••",
     nombre: "Asociada Sin Solicitudes",
     grado: "SI",
   },

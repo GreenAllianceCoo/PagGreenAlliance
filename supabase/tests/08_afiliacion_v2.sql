@@ -1,6 +1,6 @@
 -- ============================================================
 -- Green Alliance · pgTAP · Fase 2 · solicitudes_afiliacion v2
--- nombres/apellidos separados, institución + correo institucional, nequi,
+-- nombres/apellidos separados, institución + correo (cualquier dominio), nequi,
 -- asesor_id, fotos obligatorias. Todo se inserta como lo haría el servidor
 -- (service role): RLS de esta tabla ya se prueba en 04_solicitudes_afiliacion.sql.
 -- ============================================================
@@ -63,9 +63,9 @@ select lives_ok(
 );
 
 -- ------------------------------------------------------------
--- Correo institucional cruzado: rechazado
+-- Correo de cualquier dominio: aceptado (sin importar la institución)
 -- ------------------------------------------------------------
-select throws_ok(
+select lives_ok(
   $$ insert into public.solicitudes_afiliacion (
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
@@ -73,11 +73,10 @@ select throws_ok(
        'Cruzado', 'Malo', '3000000004', 'PT', 'policia', '3001234570', '3001234570',
        'cruzado@ejercito.mil.co', 'a/f.jpg', 'a/r.jpg', 'a/s.jpg', now()
      ) $$,
-  '23514', null,
-  'rechaza correo de ejército cuando la institución es policía'
+  'acepta correo de ejército con institución policía'
 );
 
-select throws_ok(
+select lives_ok(
   $$ insert into public.solicitudes_afiliacion (
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
@@ -85,11 +84,10 @@ select throws_ok(
        'Cruzado', 'Malo', '3000000005', 'PT', 'ejercito', '3001234571', '3001234571',
        'cruzado@policia.gov.co', 'a/f.jpg', 'a/r.jpg', 'a/s.jpg', now()
      ) $$,
-  '23514', null,
-  'rechaza correo de policía cuando la institución es ejército'
+  'acepta correo de policía con institución ejército'
 );
 
-select throws_ok(
+select lives_ok(
   $$ insert into public.solicitudes_afiliacion (
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
@@ -97,8 +95,7 @@ select throws_ok(
        'Sin', 'Institucional', '3000000006', 'PT', 'policia', '3001234572', '3001234572',
        'sin.institucional@gmail.com', 'a/f.jpg', 'a/r.jpg', 'a/s.jpg', now()
      ) $$,
-  '23514', null,
-  'rechaza un correo que no es institucional'
+  'acepta un correo que no es institucional'
 );
 
 -- ------------------------------------------------------------
