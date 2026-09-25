@@ -20,7 +20,7 @@ test.describe("H · Solicitud de crédito", () => {
   test.beforeEach(borrarSolicitudesCredito);
   test.afterEach(borrarSolicitudesCredito);
 
-  test("Ingreso con código → «Nueva solicitud» → 50 % → /cuenta con la solicitud pendiente y la tasa", async ({
+  test("Ingreso con código → «Nueva solicitud» → 50 % → /cuenta con la solicitud pendiente y la tasa guardada sin mostrarla", async ({
     browser,
   }, testInfo) => {
     const u = USUARIOS.sinSolicitudes;
@@ -35,9 +35,9 @@ test.describe("H · Solicitud de crédito", () => {
     await expect(page).toHaveURL(/\/cuenta\/solicitar$/);
 
     await page.getByRole("radio", { name: "50% de devolución" }).check();
-    // Monto por defecto = tope del grado SI al 50 % ($1.500.000); tasa 8,2 %.
+    // Monto por defecto = tope del grado SI al 50 % ($1.500.000). La tasa (8,2 %) se guarda pero no se muestra (25-sep).
     await expect(page.getByText("$1.500.000").first()).toBeVisible();
-    await expect(page.getByText("8,2 %")).toBeVisible();
+    await expect(page.getByText("8,2 %")).toHaveCount(0);
     await page.getByRole("button", { name: "Enviar solicitud" }).click();
 
     await page.waitForURL("**/cuenta", { timeout: 20_000 });
@@ -47,7 +47,7 @@ test.describe("H · Solicitud de crédito", () => {
     expect(texto).toContain("En revisión");
     expect(texto).toContain("$ 1.500.000");
     expect(texto).toContain("50%");
-    expect(texto).toMatch(/Interés mensual: 8,2\s?%/);
+    expect(texto).not.toContain("Interés");
 
     // Una sola fila pendiente en la base.
     const { cuerpo } = await adminRest(

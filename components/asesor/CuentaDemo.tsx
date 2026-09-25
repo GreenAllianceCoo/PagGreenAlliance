@@ -13,7 +13,6 @@ import {
   GRADOS,
   MONTO_MINIMO,
   NOMBRE_GRADO,
-  formatTasa,
   topeMaximoDemo,
   type CodigoGrado,
   type PaqueteDemo,
@@ -228,10 +227,6 @@ export function CuentaDemo({
 
                 {paquete ? (
                   <dl className="m-0 grid grid-cols-2 gap-3">
-                    <div className="flex flex-col gap-0.5 rounded-12 bg-ga-fondo-suave p-3.5">
-                      <dt className="text-14 text-ga-texto-3">Interés mensual</dt>
-                      <dd className="m-0 text-16 font-bold text-ga-texto">{formatTasa(paquete.tasa_interes_mensual)}</dd>
-                    </div>
                     <div className="flex flex-col gap-0.5 rounded-12 bg-ga-fondo-suave p-3.5">
                       <dt className="text-14 text-ga-texto-3">Plazo</dt>
                       <dd className="m-0 text-16 font-bold text-ga-texto">{paquete.plazo_meses} meses</dd>

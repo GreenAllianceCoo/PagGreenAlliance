@@ -200,7 +200,6 @@ test.describe("I2 · /cuenta/solicitar", () => {
   }, testInfo) => {
     const { cuerpo } = await adminRest("grados_credito?select=porcentaje,capacidad_maxima,tasa_interes_mensual,plazo_meses&grado=eq.SI");
     const paquetes = cuerpo as { porcentaje: string; capacidad_maxima: number; tasa_interes_mensual: number; plazo_meses: number }[];
-    const tasaTexto = (t: number) => `${(Number(t) * 100).toLocaleString("es-CO", { maximumFractionDigits: 2 })} %`;
     const pesos = (v: number) => `$${v.toLocaleString("es-CO")}`;
 
     const { ctx, page } = await sesionSinSolicitudes(browser, testInfo);
@@ -229,7 +228,7 @@ test.describe("I2 · /cuenta/solicitar", () => {
       await expect(page.getByText(`Tope ${pesos(p.capacidad_maxima)}`)).toBeVisible();
       await expect(page.getByText("Mínimo $100.000")).toBeVisible();
       const dl = page.locator("main dl");
-      await expect(dl).toContainText(`Interés mensual${tasaTexto(p.tasa_interes_mensual)}`);
+      await expect(dl).not.toContainText("Interés");
       await expect(dl).toContainText(`Plazo${p.plazo_meses} meses`);
       // No se calcula la cuota.
       await expect(page.locator("main")).not.toContainText(/cuota/i);
@@ -272,7 +271,7 @@ test.describe("I2 · /cuenta/solicitar", () => {
     expect(texto).toContain("En revisión");
     expect(texto).toContain("$ 100.000");
     expect(texto).toContain("100%");
-    expect(texto).toMatch(/Interés mensual: 8,2\s?%/);
+    expect(texto).not.toContain("Interés");
     const filas = await solicitudesDe(ID_SIN_SOLICITUDES);
     expect(filas.map((f) => [f.estado, Number(f.monto_solicitado), f.porcentaje_devolucion])).toEqual([["pendiente", 100000, "100"]]);
 
