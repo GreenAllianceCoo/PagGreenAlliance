@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Inicio del asociado · escritorio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Manrope',system-ui,sans-serif;background:#F3F6F4;color:#14212B}
+a{color:#1E6652}a:hover{color:#14493A}
+</style>
+</helmet>
+<div style="width: 1280px; height: 900px; box-sizing: border-box; background: #F3F6F4; display: flex; flex-direction: column;">
+  <header style="height: 76px; box-sizing: border-box; padding: 0 56px; background: #FFFFFF; border-bottom: 1px solid #E1E6E3; display: flex; align-items: center; justify-content: space-between;">
+    <dc-import name="Logo" tone="dark" hint-size="240px,44px"></dc-import>
+    <nav aria-label="Principal" style="display: flex; gap: 28px; font-size: 16px; font-weight: 700;">
+      <a href="Inicio-PC.dc.html" style="color: #1E6652; text-decoration: none; border-bottom: 2px solid #1E6652; padding-bottom: 4px;">Inicio</a>
+      <a href="#" style="color: #14212B; text-decoration: none;">Nueva solicitud</a>
+      <a href="#" style="color: #14212B; text-decoration: none;">Convenios</a>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 14px; font-size: 15px;">
+      <span style="font-weight: 700;">[Nombre]</span>
+      <a href="Ingreso-PC.dc.html" style="display: inline-flex; align-items: center; height: 40px; padding: 0 14px; border: 1.5px solid #B9C3CA; border-radius: 10px; color: #1A3C57; font-weight: 700; text-decoration: none;">Salir</a>
+    </div>
+  </header>
+
+  <main style="padding: 40px 56px; display: flex; flex-direction: column; gap: 24px;">
+    <h1 style="margin: 0; font-size: 32px; font-weight: 800; color: #1A3C57;">Hola, [Nombre]</h1>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;">
+      <section style="grid-column: span 2; background: #FFFFFF; border-radius: 18px; padding: 28px; display: flex; flex-direction: column; gap: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;"><h2 style="margin: 0; font-size: 20px; font-weight: 800;">Tu solicitud</h2><span style="font-size: 14px; font-weight: 700; color: #7A4A00; background: #FFF1D6; border-radius: 999px; padding: 5px 12px;">En revisión</span></div>
+        <div style="display: flex; gap: 48px;">
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; color: #52626E;">Monto solicitado</span><span style="font-size: 34px; font-weight: 800; color: #1A3C57;">$ [MONTO]</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; color: #52626E;">Modalidad</span><span style="font-size: 34px; font-weight: 800; color: #1A3C57;">50%</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14px; color: #52626E;">Plazo</span><span style="font-size: 34px; font-weight: 800; color: #1A3C57;">[PLAZO]</span></div>
+        </div>
+        <ol style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; font-size: 15px;">
+          <li style="display: flex; flex-direction: column; gap: 8px; border-top: 4px solid #1E6652; padding-top: 12px;"><strong>Enviada</strong><span style="color: #52626E;">[fecha]</span></li>
+          <li style="display: flex; flex-direction: column; gap: 8px; border-top: 4px solid #E0A33A; padding-top: 12px;"><strong>En revisión</strong><span style="color: #52626E;">[fecha]</span></li>
+          <li style="display: flex; flex-direction: column; gap: 8px; border-top: 4px solid #D5DCE0; padding-top: 12px; color: #52626E;"><span style="font-weight: 700;">Aprobada</span><span>—</span></li>
+          <li style="display: flex; flex-direction: column; gap: 8px; border-top: 4px solid #D5DCE0; padding-top: 12px; color: #52626E;"><span style="font-weight: 700;">Desembolso</span><span>—</span></li>
+        </ol>
+        <p style="margin: 0; font-size: 15px; color: #3F4F5B; background: #F3F6F4; border-radius: 10px; padding: 12px 14px;">Te avisaremos por correo cuando cambie el estado.</p>
+      </section>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <section style="background: #1A3C57; color: #FFFFFF; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 14px; color: #C9D6E0;">Tope disponible para tu grado</span>
+          <span style="font-size: 30px; font-weight: 800;">[TOPE]</span>
+        </section>
+        <a href="#" style="background: #FFFFFF; border-radius: 16px; padding: 20px; display: flex; align-items: center; gap: 12px; color: #14212B; text-decoration: none; font-weight: 800; font-size: 16px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1E6652" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>Nueva solicitud</a>
+        <a href="#" style="display: flex; align-items: center; justify-content: center; height: 52px; border: 1.5px solid #1E6652; border-radius: 12px; color: #1E6652; font-weight: 800; text-decoration: none;">Hablar con la cooperativa</a>
+      </div>
+    </div>
+    <section style="background: #FFFFFF; border-radius: 18px; padding: 24px 28px; display: flex; flex-direction: column; gap: 16px;">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 800;">Tus convenios</h2>
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; font-size: 14px; font-weight: 700;">
+        <a href="#" style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #DDE3DF; border-radius: 12px; color: #14212B; text-decoration: none;"><span aria-hidden="true" style="font-size: 22px;">📱</span>AMB Móvil</a>
+        <a href="#" style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #DDE3DF; border-radius: 12px; color: #14212B; text-decoration: none;"><span aria-hidden="true" style="font-size: 22px;">✈️</span>Locos por los Viajes</a>
+        <a href="#" style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #DDE3DF; border-radius: 12px; color: #14212B; text-decoration: none;"><span aria-hidden="true" style="font-size: 22px;">🦷</span>Dr. Ribero Dental</a>
+        <a href="#" style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #DDE3DF; border-radius: 12px; color: #14212B; text-decoration: none;"><span aria-hidden="true" style="font-size: 22px;">🏞️</span>Racing Tours</a>
+        <a href="#" style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #DDE3DF; border-radius: 12px; color: #14212B; text-decoration: none;"><span aria-hidden="true" style="font-size: 22px;">🛂</span>Dream &amp; Go Visas</a>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

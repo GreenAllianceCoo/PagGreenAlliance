@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<!--
+  Correo «Boleta del sorteo» · Cooperativa Green Alliance
+  - Resend → Templates → nombre: ga-sorteo-boleta → pegar TODO este archivo → Publish.
+  - Asunto: ¡Ya tienes tu boleta para el sorteo de {{{MES}}}! · Cooperativa Green Alliance
+  - Variables: NOMBRE, NUMERO_BOLETA, MES.
+  - Estilos en línea y tablas a propósito: Gmail y Outlook ignoran <style> y flexbox.
+-->
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <title>Tu boleta para el sorteo</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f3f6f4;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#f3f6f4;">
+    Tu número de boleta para el sorteo de {{{MES}}} está adentro. Escríbelo en tu cuenta para confirmar.
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f6f4;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background-color:#ffffff;border:1px solid #e1e6e3;border-radius:12px;">
+
+          <!-- Encabezado verde con logo -->
+          <tr>
+            <td align="center" style="background-color:#1e6652;border-radius:12px 12px 0 0;padding:24px 24px 20px;">
+              <img src="https://www.greenallianceco.com/logos/blanco/green-alliance-logo-blanco-600.png" width="150" height="98" alt="Cooperativa Green Alliance" style="display:block;border:0;outline:none;text-decoration:none;width:150px;height:auto;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:bold;color:#ffffff;">
+            </td>
+          </tr>
+
+          <!-- Cuerpo -->
+          <tr>
+            <td align="center" style="padding:32px 32px 8px;font-family:Arial,Helvetica,sans-serif;color:#14212b;">
+              <p style="margin:0 0 8px;font-size:32px;line-height:36px;">🎉</p>
+              <p style="margin:0 0 8px;font-size:13px;line-height:18px;letter-spacing:1px;font-weight:bold;text-transform:uppercase;color:#1e6652;">SORTEO DE {{{MES}}}</p>
+              <h1 style="margin:0 0 12px;font-size:24px;line-height:30px;font-weight:bold;color:#1a3c57;">¡Hola, {{{NOMBRE}}}!</h1>
+              <p style="margin:0;font-size:16px;line-height:24px;color:#3f4f5b;">
+                Estás a un paso de participar en el sorteo del mes. Este es tu número de boleta:
+              </p>
+            </td>
+          </tr>
+
+          <!-- Boleta -->
+          <tr>
+            <td align="center" style="padding:24px 32px 8px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="background-color:#fff8e1;border:2px dashed #e0b43a;border-radius:12px;">
+                <tr>
+                  <td align="center" style="padding:16px 32px;">
+                    <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:16px;letter-spacing:2px;font-weight:bold;color:#8a6a12;">BOLETA N.º</p>
+                    <p style="margin:4px 0 0;font-family:'Courier New',Courier,monospace;font-size:36px;line-height:40px;font-weight:bold;letter-spacing:6px;color:#14212b;">{{{NUMERO_BOLETA}}}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Qué hacer -->
+          <tr>
+            <td style="padding:20px 32px 8px;font-family:Arial,Helvetica,sans-serif;">
+              <p style="margin:0;font-size:16px;line-height:24px;color:#3f4f5b;">
+                <strong style="color:#14212b;">Para confirmar tu participación</strong>, vuelve a «Sorteo del mes» en tu
+                cuenta y escribe este número. Si no lo confirmas, no quedas inscrito.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Botón -->
+          <tr>
+            <td align="center" style="padding:24px 32px 8px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="background-color:#1e6652;border-radius:8px;">
+                    <a href="https://www.greenallianceco.com/cuenta" target="_blank" style="display:inline-block;padding:14px 28px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:20px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:8px;">Ir a mi cuenta</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Aviso -->
+          <tr>
+            <td style="padding:16px 32px 32px;font-family:Arial,Helvetica,sans-serif;">
+              <p style="margin:0;font-size:14px;line-height:20px;color:#52626e;">
+                El ganador se anunciará por los canales oficiales de Green Alliance. Si tú no pediste participar, ignora este correo.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+        <!-- Pie -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;">
+          <tr>
+            <td align="center" style="padding:20px 16px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#52626e;">
+              <strong style="color:#14212b;">Cooperativa Green Alliance</strong> · Crédito para policías y militares de Colombia<br>
+              <a href="https://www.greenallianceco.com" style="color:#52626e;">www.greenallianceco.com</a> ·
+              <a href="mailto:soporte@greenallianceco.com" style="color:#52626e;">soporte@greenallianceco.com</a> ·
+              WhatsApp <a href="https://wa.me/573117241942" style="color:#52626e;">311 724 1942</a><br>
+              Este es un correo automático; por favor no respondas a este mensaje.
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

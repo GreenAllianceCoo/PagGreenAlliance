@@ -20,8 +20,22 @@ next-env.d.ts
 .vercel
 
 # claude code local skill symlinks (regenerate with `npx skills add`)
-/.claude/
+/.claude/skills/
+/.claude/settings.local.json
 
 # misc
 .DS_Store
 npm-debug.log*
+
+# pruebas e2e (Playwright): resultados y reportes generados
+/test-results/
+/playwright-report/
+
+# archivos temporales de Office (Excel abierto)
+~$*
+
+# caché de Python (docs/avances/generar_excel.py)
+__pycache__/
+
+# capturas de las verificaciones (pesadas; el reporte .md sí se versiona)
+docs/verificaciones/**/*.png

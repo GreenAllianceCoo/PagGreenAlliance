@@ -6,12 +6,16 @@ de administracion.
 
 ## 1. Crear la base de datos
 
-1. Entra a tu proyecto en supabase.com (plan Pro).
-2. Ve a **SQL Editor > New query**.
-3. Pega todo el contenido de `supabase_schema.sql` y ejecutalo.
-4. Esto crea las tablas `perfiles`, `grados_credito` (ya con los topes reales
-   cargados), `solicitudes_credito` y `convenios`, con las reglas de
-   seguridad (RLS) activadas.
+El esquema vive en `supabase/migrations/` (en orden). No lo ejecutes a mano en
+el SQL Editor.
+
+- **Local:** `npx supabase start` y luego `npx supabase db reset`.
+- **Producción:** `npx supabase link --project-ref <ref>` y luego
+  `npx supabase db push`.
+
+Crea las tablas `perfiles`, `grados_credito` (con los topes y tasas de interés
+reales), `solicitudes_credito`, `convenios` y `solicitudes_afiliacion`, con RLS
+activado. Las pruebas de la base se corren con `npm run test:db`.
 
 ## 2. Conectar las variables de entorno
 
@@ -35,10 +39,10 @@ manualmente:
 
 1. En Supabase: **Authentication > Users > Add user**. Usa como correo
    `TUCEDULA@asociados.greenallianceco.com` y una contrasena.
-2. En **Table Editor > perfiles**, inserta una fila con ese mismo `id`
-   (cópialo del usuario que acabas de crear), tu `cedula`, `nombre_completo`,
-   y `rol = admin`.
-3. Ya puedes entrar en `/login` con esa cedula y contrasena.
+2. El perfil se crea solo. En el **SQL Editor**, hazlo admin:
+   `update public.perfiles set rol = 'admin' where id = '<id del usuario>';`
+3. Ya puedes entrar en `/ingresar` con esa cedula: llega un codigo al correo del
+   usuario (el ingreso con contrasena y `/login` ya no existen).
 
 ## 5. Desplegar en Vercel
 
@@ -51,8 +55,6 @@ manualmente:
 
 ## Que falta (siguiente con Claude Code)
 
-- Formulario de solicitud de credito (`/dashboard/solicitar`): elegir 50/100,
-  monto segun tope, envio.
 - Notificacion por correo via Resend cuando se crea o resuelve una solicitud.
 - Panel de administracion (`/admin`): listado de solicitudes, aprobar/rechazar.
 - Registro publico de nuevos asociados.

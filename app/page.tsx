@@ -1,22 +1,19 @@
-import Link from "next/link";
+import { Landing } from "@/components/pantallas/Landing";
+import { CORREO_CONTACTO, TEXTO_VIGILANCIA, WHATSAPP_NUMERO } from "@/lib/config";
+import { CONVENIOS } from "@/lib/convenios";
+import { ESTADISTICAS_EJEMPLO, TESTIMONIOS_EJEMPLO } from "@/lib/mock";
 
 export default function Home() {
+  // Convenios fijos (decisión del 23-sep): no se leen de la tabla `convenios`.
+  // TODO(pendiente-spec): cifras y testimonios reales.
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center gap-6 px-6 text-center">
-      <div className="w-16 h-16 rounded-full bg-navy flex items-center justify-center">
-        <span className="text-white font-bold text-xl">GA</span>
-      </div>
-      <h1 className="text-3xl font-bold text-navy">Cooperativa Green Alliance</h1>
-      <p className="text-gray-600 max-w-md">
-        Escudo y proteccion financiera para nuestros asociados. Landing pendiente
-        de contenido final (mision, vision, servicios).
-      </p>
-      <Link
-        href="/login"
-        className="bg-green text-white px-6 py-3 rounded-lg font-semibold"
-      >
-        Iniciar sesion
-      </Link>
-    </main>
+    <Landing
+      estadisticas={ESTADISTICAS_EJEMPLO}
+      testimonios={TESTIMONIOS_EJEMPLO}
+      convenios={CONVENIOS}
+      whatsapp={WHATSAPP_NUMERO}
+      correo={CORREO_CONTACTO}
+      textoVigilancia={TEXTO_VIGILANCIA}
+    />
   );
 }

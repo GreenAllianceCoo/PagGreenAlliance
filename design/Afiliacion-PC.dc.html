@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Solicitud de afiliación · escritorio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Manrope',system-ui,sans-serif;background:#F3F6F4;color:#14212B}
+a{color:#1E6652}a:hover{color:#14493A}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1020px; box-sizing: border-box; background: #F3F6F4; display: flex; flex-direction: column;">
+  <header style="height: 76px; box-sizing: border-box; padding: 0 56px; background: #FFFFFF; border-bottom: 1px solid #E1E6E3; display: flex; align-items: center; justify-content: space-between;">
+    <a href="Main.dc.html" aria-label="Ir al inicio" style="display: block; width: 240px; height: 44px;"><dc-import name="Logo" tone="dark" hint-size="240px,44px"></dc-import></a>
+    <a href="Ingreso-PC.dc.html" style="font-size: 16px; font-weight: 800;">¿Ya eres asociado? Ingresa</a>
+  </header>
+  <main style="padding: 48px 56px; display: flex; gap: 48px; align-items: flex-start;">
+    <aside style="width: 360px; flex-shrink: 0; display: flex; flex-direction: column; gap: 20px;">
+      <h1 style="margin: 0; font-size: 40px; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; color: #1A3C57;">Quiero afiliarme</h1>
+      <p style="margin: 0; font-size: 17px; line-height: 1.55; color: #3F4F5B;">Déjanos tus datos y el equipo de la cooperativa te contactará para completar tu afiliación.</p>
+      <div style="display: flex; gap: 10px; align-items: flex-start; background: #FFFFFF; border-radius: 14px; padding: 16px; font-size: 15px; line-height: 1.5; color: #3F4F5B;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1E6652" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 2px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 8h.01"></path></svg>
+        <span>Esto no crea tu cuenta todavía. Cuando tu afiliación quede activa, podrás ingresar con tu cédula.</span>
+      </div>
+      <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 15px; line-height: 1.45; color: #3F4F5B;">
+        <li style="display: flex; gap: 10px;"><span style="width: 24px; height: 24px; flex-shrink: 0; border-radius: 50%; background: #1A3C57; color: #FFFFFF; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center;">1</span>Envías este formulario.</li>
+        <li style="display: flex; gap: 10px;"><span style="width: 24px; height: 24px; flex-shrink: 0; border-radius: 50%; background: #1A3C57; color: #FFFFFF; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center;">2</span>El equipo te contacta por WhatsApp o correo.</li>
+        <li style="display: flex; gap: 10px;"><span style="width: 24px; height: 24px; flex-shrink: 0; border-radius: 50%; background: #1E6652; color: #FFFFFF; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center;">3</span>Ya activo, ingresas con tu cédula.</li>
+      </ol>
+    </aside>
+    <form style="flex-grow: 1; background: #FFFFFF; border-radius: 20px; padding: 36px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 24px;">
+      <div style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 6px;">
+        <label for="pa-nombre" style="font-size: 15px; font-weight: 700;">Nombres y apellidos</label>
+        <input id="pa-nombre" type="text" autocomplete="name" style="height: 52px; border: 1.5px solid #B9C3CA; border-radius: 12px; padding: 0 14px; font: inherit; font-size: 17px;">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label for="pa-cc" style="font-size: 15px; font-weight: 700;">Número de cédula</label>
+        <input id="pa-cc" type="text" inputmode="numeric" placeholder="Sin puntos ni espacios" style="height: 52px; border: 1.5px solid #B9C3CA; border-radius: 12px; padding: 0 14px; font: inherit; font-size: 17px;">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label for="pa-grado" style="font-size: 15px; font-weight: 700;">Grado</label>
+        <select id="pa-grado" style="height: 52px; border: 1.5px solid #B9C3CA; border-radius: 12px; padding: 0 12px; font: inherit; font-size: 17px; background: #FFFFFF; color: #14212B;"><option>Selecciona tu grado</option></select>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label for="pa-cel" style="font-size: 15px; font-weight: 700;">Celular (WhatsApp)</label>
+        <input id="pa-cel" type="tel" autocomplete="tel" placeholder="3001234567" style="height: 52px; border: 1.5px solid #B9C3CA; border-radius: 12px; padding: 0 14px; font: inherit; font-size: 17px;">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label for="pa-email" style="font-size: 15px; font-weight: 700;">Correo electrónico</label>
+        <input id="pa-email" type="email" autocomplete="email" placeholder="nombre@correo.com" style="height: 52px; border: 1.5px solid #B9C3CA; border-radius: 12px; padding: 0 14px; font: inherit; font-size: 17px;">
+      </div>
+      <div style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 6px;">
+        <label for="pa-unidad" style="font-size: 15px; font-weight: 700;">Unidad o dependencia <span style="font-weight: 400; color: #52626E;">(opcional)</span></label>
+        <input id="pa-unidad" type="text" style="height: 52px; border: 1.5px solid #B9C3CA; border-radius: 12px; padding: 0 14px; font: inherit; font-size: 17px;">
+      </div>
+      <div style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 6px;">
+        <label for="pa-msg" style="font-size: 15px; font-weight: 700;">¿Algo que debamos saber? <span style="font-weight: 400; color: #52626E;">(opcional)</span></label>
+        <textarea id="pa-msg" rows="3" style="border: 1.5px solid #B9C3CA; border-radius: 12px; padding: 12px 14px; font: inherit; font-size: 16px; resize: none;"></textarea>
+      </div>
+      <label style="grid-column: 1 / -1; display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 1.5; color: #3F4F5B;">
+        <input type="checkbox" style="width: 22px; height: 22px; accent-color: #1E6652; margin: 0; flex-shrink: 0;">
+        <span>Autorizo a la Cooperativa Green Alliance a tratar mis datos personales para gestionar mi afiliación, según su <a href="#" style="font-weight: 700;">política de datos</a> (Ley 1581 de 2012).</span>
+      </label>
+      <div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 4px;">
+        <span style="font-size: 14px; color: #52626E;">Te enviaremos una copia de tu solicitud a tu correo.</span>
+        <a href="Enviada-PC.dc.html" style="display: inline-flex; align-items: center; justify-content: center; height: 54px; padding: 0 36px; background: #1E6652; border-radius: 12px; color: #FFFFFF; font-size: 17px; font-weight: 800; text-decoration: none;">Enviar solicitud</a>
+      </div>
+    </form>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1020}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

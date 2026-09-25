@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Afiliación: para qué sirve y cómo montarla</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Manrope',system-ui,sans-serif;background:#F6F7F5;color:#14212B}
+a{color:#1E6652}a:hover{color:#14493A}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1480px; box-sizing: border-box; background: #F6F7F5; padding: 56px 64px; display: flex; flex-direction: column; gap: 32px;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 40px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; max-width: 820px;">
+      <span style="font-size: 14px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #1E6652;">Especificación · formulario propio</span>
+      <h1 style="margin: 0; font-size: 44px; font-weight: 800; line-height: 1.1; color: #1A3C57;">«Deseo afiliarme»: para qué sirve y cómo montarlo</h1>
+      <p style="margin: 0; font-size: 18px; line-height: 1.55; color: #3F4F5B;">Capta a policías que aún no son asociados y quieren serlo. No crea usuario ni da acceso: genera una solicitud que el equipo revisa, y avisa por correo al equipo y al solicitante.</p>
+    </div>
+    <dc-import name="Logo" tone="dark" hint-size="240px,44px"></dc-import>
+  </div>
+
+  <section style="background: #FFFFFF; border: 1px solid #DDE3DF; border-radius: 16px; padding: 24px 28px; display: flex; flex-direction: column; gap: 16px;">
+    <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #1A3C57;">Recorrido</h2>
+    <div style="display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 700;">
+      <span style="padding: 10px 14px; border-radius: 10px; background: #EEF2F5;">Login · paso 1 (cédula)</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8A9AA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+      <span style="padding: 10px 14px; border-radius: 10px; background: #EEF2F5;">Botón «Deseo afiliarme»</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8A9AA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+      <span style="padding: 10px 14px; border-radius: 10px; background: #E3F0EA; color: #14493A;">Formulario /afiliacion</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8A9AA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+      <span style="padding: 10px 14px; border-radius: 10px; background: #E3F0EA; color: #14493A;">Guardar + 2 correos</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8A9AA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+      <span style="padding: 10px 14px; border-radius: 10px; background: #EEF2F5;">Pantalla «Solicitud enviada»</span>
+    </div>
+  </section>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+    <section style="background: #FFFFFF; border: 1px solid #DDE3DF; border-radius: 16px; padding: 24px 28px; display: flex; flex-direction: column; gap: 12px;">
+      <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #1A3C57;">Campos y validaciones</h2>
+      <table style="border-collapse: collapse; font-size: 14px; line-height: 1.45;">
+        <thead><tr style="text-align: left; color: #52626E;"><th style="padding: 6px 8px 6px 0; font-weight: 700;">Campo</th><th style="padding: 6px 8px; font-weight: 700;">Regla</th></tr></thead>
+        <tbody>
+          <tr style="border-top: 1px solid #E6EBE8;"><td style="padding: 8px 8px 8px 0; font-weight: 700;">Nombres y apellidos</td><td style="padding: 8px;">Obligatorio · 3 a 120 caracteres</td></tr>
+          <tr style="border-top: 1px solid #E6EBE8;"><td style="padding: 8px 8px 8px 0; font-weight: 700;">Cédula</td><td style="padding: 8px;">Obligatoria · solo números, 6 a 10 dígitos · sin otra solicitud pendiente</td></tr>
+          <tr style="border-top: 1px solid #E6EBE8;"><td style="padding: 8px 8px 8px 0; font-weight: 700;">Grado</td><td style="padding: 8px;">Obligatorio · lista tomada de <code style="font-family: 'JetBrains Mono', monospace; font-size: 13px;">grados_credito</code></td></tr>
+          <tr style="border-top: 1px solid #E6EBE8;"><td style="padding: 8px 8px 8px 0; font-weight: 700;">Unidad o dependencia</td><td style="padding: 8px;">Opcional · hasta 120</td></tr>
+          <tr style="border-top: 1px solid #E6EBE8;"><td style="padding: 8px 8px 8px 0; font-weight: 700;">Celular</td><td style="padding: 8px;">Obligatorio · 10 dígitos, empieza por 3</td></tr>
+          <tr style="border-top: 1px solid #E6EBE8;"><td style="padding: 8px 8px 8px 0; font-weight: 700;">Correo</td><td style="padding: 8px;">Obligatorio · formato válido, se guarda en minúsculas</td></tr>
+          <tr style="border-top: 1px solid #E6EBE8;"><td style="padding: 8px 8px 8px 0; font-weight: 700;">Mensaje</td><td style="padding: 8px;">Opcional · hasta 500</td></tr>
+          <tr style="border-top: 1px solid #E6EBE8;"><td style="padding: 8px 8px 8px 0; font-weight: 700;">Autorización de datos</td><td style="padding: 8px;">Obligatoria · se guarda la fecha en que aceptó</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section style="background: #FFFFFF; border: 1px solid #DDE3DF; border-radius: 16px; padding: 24px 28px; display: flex; flex-direction: column; gap: 12px;">
+      <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #1A3C57;">Qué pasa al enviar</h2>
+      <ol style="margin: 0; padding: 0 0 0 20px; display: flex; flex-direction: column; gap: 10px; font-size: 15px; line-height: 1.5; color: #3F4F5B;">
+        <li>Server Action / Route Handler de Next.js valida los campos (mismas reglas en servidor).</li>
+        <li>Inserta una fila en la tabla nueva <code style="font-family: 'JetBrains Mono', monospace; font-size: 13px;">solicitudes_afiliacion</code> con estado <strong>pendiente</strong>.</li>
+        <li>Resend envía <strong>correo al equipo</strong> ([correo del equipo]) con todos los datos.</li>
+        <li>Resend envía <strong>copia al solicitante</strong> con los próximos pasos.</li>
+        <li>Muestra la pantalla «Solicitud enviada». Si falla un correo, la solicitud igual queda guardada y se registra el error.</li>
+      </ol>
+      <div style="margin-top: 4px; background: #F3F6F4; border-radius: 10px; padding: 14px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.6; color: #14212B; white-space: pre-line;">solicitudes_afiliacion
+id uuid · nombre text · cedula text · grado_id → grados_credito
+unidad text? · celular text · email text · mensaje text?
+acepto_datos_at timestamptz · estado (pendiente | contactado | aprobada | rechazada)
+created_at timestamptz</div>
+    </section>
+
+    <section style="background: #FFFFFF; border: 1px solid #DDE3DF; border-radius: 16px; padding: 24px 28px; display: flex; flex-direction: column; gap: 12px;">
+      <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #1A3C57;">Seguridad</h2>
+      <ul style="margin: 0; padding: 0 0 0 20px; display: flex; flex-direction: column; gap: 10px; font-size: 15px; line-height: 1.5; color: #3F4F5B;">
+        <li>El insert se hace solo desde el servidor. RLS: el público no puede leer ni escribir la tabla; el admin puede leer y cambiar estado.</li>
+        <li>Límite de envíos por IP y por cédula, y un campo trampa oculto (honeypot) contra bots.</li>
+        <li>El login nunca dice si una cédula existe: siempre muestra «Si tu cédula está registrada, te enviamos un código». Así nadie puede averiguar quién es asociado.</li>
+      </ul>
+    </section>
+
+    <section style="background: #FFFFFF; border: 1px solid #DDE3DF; border-radius: 16px; padding: 24px 28px; display: flex; flex-direction: column; gap: 12px;">
+      <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #1A3C57;">Nota: ingreso con cédula + código</h2>
+      <ul style="margin: 0; padding: 0 0 0 20px; display: flex; flex-direction: column; gap: 10px; font-size: 15px; line-height: 1.5; color: #3F4F5B;">
+        <li>El servidor busca la cédula en <code style="font-family: 'JetBrains Mono', monospace; font-size: 13px;">perfiles</code> (debe ser única) y obtiene el correo sin mostrarlo completo.</li>
+        <li>Llama <code style="font-family: 'JetBrains Mono', monospace; font-size: 13px;">signInWithOtp({ email, options: { shouldCreateUser: false } })</code>; la plantilla de correo de Supabase usa <code style="font-family: 'JetBrains Mono', monospace; font-size: 13px;">{{tokenTxt}}</code> para mandar el código de 6 dígitos.</li>
+        <li>Paso 2 valida con <code style="font-family: 'JetBrains Mono', monospace; font-size: 13px;">verifyOtp({ email, token, type: 'email' })</code>.</li>
+      </ul>
+    </section>
+  </div>
+
+  <section style="background: #FFF7E6; border: 1px solid #F0DDB0; border-radius: 16px; padding: 20px 28px; display: flex; flex-direction: column; gap: 8px;">
+    <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: #7A4A00;">Por confirmar con la cooperativa</h2>
+    <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #5C4200;">Correo que recibe las solicitudes · tiempo de respuesta ([N] días hábiles) · si piden documentos (foto de cédula o carné) · texto de la política de datos · si la afiliación aprobada crea el perfil automáticamente o lo hace el admin a mano.</p>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1480}}'>
+class Component extends DCLogic {
+  renderVals() { return { tokenTxt: '{{ .Token }}' }; }
+}
+</script>
+</body>
+</html>

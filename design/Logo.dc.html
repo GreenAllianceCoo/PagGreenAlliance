@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Logo Green Alliance · horizontal</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 240px; height: 44px; display: flex; align-items: center; gap: 10px; font-family: 'Montserrat', system-ui, sans-serif;">
+  <sc-if value="{{dark}}" hint-placeholder-val="{{true}}">
+    <img src="/_blob/14937f33b894ce25659990d5e93e1fdd" alt="" style="height: 44px; width: auto; display: block;">
+    <span style="display: flex; flex-direction: column; line-height: 1;">
+      <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.14em; color: #1F3A56;">COOPERATIVA</span>
+      <span style="font-size: 18px; font-weight: 800; letter-spacing: 0.01em; white-space: nowrap;"><span style="color: #1E6652;">GREEN</span> <span style="color: #1F3A56;">ALLIANCE</span></span>
+    </span>
+  </sc-if>
+  <sc-if value="{{light}}" hint-placeholder-val="{{false}}">
+    <img src="/_blob/61ec3d1356044aab52c91dc4471ca24f" alt="" style="height: 44px; width: auto; display: block;">
+    <span style="display: flex; flex-direction: column; line-height: 1; color: #FFFFFF;">
+      <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.14em;">COOPERATIVA</span>
+      <span style="font-size: 18px; font-weight: 800; letter-spacing: 0.01em; white-space: nowrap;">GREEN ALLIANCE</span>
+    </span>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"tone":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":240,"height":44}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const light = (this.props.tone ?? 'dark') === 'light';
+    return { light, dark: !light };
+  }
+}
+</script>
+</body>
+</html>
