@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
@@ -31,7 +31,13 @@ type CuentaDemoProps = {
   paquetesPorGrado: Record<CodigoGrado, PaqueteDemo[]>;
   /** Server Action de «Salir» (misma del resto de /asesor). */
   accionSalir?: (formData: FormData) => void;
+  /** Encabezado propio (p. ej. el de /admin); si falta, el del asesor. */
+  encabezado?: ReactNode;
+  /** A dónde vuelven la flecha y el botón, con su texto (por defecto, «Volver a Mis clientes» → /asesor). */
+  volver?: { href: string; texto: string };
 };
+
+const VOLVER_ASESOR = { href: "/asesor", texto: "Volver a Mis clientes" };
 
 /**
  * Cuenta de demostración del asesor (spec-fase-2.md §5): «se ve igual que
@@ -39,7 +45,13 @@ type CuentaDemoProps = {
  * los mismos tokens y tarjetas que Cuenta.tsx (que no se puede editar), en
  * un componente nuevo. NUNCA llama a Supabase: es 100% estado local.
  */
-export function CuentaDemo({ nombreAsesor, paquetesPorGrado, accionSalir }: CuentaDemoProps) {
+export function CuentaDemo({
+  nombreAsesor,
+  paquetesPorGrado,
+  accionSalir,
+  encabezado,
+  volver = VOLVER_ASESOR,
+}: CuentaDemoProps) {
   const gradosDisponibles = GRADOS.filter((g) => (paquetesPorGrado[g]?.length ?? 0) > 0);
   const [grado, setGrado] = useState<CodigoGrado>(gradosDisponibles[0] ?? "PP");
   const paquetes = useMemo(() => paquetesPorGrado[grado] ?? [], [paquetesPorGrado, grado]);
@@ -80,7 +92,7 @@ export function CuentaDemo({ nombreAsesor, paquetesPorGrado, accionSalir }: Cuen
 
   return (
     <div className="min-h-dvh bg-ga-fondo-suave">
-      <EncabezadoAsesor nombre={nombreAsesor} accionSalir={accionSalir} />
+      {encabezado ?? <EncabezadoAsesor nombre={nombreAsesor} accionSalir={accionSalir} />}
 
       {/* Franja de modo demostración: visible en toda la pantalla. */}
       <p className="m-0 bg-ga-navy px-5 py-2.5 text-center text-14 font-bold text-white lg:text-15">
@@ -90,8 +102,8 @@ export function CuentaDemo({ nombreAsesor, paquetesPorGrado, accionSalir }: Cuen
       <main className="flex flex-col gap-4 px-5 pb-6 pt-4 md:mx-auto md:max-w-2xl lg:max-w-none lg:gap-6 lg:px-14 lg:py-10">
         <div className="flex items-center gap-3">
           <Link
-            href="/asesor"
-            aria-label="Volver a Mis clientes"
+            href={volver.href}
+            aria-label={volver.texto}
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-ga-navy"
           >
             <IconoVolver tamano={22} grosor={1.8} />
@@ -249,8 +261,8 @@ export function CuentaDemo({ nombreAsesor, paquetesPorGrado, accionSalir }: Cuen
               <span className="text-14 text-ga-navy-texto-suave">Tope disponible para el grado {NOMBRE_GRADO[grado]}</span>
               <span className="text-26 font-extrabold lg:text-30">{formatCOP(tope)}</span>
             </section>
-            <ButtonLink href="/asesor" variante="terciario" className="gap-2">
-              Volver a Mis clientes
+            <ButtonLink href={volver.href} variante="terciario" className="gap-2">
+              {volver.texto}
             </ButtonLink>
           </div>
         </div>

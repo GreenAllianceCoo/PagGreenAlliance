@@ -7,7 +7,7 @@
 import type { EstadoPaso } from "@/components/ui/PasosSolicitud";
 
 /** Correo enmascarado que se muestra en /ingresar/codigo y /afiliacion/enviada. */
-export const CORREO_ENMASCARADO_EJEMPLO = "ju•••@correo.com";
+export const CORREO_ENMASCARADO_EJEMPLO = "ju•••@•••";
 
 /** Dígitos de ejemplo que el diseño muestra en las casillas del código. */
 export const OTP_EJEMPLO = ["4", "8", "1"];

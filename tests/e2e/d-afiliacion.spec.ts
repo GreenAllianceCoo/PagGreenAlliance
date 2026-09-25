@@ -229,7 +229,7 @@ async function llenarFormulario(page: Page, d: Partial<DatosAfiliacionV2>, fotos
   }
   if (d.nequi !== undefined) await page.getByLabel("Número Nequi").fill(d.nequi);
   if (d.celular !== undefined) await page.getByLabel("Celular").fill(d.celular);
-  if (d.email !== undefined) await page.getByLabel("Correo institucional").fill(d.email);
+  if (d.email !== undefined) await page.getByLabel("Correo electrónico").fill(d.email);
   if (d.asesor !== undefined) {
     await page.getByLabel("Asesor").selectOption(d.asesor ? { label: d.asesor } : { index: 0 });
   }
@@ -371,32 +371,18 @@ test.describe("D3 · Reglas de validación por campo", () => {
   }
 });
 
-test.describe("D4 · Correo institucional según la institución elegida", () => {
-  // BUG (lib/validaciones/afiliacion.ts, esquemaAfiliacion.check): el cruce
-  // institución↔dominio del correo NO se evalúa si al mismo tiempo hay OTRO
-  // campo inválido en el formulario (aquí, la autorización sin marcar).
-  // Reproducido sin navegador en tests/unit/validaciones.test.ts ("el
-  // dominio equivocado se detecta aunque TAMBIÉN falte la autorización"):
-  // con acepto_datos:false, esquemaAfiliacion.safeParse ya NO reporta el
-  // error de "email" aunque institución y correo no combinen. El comentario
-  // del propio esquema dice que el cruce «solo se valida si los dos campos
-  // [institución y correo] ya son individualmente válidos»: el efecto real
-  // es más amplio (se salta si CUALQUIER campo del formulario falla, no solo
-  // institución/correo) porque `.check()` de zod no corre si el objeto ya
-  // tiene algún error de campo. Los 2 casos marcados `bug: true` quedan
-  // fallando a propósito (no se ajusta la prueba): repórtese a
-  // ga-funcionalidad-botones.
+test.describe("D4 · Correo: cualquier dominio, con formato válido", () => {
   const casos = [
     { nombre: "Policía + @policia.gov.co", institucion: "policia" as const, email: "agente.qa@policia.gov.co", valido: true },
-    { nombre: "Policía + dominio ajeno", institucion: "policia" as const, email: "agente.qa@gmail.com", valido: false, bug: true },
+    { nombre: "Policía + @gmail.com", institucion: "policia" as const, email: "agente.qa@gmail.com", valido: true },
     { nombre: "Ejército + @buzonejercito.mil.co", institucion: "ejercito" as const, email: "soldado.qa@buzonejercito.mil.co", valido: true },
     { nombre: "Ejército + @ejercito.mil.co", institucion: "ejercito" as const, email: "soldado.qa@ejercito.mil.co", valido: true },
-    { nombre: "Ejército + dominio de Policía", institucion: "ejercito" as const, email: "soldado.qa@policia.gov.co", valido: false, bug: true },
+    { nombre: "Ejército + @hotmail.com", institucion: "ejercito" as const, email: "soldado.qa@hotmail.com", valido: true },
     { nombre: "Correo sin formato válido (sin arroba)", institucion: "policia" as const, email: "agente.qa-policia.gov.co", valido: false },
   ];
 
   for (const caso of casos) {
-    const titulo = `${caso.valido ? "Válido" : "Inválido"}: ${caso.nombre}${caso.bug ? " (bug conocido, ver comentario arriba)" : ""}`;
+    const titulo = `${caso.valido ? "Válido" : "Inválido"}: ${caso.nombre}`;
     test(titulo, async ({ page }) => {
       await page.goto("/afiliacion");
       await llenarFormulario(page, {
@@ -432,7 +418,7 @@ test.describe("D5 · Autorización de datos", () => {
     await expect(page.getByLabel("Institución")).toHaveValue(d.institucion);
     await expect(page.getByLabel("Número Nequi")).toHaveValue(d.nequi);
     await expect(page.getByLabel("Celular")).toHaveValue(d.celular);
-    await expect(page.getByLabel("Correo institucional")).toHaveValue(d.email);
+    await expect(page.getByLabel("Correo electrónico")).toHaveValue(d.email);
     expect(await filasPorCedula(d.cedula)).toHaveLength(0);
   });
 });
@@ -524,8 +510,8 @@ test.describe("D9 · Envío feliz con 3 fotos grandes (foto de cámara sin compr
     await enviar(page);
     await expect(page).toHaveURL(/\/afiliacion\/enviada$/, { timeout: 45_000 });
     await expect(page.locator("h1")).toHaveText("¡Solicitud enviada!");
-    // Correo enmascarado (usuario y dominio, lib/mascara.ts): «la•••@po•••.co».
-    await expect(page.locator("main")).toContainText("la•••@po•••.co");
+    // Correo enmascarado (usuario y dominio, lib/mascara.ts): «la•••@•••» (dominio oculto).
+    await expect(page.locator("main")).toContainText("la•••@•••");
     const html = await page.content();
     expect(html.toLowerCase()).not.toContain(d.email.toLowerCase());
 

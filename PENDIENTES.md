@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 24-sep-2026 (borrador de política de datos y plantillas de Resend; Test QA borrado y dominio conectado)
+Actualizado: 25-sep-2026 (cuenta de demostración para administradores en /admin/demo; máscara de correo oculta también el dominio; correcciones de HTML sin escapar en correos, espacios en WhatsApp y correo de cualquier dominio listas en local, falta desplegar)
 
 ## Dónde quedamos
 
@@ -63,7 +63,7 @@ Van en `lib/config.ts` (o en una variable de entorno) y en `lib/mock.ts` → dat
 - [x] Número de **WhatsApp** (`NEXT_PUBLIC_WHATSAPP`), para los enlaces `wa.me/57<NÚMERO>`. 24-sep: 311 724 1942.
 - [x] **[N] días hábiles** de respuesta (`DIAS_RESPUESTA`). 24-sep: la cooperativa dio «4 horas o menos» en su lugar.
 - [x] **Correo de contacto** (`CORREO_CONTACTO`). 24-sep: soporte@greenallianceco.com.
-- [ ] **Texto de vigilancia de Supersolidaria** (`TEXTO_VIGILANCIA`).
+- [x] **Texto de vigilancia de Supersolidaria** (`TEXTO_VIGILANCIA`). 25-sep: confirmado, «Vigilada por Supersolidaria» (falta desplegar).
 - [ ] **Política de datos**: el texto y la ruta (se sugiere `/politica-de-datos`); hoy el enlace es `href="#"`.
 - [x] **Destino de «Nueva solicitud»** (nav, acceso rápido y estado vacío de `/cuenta`): → `/cuenta/solicitar`.
 - [ ] **Fotos reales** de asociados y apoyos, **cifras** y **testimonios** para la landing.
@@ -122,7 +122,7 @@ Se decidió código por correo en vez de contraseña. Configurar en el panel de 
 
 - [x] Correr `ga-verificador-qa` y `ga-verificador-responsive` cuando haya funcionalidad.
 - [x] Borrar `/login` y `/dashboard` (hecho el 23-sep).
-- [ ] Hacer commit de las pantallas nuevas, subir a GitHub y desplegar en Vercel.
+- [x] Hacer commit de las pantallas nuevas, subir a GitHub y desplegar en Vercel. 25-sep: PR develop → main fusionado, Vercel desplegó fase 2 en producción.
 
 ## 5. Encargo de Carlos Pardo (500.000 COP)
 

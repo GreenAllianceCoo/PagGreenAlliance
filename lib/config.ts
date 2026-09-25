@@ -4,10 +4,10 @@
  */
 
 // Número de WhatsApp de la cooperativa (sin +57). NEXT_PUBLIC_WHATSAPP lo reemplaza si existe.
-const WHATSAPP_DIGITOS = (process.env.NEXT_PUBLIC_WHATSAPP || "3117241942").replace(/D/g, "");
+const WHATSAPP_DIGITOS = (process.env.NEXT_PUBLIC_WHATSAPP || "3117241942").replace(/\D/g, "");
 
 /** Número para mostrar: «311 724 1942». */
-export const WHATSAPP_NUMERO = WHATSAPP_DIGITOS.replace(/^(d{3})(d{3})(d{4})$/, "$1 $2 $3");
+export const WHATSAPP_NUMERO = WHATSAPP_DIGITOS.replace(/^(\d{3})(\d{3})(\d{4})$/, "$1 $2 $3");
 
 /**
  * Enlace https://wa.me/57<NÚMERO> (mapa de botones §2–§4). Si la variable no
@@ -26,5 +26,5 @@ export const TIEMPO_RESPUESTA = "4 horas o menos";
 // Correo de contacto público.
 export const CORREO_CONTACTO = "soporte@greenallianceco.com";
 
-// TODO(pendiente-spec): texto legal de vigilancia.
-export const TEXTO_VIGILANCIA = "[Vigilada por Supersolidaria — confirmar]";
+// Texto legal de vigilancia (confirmado por la cooperativa el 25-sep).
+export const TEXTO_VIGILANCIA = "Vigilada por Supersolidaria";

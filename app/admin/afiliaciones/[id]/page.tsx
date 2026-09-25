@@ -58,7 +58,7 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
           <Dato etiqueta="Institución" valor={INSTITUCIONES[solicitud.institucion ?? ""] ?? solicitud.institucion} />
           <Dato etiqueta="Celular" valor={solicitud.celular} />
           <Dato etiqueta="Nequi" valor={solicitud.nequi} />
-          <Dato etiqueta="Correo institucional" valor={solicitud.email} />
+          <Dato etiqueta="Correo" valor={solicitud.email} />
           <Dato etiqueta="Asesor que refirió" valor={asesor?.nombre_completo ?? "Sin asesor"} />
           <Dato
             etiqueta="Enviada"
@@ -82,7 +82,7 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
             repite aquí, junto a las fotos, para compararlo sin desplazarse
             hasta «Datos de la solicitud». */}
         <p className="m-0 text-15">
-          <span className="font-bold text-ga-texto-3">Correo institucional: </span>
+          <span className="font-bold text-ga-texto-3">Correo: </span>
           <span className="font-bold text-ga-texto">{solicitud.email || "—"}</span>
         </p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -121,7 +121,7 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
         >
           <span className="font-extrabold">Antes de aprobar</span>
           <p className="m-0">
-            Confirma que el nombre del correo institucional corresponde a la persona, y que la cédula
+            Confirma que el correo corresponde a la persona (puede ser personal, no solo institucional), y que la cédula
             (frente y reverso) y la selfie son de la misma persona. Si tienes dudas, contáctala por
             WhatsApp antes de aprobar.
           </p>

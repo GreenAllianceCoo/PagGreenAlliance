@@ -15,7 +15,6 @@ import type { Grado } from "@/lib/mock";
 import {
   INSTITUCIONES,
   NOMBRE_INSTITUCION,
-  dominioEsperado,
   type CampoAfiliacion,
   type ValoresAfiliacion,
 } from "@/lib/validaciones/afiliacion";
@@ -58,8 +57,6 @@ export function Afiliacion({
   accion,
   valores = {},
 }: AfiliacionProps) {
-  const institucionElegida = valores.institucion ?? "";
-
   return (
     <div className="min-h-dvh bg-white lg:bg-ga-fondo-suave">
       {/* Celular: la maqueta usa 52 px arriba para simular la barra de estado del teléfono;
@@ -220,9 +217,8 @@ export function Afiliacion({
           </Field>
           <Field
             id="af-email"
-            label="Correo institucional"
+            label="Correo electrónico"
             error={errores.email}
-            ayuda={dominioEsperado(institucionElegida)}
           >
             {(control) => (
               <Input
@@ -230,7 +226,7 @@ export function Afiliacion({
                 name="email"
                 type="email"
                 autoComplete="email"
-                placeholder="nombre@policia.gov.co"
+                placeholder="nombre@correo.com"
                 defaultValue={valores.email}
               />
             )}
@@ -329,7 +325,7 @@ export function Afiliacion({
               Enviar solicitud
             </Button>
             <span className="text-center text-13 text-ga-texto-3 xl:text-left xl:text-14">
-              El equipo te contactará por WhatsApp o a tu correo institucional.
+              El equipo te contactará por WhatsApp o a tu correo.
             </span>
           </div>
         </form>

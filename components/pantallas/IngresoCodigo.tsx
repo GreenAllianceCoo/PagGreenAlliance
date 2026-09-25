@@ -4,7 +4,7 @@ import { OtpInput } from "@/components/ui/OtpInput";
 import { ProgressSteps } from "@/components/ui/ProgressSteps";
 
 export type IngresoCodigoProps = {
-  /** Correo enmascarado (ju•••@correo.com) leído de la cookie del paso 1. */
+  /** Correo enmascarado (ju•••@•••) leído de la cookie del paso 1. */
   correoEnmascarado: string;
   whatsapp: string;
   /** Enlace https://wa.me/57<NÚMERO>; sin valor se muestra el texto sin enlace. */

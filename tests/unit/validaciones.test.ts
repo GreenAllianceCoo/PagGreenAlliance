@@ -231,36 +231,17 @@ describe("esquemaAfiliacion", () => {
     expect(errorDe("celular", conCambio({ celular: "300123456" }))).toMatch(/10 dígitos/);
   });
 
-  it("correo institucional: obligatorio, con formato y dominio según la institución", () => {
-    expect(errorDe("email", conCambio({ email: "" }))).toBe("Escribe tu correo institucional.");
+  it("correo: obligatorio y con formato válido", () => {
+    expect(errorDe("email", conCambio({ email: "" }))).toBe("Escribe tu correo.");
     expect(errorDe("email", conCambio({ email: "no-es-correo" }))).toMatch(/Revisa el correo/);
-    // Formato válido pero dominio equivocado para la institución elegida.
-    expect(errorDe("email", conCambio({ institucion: "policia", email: "juan@gmail.com" }))).toMatch(
-      /institucional.*@policia\.gov\.co/,
-    );
-    expect(
-      errorDe("email", conCambio({ institucion: "ejercito", email: "juan@policia.gov.co" })),
-    ).toMatch(/institucional.*ejercito\.mil\.co/);
   });
   it.each([
     ["policia", "juan.perez@policia.gov.co"],
-    ["ejercito", "juan.perez@ejercito.mil.co"],
+    ["policia", "juan@gmail.com"],
     ["ejercito", "juan.perez@buzonejercito.mil.co"],
-  ])("correo institucional: acepta %s con %s", (institucion, email) => {
+    ["ejercito", "juan@hotmail.com"],
+  ])("correo: acepta cualquier dominio (%s con %s)", (institucion, email) => {
     expect(errorDe("email", conCambio({ institucion, email }))).toBeUndefined();
-  });
-
-  // BUG reproducido con tests/e2e/d-afiliacion.spec.ts (D4): en el formulario
-  // real, con la autorización sin marcar Y el correo con el dominio
-  // equivocado a la vez, el error de "email" no aparecía (solo el de
-  // "acepto_datos"). Aquí se reproduce solo con zod (sin navegador) para
-  // aislar si es el esquema o el envoltorio de FormularioAfiliacion.tsx.
-  it("correo institucional: el dominio equivocado se detecta aunque TAMBIÉN falte la autorización", () => {
-    const r = errorDe(
-      "email",
-      conCambio({ institucion: "policia", email: "juan@gmail.com", acepto_datos: false }),
-    );
-    expect(r).toMatch(/institucional.*@policia\.gov\.co/);
   });
 
   it("asesor: opcional (vacío → null), si viene debe ser un uuid", () => {
