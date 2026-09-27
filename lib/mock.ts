@@ -65,15 +65,3 @@ export const ESTADISTICAS_EJEMPLO = {
   tiempoRespuestaCorto: "≤ 4 h",
 };
 
-export type Testimonio = { texto: string; autor: string };
-
-export const TESTIMONIOS_EJEMPLO: Testimonio[] = [
-  {
-    texto: "[Testimonio real de un asociado: qué necesitaba y qué logró.]",
-    autor: "[Nombre], [grado] · asociado desde [año]",
-  },
-  {
-    texto: "[Testimonio real de un asociado: qué necesitaba y qué logró.]",
-    autor: "[Nombre], [grado] · asociado desde [año]",
-  },
-];

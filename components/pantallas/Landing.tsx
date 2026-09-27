@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ComprobanteSolicitud } from "@/components/pantallas/landing/ComprobanteSolicitud";
 import { MatrizCirculos } from "@/components/pantallas/landing/MatrizCirculos";
 import { Logo } from "@/components/ui/Logo";
-import type { Convenio, Testimonio } from "@/lib/mock";
+import type { Convenio } from "@/lib/mock";
 
 /**
  * Landing (rediseño C+, pieza 2a de docs/Green Alliance C+.dc.html: hero con
@@ -21,7 +21,6 @@ export type LandingProps = {
     tiempoRespuesta: string;
     tiempoRespuestaCorto?: string;
   };
-  testimonios: Testimonio[];
   convenios: Convenio[];
   whatsapp: string;
   correo: string;
@@ -99,7 +98,7 @@ const PASOS_ALIVIO: Array<{ numero: string; fondo: string; numeroFg: string; tit
 // Sedes (pieza 2a): Bogotá + 4 sucursales.
 const SEDES = ["Bogotá · sede principal", "Valledupar, Cesar", "Bosconia, Cesar", "La Jagua de Ibirico, Cesar", "Hatonuevo, La Guajira"];
 
-export function Landing({ estadisticas, testimonios, convenios, whatsapp, correo, textoVigilancia }: LandingProps) {
+export function Landing({ estadisticas, convenios, whatsapp, correo, textoVigilancia }: LandingProps) {
   const cifraRespuesta = estadisticas.tiempoRespuestaCorto ?? estadisticas.tiempoRespuesta;
 
   return (
@@ -315,29 +314,6 @@ export function Landing({ estadisticas, testimonios, convenios, whatsapp, correo
             ))}
           </div>
         </section>
-
-        {/* Historias: no está en la pieza 2a del lienzo C+, se conserva con el estilo nuevo
-            (docs/diseno/pedidos.md no tiene pedido abierto para esto: es contenido que ya
-            existía en la landing anterior y la regla del encargo pide conservarlo). */}
-        {/* Se oculta mientras los testimonios sean de ejemplo ([entre corchetes]): falta el contenido real de la cooperativa (D-07). */}
-        {testimonios.length > 0 && !testimonios.some((t) => /[.*]/.test(t.texto + t.autor)) ? (
-        <section
-          id="c-historias"
-          className="flex scroll-mt-4 flex-col gap-5 bg-ga-navy px-4 py-12 text-white lg:gap-8 lg:px-16 lg:py-16"
-        >
-          <h2 className="m-0 font-display text-28 font-extrabold tracking-titular lg:text-44">
-            Lo que hicieron con su crédito
-          </h2>
-          <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-6">
-            {testimonios.map((testimonio, i) => (
-              <figure key={i} className="m-0 flex flex-col gap-3 rounded-24 bg-ga-navy-claro p-5 lg:gap-4 lg:rounded-28 lg:p-7">
-                <blockquote className="m-0 text-18 leading-150 lg:text-21">{testimonio.texto}</blockquote>
-                <figcaption className="text-14 text-ga-navy-texto-suave lg:text-16">{testimonio.autor}</figcaption>
-              </figure>
-            ))}
-          </div>
-        </section>
-        ) : null}
 
         {/* Empresas en convenio */}
         <section id="c-convenios" className="mx-auto flex w-full scroll-mt-4 max-w-[1280px] flex-col gap-5 px-4 py-11 lg:gap-6 lg:px-16 lg:py-20">

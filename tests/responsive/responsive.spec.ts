@@ -16,7 +16,7 @@ import { esperarCodigo, esperarVentanaReenvio, llenarOtp, pedirCodigo, USUARIOS 
  * - La landing ya no tiene espacios de foto (EspacioFoto quedó sin uso); la prueba de esa
  *   sección se quitó. La ilustración del hero (manchas + MatrizCirculos + ComprobanteSolicitud)
  *   se revisa con la misma prueba de scroll horizontal / recortes, más una captura dedicada.
- * - La sección de testimonios está oculta mientras el contenido sea de ejemplo (ver Landing.tsx);
+ * - La landing ya no tiene sección de testimonios (decisión del 27-sep);
  *   no se prueba ese bloque a propósito.
  * - Se agregan /asesor, /asesor/demo y las 5 secciones de /admin (header píldora + barra
  *   inferior flotante en /cuenta y /asesor; menú lateral de 248 px + barra/pestañas en /admin).

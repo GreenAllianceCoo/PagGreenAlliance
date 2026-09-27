@@ -739,9 +739,7 @@ test.describe("I6 · Marcadores pendientes visibles", () => {
     fs.mkdirSync(CARPETA_QA, { recursive: true });
     fs.writeFileSync(path.join(CARPETA_QA, `i-marcadores-${testInfo.project.name}.json`), JSON.stringify(inventario, null, 2));
     test.info().annotations.push({ type: "marcadores", description: JSON.stringify(inventario) });
-    // Nunca deben verse los marcadores de datos DEL USUARIO en sus páginas. En la landing,
-    // «[Nombre], [grado] · asociado desde [año]» es un testimonio pendiente de la cooperativa
-    // (se reporta como bloqueo de contenido, no como falla de esta prueba).
+    // Nunca deben verse los marcadores de datos DEL USUARIO en sus páginas.
     const privadas = [...(inventario["/cuenta"] ?? []), ...(inventario["/cuenta/solicitar"] ?? [])].join(" ");
     expect(privadas).not.toContain("[Nombre]");
     expect(privadas).not.toContain("[TOPE]");

@@ -235,22 +235,10 @@ test.describe("E · Landing /", () => {
     );
   });
 
-  test("Testimonios de ejemplo ([entre corchetes]) no se muestran en la landing", async ({
-    page,
-  }) => {
-    // lib/mock.ts#TESTIMONIOS_EJEMPLO: texto y autor literales entre
-    // corchetes («[Testimonio real de un asociado…]», «[Nombre], [grado]…»).
-    // Sección G del encargo: no deberían quedar marcadores del diseño fijos
-    // en producción. Se deja como prueba (no se «arregla» solo con datos:
-    // hace falta contenido real de la cooperativa) para que no se pierda de
-    // vista; ver hallazgo en el informe de QA.
-    await page.goto("/#c-historias");
-    const texto = await textoVisible(page);
-    const marcadores = texto.match(/\[[^\]]{1,80}\]/g) ?? [];
-    // eslint-disable-next-line no-console
-    console.log("Marcadores [entre corchetes] en la landing:", marcadores);
-    expect(marcadores, "La sección de testimonios debe ocultarse mientras sean de ejemplo (D-07)").toEqual([]);
+  test("La landing no tiene sección de testimonios (decisión de Sebas, 27-sep)", async ({ page }) => {
+    await page.goto("/");
     await expect(page.getByText("Lo que hicieron con su crédito")).toHaveCount(0);
+    await expect(page.locator("#c-historias")).toHaveCount(0);
   });
 });
 
