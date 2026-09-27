@@ -73,7 +73,6 @@ const BASE: FilaSolicitud = {
   monto_solicitado: 500000,
   porcentaje_devolucion: "50",
   plazo_meses: 3,
-  tasa_interes_mensual: 0.079,
   fecha_solicitud: "2026-09-23T15:00:00Z",
   fecha_respuesta: null,
 };
@@ -85,7 +84,6 @@ describe("vistaSolicitud", () => {
     expect(v.monto).toBe("$ 500.000");
     expect(v.modalidad).toBe("50%");
     expect(v.plazo).toBe("3 meses");
-    expect(v.tasa).toBe("7,9 %");
     expect(v.pasos.map((p) => p.estado)).toEqual(["hecho", "actual", "pendiente", "pendiente"]);
     expect(v.pasos[0].fecha).toBeTruthy();
   });
@@ -100,8 +98,8 @@ describe("vistaSolicitud", () => {
     expect(v.estadoTexto).toBe("Rechazada");
     expect(v.pasos[2].etiqueta).toBe("Rechazada");
   });
-  it("la tasa viene de la solicitud (numeric llega como texto)", () => {
-    expect(vistaSolicitud({ ...BASE, tasa_interes_mensual: "0.05050000" }).tasa).toBe("5,05 %");
+  it("no expone la tasa al asociado (uso interno, decisión 25-sep)", () => {
+    expect(vistaSolicitud(BASE)).not.toHaveProperty("tasa");
   });
 });
 

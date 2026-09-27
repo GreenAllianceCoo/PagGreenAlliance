@@ -8,7 +8,6 @@ import { MONTO_MINIMO } from "@/lib/credito";
 type Paquete = {
   porcentaje: "50" | "100";
   capacidad_maxima: number;
-  tasa_interes_mensual: number;
   plazo_meses: number;
 };
 
@@ -22,7 +21,7 @@ const initialState: EstadoSolicitud = {};
 
 /**
  * Formulario de solicitud de crédito: porcentaje de devolución (50 / 100),
- * monto (mínimo $100.000, máximo el tope del grado) y la tasa mensual del grado.
+ * monto (mínimo $100.000, máximo el tope del grado) y el plazo del grado.
  * La acción vuelve a validar todo en el servidor.
  */
 export default function SolicitudForm({ paquetes }: { paquetes: Paquete[] }) {

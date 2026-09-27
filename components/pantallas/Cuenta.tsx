@@ -23,8 +23,6 @@ export type CuentaProps = {
     monto: string;
     modalidad: string;
     plazo: string;
-    /** Tasa de interés mensual («7,9 %»). Uso interno: no se muestra al asociado (25-sep). */
-    tasa?: string;
     pasos: PasoSolicitud[];
   } | null;
   convenios: Convenio[];

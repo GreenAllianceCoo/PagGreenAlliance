@@ -42,7 +42,8 @@ export default async function SolicitarPage() {
   const { data: paquetes } = perfil?.grado
     ? await supabase
         .from("grados_credito")
-        .select("porcentaje, capacidad_maxima, tasa_interes_mensual, plazo_meses")
+        // Sin tasa_interes_mensual: es de uso interno y no debe llegar al navegador (25-sep).
+        .select("porcentaje, capacidad_maxima, plazo_meses")
         .eq("grado", perfil.grado)
         .order("porcentaje", { ascending: true })
     : { data: null };

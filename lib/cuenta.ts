@@ -1,4 +1,3 @@
-import { formatTasa } from "@/lib/credito";
 import type { PasoSolicitud } from "@/lib/mock";
 
 /**
@@ -26,7 +25,6 @@ export type FilaSolicitud = {
   monto_solicitado: number | string;
   porcentaje_devolucion: "50" | "100";
   plazo_meses: number;
-  tasa_interes_mensual: number | string;
   fecha_solicitud: string;
   fecha_respuesta: string | null;
 };
@@ -36,8 +34,6 @@ export type VistaSolicitud = {
   monto: string;
   modalidad: string;
   plazo: string;
-  /** Tasa de interés mensual guardada en la solicitud (la cuota no se calcula). */
-  tasa: string;
   pasos: PasoSolicitud[];
 };
 
@@ -84,7 +80,6 @@ export function vistaSolicitud(fila: FilaSolicitud): VistaSolicitud {
     monto: formatearPesos(fila.monto_solicitado),
     modalidad: `${fila.porcentaje_devolucion}%`,
     plazo: `${fila.plazo_meses} ${fila.plazo_meses === 1 ? "mes" : "meses"}`,
-    tasa: formatTasa(Number(fila.tasa_interes_mensual)),
     pasos,
   };
 }
