@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 27-sep-2026 (rediseño C+ en la rama rediseno-c-plus: panel del asociado, asesor y admin ya maquetados en código; KPIs/tope/nota interna del admin ya conectados a datos reales (ga-funcionalidad-botones), QA y seguridad del rediseño aprobados con observaciones menores (ga-verificador-qa, ga-revisor-seguridad), tasa de interés fuera del payload de /cuenta y cédula de las «hermanas» enmascarada en servidor (commits locales e650033, fdab456); falta aplicar las migraciones de backend de 1.8 y el paso de responsive (6.19) — ver docs/avances/Avances_Green_Alliance.xlsx)
+Actualizado: 27-sep-2026 (rediseño C+ completo y verificado de punta a punta en la rama rediseno-c-plus: QA, seguridad y responsive en verde tras corregir los 9 hallazgos responsive y el contraste del admin oscuro (commits locales, incluye 846657b y b0239a8); la barra inferior de /cuenta y /asesor queda siempre visible con espacio reservado, no oculta al cargar. Faltan solo el push de la rama y abrir el PR a develop (6.18), a la espera de que Sebas lo autorice — no depende de aplicar las migraciones de backend de 1.8, que siguen pendientes aparte. Ver docs/avances/Avances_Green_Alliance.xlsx)
 
 ## Dónde quedamos
 
