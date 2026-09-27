@@ -42,6 +42,36 @@ test("admin entra a /admin y aprueba la afiliación de ejemplo (2 pasos)", async
   await page.getByRole("button", { name: "Sí, aprobar" }).click();
   await expect(page.getByText(/aprobad/i).first()).toBeVisible({ timeout: 15_000 });
 
+  // --- «Escribir por WhatsApp» habilitado (pieza 3e/3i, D-08): enlaza a
+  // wa.me con el prefijo 57 + el celular de la solicitud (seed.sql: 3009998877).
+  const enlaceWhatsapp = page.getByRole("link", { name: "Escribir por WhatsApp" });
+  await expect(enlaceWhatsapp).toBeVisible();
+  expect(await enlaceWhatsapp.getAttribute("href")).toMatch(/^https:\/\/wa\.me\/57/);
+
+  // --- Bloque «Asesor» (pieza 3i, D-09): la solicitud de ejemplo (Camilo,
+  // seed.sql) ya viene referida por el asesor de prueba, y `aprobarAfiliacion`
+  // le copia ese mismo asesor al perfil recién creado — por eso el bloque de
+  // asignar NO aparece: se ve de solo lectura con el asesor que ya tiene.
+  await expect(page.getByRole("button", { name: "Asignar asesor" })).toHaveCount(0);
+  await expect(page.getByText(/Asesor asignado:\s*Asesor de Prueba/)).toBeVisible();
+
+  // Simulamos que el asociado quedó sin asesor asignado (p. ej. nadie lo
+  // refirió) para probar el bloque de todos modos, con el único asesor que
+  // deja el seed («Asesor de Prueba»).
+  await adminRest("perfiles?cedula=eq.1234567898", {
+    method: "PATCH",
+    body: JSON.stringify({ asesor_id: null }),
+  });
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Asignar asesor" })).toBeVisible();
+  await page.getByLabel("Elige un asesor").selectOption({ label: "Asesor de Prueba" });
+  await page.getByRole("button", { name: "Asignar asesor" }).click();
+  await expect(page.getByText(/Asesor asignado/)).toBeVisible({ timeout: 10_000 });
+  // Tras recargar sigue de solo lectura, sin opción de cambiarlo.
+  await page.reload();
+  await expect(page.getByText(/Asesor asignado:\s*Asesor de Prueba/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Asignar asesor" })).toHaveCount(0);
+
   await page.goto("/admin/creditos");
   await expect(page.getByText("Asociado de Prueba").first()).toBeVisible();
   for (const ruta of ["/admin/asesores", "/admin/sorteo"]) {

@@ -232,6 +232,19 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(8px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        // Bloque «Asesor» del admin (pieza 3i, D-09, MOVIMIENTO): al asignar,
+        // el bloque entero se funde hacia la versión de solo lectura.
+        "ga-asesor-listo": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        // Mensaje de error del bloque «Asesor» (pieza 3i, MOVIMIENTO): entra
+        // con 4 px + opacidad. Reducido: `prefers-reduced-motion` ya recorta
+        // la duración a 1 ms (app/globals.css), así que solo queda el fundido.
+        "ga-error-chico": {
+          from: { opacity: "0", transform: "translateY(4px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         "ga-entrada": "ga-entrada 400ms cubic-bezier(.34,1.3,.64,1) both",
@@ -242,6 +255,8 @@ const config: Config = {
         "ga-fila-entra": "ga-fila-entra 320ms cubic-bezier(.34,1.3,.64,1) both",
         "ga-toast": "ga-toast 220ms ease-out both",
         "ga-lista": "ga-lista 200ms ease-out both",
+        "ga-asesor-listo": "ga-asesor-listo 250ms cubic-bezier(.34,1.3,.64,1) both",
+        "ga-error-chico": "ga-error-chico 150ms ease-out both",
       },
       spacing: {
         "4.5": "1.125rem", // 18px

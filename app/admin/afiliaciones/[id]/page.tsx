@@ -47,10 +47,17 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
       .from("perfiles")
       .select("id, asesor_id")
       .eq("cedula", solicitud.cedula)
-      .is("asesor_id", null)
       .maybeSingle();
 
-    if (perfil) {
+    if (perfil?.asesor_id) {
+      // Ya tiene asesor: el bloque se muestra de solo lectura («Asesor asignado: …»).
+      const { data: suAsesor } = await supabase
+        .from("perfiles")
+        .select("nombre_completo")
+        .eq("id", perfil.asesor_id)
+        .maybeSingle();
+      perfilAsociado = { id: perfil.id, asesorNombre: suAsesor?.nombre_completo ?? "Asesor asignado" };
+    } else if (perfil) {
       perfilAsociado = { id: perfil.id, asesorNombre: null };
       const { data: listaAsesores } = await supabase
         .from("perfiles")

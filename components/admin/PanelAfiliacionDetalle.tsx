@@ -4,11 +4,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AccionesAfiliacion } from "./AccionesAfiliacion";
+import { AsignarAsesor } from "./AsignarAsesor";
 import { ChipEstado, type EstadoAdmin } from "./ChipEstado";
 import { FotoAfiliacion } from "./FotoAfiliacion";
 import { ToastAdmin } from "./ToastAdmin";
 import { formatearFecha } from "@/lib/cuenta";
 import { HISTORIAL_NOTAS_INTERNAS_HABILITADO } from "@/lib/admin/flags";
+import { enlaceWhatsappAfiliacion } from "@/lib/admin/whatsapp";
+import { IconoWhatsapp } from "@/components/ui/Iconos";
 import type { FilaListaAfiliacion } from "@/app/admin/afiliaciones/_datos";
 
 const INSTITUCIONES: Record<string, string> = { policia: "Policía Nacional", ejercito: "Ejército Nacional" };
@@ -34,14 +37,11 @@ type Props = {
   /** Lista de hermanas del mismo estado (pieza 3e: «lista + ficha en la misma vista»), incluye la actual. */
   hermanas: FilaListaAfiliacion[];
   /**
-   * TODO(diseno: D-09): «Asignar asesor» (P-96). El servidor
+   * «Asignar asesor» (pieza 3i, D-09 · P-96): el servidor
    * (app/admin/afiliaciones/[id]/page.tsx) solo llena estas dos props cuando
    * la afiliación está aprobada Y el perfil del asociado todavía no tiene
-   * asesor; en cualquier otro caso llegan `null` / `[]` y el botón NO debe
-   * mostrarse. Falta que ga-disenador-lienzo maquete esta pieza (selector de
-   * asesor + confirmación) y que ga-diseno-a-codigo la conecte a la Server
-   * Action `asignarAsesor` (app/admin/afiliaciones/actions.ts). No hay
-   * opción de cambiar ni quitar un asesor ya asignado.
+   * asesor; en cualquier otro caso llegan `null` / `[]` y el bloque no se
+   * muestra. Sin opción de cambiar ni quitar un asesor ya asignado.
    */
   perfilAsociado?: { id: string; asesorNombre: string | null } | null;
   asesores?: { id: string; nombre: string }[];
@@ -54,9 +54,21 @@ type Props = {
  * propia URL (cada una es una página de servidor distinta, a diferencia de
  * créditos que no cambia de ruta).
  */
-export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas }: Props) {
+export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas, perfilAsociado, asesores = [] }: Props) {
   const router = useRouter();
   const [toast, setToast] = useState<string | null>(null);
+  const enlaceWhatsapp = enlaceWhatsappAfiliacion(solicitud.celular, solicitud.nombre);
+
+  // «Asignar asesor» (D-09): la propia Server Action llama a `revalidatePath`,
+  // lo que hace que Next vuelva a pedir esta página apenas termina — y como
+  // `perfilAsociado` solo llega cuando el perfil TODAVÍA no tiene asesor, ese
+  // refresco automático lo deja en `null` justo cuando la asignación acaba de
+  // tener éxito. Sin esta «foto» inicial (congelada con `useState`, que
+  // ignora los cambios de prop después del primer render), <AsignarAsesor>
+  // se desmontaría antes de poder mostrar su propio aviso de éxito.
+  const [perfilAsociadoInicial] = useState(perfilAsociado ?? null);
+  // Lo más reciente del servidor manda (p. ej. tras aprobar en esta misma vista); la «foto» inicial solo cubre el refresco.
+  const perfilMostrado = perfilAsociado ?? perfilAsociadoInicial;
 
   useEffect(() => {
     function alTeclado(e: KeyboardEvent) {
@@ -164,18 +176,51 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas }: Props) {
 
         <AccionesAfiliacion id={solicitud.id} estado={solicitud.estado} nombre={solicitud.nombre} onResuelto={setToast} />
 
-        {/* «Escribir por WhatsApp» (pieza 3e): decisión pendiente P-95 (¿con
-            qué número — el que ya se ve arriba, o el institucional? ¿abre
-            wa.me o un flujo propio?). Se deja visible pero deshabilitado en
-            vez de inventar el comportamiento. */}
-        <button
-          type="button"
-          disabled
-          title="Pendiente de decidir (P-95): docs/diseno/pedidos.md"
-          className="flex h-11 items-center justify-center gap-2 rounded-full text-14 font-bold text-admin-texto-3 shadow-[inset_0_0_0_1px_var(--ga-admin-borde-sutil)] disabled:cursor-not-allowed"
-        >
-          Escribir por WhatsApp
-        </button>
+        {/* «Escribir por WhatsApp» (pieza 3e/3i, D-08 · P-95 aprobado el
+            2026-09-27): habilitado por defecto, abre wa.me en pestaña nueva
+            con un mensaje corto prellenado. Estilo secundario neutro (borde,
+            sin relleno) para no competir con «Aprobar»/«Rechazar»; se
+            deshabilita, con el motivo visible, si la solicitud no tiene un
+            celular colombiano válido (lib/admin/whatsapp.ts). */}
+        <div className="flex flex-col gap-1.5">
+          {enlaceWhatsapp ? (
+            <a
+              href={enlaceWhatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-11 items-center justify-center gap-2 rounded-full text-14 font-bold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] outline-none transition-colors duration-200 hover:bg-white/[.06] hover:text-white focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-admin-verde)]"
+            >
+              <IconoWhatsapp tamano={17} />
+              Escribir por WhatsApp
+            </a>
+          ) : (
+            <>
+              <button
+                type="button"
+                disabled
+                className="flex h-11 items-center justify-center gap-2 rounded-full text-14 font-bold text-admin-texto-3 opacity-40 shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:cursor-not-allowed"
+              >
+                <IconoWhatsapp tamano={17} apagado />
+                Escribir por WhatsApp
+              </button>
+              <span className="text-center text-12 text-admin-texto-3">Sin celular registrado.</span>
+            </>
+          )}
+        </div>
+
+        {/* «Asesor» (pieza 3i, D-09 · P-96 aprobado el 2026-09-27): asigna
+            perfiles.asesor_id de un asociado ya aprobado. El servidor
+            (app/admin/afiliaciones/[id]/page.tsx) solo manda `perfilAsociado`
+            cuando la afiliación ya está aprobada y el perfil todavía no
+            tiene asesor; en cualquier otro caso este bloque no se muestra. */}
+        {perfilMostrado ? (
+          <AsignarAsesor
+            solicitudId={solicitud.id}
+            perfilAsociado={perfilMostrado}
+            asesores={asesores}
+            onResuelto={setToast}
+          />
+        ) : null}
 
         {/* TODO(backend: migración 20260925200200_historial_y_notas_internas.sql
             sin aplicar): igual que en créditos (pieza 2d), la nota interna
