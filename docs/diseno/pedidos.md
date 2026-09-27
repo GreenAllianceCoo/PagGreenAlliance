@@ -63,3 +63,17 @@ Formato de cada pedido:
 - Qué falta: la pieza `2a` no incluye esta sección (así lo documenta el propio código, `components/pantallas/Landing.tsx`: «Historias: no está en la pieza 2a del lienzo C+, se conserva con el estilo nuevo... sin enlace en el nav»). Al no tener respaldo en el lienzo, hoy vive con el texto de ejemplo de `lib/mock.ts#TESTIMONIOS_EJEMPLO` visible en producción, con corchetes literales: «[Testimonio real de un asociado: qué necesitaba y qué logró.]» y «[Nombre], [grado] · asociado desde [año]» (visto en escritorio y celular, ver `tests/e2e/e-diseno.spec.ts`, prueba «Hallazgo: testimonios de ejemplo con corchetes visibles»).
 - Datos y reglas: decidir (a) si la sección se mantiene en el rediseño C+ (y en ese caso, agregarla a `2a` con enlace en el nav, como tenía la landing anterior) o se retira; (b) si se mantiene, de dónde salen los testimonios reales (¿tabla nueva? ¿contenido fijo redactado por la cooperativa?) para reemplazar el texto de ejemplo antes de producción.
 - Estado: Pendiente
+
+### D-08 · Admin · botón «Escribir por WhatsApp» habilitado · /admin/afiliaciones/[id]
+- Pedido por: sesión principal (Sebas, P-95 aprobado) · 2026-09-27
+- Prioridad: alta
+- Qué falta: en `3e` el botón queda deshabilitado a la espera de P-95. Ya aprobado: diseñarlo habilitado, con el glifo oficial de WhatsApp en SVG en línea (sin imágenes externas), que abra `https://wa.me/57<celular>` en pestaña nueva con un mensaje inicial corto y cordial, en tuteo. Definir colores dentro del admin oscuro (verde de WhatsApp #25D366 solo en el ícono o también en el botón, con contraste AA), estados normal/hover/foco/deshabilitado (sin celular válido, con motivo visible), y que conviva con «Aprobar»/«Rechazar» sin competir con ellos.
+- Datos y reglas: mismas reglas de datos que hoy (celular visible solo en la ficha del admin, nunca en listas ni al asesor); nada de fotos de personas en el ícono (es un glifo, no una foto).
+- Estado: Resuelto → 3e (botón habilitado en el ejemplo «Pendiente») y 3i (estados normal/hover/foco/deshabilitado)
+
+### D-09 · Admin · asignar asesor a un asociado ya aprobado · /admin/afiliaciones/[id]
+- Pedido por: sesión principal (Sebas, P-96 aprobado) · 2026-09-27
+- Prioridad: alta
+- Qué falta: bloque «Asesor» en la ficha, distinto del campo existente «Asesor que refirió». Aparece **solo** cuando la afiliación está `aprobada` y el perfil del asociado **no tiene** `asesor_id` todavía. Selector de asesores registrados + botón «Asignar asesor», con confirmación ligera y estados cargando/éxito/error. Si ya tiene asesor, se ve de solo lectura («Asesor: Andrés Rojas»), sin opción de cambiarlo por ahora. Si no hay asesores registrados, mensaje con enlace a /admin/asesores. Si la afiliación no está aprobada, el bloque no aparece en absoluto.
+- Datos y reglas: usa `perfiles.asesor_id`, que ya existe con su validación (`validar_perfil_asesor_id`, debe ser un perfil con `rol = 'asesor'`); no hace falta migración nueva, sí una Server Action nueva para asignar desde el admin.
+- Estado: Resuelto → 3i

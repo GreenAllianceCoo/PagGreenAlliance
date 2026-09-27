@@ -36,6 +36,31 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
     listarSolicitudesAfiliacion(supabase, estadoValido),
   ]);
 
+  // «Asignar asesor» (P-96): solo se cargan estos datos —y solo entonces se
+  // le pasan a la UI— cuando la afiliación está aprobada Y el perfil del
+  // asociado todavía no tiene asesor; en cualquier otro caso no hace falta
+  // (ni el botón debe aparecer, ni vale la pena gastar la consulta).
+  let perfilAsociado: { id: string; asesorNombre: string | null } | null = null;
+  let asesores: { id: string; nombre: string }[] = [];
+  if (solicitud.estado === "aprobada") {
+    const { data: perfil } = await supabase
+      .from("perfiles")
+      .select("id, asesor_id")
+      .eq("cedula", solicitud.cedula)
+      .is("asesor_id", null)
+      .maybeSingle();
+
+    if (perfil) {
+      perfilAsociado = { id: perfil.id, asesorNombre: null };
+      const { data: listaAsesores } = await supabase
+        .from("perfiles")
+        .select("id, nombre_completo")
+        .eq("rol", "asesor")
+        .order("nombre_completo");
+      asesores = (listaAsesores ?? []).map((a) => ({ id: a.id, nombre: a.nombre_completo }));
+    }
+  }
+
   return (
     <AdminShell nombre={nombreAdmin} seccion="afiliaciones">
       <div className="flex items-center gap-3">
@@ -70,6 +95,9 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
         fotos={fotos}
         // La cédula de las «hermanas» sale ya enmascarada del servidor: solo la de la ficha abierta viaja completa.
         hermanas={hermanas.map((h) => ({ ...h, cedula: enmascararCedula(h.cedula) }))}
+        // TODO(diseno: D-09): «Asignar asesor» (P-96). Ver PanelAfiliacionDetalle.tsx.
+        perfilAsociado={perfilAsociado}
+        asesores={asesores}
       />
     </AdminShell>
   );

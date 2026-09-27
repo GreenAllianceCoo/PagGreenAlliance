@@ -33,6 +33,18 @@ type Props = {
   fotos: { frente: string | null; reverso: string | null; selfie: string | null };
   /** Lista de hermanas del mismo estado (pieza 3e: «lista + ficha en la misma vista»), incluye la actual. */
   hermanas: FilaListaAfiliacion[];
+  /**
+   * TODO(diseno: D-09): «Asignar asesor» (P-96). El servidor
+   * (app/admin/afiliaciones/[id]/page.tsx) solo llena estas dos props cuando
+   * la afiliación está aprobada Y el perfil del asociado todavía no tiene
+   * asesor; en cualquier otro caso llegan `null` / `[]` y el botón NO debe
+   * mostrarse. Falta que ga-disenador-lienzo maquete esta pieza (selector de
+   * asesor + confirmación) y que ga-diseno-a-codigo la conecte a la Server
+   * Action `asignarAsesor` (app/admin/afiliaciones/actions.ts). No hay
+   * opción de cambiar ni quitar un asesor ya asignado.
+   */
+  perfilAsociado?: { id: string; asesorNombre: string | null } | null;
+  asesores?: { id: string; nombre: string }[];
 };
 
 /**

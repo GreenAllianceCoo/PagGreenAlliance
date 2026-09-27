@@ -24,6 +24,17 @@ export const esquemaAprobarAfiliacion = z.object({
   id: z.uuid({ error: "Falta el id de la solicitud." }),
 });
 
+/**
+ * «Asignar asesor» (P-96): la afiliación (por su id) y el asesor elegido
+ * (perfil con rol asesor). El resto de las reglas (afiliación aprobada,
+ * perfil sin asesor, asesor válido) se comprueban en el servidor, no aquí:
+ * este esquema solo valida la forma de los dos ids.
+ */
+export const esquemaAsignarAsesor = z.object({
+  id: z.uuid({ error: "Falta el id de la solicitud." }),
+  asesorId: z.uuid({ error: "Elige un asesor." }),
+});
+
 // ---------------------------------------------------------------------------
 // Solicitudes de crédito
 // ---------------------------------------------------------------------------
