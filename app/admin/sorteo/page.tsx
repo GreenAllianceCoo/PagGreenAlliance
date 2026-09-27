@@ -25,7 +25,7 @@ type FilaBoleta = {
   cedula: string | null;
 };
 
-/** Boletas confirmadas del mes elegido (mapa §Admin · Sorteo). */
+/** Boletas confirmadas del mes elegido (pieza 3g). */
 export default async function SorteoPage({
   searchParams,
 }: {
@@ -50,34 +50,34 @@ export default async function SorteoPage({
   return (
     <AdminShell nombre={nombre} seccion="sorteo">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="m-0 text-24 font-extrabold text-ga-navy lg:text-30">Sorteo mensual</h1>
+        <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Sorteo mensual</h1>
         <SelectorMes anio={anio} mes={mes} anios={anios} />
       </div>
 
       {error ? (
-        <p className="m-0 rounded-12 bg-white p-4 text-15 text-ga-error">No pudimos cargar las boletas.</p>
+        <p className="m-0 rounded-12 bg-admin-superficie p-4 text-15 text-admin-rojo-2">No pudimos cargar las boletas.</p>
       ) : boletas.length === 0 ? (
-        <p className="m-0 rounded-12 bg-white p-4 text-15 text-ga-texto-3">
-          No hay boletas confirmadas para este mes.
-        </p>
+        <div className="rounded-16 bg-admin-superficie p-9 text-center">
+          <span className="text-15 text-admin-texto-3">No hay boletas confirmadas para este mes.</span>
+        </div>
       ) : (
-        <div className="overflow-x-auto rounded-18 bg-white">
+        <div className="overflow-x-auto rounded-20 bg-admin-superficie">
           <table className="w-full min-w-[480px] border-collapse text-15">
             <thead>
-              <tr className="border-b border-ga-linea text-left text-13 text-ga-texto-3">
-                <th className="p-4 font-bold">Boleta</th>
-                <th className="p-4 font-bold">Nombre</th>
-                <th className="p-4 font-bold">Cédula</th>
-                <th className="p-4 font-bold">Confirmada</th>
+              <tr className="border-b border-admin-borde-sutil text-left text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+                <th className="p-4">Boleta</th>
+                <th className="p-4">Nombre</th>
+                <th className="p-4">Cédula</th>
+                <th className="p-4">Confirmada</th>
               </tr>
             </thead>
             <tbody>
               {boletas.map((b) => (
-                <tr key={b.numero} className="border-b border-ga-linea last:border-0">
-                  <td className="p-4 font-mono font-bold tracking-cedula">{b.numero}</td>
-                  <td className="p-4">{b.nombre_completo ?? "—"}</td>
-                  <td className="p-4">{b.cedula ?? "—"}</td>
-                  <td className="p-4 text-ga-texto-3">
+                <tr key={b.numero} className="border-b border-admin-borde-sutil last:border-0">
+                  <td className="p-4 font-mono font-extrabold tracking-cedula">{b.numero}</td>
+                  <td className="p-4 font-bold text-white">{b.nombre_completo ?? "—"}</td>
+                  <td className="p-4 text-admin-texto-2">{b.cedula ?? "—"}</td>
+                  <td className="p-4 text-admin-texto-3">
                     {b.fecha_confirmacion
                       ? new Date(b.fecha_confirmacion).toLocaleString("es-CO", { dateStyle: "short", timeStyle: "short" })
                       : "—"}

@@ -79,6 +79,9 @@ const config: Config = {
           "admin-rojo-claro": "var(--ga-admin-rojo-claro)",
           "admin-borde": "var(--ga-admin-borde)",
           "admin-borde-sutil": "var(--ga-admin-borde-sutil)",
+          // Agregados por ga-diseno-a-codigo (tanda 4b): chips «aprobado»/«rechazado» del admin oscuro.
+          "admin-verde-fondo": "var(--ga-admin-verde-fondo)",
+          "admin-rojo-fondo": "var(--ga-admin-rojo-fondo)",
         },
       },
       fontFamily: {
@@ -89,6 +92,8 @@ const config: Config = {
       // Tamaños de letra en px exactos del diseño: `text-15` = 15px.
       fontSize: {
         "10": "10px",
+        // Agregado por ga-diseno-a-codigo (tanda 4b): chip de contador del menú del admin oscuro (pieza 2d).
+        "12": "12px",
         "13": "13px",
         "14": "14px",
         "15": "15px",
@@ -106,7 +111,10 @@ const config: Config = {
         "32": "32px",
         "34": "34px",
         "36": "36px",
+        // Agregados por ga-diseno-a-codigo (tanda 4b, pieza 2d): cifras de las tarjetas KPI del admin oscuro.
+        "38": "38px",
         "40": "40px",
+        "48": "48px",
         "44": "44px",
         "46": "46px",
         "56": "56px",
@@ -127,6 +135,8 @@ const config: Config = {
         "120": "1.2",
         "125": "1.25",
         "130": "1.3",
+        // Agregado por ga-diseno-a-codigo (tanda 4b): textareas del admin oscuro (nota interna, motivo de rechazo).
+        "140": "1.4",
         "145": "1.45",
         "150": "1.5",
         "155": "1.55",
@@ -203,6 +213,24 @@ const config: Config = {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
+        // Agregados por ga-diseno-a-codigo (tanda 4b, pieza 2d «MOVIMIENTO»):
+        // fila nueva de la lista de admin: entra desde arriba (−8px → 0).
+        "ga-fila-entra": {
+          from: { opacity: "0", transform: "translateY(-8px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        // Toast del admin: sube 12px + fundido (se retira con un temporizador en JS, no con esta animación).
+        "ga-toast": {
+          from: { opacity: "0", transform: "translateY(12px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        // «Mis clientes» del asesor (pieza 2c, MOVIMIENTO): al filtrar, la lista
+        // cambia con un fundido + 8 px en vez de saltar (imita una View Transition
+        // sin usar esa API, que todavía no tiene soporte parejo en navegadores).
+        "ga-lista": {
+          from: { opacity: "0", transform: "translateY(8px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         "ga-entrada": "ga-entrada 400ms cubic-bezier(.34,1.3,.64,1) both",
@@ -210,10 +238,16 @@ const config: Config = {
         "ga-sacude": "ga-sacude 240ms linear",
         "ga-trazo": "ga-trazo 400ms cubic-bezier(.34,1.3,.64,1) both",
         "ga-aparecer": "ga-aparecer 200ms ease-out both",
+        "ga-fila-entra": "ga-fila-entra 320ms cubic-bezier(.34,1.3,.64,1) both",
+        "ga-toast": "ga-toast 220ms ease-out both",
+        "ga-lista": "ga-lista 200ms ease-out both",
       },
       spacing: {
         "4.5": "1.125rem", // 18px
         "5.5": "1.375rem", // 22px
+        // Agregados por ga-diseno-a-codigo (tanda 4b, pieza 2d): alturas exactas de botones del admin oscuro.
+        "11.5": "2.875rem", // 46px · botones del paso de confirmación
+        "12.5": "3.125rem", // 50px · «Aprobar»/«Rechazar»
         "13": "3.25rem", // 52px · alto de input
         "13.5": "3.375rem", // 54px · alto de botón
         "14.5": "3.625rem", // 58px · casilla OTP escritorio (pieza 3b)

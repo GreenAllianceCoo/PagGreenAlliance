@@ -100,6 +100,14 @@
   --ga-admin-rojo-claro: #ffd3ce; /* extra de 2d: cuerpo del aviso «Supera el tope» (no está en la lista de 3a) */
   --ga-admin-borde: rgba(255, 255, 255, 0.14);
   --ga-admin-borde-sutil: rgba(255, 255, 255, 0.06);
+
+  /* Agregados por ga-diseno-a-codigo (tanda 4b, piezas 2d/3e-3h): fondos
+     tenues para los chips «aprobado»/«rechazado» del admin oscuro, con el
+     mismo patrón de opacidad .16 que ya usa --ga-admin-ambar-fondo (no hay
+     ejemplo literal de estos 2 en el lienzo; se derivan de --ga-admin-verde
+     y --ga-admin-rojo con la misma fórmula). */
+  --ga-admin-verde-fondo: rgba(111, 203, 163, 0.16);
+  --ga-admin-rojo-fondo: rgba(255, 138, 128, 0.16);
 }
 
 @layer base {

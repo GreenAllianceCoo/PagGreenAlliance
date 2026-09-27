@@ -49,3 +49,10 @@ Formato de cada pedido:
 - Qué falta: lo que Claude Design dejó como «Sigue» en `2d`: detalle de afiliación (etapas Recibida → Contactada → Aprobada/Rechazada, «Escribir por WhatsApp», «Marcar como contactada», visor de las 3 fotos con estado de carga y de enlace vencido), Asesores (lista, crear, asignar asociados), Sorteo (selector de mes, tabla de boletas), la pestaña «Demostración» (/admin/demo) y la versión para celular del admin.
 - Datos y reglas: en `2d` cambiar la etiqueta «Correo institucional» por «Correo» (el correo puede ser de cualquier dominio).
 - Estado: Resuelto → 3e (detalle de afiliación), 3f (Asesores), 3g (Sorteo), 3h (Demostración + patrón del admin en celular). El cambio de etiqueta en `2d` ya se había hecho el 2026-09-25.
+
+### D-06 · Panel del asesor · /asesor (tarjetas y chips de resumen)
+- Pedido por: ga-diseno-a-codigo · 2026-09-27
+- Prioridad: media
+- Qué falta: la pieza `2c` modela «Mis clientes» con datos ficticios en los que TODO cliente tiene un estado de afiliación (`CLIENTES` del script: `af` siempre es Pendiente/Contactado/Aprobada/Rechazada). El modelo real (`resumen_clientes_asesor()`) es más rico: además de solicitudes de afiliación (`origen: 'solicitud_afiliacion'`, con `estado_afiliacion`), el asesor también ve asociados YA afiliados (`origen: 'asociado'`), que pueden tener su propio estado de crédito (`estado_credito`: pendiente/aprobado/rechazado/ninguno) pero no tienen `estado_afiliacion`. El lienzo no dice qué tarjeta/chip debe contar a esos asociados.
+- Datos y reglas: implementé la regla «un asociado ya es, por definición, una afiliación Aprobada» (agrupa `origen: 'asociado'` en la tarjeta/chip «Aprobada» sin importar su estado de crédito) — `lib/asesor/resumen.ts`, función `categoriaAfiliacion` (marcada `TODO(diseno: D-06)`). Falta decidir: (a) si esa regla es correcta, o si un asociado con crédito rechazado debería verse distinto de uno recién afiliado; (b) si la columna/chip «Último crédito» de la tabla (En revisión/Aprobado/No aprobado/Sin crédito) debe aparecer en el lienzo con su propio color, o si ya está cubierta por el design system `3a`.
+- Estado: Pendiente

@@ -6,13 +6,15 @@ import { cx } from "./cx";
  * (enviada/revision/aprobada/rechazada) y las 2 de afiliación que no
  * comparten color con crédito (pendiente = revision, contactado = enviada).
  */
-export type EstadoBadge = "enviada" | "revision" | "aprobada" | "rechazada";
+export type EstadoBadge = "enviada" | "revision" | "aprobada" | "rechazada" | "neutral";
 
 const ESTILOS: Record<EstadoBadge, string> = {
   enviada: "bg-ga-gris-azulado text-ga-navy",
   revision: "bg-ga-ambar-fondo text-ga-ambar-texto",
   aprobada: "bg-ga-verde-claro text-ga-verde-oscuro",
   rechazada: "bg-ga-error-fondo text-ga-error-texto",
+  // «Sin crédito» (panel del asesor, pieza 2c): ni bueno ni malo, solo informativo.
+  neutral: "bg-ga-linea-suave text-ga-texto-3",
 };
 
 type BadgeProps = {
