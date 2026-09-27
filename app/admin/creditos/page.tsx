@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PanelCreditos, type FilaCreditoPanel } from "@/components/admin/PanelCreditos";
 import { exigirAdmin } from "@/lib/admin/servidor";
+import { cargarKpisAdmin } from "@/lib/admin/kpis";
+import { cargarPaquetesDemo } from "@/lib/asesor/cargarPaquetesDemo";
 import { formatearPesos } from "@/lib/cuenta";
 
 export const metadata: Metadata = { title: "Créditos · Admin · Green Alliance" };
@@ -36,13 +38,23 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
   // existía (antes solo pedía nombre_completo y cedula): son columnas que ya
   // están en el esquema, para el historial y el «Celular» del detalle (pieza
   // 2d). No es una consulta nueva, solo 2 columnas más de la misma.
-  const { data, error } = await supabase
-    .from("solicitudes_credito")
-    .select(
-      "id, estado, monto_solicitado, porcentaje_devolucion, tasa_interes_mensual, grado, fecha_solicitud, fecha_respuesta, motivo_rechazo, perfiles:asociado_id(nombre_completo, cedula, telefono)",
-    )
-    .eq("estado", estado)
-    .order("fecha_solicitud", { ascending: false });
+  //
+  // Los KPI (cargarKpisAdmin) y los topes reales (cargarPaquetesDemo) son
+  // consultas aparte, en paralelo: no dependen de la lista filtrada por
+  // pestaña y por eso ahora son exactos sin importar qué estado se esté
+  // viendo (antes «Afiliaciones pendientes» quedaba en «—» y los otros 2
+  // KPI solo eran correctos en la pestaña «aprobado»).
+  const [{ data, error }, kpis, paquetesPorGrado] = await Promise.all([
+    supabase
+      .from("solicitudes_credito")
+      .select(
+        "id, estado, monto_solicitado, porcentaje_devolucion, tasa_interes_mensual, grado, fecha_solicitud, fecha_respuesta, motivo_rechazo, perfiles:asociado_id(nombre_completo, cedula, telefono)",
+      )
+      .eq("estado", estado)
+      .order("fecha_solicitud", { ascending: false }),
+    cargarKpisAdmin(supabase),
+    cargarPaquetesDemo(supabase, "admin_creditos_grados_fallo"),
+  ]);
 
   const crudas = (data ?? []) as unknown as FilaCruda[];
   const filas: FilaCreditoPanel[] = crudas.map((f) => ({
@@ -60,21 +72,6 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
     telefono: f.perfiles?.telefono ?? null,
   }));
 
-  // «Aprobados este mes» / «Monto aprobado este mes»: solo se pueden calcular
-  // sin una consulta nueva cuando la lista YA cargada es la de aprobados
-  // (filtra por mes en memoria, sobre datos que ya llegaron). En las otras
-  // pestañas quedan sin dato (TODO(backend) más abajo).
-  let aprobadosEsteMes: number | undefined;
-  let montoAprobadoEsteMes: string | undefined;
-  if (estado === "aprobado") {
-    const inicioMes = new Date();
-    inicioMes.setDate(1);
-    inicioMes.setHours(0, 0, 0, 0);
-    const esteMes = filas.filter((f) => f.fecha_respuesta && new Date(f.fecha_respuesta) >= inicioMes);
-    aprobadosEsteMes = esteMes.length;
-    montoAprobadoEsteMes = formatearPesos(esteMes.reduce((acc, f) => acc + f.monto_solicitado, 0));
-  }
-
   return (
     <AdminShell nombre={nombre} seccion="creditos" contadorSeccionActual={estado === "pendiente" ? filas.length : undefined}>
       {error ? (
@@ -86,15 +83,12 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
           filas={filas}
           estadoFiltro={estado}
           conteoFiltroActual={filas.length}
+          paquetesPorGrado={paquetesPorGrado}
           kpis={{
-            creditosPendientes: estado === "pendiente" ? filas.length : undefined,
-            // TODO(backend): «Afiliaciones pendientes» necesita el conteo de
-            // OTRA tabla (solicitudes_afiliacion), que esta página no carga.
-            // Sin consulta nueva no se puede mostrar aquí — ver
-            // docs/auditorias/2026-09-25-backend-rediseno-c-plus.md, fila «KPIs del admin».
-            afiliacionesPendientes: undefined,
-            aprobadosEsteMes,
-            montoAprobadoEsteMes,
+            creditosPendientes: kpis.creditosPendientes,
+            afiliacionesPendientes: kpis.afiliacionesPendientes,
+            aprobadosEsteMes: kpis.aprobadosEsteMes,
+            montoAprobadoEsteMes: formatearPesos(kpis.montoAprobadoEsteMes),
           }}
         />
       )}

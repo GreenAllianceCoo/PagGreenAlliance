@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 25-sep-2026 (PR #2 desplegado a producción: cuenta de demostración para administradores en /admin/demo, correo de cualquier dominio, HTML escapado en correos de Resend y espacios de WhatsApp, todo confirmado en vivo; rediseño C+ en la rama rediseno-c-plus: design system, landing e ingreso/afiliación ya maquetados en código (commit local 63d4b4d), lienzo completo también para asociado y admin (piezas 3d–3h), falta maquetar esas dos en código; auditoría de backend con 5 migraciones propuestas — ver docs/avances/Avances_Green_Alliance.xlsx)
+Actualizado: 27-sep-2026 (rediseño C+ en la rama rediseno-c-plus: panel del asociado (commit local 51da63f) y paneles del asesor y del admin en modo oscuro (commit local e39ad72) ya maquetados en código; faltan e2e, aplicar las migraciones de backend de 1.8 y ajustar KPIs/tope/nota interna del admin a datos reales — ver docs/avances/Avances_Green_Alliance.xlsx)
 
 ## Dónde quedamos
 

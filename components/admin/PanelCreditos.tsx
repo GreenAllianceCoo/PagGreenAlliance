@@ -11,8 +11,9 @@ import { coincideBusqueda } from "@/lib/admin/busqueda";
 import { formatearFecha, formatearPesos } from "@/lib/cuenta";
 import { formatTasa } from "@/lib/credito";
 import { enmascararCedula } from "@/lib/mascara";
-import { PAQUETES_DEMO } from "@/lib/asesor/datosDemo";
+import { PAQUETES_DEMO, type PaqueteDemo } from "@/lib/asesor/datosDemo";
 import type { CodigoGrado } from "@/lib/validaciones/afiliacion";
+import { HISTORIAL_NOTAS_INTERNAS_HABILITADO } from "@/lib/admin/flags";
 
 export type EstadoCredito = "pendiente" | "aprobado" | "rechazado";
 
@@ -37,17 +38,21 @@ const ESTADOS = ["pendiente", "aprobado", "rechazado"] as const;
 
 /**
  * Tope del paquete (grado + porcentaje) para el aviso «Dentro/Supera el
- * tope». La página no carga `grados_credito` (evitar una consulta nueva),
- * así que se usa la misma copia de referencia que `/asesor/demo` y
- * `/admin/demo` (lib/asesor/datosDemo.ts): son los mismos topes públicos,
- * solo que aquí no hay ida y vuelta a la base para traerlos otra vez.
- * TODO(backend): si `grados_credito` cambia sin desplegar de nuevo esta
- * copia, el aviso puede quedar desactualizado; para un dato siempre exacto
- * habría que unir `grados_credito` en la consulta de la página (nueva
- * consulta, para `ga-funcionalidad-botones`).
+ * tope». `paquetesPorGrado` viene de `cargarPaquetesDemo` (la página de
+ * servidor), que SIEMPRE intenta leer primero los topes reales de
+ * `grados_credito`; solo cae a la copia de referencia (`PAQUETES_DEMO`) si
+ * esa consulta falla. Así el aviso —y el bloqueo de «Aprobar» que depende de
+ * él— usa el tope vigente de verdad, no una copia que puede desactualizarse.
+ * De todos modos, aunque la UI se equivocara, el servidor (trigger
+ * `chk_monto_solicitud` + `validar_monto_solicitud`) es quien de verdad
+ * impide guardar un monto sobre el tope: esto es solo el aviso visual.
  */
-function topeDelPaquete(grado: string, porcentaje: "50" | "100"): number | undefined {
-  const paquetes = PAQUETES_DEMO[grado as CodigoGrado];
+function topeDelPaquete(
+  paquetesPorGrado: Record<CodigoGrado, PaqueteDemo[]>,
+  grado: string,
+  porcentaje: "50" | "100",
+): number | undefined {
+  const paquetes = paquetesPorGrado[grado as CodigoGrado] ?? PAQUETES_DEMO[grado as CodigoGrado];
   return paquetes?.find((p) => p.porcentaje === porcentaje)?.capacidad_maxima;
 }
 
@@ -56,11 +61,13 @@ type Props = {
   estadoFiltro: EstadoCredito;
   /** Conteos de las 3 pestañas: solo la activa es exacta (viene de esta misma consulta); las otras 2 quedan sin número. */
   conteoFiltroActual: number;
+  /** Topes reales de `grados_credito` (con la copia de referencia como respaldo), para el aviso «Dentro/Supera el tope». */
+  paquetesPorGrado: Record<CodigoGrado, PaqueteDemo[]>;
   kpis: {
-    creditosPendientes?: number;
-    afiliacionesPendientes?: number;
-    aprobadosEsteMes?: number;
-    montoAprobadoEsteMes?: string;
+    creditosPendientes: number;
+    afiliacionesPendientes: number;
+    aprobadosEsteMes: number;
+    montoAprobadoEsteMes: string;
   };
 };
 
@@ -69,7 +76,7 @@ type Props = {
  * estado, lista + detalle en la misma vista, aprobar en 2 pasos, rechazar
  * con motivo obligatorio, toast y atajos J/K/A/R/Esc.
  */
-export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, kpis }: Props) {
+export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquetesPorGrado, kpis }: Props) {
   const [busqueda, setBusqueda] = useState("");
   const filtradas = useMemo(() => filas.filter((f) => coincideBusqueda(busqueda, f.nombre, f.cedula)), [filas, busqueda]);
 
@@ -184,10 +191,11 @@ export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, kpis }:
         {seleccionado ? (
           <DetalleCredito
             // `key`: al cambiar de fila se remonta y su estado local (paso de
-            // confirmación, nota interna, resultado de la Server Action)
-            // arranca de nuevo, sin necesitar un efecto que lo reinicie.
+            // confirmación, resultado de la Server Action) arranca de nuevo,
+            // sin necesitar un efecto que lo reinicie.
             key={seleccionado.id}
             fila={seleccionado}
+            paquetesPorGrado={paquetesPorGrado}
             onResuelto={(mensaje) => setToast(mensaje)}
           />
         ) : (
@@ -204,9 +212,16 @@ export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, kpis }:
 
 /** Ficha de una solicitud (columna derecha): un componente aparte para que
  * el `key={fila.id}` del padre reinicie su estado local al cambiar de fila. */
-function DetalleCredito({ fila, onResuelto }: { fila: FilaCreditoPanel; onResuelto: (mensaje: string) => void }) {
+function DetalleCredito({
+  fila,
+  paquetesPorGrado,
+  onResuelto,
+}: {
+  fila: FilaCreditoPanel;
+  paquetesPorGrado: Record<CodigoGrado, PaqueteDemo[]>;
+  onResuelto: (mensaje: string) => void;
+}) {
   const [paso, setPaso] = useState<"idle" | "aprobar" | "rechazar">("idle");
-  const [notaInterna, setNotaInterna] = useState("");
   const [estadoAccion, accion] = useActionState(resolverCredito, VACIO);
 
   // Notifica al padre (toast) cuando la Server Action termina con éxito. No
@@ -233,7 +248,7 @@ function DetalleCredito({ fila, onResuelto }: { fila: FilaCreditoPanel; onResuel
     return () => window.removeEventListener("keydown", alTeclado);
   }, [fila.estado]);
 
-  const tope = topeDelPaquete(fila.grado, fila.porcentaje_devolucion);
+  const tope = topeDelPaquete(paquetesPorGrado, fila.grado, fila.porcentaje_devolucion);
   const dentroDelTope = tope !== undefined ? fila.monto_solicitado <= tope : undefined;
 
   return (
@@ -356,25 +371,14 @@ function DetalleCredito({ fila, onResuelto }: { fila: FilaCreditoPanel; onResuel
         </form>
       )}
 
-      <div className="flex flex-col gap-2">
-        <label htmlFor="nota-interna" className="text-14 font-bold">
-          Nota interna <span className="font-medium text-admin-texto-3">· solo la ve el equipo</span>
-        </label>
-        <textarea
-          id="nota-interna"
-          rows={2}
-          value={notaInterna}
-          onChange={(e) => setNotaInterna(e.target.value)}
-          placeholder="Ej.: Llamó para confirmar el plazo."
-          // TODO(backend): no hay dónde guardar esto todavía —
-          // supabase/migrations/20260925200200_historial_y_notas_internas.sql
-          // (función agregar_nota_solicitud) está propuesta, sin aplicar.
-          className="resize-none rounded-12 bg-admin-fondo p-3 text-16 leading-140 text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] outline-none focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-admin-verde)]"
-        />
-        <p className="m-0 text-12 text-admin-texto-3">
-          Por ahora no se guarda: falta conectar el historial (ver TODO(backend) en el código).
-        </p>
-      </div>
+      {/* TODO(backend: migración 20260925200200_historial_y_notas_internas.sql
+          sin aplicar): la nota interna se queda OCULTA en vez de mostrarse
+          sin guardar nada — un textarea visible que no persiste podría
+          hacerle perder al admin una nota que cree que ya quedó guardada.
+          Cuando esa migración se aplique, poner HISTORIAL_NOTAS_INTERNAS_HABILITADO
+          en `true` (lib/admin/flags.ts) y conectar este campo a la Server
+          Action que llame a `agregar_nota_solicitud`. */}
+      {HISTORIAL_NOTAS_INTERNAS_HABILITADO ? <NotaInternaCredito /> : null}
 
       <div className="flex flex-col gap-2.5">
         <span className="text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Historial</span>
@@ -384,6 +388,31 @@ function DetalleCredito({ fila, onResuelto }: { fila: FilaCreditoPanel; onResuel
         ) : null}
       </div>
     </section>
+  );
+}
+
+/**
+ * Nota interna (crédito): solo se monta cuando `HISTORIAL_NOTAS_INTERNAS_HABILITADO`
+ * es `true` (lib/admin/flags.ts), es decir, cuando ya exista dónde guardarla
+ * (ver TODO(backend) en el lugar donde se usa este componente). Mientras
+ * tanto queda fuera de la vista para no insinuar que algo se guarda.
+ */
+function NotaInternaCredito() {
+  const [notaInterna, setNotaInterna] = useState("");
+  return (
+    <div className="flex flex-col gap-2">
+      <label htmlFor="nota-interna" className="text-14 font-bold">
+        Nota interna <span className="font-medium text-admin-texto-3">· solo la ve el equipo</span>
+      </label>
+      <textarea
+        id="nota-interna"
+        rows={2}
+        value={notaInterna}
+        onChange={(e) => setNotaInterna(e.target.value)}
+        placeholder="Ej.: Llamó para confirmar el plazo."
+        className="resize-none rounded-12 bg-admin-fondo p-3 text-16 leading-140 text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] outline-none focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-admin-verde)]"
+      />
+    </div>
   );
 }
 

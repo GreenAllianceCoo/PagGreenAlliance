@@ -9,6 +9,7 @@ import { FotoAfiliacion } from "./FotoAfiliacion";
 import { ToastAdmin } from "./ToastAdmin";
 import { enmascararCedula } from "@/lib/mascara";
 import { formatearFecha } from "@/lib/cuenta";
+import { HISTORIAL_NOTAS_INTERNAS_HABILITADO } from "@/lib/admin/flags";
 import type { FilaListaAfiliacion } from "@/app/admin/afiliaciones/_datos";
 
 const INSTITUCIONES: Record<string, string> = { policia: "Policía Nacional", ejercito: "Ejército Nacional" };
@@ -45,7 +46,6 @@ type Props = {
 export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas }: Props) {
   const router = useRouter();
   const [toast, setToast] = useState<string | null>(null);
-  const [notaInterna, setNotaInterna] = useState("");
 
   useEffect(() => {
     function alTeclado(e: KeyboardEvent) {
@@ -166,24 +166,12 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas }: Props) {
           Escribir por WhatsApp
         </button>
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor="nota-interna-afiliacion" className="text-14 font-bold">
-            Nota interna <span className="font-medium text-admin-texto-3">· solo la ve el equipo</span>
-          </label>
-          <textarea
-            id="nota-interna-afiliacion"
-            rows={2}
-            value={notaInterna}
-            onChange={(e) => setNotaInterna(e.target.value)}
-            placeholder="Ej.: Contestó por WhatsApp, confirmó su correo personal."
-            // TODO(backend): igual que en créditos (pieza 2d), falta aplicar
-            // supabase/migrations/20260925200200_historial_y_notas_internas.sql.
-            className="resize-none rounded-12 bg-admin-fondo p-3 text-16 leading-140 text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] outline-none focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-admin-verde)]"
-          />
-          <p className="m-0 text-12 text-admin-texto-3">
-            Por ahora no se guarda: falta conectar el historial (ver TODO(backend) en el código).
-          </p>
-        </div>
+        {/* TODO(backend: migración 20260925200200_historial_y_notas_internas.sql
+            sin aplicar): igual que en créditos (pieza 2d), la nota interna
+            se queda OCULTA en vez de mostrarse sin guardar nada. Cuando esa
+            migración se aplique, poner HISTORIAL_NOTAS_INTERNAS_HABILITADO
+            en `true` (lib/admin/flags.ts) y conectarla a `agregar_nota_solicitud`. */}
+        {HISTORIAL_NOTAS_INTERNAS_HABILITADO ? <NotaInternaAfiliacion /> : null}
 
         <div className="flex flex-col gap-2">
           <span className="text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Historial</span>
@@ -205,6 +193,31 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas }: Props) {
       </section>
 
       <ToastAdmin mensaje={toast} onCerrar={() => setToast(null)} />
+    </div>
+  );
+}
+
+/**
+ * Nota interna (afiliación): solo se monta cuando
+ * `HISTORIAL_NOTAS_INTERNAS_HABILITADO` es `true` (lib/admin/flags.ts), es
+ * decir, cuando ya exista dónde guardarla. Mientras tanto queda fuera de la
+ * vista para no insinuar que algo se guarda.
+ */
+function NotaInternaAfiliacion() {
+  const [notaInterna, setNotaInterna] = useState("");
+  return (
+    <div className="flex flex-col gap-2">
+      <label htmlFor="nota-interna-afiliacion" className="text-14 font-bold">
+        Nota interna <span className="font-medium text-admin-texto-3">· solo la ve el equipo</span>
+      </label>
+      <textarea
+        id="nota-interna-afiliacion"
+        rows={2}
+        value={notaInterna}
+        onChange={(e) => setNotaInterna(e.target.value)}
+        placeholder="Ej.: Contestó por WhatsApp, confirmó su correo personal."
+        className="resize-none rounded-12 bg-admin-fondo p-3 text-16 leading-140 text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] outline-none focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-admin-verde)]"
+      />
     </div>
   );
 }
