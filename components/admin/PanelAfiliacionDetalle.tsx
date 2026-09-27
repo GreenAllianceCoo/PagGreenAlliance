@@ -7,7 +7,6 @@ import { AccionesAfiliacion } from "./AccionesAfiliacion";
 import { ChipEstado, type EstadoAdmin } from "./ChipEstado";
 import { FotoAfiliacion } from "./FotoAfiliacion";
 import { ToastAdmin } from "./ToastAdmin";
-import { enmascararCedula } from "@/lib/mascara";
 import { formatearFecha } from "@/lib/cuenta";
 import { HISTORIAL_NOTAS_INTERNAS_HABILITADO } from "@/lib/admin/flags";
 import type { FilaListaAfiliacion } from "@/app/admin/afiliaciones/_datos";
@@ -84,7 +83,7 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas }: Props) {
           >
             <span className="flex flex-col gap-0.5 truncate">
               <span className="truncate text-15 font-extrabold text-white">{h.nombre}</span>
-              <span className="text-13 tracking-cedula text-admin-texto-3">{enmascararCedula(h.cedula)}</span>
+              <span className="text-13 tracking-cedula text-admin-texto-3">{h.cedula}</span>
             </span>
             <span className="text-14 text-admin-texto-2">{h.grado}</span>
             <span className="text-14 text-admin-texto-2">{formatearFecha(h.created_at)}</span>

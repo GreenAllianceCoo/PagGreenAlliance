@@ -11,7 +11,15 @@ import {
   limpiarLimites,
   llenarAfiliacion,
   pedirCodigo,
+  textoVisible,
 } from "./utils";
+
+/** Sin errores de JavaScript en la página (`pageerror`), útil para las pruebas de abajo. */
+function sinErroresDePagina(page: import("@playwright/test").Page) {
+  const errores: string[] = [];
+  page.on("pageerror", (e) => errores.push(e.message));
+  return errores;
+}
 
 /** F. Accesibilidad básica: axe (serias/críticas), teclado, foco visible, labels. */
 
@@ -101,7 +109,7 @@ test.describe("F · axe sin violaciones serias o críticas", () => {
     await axe(page, "afiliacion", testInfo);
     await todosConLabel(page);
     await page.getByRole("button", { name: "Enviar solicitud" }).click();
-    await expect(page.locator("#af-nombre-error")).toBeVisible();
+    await expect(page.locator("#af-nombres-error")).toBeVisible();
     await axe(page, "afiliacion-errores", testInfo);
   });
   test("/afiliacion/enviada", async ({ page }, testInfo) => {
@@ -158,13 +166,30 @@ test.describe("F · Solo teclado", () => {
     await expect(page.getByText("El código no es válido o ya venció")).toBeVisible();
   });
 
-  test("/afiliacion: orden de Tab, Espacio marca la casilla, trampa fuera del orden", async ({ page }, testInfo) => {
+  test("/afiliacion: orden de Tab, Espacio marca la casilla, trampa fuera del orden", async ({ page }) => {
     await page.goto("/afiliacion");
     await page.waitForLoadState("networkidle");
-    const esperado = esEscritorio(testInfo)
-      ? ["af-nombre", "af-cc", "af-grado", "af-cel", "af-email", "af-unidad", "af-msg", "af-datos", "politica", "enviar"]
-      : ["af-nombre", "af-cc", "af-grado", "af-unidad", "af-cel", "af-email", "af-msg", "af-datos", "politica", "enviar"];
-    await page.locator("#af-nombre").focus();
+    // Formulario v2 (spec-fase-2 §2): sin reordenar por CSS entre viewports,
+    // el orden del DOM es el mismo en escritorio y celular.
+    const esperado = [
+      "af-nombres",
+      "af-apellidos",
+      "af-cc",
+      "af-grado",
+      "af-nequi",
+      "af-institucion",
+      "af-cel",
+      "af-email",
+      "af-asesor",
+      "af-foto-frente",
+      "af-foto-reverso",
+      "af-foto-selfie",
+      "af-msg",
+      "af-datos",
+      "politica",
+      "enviar",
+    ];
+    await page.locator("#af-nombres").focus();
     const vistos: string[] = [];
     for (let i = 0; i < esperado.length; i++) {
       const id = await page.evaluate(() => {
@@ -210,5 +235,64 @@ test.describe("F · Solo teclado", () => {
     expect(nombres).toContain("Guardar");
     expect(nombres).toMatch(esEscritorio(testInfo) ? /Salir/ : /Cerrar sesión/);
     await ctx.close();
+  });
+});
+
+/**
+ * G (accesibilidad) · `prefers-reduced-motion: reduce`: todas las
+ * animaciones del rediseño C+ (comprobante que avanza solo, sello girando,
+ * aro de reenvío, confeti del sorteo) están condicionadas con
+ * `motion-safe:`/`motion-reduce:` o miran `matchMedia`. Se emula con
+ * `reducedMotion: "reduce"` (Playwright) y se comprueba que nada se rompe:
+ * ni errores de consola ni contenido que dependa de que la animación termine.
+ */
+test.describe("F · prefers-reduced-motion: reduce", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  test("Landing: el comprobante «Tu solicitud» queda fijo, sin errores", async ({ page }) => {
+    const errores = sinErroresDePagina(page);
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    // El texto visible (innerText) ya distingue la variante móvil/escritorio
+    // que corresponde al viewport (la otra está detrás de un `lg:hidden` /
+    // `hidden lg:block`, así que no cuenta): más robusto que getByText().first(),
+    // que puede resolver a la variante oculta según el orden del DOM.
+    const antes = await textoVisible(page);
+    expect(antes).toContain("En revisión");
+    // Sigue en el mismo paso más de 3 s (con movimiento normal ya habría avanzado, cada 2.6 s).
+    await page.waitForTimeout(3000);
+    const despues = await textoVisible(page);
+    expect(despues).toBe(antes);
+    expect(errores).toEqual([]);
+  });
+
+  test("Afiliación enviada: el sello no gira ni rompe nada", async ({ page }) => {
+    const errores = sinErroresDePagina(page);
+    await page.goto("/afiliacion");
+    await llenarAfiliacion(page, datosValidos());
+    await page.locator("#af-sitio").evaluate((el: HTMLInputElement) => (el.value = "x"));
+    await page.getByRole("button", { name: "Enviar solicitud" }).click();
+    await expect(page).toHaveURL(/\/afiliacion\/enviada$/);
+    await expect(page.locator("h1")).toHaveText("¡Solicitud enviada!");
+    expect(errores).toEqual([]);
+  });
+
+  test("/cuenta: sello y tarjetas visibles, sin errores", async ({ browser }, testInfo) => {
+    const ctx = await contextoConSesion(browser, "conSolicitud", testInfo);
+    const page = await ctx.newPage();
+    const errores = sinErroresDePagina(page);
+    await page.goto("/cuenta");
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByText("Tu solicitud", { exact: true })).toBeVisible();
+    expect(errores).toEqual([]);
+    await ctx.close();
+  });
+
+  test("/ingresar/codigo: el aro de reenvío no anima, sigue usable", async ({ page }) => {
+    const errores = sinErroresDePagina(page);
+    await limpiarLimites();
+    await pedirCodigo(page, CEDULA_NO_REGISTRADA);
+    await expect(page.getByRole("button", { name: "Reenviar código" })).toBeVisible();
+    expect(errores).toEqual([]);
   });
 });

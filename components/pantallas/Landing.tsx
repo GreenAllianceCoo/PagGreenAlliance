@@ -319,6 +319,8 @@ export function Landing({ estadisticas, testimonios, convenios, whatsapp, correo
         {/* Historias: no está en la pieza 2a del lienzo C+, se conserva con el estilo nuevo
             (docs/diseno/pedidos.md no tiene pedido abierto para esto: es contenido que ya
             existía en la landing anterior y la regla del encargo pide conservarlo). */}
+        {/* Se oculta mientras los testimonios sean de ejemplo ([entre corchetes]): falta el contenido real de la cooperativa (D-07). */}
+        {testimonios.length > 0 && !testimonios.some((t) => /[.*]/.test(t.texto + t.autor)) ? (
         <section
           id="c-historias"
           className="flex scroll-mt-4 flex-col gap-5 bg-ga-navy px-4 py-12 text-white lg:gap-8 lg:px-16 lg:py-16"
@@ -335,6 +337,7 @@ export function Landing({ estadisticas, testimonios, convenios, whatsapp, correo
             ))}
           </div>
         </section>
+        ) : null}
 
         {/* Empresas en convenio */}
         <section id="c-convenios" className="mx-auto flex w-full scroll-mt-4 max-w-[1280px] flex-col gap-5 px-4 py-11 lg:gap-6 lg:px-16 lg:py-20">

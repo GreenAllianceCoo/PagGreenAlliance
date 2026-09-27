@@ -6,6 +6,7 @@ import { PanelAfiliacionDetalle } from "@/components/admin/PanelAfiliacionDetall
 import { IconoVolver } from "@/components/ui/Iconos";
 import { exigirAdmin } from "@/lib/admin/servidor";
 import { urlsFirmadasAfiliacion } from "@/lib/admin/fotos";
+import { enmascararCedula } from "@/lib/mascara";
 import { esEstadoAfiliacionValido, listarSolicitudesAfiliacion } from "../_datos";
 
 export const metadata: Metadata = { title: "Solicitud de afiliación · Admin · Green Alliance" };
@@ -67,7 +68,8 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
           created_at: solicitud.created_at,
         }}
         fotos={fotos}
-        hermanas={hermanas}
+        // La cédula de las «hermanas» sale ya enmascarada del servidor: solo la de la ficha abierta viaja completa.
+        hermanas={hermanas.map((h) => ({ ...h, cedula: enmascararCedula(h.cedula) }))}
       />
     </AdminShell>
   );

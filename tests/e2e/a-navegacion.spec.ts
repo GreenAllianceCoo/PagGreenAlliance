@@ -46,13 +46,13 @@ test.describe("A · Landing /", () => {
     expect(await h1(page)).toBe(H1["/"]);
   });
 
-  test("Anclas del nav (escritorio): Apoyos, Historias, Convenios", async ({ page }, testInfo) => {
+  test("Anclas del nav (escritorio): Apoyos, Cómo funciona, Convenios", async ({ page }, testInfo) => {
     test.skip(!esEscritorio(testInfo), "El nav de anclas solo existe en escritorio.");
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: "Principal" });
     for (const [texto, id] of [
       ["Apoyos", "#c-apoyos"],
-      ["Historias", "#c-historias"],
+      ["Cómo funciona", "#c-como-funciona"],
       ["Convenios", "#c-convenios"],
     ] as const) {
       await page.evaluate(() => window.scrollTo(0, 0));
