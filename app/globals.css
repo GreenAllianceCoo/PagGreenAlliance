@@ -187,6 +187,27 @@
   cursor: pointer;
 }
 
+/* ---------------------------------------------------------------------
+ * Barra inferior flotante de /cuenta y /asesor (piezas 2b/2c): en celular
+ * vertical es un `position: fixed` sobre una píldora blanca. Hallazgo #1 de
+ * docs/verificaciones/2026-09-27-rediseno-c-plus-responsive.md: en celular
+ * ACOSTADO (844x390) el viewport es tan bajo que la franja final de la
+ * pantalla (donde cae fija esta barra) coincide con contenido real que
+ * todavía no se ha scrolleado (el buscador de «Mis clientes», los pasos de
+ * «Tu solicitud»). Ahí la barra deja de flotar: vuelve a ser parte normal
+ * del documento (donde ya está en el JSX, al final de <main>), así nunca
+ * tapa nada. En vertical (alto ≥ 500px, todos los anchos de celular/tableta
+ * probados) sigue flotando como pide el diseño. */
+.ga-barra-inferior {
+  bottom: max(1rem, calc(env(safe-area-inset-bottom, 0px) + 0.5rem));
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .ga-barra-inferior {
+    position: static;
+    margin: 0.75rem 1.25rem calc(env(safe-area-inset-bottom, 0px) + 1.25rem);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

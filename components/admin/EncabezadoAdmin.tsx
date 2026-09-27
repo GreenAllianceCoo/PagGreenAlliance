@@ -38,9 +38,23 @@ export function EncabezadoAdmin({ nombre, seccion }: EncabezadoAdminProps) {
   }, [menuAbierto]);
 
   return (
-    <header className="relative bg-admin-menu lg:border-b lg:border-admin-borde-sutil lg:bg-transparent">
+    // Hallazgo de contraste (axe, tras el hallazgo #0 del informe responsive
+    // 2026-09-27): en escritorio este encabezado SOLO se ve completo en
+    // /admin/demo (en las otras 4 secciones AdminShell lo envuelve en
+    // `lg:hidden` y usa el menú lateral en su lugar); ahí el fondo de la
+    // página es claro (simula /cuenta), así que `lg:bg-transparent` dejaba el
+    // texto claro pensado para el fondo oscuro del admin (p. ej.
+    // `text-admin-texto-3`) sobre un fondo claro, con muy poco contraste. Se
+    // mantiene el mismo fondo oscuro que ya usa en celular en vez de
+    // transparentarse: es justo el efecto que ya se ve bien ahí (barra
+    // oscura flotando sobre el cuerpo claro de la demo).
+    <header className="relative bg-admin-menu lg:border-b lg:border-admin-borde-sutil">
       <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3 lg:h-[70px] lg:px-8 lg:py-0">
-        <Link href="/admin" aria-label="Ir al panel de administración" className="flex items-center gap-2 lg:gap-2.5">
+        <Link
+          href="/admin"
+          aria-label="Ir al panel de administración"
+          className="flex min-h-11 items-center gap-2 lg:min-h-0 lg:gap-2.5"
+        >
           <Image
             src="/logos/blanco/green-alliance-isotipo-blanco.svg"
             alt=""
@@ -76,7 +90,12 @@ export function EncabezadoAdmin({ nombre, seccion }: EncabezadoAdminProps) {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 text-14 font-bold lg:flex">
+        {/* Sin `text-admin-texto` explícito, este bloque heredaba el color de
+            texto por defecto del sitio (--ga-texto, navy oscuro, pensado para
+            fondos claros): invisible mientras el encabezado era transparente,
+            pero muy poco contraste ahora que /admin/demo lo muestra sobre
+            fondo oscuro de verdad (hallazgo de axe, ver nota de más arriba). */}
+        <div className="hidden items-center gap-3 text-14 font-bold text-admin-texto lg:flex">
           <span className="max-w-[160px] truncate">{nombre}</span>
           <form action={cerrarSesion}>
             <button
@@ -95,7 +114,7 @@ export function EncabezadoAdmin({ nombre, seccion }: EncabezadoAdminProps) {
           aria-expanded={menuAbierto}
           aria-controls={idMenu}
           onClick={() => setMenuAbierto((v) => !v)}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-admin-superficie text-15 lg:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-full bg-admin-superficie text-15 lg:hidden"
         >
           <span aria-hidden="true">☰</span>
           <span className="sr-only">Menú</span>
@@ -110,7 +129,7 @@ export function EncabezadoAdmin({ nombre, seccion }: EncabezadoAdminProps) {
             href={s.href}
             aria-current={seccion === s.clave ? "page" : undefined}
             className={
-              "rounded-full px-3.5 py-2 no-underline " +
+              "inline-flex min-h-11 items-center rounded-full px-3.5 no-underline " +
               (s.clave === seccion ? "bg-admin-superficie-2 text-white" : "text-admin-texto-3")
             }
           >

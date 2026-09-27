@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { ConvenioCard } from "@/components/ui/ConvenioCard";
 import { IconoConvenios, IconoDocumento, IconoMas, IconoSalir } from "@/components/ui/Iconos";
 import { EncabezadoCuenta, RUTA_NUEVA_SOLICITUD } from "@/components/pantallas/EncabezadoCuenta";
+import { BarraInferior } from "@/components/ui/BarraInferior";
 import { PasosSolicitud } from "@/components/ui/PasosSolicitud";
 import { SorteoDelMes, type SorteoDelMesProps } from "@/components/sorteo/SorteoDelMes";
 import { enmascararCedula } from "@/lib/mascara";
@@ -382,26 +383,28 @@ const CLASE_TAB_INFERIOR_INACTIVA = "text-ga-texto-3";
  */
 function BarraInferiorCuenta() {
   return (
-    <nav
-      aria-label="Navegación del asociado"
-      className="fixed inset-x-4 bottom-4 z-30 grid grid-cols-4 gap-1 rounded-full bg-white p-1.5 shadow-comprobante-movil lg:hidden"
-    >
-      <Link href="/cuenta" className={`flex h-13 flex-col items-center justify-center rounded-full text-13 font-extrabold no-underline ${CLASE_TAB_INFERIOR_ACTIVA}`}>
-        Inicio
-      </Link>
-      <Link
-        href={RUTA_NUEVA_SOLICITUD}
-        className={`flex h-13 flex-col items-center justify-center rounded-full text-13 font-bold no-underline ${CLASE_TAB_INFERIOR_INACTIVA}`}
+    <BarraInferior>
+      <nav
+        aria-label="Navegación del asociado"
+        className="grid grid-cols-4 gap-1 rounded-full bg-white p-1.5 shadow-comprobante-movil"
       >
-        Solicitar
-      </Link>
-      <a href="#sorteo" className={`flex h-13 flex-col items-center justify-center rounded-full text-13 font-bold no-underline ${CLASE_TAB_INFERIOR_INACTIVA}`}>
-        Sorteo
-      </a>
-      <a href="#mis-datos" className={`flex h-13 flex-col items-center justify-center rounded-full text-13 font-bold no-underline ${CLASE_TAB_INFERIOR_INACTIVA}`}>
-        Mis datos
-      </a>
-    </nav>
+        <Link href="/cuenta" className={`flex h-13 flex-col items-center justify-center rounded-full text-13 font-extrabold no-underline ${CLASE_TAB_INFERIOR_ACTIVA}`}>
+          Inicio
+        </Link>
+        <Link
+          href={RUTA_NUEVA_SOLICITUD}
+          className={`flex h-13 flex-col items-center justify-center rounded-full text-13 font-bold no-underline ${CLASE_TAB_INFERIOR_INACTIVA}`}
+        >
+          Solicitar
+        </Link>
+        <a href="#sorteo" className={`flex h-13 flex-col items-center justify-center rounded-full text-13 font-bold no-underline ${CLASE_TAB_INFERIOR_INACTIVA}`}>
+          Sorteo
+        </a>
+        <a href="#mis-datos" className={`flex h-13 flex-col items-center justify-center rounded-full text-13 font-bold no-underline ${CLASE_TAB_INFERIOR_INACTIVA}`}>
+          Mis datos
+        </a>
+      </nav>
+    </BarraInferior>
   );
 }
 

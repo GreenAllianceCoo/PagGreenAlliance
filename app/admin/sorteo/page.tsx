@@ -61,32 +61,53 @@ export default async function SorteoPage({
           <span className="text-15 text-admin-texto-3">No hay boletas confirmadas para este mes.</span>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-20 bg-admin-superficie">
-          <table className="w-full min-w-[480px] border-collapse text-15">
-            <thead>
-              <tr className="border-b border-admin-borde-sutil text-left text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
-                <th className="p-4">Boleta</th>
-                <th className="p-4">Nombre</th>
-                <th className="p-4">Cédula</th>
-                <th className="p-4">Confirmada</th>
-              </tr>
-            </thead>
-            <tbody>
-              {boletas.map((b) => (
-                <tr key={b.numero} className="border-b border-admin-borde-sutil last:border-0">
-                  <td className="p-4 font-mono font-extrabold tracking-cedula">{b.numero}</td>
-                  <td className="p-4 font-bold text-white">{b.nombre_completo ?? "—"}</td>
-                  <td className="p-4 text-admin-texto-2">{b.cedula ?? "—"}</td>
-                  <td className="p-4 text-admin-texto-3">
+        <>
+          {/* ≥ lg: tabla, como el resto de las pantallas del admin. */}
+          <div className="hidden overflow-x-auto rounded-20 bg-admin-superficie lg:block">
+            <table className="w-full min-w-[480px] border-collapse text-15">
+              <thead>
+                <tr className="border-b border-admin-borde-sutil text-left text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+                  <th className="p-4">Boleta</th>
+                  <th className="p-4">Nombre</th>
+                  <th className="p-4">Cédula</th>
+                  <th className="p-4">Confirmada</th>
+                </tr>
+              </thead>
+              <tbody>
+                {boletas.map((b) => (
+                  <tr key={b.numero} className="border-b border-admin-borde-sutil last:border-0">
+                    <td className="p-4 font-mono font-extrabold tracking-cedula">{b.numero}</td>
+                    <td className="p-4 font-bold text-white">{b.nombre_completo ?? "—"}</td>
+                    <td className="p-4 text-admin-texto-2">{b.cedula ?? "—"}</td>
+                    <td className="p-4 text-admin-texto-3">
+                      {b.fecha_confirmacion
+                        ? new Date(b.fecha_confirmacion).toLocaleString("es-CO", { dateStyle: "short", timeStyle: "short" })
+                        : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* < lg: tarjetas (mismo patrón que PanelCreditos, /admin/afiliaciones y TablaClientes del asesor). */}
+          <ul className="m-0 flex list-none flex-col gap-2.5 p-0 lg:hidden">
+            {boletas.map((b) => (
+              <li key={b.numero} className="flex flex-col gap-1.5 rounded-16 bg-admin-superficie p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-16 font-extrabold tracking-cedula text-white">{b.numero}</span>
+                  <span className="text-13 text-admin-texto-3">
                     {b.fecha_confirmacion
                       ? new Date(b.fecha_confirmacion).toLocaleString("es-CO", { dateStyle: "short", timeStyle: "short" })
                       : "—"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </span>
+                </div>
+                <span className="text-15 font-bold text-white">{b.nombre_completo ?? "—"}</span>
+                <span className="text-14 text-admin-texto-2">{b.cedula ?? "—"}</span>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </AdminShell>
   );

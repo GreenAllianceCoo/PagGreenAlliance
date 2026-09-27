@@ -18,7 +18,7 @@ export function SelectorMes({ anio, mes, anios }: Props) {
   }
 
   const clasePildora =
-    "h-11 rounded-12 bg-admin-superficie px-4 text-15 font-bold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] outline-none";
+    "h-11 rounded-12 bg-admin-superficie px-4 text-16 font-bold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] outline-none";
 
   return (
     <div className="flex gap-2.5">

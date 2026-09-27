@@ -70,7 +70,7 @@ export default async function SolicitarPage() {
             <Link
               href="/cuenta"
               aria-label="Volver"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ga-fondo-suave text-ga-navy lg:h-11 lg:w-11"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ga-fondo-suave text-ga-navy"
             >
               <IconoVolver tamano={22} grosor={1.8} />
             </Link>
@@ -83,7 +83,7 @@ export default async function SolicitarPage() {
             <button
               type="submit"
               aria-label="Cerrar sesión"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-ga-fondo-suave text-ga-navy"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-ga-fondo-suave text-ga-navy"
             >
               <IconoSalir tamano={22} grosor={1.8} />
             </button>

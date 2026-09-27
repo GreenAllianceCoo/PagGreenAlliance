@@ -101,7 +101,15 @@ export function OtpInput({ name = "codigo", valores = [], longitud = 6, error, o
           de nuevo, aunque el mensaje de error sea el mismo que el intento anterior. */}
       <div
         key={sacudida}
-        className={cx("grid grid-cols-6 gap-1.5 lg:gap-2.5", error && "motion-safe:animate-ga-sacude")}
+        className={cx(
+          // Hallazgo #6 (verificación responsive 2026-09-27): a 320px las 6
+          // casillas quedaban en 40px de ancho (4px bajo el mínimo de toque).
+          // Solo en esa franja angosta se achica el espacio entre casillas y
+          // se «sangra» 6px por lado sobre el padding del formulario (que no
+          // se toca en el resto del sitio) para llegar justo a 44px.
+          "grid grid-cols-6 gap-1.5 [@media(max-width:359px)]:-mx-1.5 [@media(max-width:359px)]:gap-1 lg:mx-0 lg:gap-2.5",
+          error && "motion-safe:animate-ga-sacude",
+        )}
       >
         {actuales.map((valor, i) => (
           <input

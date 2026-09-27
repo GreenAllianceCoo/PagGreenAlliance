@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { EncabezadoAsesor } from "@/components/asesor/EncabezadoAsesor";
+import { BarraInferior } from "@/components/ui/BarraInferior";
 import { registrar } from "@/lib/servidor/registro";
 import { createClient } from "@/lib/supabase/server";
 import { sanitizarFilaResumen, type FilaResumenAsesor } from "@/lib/asesor/resumen";
@@ -98,18 +99,20 @@ export default async function AsesorPage() {
  */
 function BarraInferiorAsesor({ accionSalir }: { accionSalir?: (formData: FormData) => void }) {
   return (
-    <nav
-      aria-label="Navegación del asesor"
-      className="fixed inset-x-4 bottom-4 z-30 grid grid-cols-2 gap-1 rounded-full bg-white p-1.5 shadow-comprobante-movil lg:hidden"
-    >
-      <span className="flex h-13 items-center justify-center rounded-full bg-ga-verde-claro text-13 font-extrabold text-ga-verde-oscuro">
-        Clientes
-      </span>
-      <form action={accionSalir} className="contents">
-        <button type="submit" className="flex h-13 items-center justify-center rounded-full text-13 font-bold text-ga-texto-3">
-          Salir
-        </button>
-      </form>
-    </nav>
+    <BarraInferior>
+      <nav
+        aria-label="Navegación del asesor"
+        className="grid grid-cols-2 gap-1 rounded-full bg-white p-1.5 shadow-comprobante-movil"
+      >
+        <span className="flex h-13 items-center justify-center rounded-full bg-ga-verde-claro text-13 font-extrabold text-ga-verde-oscuro">
+          Clientes
+        </span>
+        <form action={accionSalir} className="contents">
+          <button type="submit" className="flex h-13 items-center justify-center rounded-full text-13 font-bold text-ga-texto-3">
+            Salir
+          </button>
+        </form>
+      </nav>
+    </BarraInferior>
   );
 }

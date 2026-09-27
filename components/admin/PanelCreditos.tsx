@@ -129,7 +129,7 @@ export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquete
         <TarjetaKpi etiqueta="Monto aprobado este mes" valor={kpis.montoAprobadoEsteMes} tono="verde" />
       </div>
 
-      <nav aria-label="Filtrar por estado" className="flex gap-2">
+      <nav aria-label="Filtrar por estado" className="flex flex-wrap gap-2">
         {ESTADOS.map((e) => (
           <Link
             key={e}
