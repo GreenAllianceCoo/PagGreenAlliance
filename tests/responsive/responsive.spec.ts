@@ -6,13 +6,27 @@ import { esperarCodigo, esperarVentanaReenvio, llenarOtp, pedirCodigo, USUARIOS 
 /**
  * Revisión responsive completa (ga-verificador-responsive). Solo mide y captura; no toca la app.
  *   npx playwright test -c tests/responsive responsive.spec.ts
- * Sesión: cédula 1234567891 (sinSolicitudes) con el código de Mailpit. No limpia límites
- * (otro agente puede estar probándolos): si el ingreso falla, las rutas con sesión se marcan.
+ * Sesión asociado: cédula 1234567891 (sinSolicitudes). Sesión asesor: 1234567892. Sesión admin:
+ * 1234567899 (mismas cuentas de tests/e2e/k-roles.spec.ts, seed.sql). No limpia límites (otro
+ * agente puede estar probándolos): si el ingreso falla, las rutas con esa sesión se marcan.
  * Capturas: docs/verificaciones/responsive-AAAA-MM-DD/<ruta>-<ancho>.png
+ *
+ * Actualizado 2026-09-27 para el rediseño C+ (rama rediseno-c-plus):
+ * - El nav de la landing ya no tiene «Historias»: ahora es «Cómo funciona» (#c-como-funciona).
+ * - La landing ya no tiene espacios de foto (EspacioFoto quedó sin uso); la prueba de esa
+ *   sección se quitó. La ilustración del hero (manchas + MatrizCirculos + ComprobanteSolicitud)
+ *   se revisa con la misma prueba de scroll horizontal / recortes, más una captura dedicada.
+ * - La sección de testimonios está oculta mientras el contenido sea de ejemplo (ver Landing.tsx);
+ *   no se prueba ese bloque a propósito.
+ * - Se agregan /asesor, /asesor/demo y las 5 secciones de /admin (header píldora + barra
+ *   inferior flotante en /cuenta y /asesor; menú lateral de 248 px + barra/pestañas en /admin).
+ * - `design/*.dc.html` quedó obsoleto para /ingresar, /afiliacion y sus pantallas (ahora siguen
+ *   las piezas 3b/3c/3d de `docs/Green Alliance C+.dc.html`): la prueba que comparaba contra
+ *   `design/` se reemplazó por una que captura esas piezas del lienzo C+ como referencia.
  */
 
 const RAIZ = path.resolve(__dirname, "..", "..");
-const FECHA = process.env.FECHA_REVISION ?? "2026-09-23";
+const FECHA = process.env.FECHA_REVISION ?? "2026-09-27";
 const CAPTURAS = path.join(RAIZ, "docs", "verificaciones", `responsive-${FECHA}`);
 const DATOS = path.join(RAIZ, "test-results", "responsive");
 const AUTH = path.join(RAIZ, "test-results", ".auth");
@@ -20,10 +34,12 @@ fs.mkdirSync(CAPTURAS, { recursive: true });
 fs.mkdirSync(DATOS, { recursive: true });
 const JSONL = path.join(DATOS, `responsive-${FECHA}.jsonl`);
 
-const ANCHOS = (process.env.ANCHOS ?? "360,390,640,767,768,1023,1024,1280,1440").split(",").map(Number);
+const ANCHOS = (process.env.ANCHOS ?? "320,360,390,414,768,834,1024,1280,1440,1920").split(",").map(Number);
 const ALTO = 900;
+/** 390 en horizontal (pedido explícito del encargo): mismo ancho lógico que un celular grande, mucho menos alto. */
+const LANDSCAPE = { width: 844, height: 390 };
 
-type Sesion = "ninguna" | "codigo" | "cuenta" | "enviada";
+type Sesion = "ninguna" | "codigo" | "cuenta" | "enviada" | "asesor" | "admin";
 const RUTAS: Array<{ ruta: string; sesion: Sesion }> = [
   { ruta: "/", sesion: "ninguna" },
   { ruta: "/ingresar", sesion: "ninguna" },
@@ -33,6 +49,13 @@ const RUTAS: Array<{ ruta: string; sesion: Sesion }> = [
   { ruta: "/cuenta", sesion: "cuenta" },
   { ruta: "/cuenta/solicitar", sesion: "cuenta" },
   { ruta: "/politica-de-datos", sesion: "ninguna" },
+  { ruta: "/asesor", sesion: "asesor" },
+  { ruta: "/asesor/demo", sesion: "asesor" },
+  { ruta: "/admin/afiliaciones", sesion: "admin" },
+  { ruta: "/admin/creditos", sesion: "admin" },
+  { ruta: "/admin/asesores", sesion: "admin" },
+  { ruta: "/admin/sorteo", sesion: "admin" },
+  { ruta: "/admin/demo", sesion: "admin" },
 ];
 
 const nombreRuta = (r: string) => (r === "/" ? "landing" : r.slice(1).replace(/\//g, "_"));
@@ -60,6 +83,28 @@ async function prepararSesiones(browser: Browser) {
   await ctx.close();
 }
 
+/** Sesión de asesor o admin (tests/e2e/k-roles.spec.ts: mismas cédulas del seed local). */
+async function prepararSesionRol(browser: Browser, clave: "asesor" | "admin") {
+  if (estados[clave]) return;
+  const datos =
+    clave === "admin"
+      ? { cedula: "1234567899", correo: "admin.prueba@greenalliance.test", destino: "**/admin" }
+      : { cedula: "1234567892", correo: "asesor.prueba@greenalliance.test", destino: "**/asesor" };
+  const archivo = path.join(AUTH, `responsive-${clave}.json`);
+  fs.mkdirSync(AUTH, { recursive: true });
+  const ctx = await browser.newContext();
+  const p = await ctx.newPage();
+  await esperarVentanaReenvio(datos.correo);
+  const inicio = await pedirCodigo(p, datos.cedula);
+  const codigo = await esperarCodigo(datos.correo, inicio);
+  await llenarOtp(p, codigo);
+  await p.getByRole("button", { name: "Entrar a mi cuenta" }).click();
+  await p.waitForURL(datos.destino);
+  await ctx.storageState({ path: archivo });
+  estados[clave] = archivo;
+  await ctx.close();
+}
+
 /** Cookie «flash» de /afiliacion/enviada con el campo trampa (no guarda ni envía correos). */
 async function prepararEnviada(browser: Browser) {
   if (estados.enviada) return;
@@ -67,11 +112,29 @@ async function prepararEnviada(browser: Browser) {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const p = await ctx.newPage();
   await p.goto("/afiliacion", { waitUntil: "networkidle" });
-  await p.getByLabel("Nombres y apellidos").fill("Prueba Responsive");
+  await p.getByLabel("Nombres").fill("Prueba");
+  await p.getByLabel("Apellidos").fill("Responsive");
   await p.getByLabel("Número de cédula").fill("7000000001");
   await p.getByLabel("Grado").selectOption({ index: 1 });
-  await p.getByLabel("Celular (WhatsApp)").fill("3104567890");
+  await p.getByLabel("Institución").selectOption({ index: 1 });
+  await p.getByLabel("Número Nequi").fill("3009998877");
+  await p.getByLabel("Celular").fill("3104567890");
   await p.getByLabel("Correo electrónico").fill("responsive.qa@correo.com");
+  await p.locator('input[name="foto_cedula_frente"]').setInputFiles({
+    name: "frente.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "base64"),
+  });
+  await p.locator('input[name="foto_cedula_reverso"]').setInputFiles({
+    name: "reverso.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "base64"),
+  });
+  await p.locator('input[name="foto_selfie"]').setInputFiles({
+    name: "selfie.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "base64"),
+  });
   await p.locator("#af-datos").setChecked(true);
   await p.locator("#af-sitio").evaluate((el: HTMLInputElement) => (el.value = "bot"));
   await p.getByRole("button", { name: /Enviar/ }).click();
@@ -232,6 +295,7 @@ async function medir(page: Page) {
     const visible = (el: Element | null | undefined) => !!el && !oculto(el);
     const porTexto = (sel: string, re: RegExp) => Array.from(document.querySelectorAll(sel)).find((e) => re.test((e.textContent ?? "").trim()));
     const aside = document.querySelector("aside");
+    const header = document.querySelector("header");
     const main = document.querySelector("main");
     const form = document.querySelector("main form");
     const columnasDe = (el: Element | null | undefined) => {
@@ -242,6 +306,8 @@ async function medir(page: Page) {
     };
     const tituloConvenios = porTexto("h2", /convenios/i);
     const contConvenios = tituloConvenios?.closest("section")?.lastElementChild ?? null;
+    // Barra inferior flotante de /cuenta y /asesor (pieza 2b/2c): nav fijo, bottom-4.
+    const barraInferior = document.querySelector('nav[aria-label^="Navegación del"]');
     const patrones = {
       aside: aside && visible(aside) ? r(aside.getBoundingClientRect()) : null,
       main: main ? r(main.getBoundingClientRect()) : null,
@@ -249,7 +315,7 @@ async function medir(page: Page) {
       formColumnas: form ? getComputedStyle(form).gridTemplateColumns : null,
       convenios: columnasDe(contConvenios),
       navApoyos: visible(porTexto("header a", /^Apoyos$/)),
-      navHistorias: visible(porTexto("header a", /^Historias$/)),
+      navComoFunciona: visible(porTexto("header a", /^Cómo funciona$/)),
       navConvenios: visible(porTexto("header a", /^Convenios$/)),
       conocerCooperativa: visible(porTexto("a", /Conocer la cooperativa/)),
       cambiarCedula: visible(porTexto("a", /^Cambiar cédula$/)),
@@ -257,9 +323,34 @@ async function medir(page: Page) {
       pasoXdeY: visible(porTexto("span", /^Paso \d de \d$/)),
       listaPasos: Array.from(document.querySelectorAll("ol")).some((o) => visible(o)),
       alturaPagina: document.documentElement.scrollHeight,
+      headerVisible: visible(header),
+      barraInferior: barraInferior && visible(barraInferior) ? r(barraInferior.getBoundingClientRect()) : null,
     };
 
     return { vw, sw, anchos: anchos.slice(-6), fueraViewport, recortados, desbordados, solapes, pequenos, casillas, fuentesPequenas, inputsPequenos, otpInfo, imagenes, patrones };
+  });
+}
+
+/** Tras cargar la página, ¿la barra inferior fija tapa el último contenido visible al llegar al final? */
+async function medirSolapeBarraInferior(page: Page) {
+  return page.evaluate(() => {
+    const barra = document.querySelector('nav[aria-label^="Navegación del"]');
+    if (!barra) return null;
+    window.scrollTo(0, document.documentElement.scrollHeight);
+    const br = barra.getBoundingClientRect();
+    const main = document.querySelector("main");
+    if (!main) return null;
+    let maxBottom = 0;
+    let quien: string | null = null;
+    for (const el of Array.from(main.querySelectorAll("*"))) {
+      const b = el.getBoundingClientRect();
+      if (b.width < 1 || b.height < 1) continue;
+      if (b.bottom > maxBottom) {
+        maxBottom = b.bottom;
+        quien = `${el.tagName.toLowerCase()}.${String((el as HTMLElement).className).slice(0, 60)}`;
+      }
+    }
+    return { barraTop: Math.round(br.top), maxBottom: Math.round(maxBottom), solapa: maxBottom > br.top + 2, quien };
   });
 }
 
@@ -269,6 +360,7 @@ for (const { ruta, sesion } of RUTAS) {
   test(`Responsive · ${ruta}`, async ({ browser }) => {
     if (sesion === "codigo" || sesion === "cuenta") await prepararSesiones(browser);
     if (sesion === "enviada") await prepararEnviada(browser);
+    if (sesion === "asesor" || sesion === "admin") await prepararSesionRol(browser, sesion);
     for (const ancho of ANCHOS) {
       const ctx = await browser.newContext({
         viewport: { width: ancho, height: ALTO },
@@ -280,11 +372,14 @@ for (const { ruta, sesion } of RUTAS) {
       await page.evaluate(() => document.fonts.ready);
       const urlFinal = new URL(page.url()).pathname;
       const m = await medir(page);
+      const solapeBarra = ancho < 1024 ? await medirSolapeBarraInferior(page) : null;
       const archivo = path.join(CAPTURAS, `${nombreRuta(ruta)}-${ancho}.png`);
       await page.screenshot({ path: archivo, fullPage: true });
-      escribir({ ruta, ancho, estado: resp?.status(), urlFinal, ...m });
+      escribir({ ruta, ancho, estado: resp?.status(), urlFinal, ...m, solapeBarra });
       // Propaga tokens renovados (refresh token rotativo) a los contextos siguientes.
-      if (sesion === "cuenta" && urlFinal === ruta) await ctx.storageState({ path: estados.cuenta! });
+      if ((sesion === "cuenta" || sesion === "asesor" || sesion === "admin") && urlFinal === ruta) {
+        await ctx.storageState({ path: estados[sesion]! });
+      }
       await ctx.close();
 
       expect.soft(urlFinal, `${ruta} @${ancho}: redirigió`).toBe(ruta);
@@ -314,7 +409,7 @@ for (const { ruta, sesion } of RUTAS) {
       }
       if (ruta === "/afiliacion" && p.formColumnas) {
         const cols = p.formColumnas.split(" ").length;
-        expect.soft(cols, `${ruta} @${ancho}: columnas del formulario`).toBe(ancho >= 1024 ? 2 : 1);
+        expect.soft(cols, `${ruta} @${ancho}: columnas del formulario`).toBe(ancho >= 1280 ? 2 : 1);
         if (ancho >= 1024) expect.soft(p.aside && p.form && p.aside.x < p.form.x, `${ruta} @${ancho}: aside a la izquierda`).toBe(true);
         expect.soft(p.listaPasos, `${ruta} @${ancho}: pasos 1-2-3 solo escritorio`).toBe(ancho >= 1024);
       }
@@ -322,24 +417,78 @@ for (const { ruta, sesion } of RUTAS) {
         expect.soft(p.convenios.columnas, `${ruta} @${ancho}: convenios`).toBe(ancho >= 1024 ? Math.min(5, p.convenios.hijos) : 1);
       }
       if (ruta === "/") {
-        for (const k of ["navApoyos", "navHistorias", "navConvenios", "conocerCooperativa"] as const) {
+        for (const k of ["navApoyos", "navComoFunciona", "navConvenios", "conocerCooperativa"] as const) {
           expect.soft(p[k], `/ @${ancho}: ${k}`).toBe(ancho >= 1024);
         }
+      }
+      // Header píldora (escritorio) + barra inferior flotante (celular) de /cuenta y /asesor.
+      // /cuenta/solicitar NO lleva barra inferior a propósito (ya es la pantalla de «Solicitar»;
+      // ver comentario de BarraInferiorCuenta en components/pantallas/Cuenta.tsx).
+      if (["/cuenta", "/asesor", "/asesor/demo"].includes(ruta)) {
+        expect.soft(!!p.barraInferior, `${ruta} @${ancho}: barra inferior flotante`).toBe(ancho < 1024);
+      }
+      if (["/cuenta", "/cuenta/solicitar", "/asesor", "/asesor/demo"].includes(ruta) && solapeBarra) {
+        expect.soft(solapeBarra.solapa, `${ruta} @${ancho}: barra inferior tapa contenido (${solapeBarra.quien}, hasta ${solapeBarra.maxBottom} vs barra en ${solapeBarra.barraTop})`).toBe(false);
+      }
+      // Admin: menú lateral de 248 px (escritorio) / barra + pestañas (celular). /admin/demo
+      // reutiliza el header en línea de EncabezadoAdmin en las DOS versiones (sin menú lateral).
+      if (ruta.startsWith("/admin") && ruta !== "/admin/demo") {
+        expect.soft(p.headerVisible, `${ruta} @${ancho}: barra + pestañas del celular`).toBe(ancho < 1024);
+        if (ancho >= 1024) {
+          expect.soft(p.aside && Math.abs(p.aside.w - 248) <= 4, `${ruta} @${ancho}: menú lateral de 248 px`).toBe(true);
+        } else {
+          expect.soft(p.aside, `${ruta} @${ancho}: menú lateral oculto en celular`).toBe(null);
+        }
+      }
+      if (ruta === "/admin/demo") {
+        expect.soft(p.headerVisible, `${ruta} @${ancho}: encabezado de EncabezadoAdmin siempre visible`).toBe(true);
       }
     }
   });
 }
 
-/** Maquetas de design/ a su ancho nativo, para comparar con las capturas de 390 y 1280. */
-test("Maquetas de design/", async ({ browser }) => {
-  const dir = path.join(RAIZ, "design");
-  for (const archivo of fs.readdirSync(dir).filter((f) => /-(PC|Movil)\.dc\.html$/.test(f) || f === "Main.dc.html")) {
-    const ancho = /Movil/.test(archivo) ? 390 : 1280;
-    const ctx = await browser.newContext({ viewport: { width: ancho, height: ALTO } });
+test("390 en horizontal (844×390): sin recortes ni barra inferior tapando contenido", async ({ browser }) => {
+  for (const { ruta, sesion } of RUTAS) {
+    if (sesion === "codigo" || sesion === "cuenta") await prepararSesiones(browser);
+    if (sesion === "enviada") await prepararEnviada(browser);
+    if (sesion === "asesor" || sesion === "admin") await prepararSesionRol(browser, sesion);
+    const ctx = await browser.newContext({
+      viewport: LANDSCAPE,
+      storageState: sesion === "ninguna" ? undefined : estados[sesion],
+    });
     const page = await ctx.newPage();
-    await page.goto("file:///" + path.join(dir, archivo).replace(/\\/g, "/"));
-    await page.waitForTimeout(1200);
-    await page.screenshot({ path: path.join(CAPTURAS, `diseno-${archivo.replace(".dc.html", "")}.png`), fullPage: true });
+    const resp = await page.goto(ruta, { waitUntil: "networkidle" });
+    const urlFinal = new URL(page.url()).pathname;
+    const m = await medir(page);
+    const solapeBarra = await medirSolapeBarraInferior(page);
+    await page.screenshot({ path: path.join(CAPTURAS, `${nombreRuta(ruta)}-844x390.png`), fullPage: true });
+    escribir({ ruta, ancho: "844x390", estado: resp?.status(), urlFinal, ...m, solapeBarra });
     await ctx.close();
+    expect.soft(urlFinal, `${ruta} @844x390: redirigió`).toBe(ruta);
+    expect.soft(m.sw, `${ruta} @844x390: scroll horizontal ${m.anchos.join(" | ")}`).toBeLessThanOrEqual(m.vw);
+    expect.soft(m.pequenos.filter((p) => !p.enLinea), `${ruta} @844x390: toque < 44 px`).toEqual([]);
+    if (solapeBarra) {
+      expect.soft(solapeBarra.solapa, `${ruta} @844x390: barra inferior tapa contenido (${solapeBarra.quien})`).toBe(false);
+    }
   }
+});
+
+/**
+ * Piezas de docs/Green Alliance C+.dc.html usadas como referencia visual para comparar contra
+ * las capturas de 390 y 1280 (design/*.dc.html quedó obsoleto para estas pantallas: ver nota de
+ * cabecera). Cada pieza trae su propio mockup de 1280/1440 y 390 dentro del mismo `#id`.
+ */
+test("Piezas del lienzo C+ (referencia visual)", async ({ browser }) => {
+  const archivo = path.join(RAIZ, "docs", "Green Alliance C+.dc.html");
+  const ctx = await browser.newContext({ viewport: { width: 1700, height: 1400 } });
+  const page = await ctx.newPage();
+  await page.goto("file:///" + archivo.replace(/\\/g, "/"));
+  await page.waitForTimeout(1500);
+  for (const id of ["2a", "2b", "2c", "2d", "3b", "3c", "3d", "3e", "3f", "3g", "3h"]) {
+    const bloque = page.locator(`[id="${id}"]`);
+    await bloque.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(300);
+    await bloque.screenshot({ path: path.join(CAPTURAS, `pieza-${id}.png`) }).catch(() => {});
+  }
+  await ctx.close();
 });

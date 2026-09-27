@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 27-sep-2026 (rediseño C+ en la rama rediseno-c-plus: panel del asociado (commit local 51da63f) y paneles del asesor y del admin en modo oscuro (commit local e39ad72) ya maquetados en código; faltan e2e, aplicar las migraciones de backend de 1.8 y ajustar KPIs/tope/nota interna del admin a datos reales — ver docs/avances/Avances_Green_Alliance.xlsx)
+Actualizado: 27-sep-2026 (rediseño C+ en la rama rediseno-c-plus: panel del asociado, asesor y admin ya maquetados en código; KPIs/tope/nota interna del admin ya conectados a datos reales (ga-funcionalidad-botones), QA y seguridad del rediseño aprobados con observaciones menores (ga-verificador-qa, ga-revisor-seguridad), tasa de interés fuera del payload de /cuenta y cédula de las «hermanas» enmascarada en servidor (commits locales e650033, fdab456); falta aplicar las migraciones de backend de 1.8 y el paso de responsive (6.19) — ver docs/avances/Avances_Green_Alliance.xlsx)
 
 ## Dónde quedamos
 
@@ -133,7 +133,7 @@ Desarrollador externo, trabaja en su propia rama y entrega por PR a `develop`; c
 - [ ] Convenios administrables desde `/admin` (crear, editar, ocultar, ordenar, logo en Storage).
 - [ ] Ley 1581: borrado automático de fotos de afiliaciones rechazadas y motivo de rechazo en `/admin`.
 - [ ] Pruebas en celulares reales (Android e iPhone) con informe y capturas.
-- [ ] Actualizar `tests/e2e` b-ingreso, i-despliegue y j-produccion al formato nuevo de máscara de correo.
+- [x] Actualizar `tests/e2e` b-ingreso, i-despliegue y j-produccion al formato nuevo de máscara de correo. 27-sep: se adelantó ga-verificador-qa (b-ingreso y j-produccion corregidos, i-despliegue ya estaba al día).
 
 ---
 

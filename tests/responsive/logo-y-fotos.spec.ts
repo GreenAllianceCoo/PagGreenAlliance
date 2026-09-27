@@ -1,7 +1,7 @@
 import { expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
-import { ingresarPorUI, limpiarLimites, pedirCodigo, USUARIOS } from "../e2e/utils";
+import { esperarCodigo, esperarVentanaReenvio, ingresarPorUI, limpiarLimites, llenarOtp, pedirCodigo, USUARIOS } from "../e2e/utils";
 
 /**
  * Verificación responsive del logo horizontal (isotipo + wordmark SVG) y de los
@@ -17,7 +17,7 @@ const ANCHOS = [320, 354, 360, 390, 414, 768, 834, 1024, 1050, 1075, 1280, 1440,
 const ALTO = 900;
 const PROPORCION_WORDMARK = 4118 / 669;
 
-type Sesion = "ninguna" | "cuenta" | "codigo";
+type Sesion = "ninguna" | "cuenta" | "codigo" | "asesor" | "admin";
 const RUTAS: Array<{ ruta: string; sesion: Sesion }> = [
   { ruta: "/", sesion: "ninguna" },
   { ruta: "/ingresar", sesion: "ninguna" },
@@ -26,6 +26,8 @@ const RUTAS: Array<{ ruta: string; sesion: Sesion }> = [
   { ruta: "/politica-de-datos", sesion: "ninguna" },
   { ruta: "/cuenta", sesion: "cuenta" },
   { ruta: "/cuenta/solicitar", sesion: "cuenta" },
+  { ruta: "/asesor", sesion: "asesor" },
+  { ruta: "/admin/afiliaciones", sesion: "admin" },
 ];
 
 const nombreRuta = (r: string) => (r === "/" ? "landing" : r.slice(1).replace(/\//g, "_"));
@@ -63,9 +65,42 @@ async function estadoCodigo(browser: Browser) {
   return archivo;
 }
 
+async function estadoRol(browser: Browser, clave: "asesor" | "admin") {
+  const archivo = path.join(AUTH, `responsive-${clave}.json`);
+  const datos =
+    clave === "admin"
+      ? { cedula: "1234567899", correo: "admin.prueba@greenalliance.test", destino: "**/admin" }
+      : { cedula: "1234567892", correo: "asesor.prueba@greenalliance.test", destino: "**/asesor" };
+  if (fs.existsSync(archivo)) {
+    const ctx = await browser.newContext({ storageState: archivo });
+    const p = await ctx.newPage();
+    await p.goto(clave === "admin" ? "/admin" : "/asesor");
+    const ok = !p.url().endsWith("/ingresar");
+    await ctx.close();
+    if (ok) return archivo;
+  }
+  const ctx = await browser.newContext();
+  const p = await ctx.newPage();
+  await esperarVentanaReenvio(datos.correo);
+  const inicio = await pedirCodigo(p, datos.cedula);
+  const codigo = await esperarCodigo(datos.correo, inicio);
+  await llenarOtp(p, codigo);
+  await p.getByRole("button", { name: "Entrar a mi cuenta" }).click();
+  await p.waitForURL(datos.destino);
+  fs.mkdirSync(AUTH, { recursive: true });
+  await ctx.storageState({ path: archivo });
+  await ctx.close();
+  return archivo;
+}
+
 async function contexto(browser: Browser, sesion: Sesion, ancho: number): Promise<BrowserContext> {
   if (sesion !== "ninguna" && !estados[sesion]) {
-    estados[sesion] = sesion === "cuenta" ? await estadoCuenta(browser) : await estadoCodigo(browser);
+    estados[sesion] =
+      sesion === "cuenta"
+        ? await estadoCuenta(browser)
+        : sesion === "codigo"
+          ? await estadoCodigo(browser)
+          : await estadoRol(browser, sesion);
   }
   return browser.newContext({
     viewport: { width: ancho, height: ALTO },
@@ -196,68 +231,44 @@ for (const { ruta, sesion } of RUTAS) {
   });
 }
 
-test("Landing · espacios de foto", async ({ browser }) => {
+test("Landing · ilustración del hero (manchas + matriz de círculos + comprobante)", async ({ browser }) => {
+  // La landing (rediseño C+, pieza 2a) ya no usa components/ui/EspacioFoto.tsx (sin uso,
+  // confirmado por grep): el hero es <section> con 2 columnas (texto + ilustración). La
+  // ilustración es el 2º hijo directo: manchas orgánicas + <MatrizCirculos> + <ComprobanteSolicitud>.
+  // El desborde horizontal/vertical de sus piezas (manchas con posición absoluta, comprobante
+  // absoluto en escritorio) ya lo cubre la prueba general de scroll horizontal de
+  // responsive.spec.ts en los mismos anchos (incluidos 768 y 834, la zona sin maqueta); aquí solo
+  // se deja una captura de referencia y se valida que las imágenes (isotipo en los círculos)
+  // carguen sin deformarse.
   for (const ancho of ANCHOS) {
     const ctx = await contexto(browser, "ninguna", ancho);
     const page = await ctx.newPage();
     await page.goto("/", { waitUntil: "networkidle" });
     const datos = await page.evaluate(() => {
       const r = (b: DOMRect) => ({ x: Math.round(b.x), y: Math.round(b.y), w: Math.round(b.width), h: Math.round(b.height) });
-      const espacios = Array.from(document.querySelectorAll<HTMLElement>("main .bg-gradient-to-br"));
-      const tarjeta = Array.from(document.querySelectorAll("main strong")).find((s) => /Tu solicitud|Así ves tu solicitud/.test(s.textContent ?? ""))?.closest("div.rounded-16") as HTMLElement | undefined;
-      const bt = tarjeta?.getBoundingClientRect();
-      return espacios.map((e, i) => {
-        const b = e.getBoundingClientRect();
-        const circulo = e.querySelector<HTMLElement>(".rounded-full");
-        const svg = circulo?.querySelector("svg");
-        const bc = circulo?.getBoundingClientRect();
-        const bs = svg?.getBoundingClientRect();
-        const imgs = Array.from(e.querySelectorAll("img")).map((im) => ({ alt: im.getAttribute("alt"), ok: im.complete && im.naturalWidth > 0 }));
-        const interTarjeta =
-          i === 0 && bc && bt && getComputedStyle(tarjeta!).position === "absolute"
-            ? Math.max(0, Math.min(bc.right, bt.right) - Math.max(bc.left, bt.left)) *
-              Math.max(0, Math.min(bc.bottom, bt.bottom) - Math.max(bc.top, bt.top))
-            : 0;
-        const interTarjetaEspacio =
-          i === 0 && bt && getComputedStyle(tarjeta!).position === "absolute"
-            ? Math.max(0, Math.min(b.right, bt.right) - Math.max(b.left, bt.left)) *
-              Math.max(0, Math.min(b.bottom, bt.bottom) - Math.max(b.top, bt.top))
-            : 0;
-        return {
-          i,
-          ariaHidden: e.getAttribute("aria-hidden"),
-          espacio: r(b),
-          circulo: bc ? r(bc) : null,
-          circuloDentro: bc ? bc.left >= b.left && bc.right <= b.right && bc.top >= b.top && bc.bottom <= b.bottom : false,
-          svgDentroCirculo: bs && bc ? bs.left >= bc.left - 0.5 && bs.right <= bc.right + 0.5 && bs.top >= bc.top - 0.5 && bs.bottom <= bc.bottom + 0.5 : null,
-          svg: bs ? r(bs) : null,
-          fondo: getComputedStyle(e).backgroundImage.slice(0, 90),
-          patron: !!e.querySelector(".patron-puntos") && getComputedStyle(e.querySelector(".patron-puntos")!).backgroundImage !== "none",
-          imgs,
-          tarjeta: i === 0 && bt ? r(bt) : null,
-          areaCirculoTapadaPorTarjeta: Math.round(interTarjeta),
-          areaEspacioTapadaPorTarjeta: Math.round(interTarjetaEspacio),
-        };
-      });
+      const hero = document.querySelector("main > section") as HTMLElement | null;
+      const ilustracion = hero?.children[1] as HTMLElement | undefined;
+      const imgs = ilustracion
+        ? Array.from(ilustracion.querySelectorAll("img")).map((im) => ({
+            alt: im.getAttribute("alt"),
+            ok: im.complete && im.naturalWidth > 0,
+            w: im.getBoundingClientRect().width,
+            h: im.getBoundingClientRect().height,
+          }))
+        : [];
+      return {
+        hero: hero ? r(hero.getBoundingClientRect()) : null,
+        ilustracion: ilustracion ? r(ilustracion.getBoundingClientRect()) : null,
+        imgs,
+      };
     });
-    resumen.push({ ruta: "/ (fotos)", ancho, datos });
-    const hero = page.locator("main .bg-gradient-to-br").first();
-    await hero.screenshot({ path: path.join(SALIDA, `foto-hero-${ancho}.png`) });
-    if (ancho >= 1024) {
-      const seccion = page.locator("main section").first();
-      await seccion.screenshot({ path: path.join(SALIDA, `hero-completo-${ancho}.png`) });
-    }
-    await page.locator("#c-apoyos").screenshot({ path: path.join(SALIDA, `apoyos-${ancho}.png`) });
+    resumen.push({ ruta: "/ (hero)", ancho, datos });
+    const heroLoc = page.locator("main > section").first();
+    await heroLoc.screenshot({ path: path.join(SALIDA, `hero-${ancho}.png`) }).catch(() => {});
     await ctx.close();
-    expect.soft(datos.length, `@${ancho}: deben ser 4 espacios de foto`).toBe(4);
-    for (const d of datos) {
-      expect.soft(d.ariaHidden, `@${ancho} espacio ${d.i}: aria-hidden`).toBe("true");
-      expect.soft(d.imgs.every((im) => im.alt === "" && im.ok), `@${ancho} espacio ${d.i}: imgs decorativas cargadas`).toBe(true);
-      expect.soft(d.circuloDentro, `@${ancho} espacio ${d.i}: ilustración recortada`).toBe(true);
-      expect.soft(d.svgDentroCirculo, `@${ancho} espacio ${d.i}: dibujo se sale del círculo`).toBe(true);
-      expect.soft(d.patron, `@${ancho} espacio ${d.i}: patrón de puntos`).toBe(true);
-      expect.soft(d.areaCirculoTapadaPorTarjeta, `@${ancho}: tarjeta tapa ilustración del hero`).toBe(0);
-    }
+    expect.soft(datos.ilustracion, `@${ancho}: no se encontró la ilustración del hero (manchas + matriz + comprobante)`).not.toBeNull();
+    expect.soft(datos.imgs.every((im) => im.ok), `@${ancho}: alguna imagen del hero no cargó`).toBe(true);
+    expect.soft(datos.imgs.every((im) => im.w > 0 && im.h > 0), `@${ancho}: alguna imagen del hero quedó en 0×0`).toBe(true);
   }
 });
 
