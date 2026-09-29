@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 27-sep-2026 (rediseño C+ completo y verificado de punta a punta en la rama rediseno-c-plus: QA, seguridad y responsive en verde tras corregir los 9 hallazgos responsive y el contraste del admin oscuro (commits locales, incluye 846657b y b0239a8); la barra inferior de /cuenta y /asesor queda siempre visible con espacio reservado, no oculta al cargar. Faltan solo el push de la rama y abrir el PR a develop (6.18), a la espera de que Sebas lo autorice — no depende de aplicar las migraciones de backend de 1.8, que siguen pendientes aparte. Ver docs/avances/Avances_Green_Alliance.xlsx)
+Actualizado: 29-sep-2026 (rediseño C+ fusionado a develop: 6.18 Hecho tras suite e2e 290/290; falta solo que Sebas apruebe el PR develop → main para desplegar en producción, con el arreglo de la tasa incluido. Sebas aprobó el botón «Escribir por WhatsApp» y «asignar asesor» en el detalle de afiliación del admin (P-95/P-96 Hechos) y decidió quitar la sección de testimonios de la landing (P-103 Hecho). La primera entrega de Carlos Pardo (ZIP sobre una base anterior al rediseño) no es fusionable; se le pidió rehacerla sobre rediseno-c-plus con un PR por tarea. Ver docs/avances/Avances_Green_Alliance.xlsx)
 
 ## Dónde quedamos
 
