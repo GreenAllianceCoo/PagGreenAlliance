@@ -119,6 +119,33 @@ export async function borrarAfiliaciones(cedula: string) {
   });
 }
 
+/**
+ * Repone el crédito de ejemplo del seed (cédula `USUARIOS.conSolicitud`,
+ * $500.000 al 50 %) si otra prueba ya lo resolvió en esta misma sesión de
+ * base de datos (p. ej. k-roles.spec.ts, que aprueba/rechaza los créditos
+ * pendientes para probar los atajos de /admin/creditos). Una solicitud
+ * resuelta es inmutable en la base (trigger `sellar_revision_solicitud`:
+ * «Una solicitud ya resuelta no puede cambiar de estado»), así que en vez de
+ * actualizarla se borra y se vuelve a crear igual que el seed. Sin esto, las
+ * pruebas de C/E/I que dependen de que ese crédito siga «pendiente» quedan
+ * frágiles según el orden en que corran los archivos de prueba.
+ */
+export async function restaurarCreditoDeEjemplo() {
+  const { cuerpo: perfiles } = await adminRest(
+    `perfiles?select=id&cedula=eq.${encodeURIComponent(USUARIOS.conSolicitud.cedula)}`,
+  );
+  const id = (Array.isArray(perfiles) ? perfiles : [])[0] as { id: string } | undefined;
+  if (!id) return;
+  const { cuerpo: filas } = await adminRest(`solicitudes_credito?select=id,estado&asociado_id=eq.${id.id}`);
+  const fila = (Array.isArray(filas) ? filas : [])[0] as { id: string; estado: string } | undefined;
+  if (!fila || fila.estado === "pendiente") return;
+  await adminRest(`solicitudes_credito?id=eq.${fila.id}`, { method: "DELETE" });
+  await adminRest("solicitudes_credito", {
+    method: "POST",
+    body: JSON.stringify({ asociado_id: id.id, porcentaje_devolucion: "50", monto_solicitado: 500000 }),
+  });
+}
+
 /** Token de usuario por contraseña (seed: Prueba123!). No envía correos. */
 export async function tokenDeUsuario(correo: string) {
   const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {

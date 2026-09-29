@@ -23,6 +23,7 @@ import {
   opcionesContexto,
   pedirCodigo,
   RAIZ,
+  restaurarCreditoDeEjemplo,
   tokenDeUsuario,
   USUARIOS,
   usuarioRest,
@@ -222,6 +223,11 @@ test.describe("I1 · /login y /dashboard ya no existen", () => {
 test.describe("I2 · /cuenta/solicitar", () => {
   test.beforeEach(async () => {
     await borrarSolicitudesSinSolicitudes();
+    // Repone el crédito de ejemplo (cédula 1234567890) si k-roles.spec.ts ya
+    // lo resolvió en esta misma sesión de base de datos: lo necesita la
+    // prueba «Con solicitud pendiente (asociado 1234567890)» (ver
+    // restaurarCreditoDeEjemplo en utils.ts).
+    await restaurarCreditoDeEjemplo();
     await limpiarLimites();
   });
   test.afterAll(borrarSolicitudesSinSolicitudes);

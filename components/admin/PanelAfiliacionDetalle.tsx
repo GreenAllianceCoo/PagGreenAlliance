@@ -59,15 +59,12 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas, perfilAsoci
   const [toast, setToast] = useState<string | null>(null);
   const enlaceWhatsapp = enlaceWhatsappAfiliacion(solicitud.celular, solicitud.nombre);
 
-  // «Asignar asesor» (D-09): la propia Server Action llama a `revalidatePath`,
-  // lo que hace que Next vuelva a pedir esta página apenas termina — y como
-  // `perfilAsociado` solo llega cuando el perfil TODAVÍA no tiene asesor, ese
-  // refresco automático lo deja en `null` justo cuando la asignación acaba de
-  // tener éxito. Sin esta «foto» inicial (congelada con `useState`, que
-  // ignora los cambios de prop después del primer render), <AsignarAsesor>
-  // se desmontaría antes de poder mostrar su propio aviso de éxito.
+  // «Asesor» (D-09): el servidor manda `perfilAsociado` siempre que la
+  // afiliación está aprobada (con `asesorNombre` si ya tiene asesor, para el
+  // estado de solo lectura). Lo más reciente del servidor manda; la «foto»
+  // inicial solo cubre un refresco que llegue sin datos, para que
+  // <AsignarAsesor> no se desmonte antes de mostrar su aviso de éxito.
   const [perfilAsociadoInicial] = useState(perfilAsociado ?? null);
-  // Lo más reciente del servidor manda (p. ej. tras aprobar en esta misma vista); la «foto» inicial solo cubre el refresco.
   const perfilMostrado = perfilAsociado ?? perfilAsociadoInicial;
 
   useEffect(() => {

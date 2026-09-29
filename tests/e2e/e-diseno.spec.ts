@@ -8,6 +8,7 @@ import {
   limpiarLimites,
   llenarAfiliacion,
   pedirCodigo,
+  restaurarCreditoDeEjemplo,
   revisarOrden,
   textoVisible,
   USUARIOS,
@@ -320,6 +321,10 @@ test.describe("E · Ingreso paso 2 /ingresar/codigo", () => {
 });
 
 test.describe("E · Inicio del asociado /cuenta", () => {
+  // Repone el crédito de ejemplo si k-roles.spec.ts ya lo resolvió en esta
+  // misma sesión de base de datos (ver restaurarCreditoDeEjemplo en utils.ts).
+  test.beforeAll(restaurarCreditoDeEjemplo);
+
   test("Textos, orden, colores y fuente (asociado con solicitud)", async ({ browser }, testInfo) => {
     const u = USUARIOS.conSolicitud;
     const ctx = await contextoConSesion(browser, "conSolicitud", testInfo);

@@ -28,6 +28,12 @@ const ID_ASOCIADO_2 = "7d1f0c2a-3b4e-4f5a-8b6c-9d0e1f2a3b4c";
 test.describe.configure({ mode: "serial" });
 test.skip(({ isMobile }) => isMobile, "solo escritorio");
 
+// El crédito de prueba del asociado 2 se borra al terminar: si queda, las pruebas
+// que corren después (c-cuenta, e-diseno, i-despliegue en celular) ya no lo ven «sin solicitudes».
+test.afterAll(async () => {
+  await adminRest(`solicitudes_credito?asociado_id=eq.${ID_ASOCIADO_2}`, { method: "DELETE" });
+});
+
 test("admin entra a /admin y aprueba la afiliación de ejemplo (2 pasos)", async ({ page }) => {
   await ingresar(page, "1234567899", "admin.prueba@greenalliance.test", "/admin");
   await page.goto("/admin/afiliaciones");
