@@ -156,3 +156,16 @@ export const CONVENIOS: Convenio[] = BASE.map(completarConvenio);
 
 /** Orden de la presentación (por NIT); los convenios nuevos van al final. */
 export const ORDEN_POR_NIT: string[] = BASE.map((c) => c.nit ?? "");
+
+/** Medio multimedia del detalle (archivos en public/convenios/, sin columna en la base). */
+export type MedioConvenio =
+  | { tipo: "video"; src: string }
+  | { tipo: "pdf"; src: string; tamano: string };
+
+/** Medios por NIT. Locos por los Viajes (901.865.816-3) no tiene. */
+export const MEDIO_POR_NIT: Record<string, MedioConvenio> = {
+  "902.038.118-7": { tipo: "video", src: "/convenios/amb-movil.mp4" },
+  "1.090.464.475-4": { tipo: "video", src: "/convenios/dr-ribero.mp4" },
+  "52.953.735-3": { tipo: "video", src: "/convenios/dream-go-visas.mp4" },
+  "1.054.095.149-3": { tipo: "pdf", src: "/convenios/racing-tours-presentacion.pdf", tamano: "3 MB" },
+};

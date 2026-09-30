@@ -19,3 +19,9 @@ Formato (copiar debajo de la línea, uno por tarea):
 - Estado: Hecho
 - Qué se hizo: SP se agregó al remapeo a IJ en la migración 20260930200100 (sin aplicar); TODO R-10/R-11 marcados como decididos por Sebas; pgTAP 12 y 19 y comentario del seed ajustados. db reset, test db y vitest en verde.
 - Bloqueos o trabajo nuevo: Sebas aplica la migración en remoto.
+
+## 2026-09-30 · ga-diseno-a-codigo
+- Actividades: P-xx (convenios: medios en el detalle)
+- Estado: Hecho
+- Qué se hizo: videos de AMB Móvil, Dr. Ribero y Dream & Go Visas y PDF de Racing Tours en el detalle de convenio (mapa por NIT en lib/convenios.ts; archivos renombrados a public/convenios/).
+- Bloqueos o trabajo nuevo: ninguno (sin poster; Locos por los Viajes sin medio).
