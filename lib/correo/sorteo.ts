@@ -9,7 +9,7 @@ import { enviarPlantillaResend } from "@/lib/correo/resend";
  * (spec-fase-2.md §4, "El número que devuelve la función solo lo ve el
  * servidor").
  */
-export async function enviarBoletaSorteo(datos: { correo: string; nombre: string; numero: string; mes: string }) {
+export async function enviarBoletaSorteo(datos: { correo: string | string[]; nombre: string; numero: string; mes: string }) {
   const plantilla = process.env.RESEND_TEMPLATE_SORTEO_BOLETA;
 
   // S-05 (revisión de seguridad 2026-09-24): el número SOLO se registra fuera

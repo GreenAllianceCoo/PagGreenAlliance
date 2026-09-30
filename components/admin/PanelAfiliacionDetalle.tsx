@@ -29,6 +29,13 @@ export type DetalleAfiliacion = {
   asesorNombre: string | null;
   estado: string;
   created_at: string;
+  // Afiliación v3 (spec-requerimientos-ricardo §2), mostrados en la ficha (pieza 3m).
+  /** Nombre completo del grado («Teniente»); `grado` sigue siendo el código. */
+  gradoNombre?: string | null;
+  /** `email` es el correo PERSONAL (el de ingreso); este es el institucional. */
+  correoInstitucional?: string | null;
+  /** «Bancolombia · Ahorros · 1234567890» o null si la solicitud es anterior al formulario v3. */
+  cuentaNomina?: string | null;
 };
 
 type Props = {
@@ -123,7 +130,7 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas, perfilAsoci
         <div className="flex flex-col gap-0.5">
           <span className="font-display text-24 font-extrabold leading-115">{solicitud.nombre}</span>
           <span className="text-14 text-admin-texto-2">
-            C.C. {solicitud.cedula} · {solicitud.grado} · {INSTITUCIONES[solicitud.institucion] ?? solicitud.institucion}
+            C.C. {solicitud.cedula} · {solicitud.gradoNombre ?? solicitud.grado} · {INSTITUCIONES[solicitud.institucion] ?? solicitud.institucion}
           </span>
         </div>
 
@@ -137,8 +144,16 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas, perfilAsoci
             <div className="font-bold">{solicitud.nequi || "—"}</div>
           </div>
           <div className="col-span-2 min-w-0 rounded-12 bg-admin-superficie-2 px-3 py-2.5">
-            <div className="text-admin-texto-3">Correo</div>
+            <div className="text-admin-texto-3">Correo personal</div>
             <div className="truncate font-bold">{solicitud.email || "—"}</div>
+          </div>
+          <div className="col-span-2 min-w-0 rounded-12 bg-admin-superficie-2 px-3 py-2.5">
+            <div className="text-admin-texto-3">Correo institucional</div>
+            <div className="truncate font-bold">{solicitud.correoInstitucional || "—"}</div>
+          </div>
+          <div className="col-span-2 min-w-0 rounded-12 bg-admin-superficie-2 px-3 py-2.5">
+            <div className="text-admin-texto-3">Cuenta de nómina</div>
+            <div className="break-words font-bold">{solicitud.cuentaNomina || "—"}</div>
           </div>
           <div className="col-span-2 rounded-12 bg-admin-superficie-2 px-3 py-2.5">
             <div className="text-admin-texto-3">Asesor que refirió</div>

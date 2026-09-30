@@ -23,11 +23,13 @@ vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn() }));
 vi.mock("@/lib/ingreso/servidor", () => ({ correoDeCedula: vi.fn(async () => "asociado@correo.test") }));
 vi.mock("@/lib/correo/credito", () => ({ enviarResultadoCredito: vi.fn(async () => {}) }));
+vi.mock("@/lib/correo/institucional", () => ({ avisarCorreoInstitucional: vi.fn(async () => {}) }));
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { correoDeCedula } from "@/lib/ingreso/servidor";
 import { enviarResultadoCredito } from "@/lib/correo/credito";
+import { avisarCorreoInstitucional } from "@/lib/correo/institucional";
 import { resolverCredito } from "@/app/admin/creditos/actions";
 
 const ID_ADMIN = "00000000-0000-4000-a000-000000000010";
@@ -62,7 +64,7 @@ function crearSupabaseFalso(escenario: Escenario = {}) {
     const filtros: Record<string, unknown> = {};
     const resultado = () => {
       if (tabla === "perfiles") {
-        if (filtros.id === ID_ADMIN) return { data: { rol: esAdmin ? "admin" : "asociado", nombre_completo: "Admin" }, error: null };
+        if (filtros.id === ID_ADMIN) return { data: { rol: esAdmin ? "admin" : "asociado", nombre_completo: "Admin", activo: true }, error: null };
         return { data: { nombre_completo: "Asociado Prueba", cedula: "1234567890" }, error: null };
       }
       if (tabla === "solicitudes_credito") {
@@ -125,6 +127,7 @@ beforeEach(() => {
   vi.mocked(redirect).mockClear();
   vi.mocked(correoDeCedula).mockClear();
   vi.mocked(enviarResultadoCredito).mockClear();
+  vi.mocked(avisarCorreoInstitucional).mockClear();
 });
 
 describe("resolverCredito · quién puede resolver", () => {
@@ -165,6 +168,17 @@ describe("resolverCredito · motivo obligatorio al rechazar (P-06)", () => {
     expect(actualizaciones).toHaveLength(1);
     expect(actualizaciones[0]).toMatchObject({ estado: "rechazado", motivo_rechazo: "No cumple los requisitos" });
     expect(enviarResultadoCredito).toHaveBeenCalledTimes(1);
+  });
+
+  it("RS-02: monto y motivo van SOLO al correo personal; al institucional, el aviso sin datos", async () => {
+    crearSupabaseFalso();
+    await enviar({ id: ID_SOLICITUD, decision: "rechazado", motivo: "No cumple los requisitos" });
+    expect(enviarResultadoCredito).toHaveBeenCalledWith(expect.objectContaining({ correo: ["asociado@correo.test"] }));
+    expect(avisarCorreoInstitucional).toHaveBeenCalledTimes(1);
+    // El aviso genérico solo recibe correos: ni monto ni motivo.
+    const args = vi.mocked(avisarCorreoInstitucional).mock.calls[0];
+    expect(args[0]).toBe("asociado@correo.test");
+    expect(JSON.stringify(args)).not.toContain("No cumple");
   });
 });
 

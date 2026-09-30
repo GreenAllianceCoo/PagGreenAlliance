@@ -2,15 +2,16 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Badge, type EstadoBadge } from "@/components/ui/Badge";
-import { Button, clasesBoton } from "@/components/ui/Button";
-import { Field } from "@/components/ui/Field";
-import { Input } from "@/components/ui/Input";
-import { ConvenioCard } from "@/components/ui/ConvenioCard";
+import { clasesBoton } from "@/components/ui/Button";
+import { AvisoCreditoBloqueado } from "@/components/ui/AvisoCreditoBloqueado";
+import { ListaConvenios } from "@/components/pantallas/ListaConvenios";
 import { IconoConvenios, IconoDocumento, IconoMas, IconoSalir } from "@/components/ui/Iconos";
+import { BarraInferiorCuenta } from "@/components/pantallas/BarraInferiorCuenta";
 import { EncabezadoCuenta, RUTA_NUEVA_SOLICITUD } from "@/components/pantallas/EncabezadoCuenta";
-import { BarraInferior } from "@/components/ui/BarraInferior";
 import { PasosSolicitud } from "@/components/ui/PasosSolicitud";
 import { SorteoDelMes, type SorteoDelMesProps } from "@/components/sorteo/SorteoDelMes";
+import type { PerfilAsociado } from "@/lib/asociado/servidor";
+import type { ConteoCredito } from "@/lib/cuenta";
 import { enmascararCedula } from "@/lib/mascara";
 import type { Convenio, PasoSolicitud } from "@/lib/mock";
 
@@ -25,6 +26,8 @@ export type CuentaProps = {
     modalidad: string;
     plazo: string;
     pasos: PasoSolicitud[];
+    /** Conteo de 3 meses del crédito aprobado (spec §3.10, R-07). */
+    conteo?: ConteoCredito | null;
   } | null;
   convenios: Convenio[];
   /**
@@ -34,57 +37,24 @@ export type CuentaProps = {
    * participan en el sorteo, así que ni se muestra el acceso.
    */
   sorteo: SorteoDelMesProps | null;
-  /** Datos de solo lectura de «Mis datos» (y del carné). */
+  /** Datos del carné (la cédula se muestra enmascarada). */
   cedula: string;
   grado: string;
   /**
-   * Institución del carné (Policía Nacional / Ejército). `perfiles` todavía
-   * no tiene esta columna (propuesta en
-   * supabase/migrations/20260925200100_perfiles_institucion_y_activo.sql,
-   * sin aplicar): mientras tanto esta prop nunca se pasa desde
-   * app/cuenta/page.tsx y el carné simplemente no muestra esa línea.
-   * TODO(backend: docs/auditorias/2026-09-25-backend-rediseno-c-plus.md, fila «Carné de asociado»).
+   * Institución del carné (Policía Nacional / Ejército) y «activo» del carné: sin el dato, el
+   * carné no dibuja esa línea / chip.
    */
   institucion?: string;
-  /**
-   * «Asociado/a activo/a» del carné. Misma migración pendiente que `institucion`
-   * (columna `perfiles.activo`); sin ella el carné no muestra el chip de estado.
-   * TODO(backend: docs/auditorias/2026-09-25-backend-rediseno-c-plus.md, fila «Carné de asociado»).
-   */
   activo?: boolean;
-  /**
-   * «Tu camino a la estabilidad» (embargo solidario a 36 meses, pieza 2b): no
-   * hay ninguna columna con la fecha del primer descuento (pregunta abierta
-   * en la auditoría: ¿es un dato por asociado o por crédito? ¿arranca en la
-   * aprobación o en el primer descuento real?). Mientras la cooperativa no
-   * responda, esta prop no se pasa desde app/cuenta/page.tsx y la tarjeta no
-   * se dibuja: no hay que inventar una fecha.
-   * TODO(backend: docs/auditorias/2026-09-25-backend-rediseno-c-plus.md, fila
-   * «Tu camino a la estabilidad»; pregunta abierta 2, relacionada con P-47).
-   */
-  caminoEstabilidad?: {
-    /** Mes en curso del embargo solidario (1-based). */
-    mesActual: number;
-    totalMeses: number;
-    /** «jun 2026» */
-    fechaInicio: string;
-    /** «jun 2029» */
-    fechaFin: string;
-  };
-  /** Celular actual (único dato que el asociado puede cambiar). */
-  telefono: string;
-  /** Error bajo el campo de celular. */
-  errorTelefono?: string;
-  /** Estado de carga del botón «Guardar» de «Mis datos». */
-  guardandoTelefono?: boolean;
-  /** Server Action de «Guardar» en «Mis datos» (solo perfiles.telefono). */
-  accionTelefono?: (formData: FormData) => void;
-  /** Mensaje para lectores de pantalla tras guardar el celular. */
-  mensajeTelefono?: string;
   /** Server Action de «Salir» / cerrar sesión (signOut → /ingresar). */
   accionSalir?: (formData: FormData) => void;
   /** Enlace https://wa.me/57<NÚMERO>; sin valor, «Hablar con la cooperativa» queda sin enlace. */
   whatsappUrl?: string | null;
+  /**
+   * Perfil del asociado: aquí solo se usa la regla de crédito (`credito`, pedido D-16/3p). El
+   * resto del perfil vive en /cuenta/perfil (pieza 3k).
+   */
+  perfilAsociado?: PerfilAsociado | null;
 };
 
 /** «Aprobada» → verde, «Rechazada» → rojo, «En revisión» / cualquier otro → ámbar (pieza 3a, Badge). */
@@ -93,6 +63,9 @@ const ESTADO_A_BADGE: Record<string, EstadoBadge> = {
   Rechazada: "rechazada",
   "En revisión": "revision",
 };
+
+/** id del aviso de crédito bloqueado (pieza 3p): el mosaico apagado lo referencia con aria-describedby. */
+const ID_AVISO_CREDITO = "aviso-credito-bloqueado";
 
 /** «$ 2.500.000» → 2500000 (solo para el medidor visual; no es un nuevo cálculo de tope). */
 function numeroDesdeTexto(texto: string) {
@@ -130,7 +103,7 @@ function SelloComprobante() {
  * - Escritorio (lg): la tarjeta se estira a la altura de la columna derecha; el contenido
  *   se centra en vertical y el botón toma su ancho natural.
  */
-function SolicitudVacia() {
+function SolicitudVacia({ creditoBloqueado }: { creditoBloqueado?: string | null }) {
   return (
     <>
       <h2 className="m-0 font-display text-18 font-extrabold lg:text-24">Tu solicitud</h2>
@@ -152,107 +125,20 @@ function SolicitudVacia() {
             </p>
           </div>
         </div>
-        {/* → /cuenta/solicitar (formulario de solicitud de crédito). */}
-        <Link href={RUTA_NUEVA_SOLICITUD} className={clasesBoton("primario", "gap-2 lg:self-start lg:px-9")}>
-          <IconoMas tamano={22} grosor={2.2} />
-          Nueva solicitud
-        </Link>
+        {/* → /cuenta/solicitar (formulario de solicitud de crédito). D-16: sin botón activo si no puede pedir. */}
+        {creditoBloqueado ? (
+          <AvisoCreditoBloqueado id={ID_AVISO_CREDITO} mensaje={creditoBloqueado} conBoton />
+        ) : (
+          <Link href={RUTA_NUEVA_SOLICITUD} className={clasesBoton("primario", "gap-2 lg:self-start lg:px-9")}>
+            <IconoMas tamano={22} grosor={2.2} />
+            Nueva solicitud
+          </Link>
+        )}
         <p className="m-0 rounded-10 bg-ga-fondo-suave p-3 text-14 leading-150 text-ga-texto-2 lg:px-3.5 lg:text-15 lg:leading-normal">
           Lo que puedes pedir depende de tu grado: revisa tu tope disponible.
         </p>
       </div>
     </>
-  );
-}
-
-type MisDatosProps = {
-  nombre: string;
-  cedula: string;
-  grado: string;
-  telefono: string;
-  /** Error bajo el campo de celular (validación del formato). */
-  errorTelefono?: string;
-  /** Estado de carga del botón «Guardar». */
-  guardando?: boolean;
-  accion?: (formData: FormData) => void;
-  /** Mensaje para lectores de pantalla (p. ej. «Guardamos tu celular»). */
-  mensaje?: string;
-};
-
-/**
- * Tarjeta «Mis datos» (pieza 3d). Nombre, cédula y grado son de solo lectura
- * (la base los protege); el celular es el único campo editable. La cédula se
- * muestra completa y sin formato, tal como la guarda `perfiles.cedula` — a
- * diferencia del carné (que la enmascara), aquí es un dato propio del
- * asociado, no algo para enseñar en público.
- * - Celular: todo en una columna; botón a lo ancho.
- * - ≥ 640 px: los 3 datos en fila y el campo con «Guardar» al lado.
- * - Escritorio (lg): datos (3/5) y teléfono (2/5) en la misma fila.
- */
-function MisDatos({
-  nombre,
-  cedula,
-  grado,
-  telefono,
-  errorTelefono,
-  guardando = false,
-  accion,
-  mensaje,
-}: MisDatosProps) {
-  const datosFijos = [
-    { etiqueta: "Nombre", valor: nombre },
-    { etiqueta: "Cédula", valor: cedula },
-    { etiqueta: "Grado", valor: grado },
-  ];
-
-  return (
-    <section
-      id="mis-datos"
-      aria-labelledby="mis-datos-titulo"
-      className="flex scroll-mt-4 flex-col gap-4 rounded-28 bg-white p-5 lg:px-8 lg:py-7"
-    >
-      <div className="flex flex-col gap-1">
-        <h2 id="mis-datos-titulo" className="m-0 font-display text-18 font-extrabold lg:text-22">
-          Mis datos
-        </h2>
-        <p className="m-0 text-14 leading-150 text-ga-texto-3">
-          Si tu nombre, cédula o grado no están bien, habla con la cooperativa.
-        </p>
-      </div>
-      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-5 lg:items-end lg:gap-7">
-        <dl className="m-0 grid grid-cols-1 gap-3 sm:grid-cols-3 lg:col-span-3">
-          {datosFijos.map((dato) => (
-            <div key={dato.etiqueta} className="flex flex-col gap-0.5 rounded-12 bg-ga-fondo-suave p-3.5">
-              <dt className="text-14 text-ga-texto-3">{dato.etiqueta}</dt>
-              <dd className="m-0 break-words text-16 font-bold text-ga-texto">{dato.valor}</dd>
-            </div>
-          ))}
-        </dl>
-        {/* Server Action: actualiza solo perfiles.telefono (la base impide cambiar nombre, cédula, grado y rol). */}
-        <form action={accion} className="flex flex-col gap-3 sm:flex-row sm:items-end lg:col-span-2" noValidate>
-          <Field id="telefono" label="Celular" error={errorTelefono} className="grow">
-            {(control) => (
-              <Input
-                {...control}
-                name="telefono"
-                type="tel"
-                inputMode="tel"
-                autoComplete="tel"
-                defaultValue={telefono}
-              />
-            )}
-          </Field>
-          {/* sm:h-13 = misma altura que el campo (52 px) cuando van en la misma fila. */}
-          <Button cargando={guardando} textoCargando="Guardando…" className="sm:h-13 sm:px-7">
-            Guardar
-          </Button>
-          {/* Solo para lectores de pantalla: confirma que se guardó (no hay diseño de éxito). */}
-          <p role="status" aria-live="polite" className="sr-only">
-            {mensaje}
-          </p>
-        </form>
-      </div>
-    </section>
   );
 }
 
@@ -314,112 +200,21 @@ function CarneAsociado({
   );
 }
 
-/**
- * «Tu camino a la estabilidad» (embargo solidario a 36 meses, pieza 2b).
- * Nunca se renderiza hoy: `caminoEstabilidad` no llega desde app/cuenta/page.tsx
- * (ver el TODO(backend) en CuentaProps). Queda lista para cuando la
- * cooperativa resuelva de dónde sale la fecha del primer descuento.
- */
-function CaminoEstabilidad({
-  mesActual,
-  totalMeses,
-  fechaInicio,
-  fechaFin,
-}: NonNullable<CuentaProps["caminoEstabilidad"]>) {
-  const fraccion = Math.min(Math.max(mesActual / totalMeses, 0), 1);
-  return (
-    <section className="flex flex-col gap-4 rounded-28 bg-white p-5 lg:p-7">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="m-0 font-display text-18 font-extrabold text-ga-navy lg:text-22">
-            Tu camino a la estabilidad
-          </h2>
-          <span className="text-14 text-ga-texto-3">
-            Embargo solidario · cuenta desde tu primer descuento en el desprendible
-          </span>
-        </div>
-        <div className="flex flex-none items-baseline gap-1.5">
-          <span className="font-display text-40 font-extrabold leading-none tracking-cifra text-ga-verde lg:text-[56px]">
-            {mesActual}
-          </span>
-          <span className="text-15 font-bold text-ga-texto-3">de {totalMeses} meses</span>
-        </div>
-      </div>
-      <div className="relative h-3 overflow-hidden rounded-full bg-ga-verde-claro">
-        <div
-          className="h-full origin-left rounded-full bg-ga-verde transition-transform duration-500 ease-spring"
-          style={{ width: "100%", transform: `scaleX(${fraccion})` }}
-        />
-      </div>
-      <div className="grid grid-cols-3 text-14 text-ga-texto-3">
-        <span>
-          <b className="text-ga-texto">Inicio</b> · {fechaInicio}
-        </span>
-        <span className="text-center">
-          <b className="text-ga-texto">Mitad</b> · mes {Math.round(totalMeses / 2)}
-        </span>
-        <span className="text-right">
-          <b className="text-ga-texto">De vuelta a los bancos</b> · {fechaFin}
-        </span>
-      </div>
-    </section>
-  );
-}
-
-const CLASE_TAB_INFERIOR_ACTIVA = "bg-ga-verde-claro text-ga-verde-oscuro";
-const CLASE_TAB_INFERIOR_INACTIVA = "text-ga-texto-3";
-
-/**
- * Barra inferior del asociado, solo en celular (pieza 2b). El mockup deja
- * «Nueva solicitud» únicamente aquí («Solicitar») y en el menú de escritorio,
- * sin repetirla en el cuerpo; en este código SÍ sigue repetida en el acceso
- * rápido de `nav[aria-label="Accesos"]` porque `tests/e2e/a-navegacion.spec.ts`
- * («Logo, «Inicio», «Nueva solicitud», «Convenios» y tarjetas href=#») hace
- * clic en ese enlace también en celular — quitarlo rompería la prueba.
- * Nav con nombre propio («Navegación del asociado», distinto de «Principal» y
- * «Accesos») para no chocar con los locators de esos otros nav. «Sorteo» y
- * «Mis datos» son anclas a las secciones de esta misma página (no hay rutas
- * propias todavía).
- */
-function BarraInferiorCuenta() {
-  return (
-    <BarraInferior>
-      <nav
-        aria-label="Navegación del asociado"
-        className="grid grid-cols-4 gap-1 rounded-full bg-white p-1.5 shadow-comprobante-movil"
-      >
-        <Link href="/cuenta" className={`flex h-13 flex-col items-center justify-center rounded-full text-13 font-extrabold no-underline ${CLASE_TAB_INFERIOR_ACTIVA}`}>
-          Inicio
-        </Link>
-        <Link
-          href={RUTA_NUEVA_SOLICITUD}
-          className={`flex h-13 flex-col items-center justify-center rounded-full text-13 font-bold no-underline ${CLASE_TAB_INFERIOR_INACTIVA}`}
-        >
-          Solicitar
-        </Link>
-        <a href="#sorteo" className={`flex h-13 flex-col items-center justify-center rounded-full text-13 font-bold no-underline ${CLASE_TAB_INFERIOR_INACTIVA}`}>
-          Sorteo
-        </a>
-        <a href="#mis-datos" className={`flex h-13 flex-col items-center justify-center rounded-full text-13 font-bold no-underline ${CLASE_TAB_INFERIOR_INACTIVA}`}>
-          Mis datos
-        </a>
-      </nav>
-    </BarraInferior>
-  );
-}
-
 /** Franja de accesos + tope + sorteo, columna derecha del grid superior. */
 function ColumnaLateral({
   tope,
   montoUsado,
   sorteo,
   whatsappUrl,
+  creditoBloqueado,
 }: {
   tope: string;
   /** Monto de la última solicitud, ya formateado («$ 2.500.000»); solo para el medidor visual. */
   montoUsado?: string;
   sorteo: SorteoDelMesProps | null;
   whatsappUrl?: string | null;
+  /** D-16: mensaje de por qué no puede pedir crédito (null = sí puede). */
+  creditoBloqueado?: string | null;
 }) {
   const toperNumero = numeroDesdeTexto(tope);
   const usadoNumero = montoUsado ? numeroDesdeTexto(montoUsado) : 0;
@@ -449,13 +244,25 @@ function ColumnaLateral({
 
       <nav id="sorteo" aria-label="Accesos" className="grid scroll-mt-4 grid-cols-2 gap-3 lg:grid-cols-1">
         {/* → /cuenta/solicitar (formulario de solicitud de crédito). */}
-        <Link
-          href={RUTA_NUEVA_SOLICITUD}
-          className="flex flex-col gap-2.5 rounded-16 bg-white p-4.5 text-15 font-bold text-ga-texto no-underline hover:bg-ga-verde-tint lg:flex-row lg:items-center lg:gap-3 lg:p-5 lg:text-16 lg:font-extrabold"
-        >
-          <IconoMas grosor={1.8} className="text-ga-verde" />
-          Nueva solicitud
-        </Link>
+        {creditoBloqueado ? (
+          <span
+            role="link"
+            aria-disabled="true"
+            aria-describedby={ID_AVISO_CREDITO}
+            className="flex cursor-not-allowed flex-col gap-2.5 rounded-16 bg-ga-linea-suave p-4.5 text-15 font-bold text-ga-deshabilitado-texto lg:flex-row lg:items-center lg:gap-3 lg:p-5 lg:text-16 lg:font-extrabold"
+          >
+            <IconoMas grosor={1.8} />
+            Nueva solicitud
+          </span>
+        ) : (
+          <Link
+            href={RUTA_NUEVA_SOLICITUD}
+            className="flex flex-col gap-2.5 rounded-16 bg-white p-4.5 text-15 font-bold text-ga-texto no-underline hover:bg-ga-verde-tint lg:flex-row lg:items-center lg:gap-3 lg:p-5 lg:text-16 lg:font-extrabold"
+          >
+            <IconoMas grosor={1.8} className="text-ga-verde" />
+            Nueva solicitud
+          </Link>
+        )}
         {/* TODO(pendiente-spec): confirmar si «Convenios» tendrá página propia. Hoy: sección #convenios. */}
         <a
           href="#convenios"
@@ -502,15 +309,12 @@ export function Cuenta({
   grado,
   institucion,
   activo,
-  caminoEstabilidad,
-  telefono,
-  errorTelefono,
-  guardandoTelefono,
-  accionTelefono,
-  mensajeTelefono,
   accionSalir,
   whatsappUrl,
+  perfilAsociado,
 }: CuentaProps) {
+  // D-16: mensaje si NO puede pedir crédito (no operando, inactivo, sin cupo…); null = puede.
+  const creditoBloqueado = perfilAsociado && !perfilAsociado.credito.puedeSolicitar ? perfilAsociado.credito.mensaje : null;
   const insigniaBadge: ReactNode = solicitud ? (
     <Badge tamano="md" estado={ESTADO_A_BADGE[solicitud.estadoTexto] ?? "revision"}>
       {solicitud.estadoTexto}
@@ -601,9 +405,12 @@ export function Cuenta({
                   {/* La tasa se guarda en la solicitud pero NO se muestra al asociado (decisión 25-sep): es de uso interno. */}
                   Te avisaremos por correo cuando cambie el estado.
                 </p>
+                {/* Pieza 3p: con solicitud en curso (o cualquier otro motivo) el mosaico «Nueva solicitud»
+                    queda apagado y el motivo se ve aquí, enlazado por aria-describedby. */}
+                {creditoBloqueado ? <AvisoCreditoBloqueado id={ID_AVISO_CREDITO} mensaje={creditoBloqueado} /> : null}
               </>
             ) : (
-              <SolicitudVacia />
+              <SolicitudVacia creditoBloqueado={creditoBloqueado} />
             )}
           </section>
 
@@ -612,12 +419,9 @@ export function Cuenta({
             montoUsado={solicitud?.monto}
             sorteo={sorteo}
             whatsappUrl={whatsappUrl}
+            creditoBloqueado={creditoBloqueado}
           />
         </div>
-
-        {/* «Tu camino a la estabilidad»: no se dibuja hasta que exista la fecha del
-            primer descuento (ver TODO(backend) en CuentaProps). */}
-        {caminoEstabilidad ? <CaminoEstabilidad {...caminoEstabilidad} /> : null}
 
         {/* Carné (pieza 2b): con los datos que ya existen hoy (nombre, cédula
             enmascarada, grado); institución y «activo» quedan para cuando
@@ -629,29 +433,14 @@ export function Cuenta({
           className="flex scroll-mt-4 flex-col gap-4 rounded-28 bg-white p-5 lg:px-8 lg:py-7"
         >
           <h2 className="m-0 font-display text-18 font-extrabold lg:text-22">Tus convenios</h2>
-          <div className="flex flex-col gap-3 lg:grid lg:grid-cols-5">
-            {convenios.map((convenio) => (
-              // TODO(pendiente-spec): no hay página de detalle del convenio.
-              <ConvenioCard key={convenio.nombre} convenio={convenio} variante="enlace" href="#" />
-            ))}
-          </div>
+          {/* Detalle por marca (pieza 3n): modal en escritorio, hoja inferior en celular. */}
+          <ListaConvenios convenios={convenios} variante="cuenta" />
         </section>
 
-        <MisDatos
-          nombre={nombre}
-          cedula={cedula}
-          grado={grado}
-          telefono={telefono}
-          errorTelefono={errorTelefono}
-          guardando={guardandoTelefono}
-          accion={accionTelefono}
-          mensaje={mensajeTelefono}
-        />
       </main>
 
-      {/* Barra inferior (pieza 2b): navegación rápida por anclas de esta misma
-          pantalla; ver la nota de fidelidad en BarraInferiorCuenta. */}
-      <BarraInferiorCuenta />
+      {/* Barra inferior (pieza 2b): Inicio, Solicitar, Sorteo, Perfil. */}
+      <BarraInferiorCuenta activa="inicio" />
     </div>
   );
 }

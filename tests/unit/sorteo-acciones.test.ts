@@ -14,6 +14,7 @@ vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn() }));
 vi.mock("@/lib/supabase/admin", () => ({ crearClienteAdmin: vi.fn() }));
 vi.mock("@/lib/correo/sorteo", () => ({ enviarBoletaSorteo: vi.fn().mockResolvedValue(undefined) }));
 vi.mock("@/lib/servidor/registro", () => ({ registrar: vi.fn() }));
+vi.mock("@/lib/correo/institucional", () => ({ avisarCorreoInstitucional: vi.fn(async () => {}) }));
 // F2-04 / S-01: actions-sorteo.ts ahora importa dentroDelLimite (lib/servidor/limite.ts,
 // "server-only" real) para el tope de «Reenviar mi boleta»; se simula igual que el resto.
 vi.mock("@/lib/servidor/limite", () => ({ dentroDelLimite: vi.fn().mockResolvedValue(true) }));
@@ -22,6 +23,7 @@ vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 import { createClient } from "@/lib/supabase/server";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { enviarBoletaSorteo } from "@/lib/correo/sorteo";
+import { avisarCorreoInstitucional } from "@/lib/correo/institucional";
 import { dentroDelLimite } from "@/lib/servidor/limite";
 import { confirmarBoletaSorteo, participarSorteo, reenviarBoletaSorteo } from "@/app/cuenta/actions-sorteo";
 
@@ -34,9 +36,17 @@ function clienteFalso(opts: {
   /** S-13: rol de quien tiene la sesión. Por defecto "asociado" (puede participar). */
   rol?: string;
   filaBoleta?: { intentos?: number; numero?: string } | null;
+  /** Correo institucional del perfil (spec-requerimientos-ricardo §2.8): el aviso va a los dos. */
+  correoInstitucional?: string | null;
 }) {
   const single = vi.fn().mockResolvedValue({
-    data: opts.nombrePerfil ? { nombre_completo: opts.nombrePerfil, rol: opts.rol ?? "asociado" } : null,
+    data: opts.nombrePerfil
+      ? {
+          nombre_completo: opts.nombrePerfil,
+          rol: opts.rol ?? "asociado",
+          correo_institucional: opts.correoInstitucional ?? null,
+        }
+      : null,
     error: null,
   });
   const maybeSingle = vi.fn().mockResolvedValue({ data: opts.filaBoleta ?? null, error: null });
@@ -102,12 +112,29 @@ describe("participarSorteo · con sesión", () => {
 
     expect(rpc).toHaveBeenCalledWith("participar_sorteo", { p_asociado_id: USUARIO.id });
     expect(enviarBoletaSorteo).toHaveBeenCalledWith(
-      expect.objectContaining({ correo: USUARIO.email, nombre: "Juan Pérez", numero: "123456" }),
+      expect.objectContaining({ correo: [USUARIO.email], nombre: "Juan Pérez", numero: "123456" }),
     );
     expect(resultado.ok).toBe(true);
     expect(resultado.correoEnmascarado).toBe("ju•••@•••");
     // Nunca el número crudo en la respuesta al navegador.
     expect(JSON.stringify(resultado)).not.toContain("123456");
+  });
+
+  it("RS-02: con correo institucional, el número va SOLO al personal; al institucional, un aviso sin datos", async () => {
+    vi.mocked(createClient).mockResolvedValue(
+      clienteFalso({ user: USUARIO, nombrePerfil: "Juan Pérez", correoInstitucional: "Juan.Perez@Policia.gov.co" }) as never,
+    );
+    const rpc = vi.fn().mockResolvedValue({
+      data: [{ id: "b1", numero: "123456", anio: 2026, mes: 10, fecha_envio: "2026-10-03T00:00:00Z" }],
+      error: null,
+    });
+    vi.mocked(crearClienteAdmin).mockReturnValue(adminFalso(rpc) as never);
+
+    const resultado = await participarSorteo();
+
+    expect(enviarBoletaSorteo).toHaveBeenCalledWith(expect.objectContaining({ correo: [USUARIO.email] }));
+    expect(avisarCorreoInstitucional).toHaveBeenCalledWith(USUARIO.email, "Juan.Perez@Policia.gov.co");
+    expect(resultado.correoEnmascarado).toBe("ju•••@•••");
   });
 
   it("S-13: un rol distinto de asociado (p. ej. admin o asesor) no participa", async () => {
@@ -236,7 +263,7 @@ describe("reenviarBoletaSorteo · F2-04 (auditoría 2026-09-24)", () => {
     const resultado = await reenviarBoletaSorteo();
 
     expect(enviarBoletaSorteo).toHaveBeenCalledWith(
-      expect.objectContaining({ correo: USUARIO.email, numero: "654321" }),
+      expect.objectContaining({ correo: [USUARIO.email], numero: "654321" }),
     );
     expect(resultado.ok).toBe(true);
     expect(resultado.correoEnmascarado).toBe("ju•••@•••");

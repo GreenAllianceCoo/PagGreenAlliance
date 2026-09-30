@@ -115,8 +115,8 @@ describe("filtrarClientes", () => {
     expect(filtrarClientes(filas, { busqueda: "PÉREZ" })).toHaveLength(1);
   });
 
-  it("busca por cédula (coincidencia parcial)", () => {
-    expect(filtrarClientes(filas, { busqueda: "0002" })).toHaveLength(1);
+  it("RS-12: no filtra por cédula (la lista la trae enmascarada; se busca con buscarCliente)", () => {
+    expect(filtrarClientes(filas, { busqueda: "0002" })).toHaveLength(0);
   });
 
   it("filtra por estado", () => {

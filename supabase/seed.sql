@@ -77,6 +77,22 @@ update public.perfiles
    set cedula = '1234567891', grado = 'SI'
  where id = '7d1f0c2a-3b4e-4f5a-8b6c-9d0e1f2a3b4c';
 
+-- Spec §8 (migración 20260930100200): solo se pide crédito con el proceso
+-- ejecutivo en «operando». Los asociados 1 y 2 (los que usan las e2e de
+-- crédito) quedan operando desde hace 6 meses: fuera del periodo de
+-- comisiones en curso y sin llegar a los 24 meses de la renovación.
+insert into public.procesos_ejecutivos (asociado_id, estado, fecha_inicio_embargo) values
+  ('4c7808d8-085f-42ed-9e5d-f53c117b4cd1', 'operando',
+   ((now() at time zone 'America/Bogota')::date - interval '6 months')::date),
+  ('7d1f0c2a-3b4e-4f5a-8b6c-9d0e1f2a3b4c', 'operando',
+   ((now() at time zone 'America/Bogota')::date - interval '6 months')::date);
+
+update public.historial_proceso_ejecutivo h
+   set created_at = (pe.fecha_inicio_embargo::timestamp at time zone 'America/Bogota')
+  from public.procesos_ejecutivos pe
+ where pe.asociado_id = h.asociado_id
+   and h.asociado_id in ('4c7808d8-085f-42ed-9e5d-f53c117b4cd1', '7d1f0c2a-3b4e-4f5a-8b6c-9d0e1f2a3b4c');
+
 -- Solicitud pendiente del asociado 1. Grado, tasa y plazo los pone el trigger
 -- chk_monto_solicitud; la fecha, tr_fijar_fecha_solicitud.
 insert into public.solicitudes_credito (asociado_id, porcentaje_devolucion, monto_solicitado)
@@ -176,3 +192,142 @@ insert into auth.identities (
 update public.perfiles
    set cedula = '1234567899', rol = 'admin'
  where id = 'bd8bb056-286f-4b75-89e1-cc07b6c7c0f8';
+
+-- ============================================================
+-- Requerimientos de Ricardo (2026-09-29) · datos de prueba
+-- (migraciones 20260929100000..100700). No cambia cédula, correo, teléfono,
+-- rol ni solicitudes de los usuarios que ya usan las e2e.
+--
+--   Asociado 1 (1234567890) y 2 (1234567891): se les completa institución
+--     (Policía); al 1 también correo institucional y cuenta de nómina.
+--   Asociado 3 · cédula 1234567893 · grado TE (grupo OF) · Ejército ·
+--     correo operando.prueba@greenalliance.test · cliente del asesor de
+--     prueba · proceso en «operando» desde hace 25 meses (ya puede pedir la
+--     renovación; retiro anticipado disponible).
+--   Asociado 4 · cédula 1234567894 · grado IJ (SIN cupo de crédito) ·
+--     Policía · correo sin.cupo@greenalliance.test · cliente del asesor de
+--     prueba · proceso en «operando» desde el inicio del periodo de
+--     comisiones en curso (= 1 ingreso nuevo del periodo para el asesor).
+--   Asesor de prueba: 3 clientes operativos (asociados 1, 3 y 4) y 1 ingreso
+--     nuevo en el periodo; pagos de comisión registrados por 700.000.
+--   Afiliación de ejemplo con los campos nuevos (correo institucional +
+--     cuenta de nómina en billetera): Diana Cárdenas, cédula 1234567897.
+--   Convenios: los 5 de la spec §4 los crea la migración
+--     20260929100600 (no se repiten aquí).
+-- ============================================================
+
+update public.perfiles
+   set institucion = 'policia',
+       correo_institucional = 'asociado.prueba@policia.gov.co',
+       nomina_entidad = 'Bancolombia', nomina_tipo = 'ahorros', nomina_numero = '12345678901'
+ where id = '4c7808d8-085f-42ed-9e5d-f53c117b4cd1';
+
+update public.perfiles
+   set institucion = 'policia'
+ where id = '7d1f0c2a-3b4e-4f5a-8b6c-9d0e1f2a3b4c';
+
+insert into auth.users (
+  instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+  raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+  confirmation_token, recovery_token, email_change, email_change_token_new
+) values
+(
+  '00000000-0000-0000-0000-000000000000',
+  '3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b01',
+  'authenticated', 'authenticated',
+  'operando.prueba@greenalliance.test',
+  extensions.crypt('Prueba123!', extensions.gen_salt('bf')),
+  now(),
+  '{"provider":"email","providers":["email"],"cedula":"1234567893","grado":"TE"}',
+  '{"nombre_completo":"Asociado Operando de Prueba","telefono":"3005550003"}',
+  now(), now(), '', '', '', ''
+),
+(
+  '00000000-0000-0000-0000-000000000000',
+  '3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b02',
+  'authenticated', 'authenticated',
+  'sin.cupo@greenalliance.test',
+  extensions.crypt('Prueba123!', extensions.gen_salt('bf')),
+  now(),
+  '{"provider":"email","providers":["email"],"cedula":"1234567894","grado":"IJ"}',
+  '{"nombre_completo":"Asociada Sin Cupo de Prueba","telefono":"3005550004"}',
+  now(), now(), '', '', '', ''
+);
+
+insert into auth.identities (
+  id, user_id, provider_id, provider, identity_data, last_sign_in_at, created_at, updated_at
+) values
+(
+  gen_random_uuid(),
+  '3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b01',
+  '3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b01',
+  'email',
+  '{"sub":"3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b01","email":"operando.prueba@greenalliance.test","email_verified":true}',
+  now(), now(), now()
+),
+(
+  gen_random_uuid(),
+  '3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b02',
+  '3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b02',
+  'email',
+  '{"sub":"3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b02","email":"sin.cupo@greenalliance.test","email_verified":true}',
+  now(), now(), now()
+);
+
+update public.perfiles
+   set cedula = '1234567893', grado = 'TE', institucion = 'ejercito',
+       correo_institucional = 'operando.prueba@buzonejercito.mil.co',
+       nomina_entidad = 'Banco de Bogotá', nomina_tipo = 'corriente', nomina_numero = '0012345678',
+       asesor_id = '9f2e6a1c-6b3d-4a2e-9c7a-1d2e3f4a5b6c'
+ where id = '3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b01';
+
+update public.perfiles
+   set cedula = '1234567894', grado = 'IJ', institucion = 'policia',
+       correo_institucional = 'sin.cupo@policia.gov.co',
+       nomina_entidad = 'Nequi', nomina_tipo = 'deposito_electronico', nomina_numero = '3005550004',
+       asesor_id = '9f2e6a1c-6b3d-4a2e-9c7a-1d2e3f4a5b6c'
+ where id = '3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b02';
+
+-- Procesos ejecutivos (como postgres: el trigger no exige admin sin sesión).
+insert into public.procesos_ejecutivos (asociado_id, estado, fecha_inicio_embargo) values
+  ('3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b01', 'operando',
+   ((now() at time zone 'America/Bogota')::date - interval '25 months')::date),
+  ('3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b02', 'operando',
+   (select pc.inicio from public.periodo_comision((now() at time zone 'America/Bogota')::date) pc));
+
+-- El historial se creó con la hora de hoy; se lleva a la fecha real de inicio
+-- para que «clientes operativos al corte» de periodos pasados tenga sentido.
+update public.historial_proceso_ejecutivo h
+   set created_at = (pe.fecha_inicio_embargo::timestamp at time zone 'America/Bogota')
+  from public.procesos_ejecutivos pe
+ where pe.asociado_id = h.asociado_id
+   and h.asociado_id = '3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b01';
+
+-- Pagos de comisión del asesor de prueba (total 700.000).
+insert into public.pagos_comision (asesor_id, asociado_id, periodo_corte, concepto, monto, nota) values
+  ('9f2e6a1c-6b3d-4a2e-9c7a-1d2e3f4a5b6c', '3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b01',
+   (select pc.fin from public.periodo_comision(((now() at time zone 'America/Bogota')::date - interval '25 months')::date) pc),
+   'ingreso_nuevo', 500000, 'Seed: ingreso del asociado 3'),
+  ('9f2e6a1c-6b3d-4a2e-9c7a-1d2e3f4a5b6c', '3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b01',
+   (select pc.fin from public.periodo_comision(((now() at time zone 'America/Bogota')::date - interval '2 months')::date) pc),
+   'embargo_operativo', 100000, 'Seed: operativo'),
+  ('9f2e6a1c-6b3d-4a2e-9c7a-1d2e3f4a5b6c', '3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b01',
+   (select pc.fin from public.periodo_comision(((now() at time zone 'America/Bogota')::date - interval '1 month')::date) pc),
+   'embargo_operativo', 100000, 'Seed: operativo');
+
+-- Afiliación de ejemplo con los campos nuevos (grado del Ejército, nómina en billetera).
+insert into public.solicitudes_afiliacion (
+  nombres, apellidos, cedula, grado, institucion, celular, nequi, email, correo_institucional,
+  nomina_entidad, nomina_tipo, nomina_numero,
+  asesor_id, foto_cedula_frente, foto_cedula_reverso, foto_selfie, mensaje, acepto_datos_at
+) values (
+  'Diana', 'Cárdenas Ruiz', '1234567897', 'CS', 'ejercito', '3157778899', '3157778899',
+  'diana.cardenas@correo.test', 'diana.cardenas@buzonejercito.mil.co',
+  'Daviplata', 'deposito_electronico', '3157778899',
+  '9f2e6a1c-6b3d-4a2e-9c7a-1d2e3f4a5b6c',
+  'afiliacion-documentos/1234567897/cedula-frente.jpg',
+  'afiliacion-documentos/1234567897/cedula-reverso.jpg',
+  'afiliacion-documentos/1234567897/selfie.jpg',
+  'Quiero saber cuándo empieza el conteo.',
+  now()
+);

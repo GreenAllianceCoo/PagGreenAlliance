@@ -12,10 +12,12 @@ vi.mock("next/headers", () => ({
 vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn() }));
 vi.mock("@/lib/supabase/admin", () => ({ crearClienteAdmin: vi.fn() }));
 vi.mock("@/lib/correo/resend", () => ({ enviarPlantillaResend: vi.fn(async () => {}) }));
+vi.mock("@/lib/correo/institucional", () => ({ avisarCorreoInstitucional: vi.fn(async () => {}) }));
 
 import { createClient } from "@/lib/supabase/server";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { enviarPlantillaResend } from "@/lib/correo/resend";
+import { avisarCorreoInstitucional } from "@/lib/correo/institucional";
 import { aprobarAfiliacion, cambiarEstadoAfiliacion } from "@/app/admin/afiliaciones/actions";
 
 const ID_ADMIN = "00000000-0000-4000-a000-000000000020";
@@ -28,10 +30,23 @@ type Escenario = {
   estadoSolicitud?: "pendiente" | "contactado" | "aprobada" | "rechazada";
   perfilYaExiste?: boolean;
   errorCrearUsuario?: boolean;
+  /** Solicitud del formulario v3 (institución, correo institucional, nómina, asesor). */
+  v3?: boolean;
+  /** El trigger validar_perfil_asesor_id rechaza el asesor (dejó de atender). */
+  asesorYaNoAtiende?: boolean;
 };
 
+const ID_ASESOR = "00000000-0000-4000-a000-000000000023";
+
 function crearSupabaseFalso(escenario: Escenario = {}) {
-  const { estadoSolicitud = "pendiente", perfilYaExiste = false, errorCrearUsuario = false } = escenario;
+  const {
+    estadoSolicitud = "pendiente",
+    perfilYaExiste = false,
+    errorCrearUsuario = false,
+    v3 = false,
+    asesorYaNoAtiende = false,
+  } = escenario;
+  const actualizacionesPerfil: Record<string, unknown>[] = [];
 
   const actualizacionesEstado: Record<string, unknown>[] = [];
   const usuariosCreados: Record<string, unknown>[] = [];
@@ -39,7 +54,7 @@ function crearSupabaseFalso(escenario: Escenario = {}) {
   // Cliente autenticado del admin (RLS): lee la solicitud y cambia el estado.
   const from = vi.fn((tabla: string) => {
     const resultado = () => {
-      if (tabla === "perfiles") return { data: { rol: "admin", nombre_completo: "Admin" }, error: null };
+      if (tabla === "perfiles") return { data: { rol: "admin", nombre_completo: "Admin", activo: true }, error: null };
       if (tabla === "solicitudes_afiliacion") {
         return {
           data: {
@@ -49,8 +64,18 @@ function crearSupabaseFalso(escenario: Escenario = {}) {
             grado: "PT",
             email: "camilo@policia.gov.co",
             celular: "3009998877",
-            asesor_id: null,
+            asesor_id: v3 ? ID_ASESOR : null,
             estado: estadoSolicitud,
+            ...(v3
+              ? {
+                  email: "camilo.personal@gmail.com",
+                  institucion: "policia",
+                  correo_institucional: "camilo@policia.gov.co",
+                  nomina_entidad: "Bancolombia",
+                  nomina_tipo: "ahorros",
+                  nomina_numero: "12345678",
+                }
+              : {}),
           },
           error: null,
         };
@@ -84,9 +109,14 @@ function crearSupabaseFalso(escenario: Escenario = {}) {
       data: perfilYaExiste ? { id: ID_PERFIL_NUEVO } : null,
       error: null,
     }));
-    consulta.update = vi.fn(() => {
+    consulta.update = vi.fn((cambios: Record<string, unknown>) => {
+      actualizacionesPerfil.push(cambios);
       const encadenable: Record<string, unknown> = {};
-      encadenable.eq = vi.fn(async () => ({ data: null, error: null }));
+      encadenable.eq = vi.fn(async () =>
+        asesorYaNoAtiende && "asesor_id" in cambios
+          ? { data: null, error: { message: "asesor_id debe ser un perfil con rol asesor" } }
+          : { data: null, error: null },
+      );
       return encadenable;
     });
     return consulta;
@@ -105,7 +135,7 @@ function crearSupabaseFalso(escenario: Escenario = {}) {
   };
   vi.mocked(crearClienteAdmin).mockReturnValue(clienteAdmin as never);
 
-  return { actualizacionesEstado, usuariosCreados };
+  return { actualizacionesEstado, usuariosCreados, actualizacionesPerfil };
 }
 
 function formulario(campos: Record<string, string>) {
@@ -118,6 +148,7 @@ beforeEach(() => {
   vi.mocked(createClient).mockReset();
   vi.mocked(crearClienteAdmin).mockReset();
   vi.mocked(enviarPlantillaResend).mockClear();
+  vi.mocked(avisarCorreoInstitucional).mockClear();
 });
 
 describe("aprobarAfiliacion · crea la cuenta una sola vez (idempotente)", () => {
@@ -151,6 +182,51 @@ describe("aprobarAfiliacion · crea la cuenta una sola vez (idempotente)", () =>
     const resultado = await aprobarAfiliacion({}, formulario({ id: ID_SOLICITUD }));
     expect(resultado.error).toBeTruthy();
     expect(actualizacionesEstado).toHaveLength(0);
+  });
+});
+
+describe("aprobarAfiliacion · afiliación v3 (spec-requerimientos-ricardo §2.8 y §2.12)", () => {
+  it("crea el usuario con el correo PERSONAL y copia institución, correo institucional, nómina y asesor al perfil", async () => {
+    const { usuariosCreados, actualizacionesPerfil } = crearSupabaseFalso({ v3: true });
+    const resultado = await aprobarAfiliacion({}, formulario({ id: ID_SOLICITUD }));
+    expect(resultado.error).toBeUndefined();
+    expect(usuariosCreados[0]).toMatchObject({ email: "camilo.personal@gmail.com" });
+    expect(actualizacionesPerfil[0]).toEqual({
+      cedula: "1234567899",
+      grado: "PT",
+      institucion: "policia",
+      correo_institucional: "camilo@policia.gov.co",
+      nomina_entidad: "Bancolombia",
+      nomina_tipo: "ahorros",
+      nomina_numero: "12345678",
+      asesor_id: ID_ASESOR,
+    });
+    expect(actualizacionesPerfil[0]).not.toHaveProperty("email");
+  });
+
+  it("RS-02: «Ingreso aceptado» (con la cédula) va SOLO al personal; al institucional, el aviso sin datos", async () => {
+    crearSupabaseFalso({ v3: true });
+    await aprobarAfiliacion({}, formulario({ id: ID_SOLICITUD }));
+    expect(enviarPlantillaResend).toHaveBeenCalledTimes(1);
+    expect(enviarPlantillaResend).toHaveBeenCalledWith(expect.objectContaining({ para: ["camilo.personal@gmail.com"] }));
+    expect(avisarCorreoInstitucional).toHaveBeenCalledWith("camilo.personal@gmail.com", "camilo@policia.gov.co");
+  });
+
+  it("sin correo institucional (solicitud antigua) solo va al personal", async () => {
+    crearSupabaseFalso();
+    await aprobarAfiliacion({}, formulario({ id: ID_SOLICITUD }));
+    expect(enviarPlantillaResend).toHaveBeenCalledWith(expect.objectContaining({ para: ["camilo@policia.gov.co"] }));
+  });
+
+  it("si el asesor ya no atiende, aprueba igual sin asesor y lo avisa", async () => {
+    const { actualizacionesPerfil, actualizacionesEstado } = crearSupabaseFalso({ v3: true, asesorYaNoAtiende: true });
+    const resultado = await aprobarAfiliacion({}, formulario({ id: ID_SOLICITUD }));
+    expect(resultado.error).toBeUndefined();
+    expect(resultado.mensaje).toMatch(/ya no atiende asociados/);
+    expect(actualizacionesPerfil).toHaveLength(2);
+    expect(actualizacionesPerfil[1]).not.toHaveProperty("asesor_id");
+    expect(actualizacionesPerfil[1]).toMatchObject({ nomina_numero: "12345678" });
+    expect(actualizacionesEstado).toEqual([{ estado: "aprobada" }]);
   });
 });
 

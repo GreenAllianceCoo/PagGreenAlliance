@@ -26,8 +26,8 @@ function formatCOP(valor: number) {
 
 type CuentaDemoProps = {
   nombreAsesor: string;
-  /** `grados_credito` agrupado por grado (de la base si se pudo leer; si no, la copia de lib/asesor/datosDemo.ts). */
-  paquetesPorGrado: Record<CodigoGrado, PaqueteDemo[]>;
+  /** `grados_credito` agrupado por grado, leído en el servidor. `null` si no se pudo leer (RS-08: no hay cifras de respaldo). */
+  paquetesPorGrado: Record<CodigoGrado, PaqueteDemo[]> | null;
   /** Server Action de «Salir» (misma del resto de /asesor). */
   accionSalir?: (formData: FormData) => void;
   /** Encabezado propio (p. ej. el de /admin); si falta, el del asesor. */
@@ -60,9 +60,10 @@ export function CuentaDemo({
   tituloDemo = "Modo demostración",
   subtituloDemo = "Nada de lo que hagas aquí se guarda",
 }: CuentaDemoProps) {
-  const gradosDisponibles = GRADOS.filter((g) => (paquetesPorGrado[g]?.length ?? 0) > 0);
+  const sinDatos = paquetesPorGrado === null;
+  const gradosDisponibles = GRADOS.filter((g) => (paquetesPorGrado?.[g]?.length ?? 0) > 0);
   const [grado, setGrado] = useState<CodigoGrado>(gradosDisponibles[0] ?? "PP");
-  const paquetes = useMemo(() => paquetesPorGrado[grado] ?? [], [paquetesPorGrado, grado]);
+  const paquetes = useMemo(() => paquetesPorGrado?.[grado] ?? [], [paquetesPorGrado, grado]);
   const tope = topeMaximoDemo(paquetes);
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
@@ -77,7 +78,7 @@ export function CuentaDemo({
 
   function cambiarGrado(nuevo: CodigoGrado) {
     setGrado(nuevo);
-    const nuevosPaquetes = paquetesPorGrado[nuevo] ?? [];
+    const nuevosPaquetes = paquetesPorGrado?.[nuevo] ?? [];
     const nuevoPorcentaje = nuevosPaquetes[0]?.porcentaje ?? "50";
     setPorcentaje(nuevoPorcentaje);
     setMonto(nuevosPaquetes[0]?.capacidad_maxima ?? MONTO_MINIMO);
@@ -159,10 +160,20 @@ export function CuentaDemo({
             {!mostrarFormulario ? (
               <>
                 <h2 className="m-0 text-18 font-extrabold lg:text-20">Tu solicitud</h2>
-                <p className="m-0 text-15 leading-150 text-ga-texto-2">
-                  Así ve el cliente su cuenta antes de pedir un crédito. Prueba «Nueva solicitud».
-                </p>
-                <Button onClick={() => setMostrarFormulario(true)} className="gap-2 lg:self-start lg:px-9">
+                {sinDatos ? (
+                  <p role="alert" className="m-0 text-14 font-semibold text-ga-error">
+                    No pudimos cargar los topes de crédito. Recarga la página; si sigue igual, avisa al equipo técnico.
+                  </p>
+                ) : (
+                  <p className="m-0 text-15 leading-150 text-ga-texto-2">
+                    Así ve el cliente su cuenta antes de pedir un crédito. Prueba «Nueva solicitud».
+                  </p>
+                )}
+                <Button
+                  onClick={() => setMostrarFormulario(true)}
+                  disabled={sinDatos}
+                  className="gap-2 lg:self-start lg:px-9"
+                >
                   Nueva solicitud
                 </Button>
               </>

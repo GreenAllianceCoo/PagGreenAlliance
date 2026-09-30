@@ -23,6 +23,10 @@ insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('00000000-0000-4000-a000-0000000000ad', 'admin@prueba.test',      '{"cedula":"1000000003"}',             '{"nombre_completo":"Admin Prueba"}');
 update public.perfiles set rol = 'admin' where id = '00000000-0000-4000-a000-0000000000ad';
 
+-- 20260930100200: el crédito exige proceso ejecutivo en «operando» (spec §8).
+insert into public.procesos_ejecutivos (asociado_id, estado)
+select id, 'operando' from public.perfiles where id::text like '00000000-0000-4000-a000-%';
+
 -- ------------------------------------------------------------
 -- Rechazos
 -- ------------------------------------------------------------
@@ -185,8 +189,10 @@ select lives_ok(
 );
 
 select is(
-  (select tasa_interes_mensual::text from public.solicitudes_credito
-    where asociado_id = '00000000-0000-4000-a000-00000000000a'),
+  -- 20260930100300: authenticated (también el admin) ya no lee la columna; el admin usa la RPC.
+  (select t.tasa_interes_mensual::text
+     from public.admin_tasas_solicitudes(array(select s.id from public.solicitudes_credito s
+                                                where s.asociado_id = '00000000-0000-4000-a000-00000000000a')) t),
   '0.07900000',
   'la pendiente conserva la tasa con que se pidió'
 );

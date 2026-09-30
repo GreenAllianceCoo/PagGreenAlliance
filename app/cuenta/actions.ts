@@ -56,5 +56,6 @@ export async function actualizarTelefono(
   }
 
   revalidatePath("/cuenta");
+  revalidatePath("/cuenta/perfil");
   return { mensaje: "Guardamos tu celular.", telefono: resultado.data.telefono };
 }

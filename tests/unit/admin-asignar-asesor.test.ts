@@ -68,7 +68,7 @@ function crearSupabaseFalso(escenario: Escenario = {}) {
     consulta.eq = vi.fn(() => consulta);
     consulta.is = vi.fn(() => consulta);
     consulta.single = vi.fn(async () => {
-      if (tabla === "perfiles") return { data: { rol: esAdmin ? "admin" : "asociado", nombre_completo: "Admin" }, error: null };
+      if (tabla === "perfiles") return { data: { rol: esAdmin ? "admin" : "asociado", nombre_completo: "Admin", activo: true }, error: null };
       if (tabla === "solicitudes_afiliacion") {
         return { data: { id: ID_SOLICITUD, cedula: CEDULA, estado: estadoSolicitud }, error: null };
       }

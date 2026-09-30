@@ -19,12 +19,14 @@ export async function exigirAdmin() {
 
   const { data: perfil } = await supabase
     .from("perfiles")
-    .select("rol, nombre_completo")
+    .select("rol, nombre_completo, activo")
     .eq("id", user.id)
     .single();
 
   // No es admin: no se revela nada, se manda al lugar que le corresponda.
-  if (perfil?.rol !== "admin") redirect("/cuenta");
+  // RS-05: un admin dado de baja (perfiles.activo = false) pierde el acceso
+  // aunque su sesión siga viva. Se manda a /cuenta, igual que a un no-admin.
+  if (perfil?.rol !== "admin" || !perfil.activo) redirect("/cuenta");
 
   return { supabase, userId: user.id, nombre: perfil.nombre_completo as string };
 }

@@ -12,6 +12,8 @@ import { revalidatePath } from "next/cache";
 import { registrar } from "@/lib/servidor/registro";
 import { dentroDelLimite } from "@/lib/servidor/limite";
 import { enviarBoletaSorteo } from "@/lib/correo/sorteo";
+import { destinatariosAviso } from "@/lib/correo/destinatarios";
+import { avisarCorreoInstitucional } from "@/lib/correo/institucional";
 import { enmascararCorreo } from "@/lib/mascara";
 import { fechaBogota, nombreMes } from "@/lib/sorteo/fecha";
 import { createClient } from "@/lib/supabase/server";
@@ -76,7 +78,7 @@ export async function participarSorteo(): Promise<EstadoParticiparSorteo> {
   // pero la Server Action es la barrera real: nadie participa llamándola directo.
   const { data: perfil } = await supabase
     .from("perfiles")
-    .select("nombre_completo, rol")
+    .select("nombre_completo, rol, correo_institucional")
     .eq("id", user.id)
     .single();
   if (perfil?.rol !== "asociado") {
@@ -92,7 +94,14 @@ export async function participarSorteo(): Promise<EstadoParticiparSorteo> {
   }
 
   const fila = data[0] as { numero: string; mes: number };
-  await enviarBoletaSorteo({ correo, nombre, numero: fila.numero, mes: nombreMes(fila.mes) });
+  // RS-02: el número SOLO al correo personal; al institucional, un aviso sin datos.
+  await avisarCorreoInstitucional(correo, perfil?.correo_institucional);
+  await enviarBoletaSorteo({
+    correo: destinatariosAviso(correo),
+    nombre,
+    numero: fila.numero,
+    mes: nombreMes(fila.mes),
+  });
 
   revalidatePath("/cuenta");
   return { ok: true, correoEnmascarado: enmascararCorreo(correo) };
@@ -210,7 +219,7 @@ export async function reenviarBoletaSorteo(): Promise<EstadoReenviarSorteo> {
       .eq("anio", anio)
       .eq("mes", mes)
       .maybeSingle(),
-    supabase.from("perfiles").select("nombre_completo").eq("id", user.id).single(),
+    supabase.from("perfiles").select("nombre_completo, correo_institucional").eq("id", user.id).single(),
   ]);
 
   if (!fila) {
@@ -218,7 +227,12 @@ export async function reenviarBoletaSorteo(): Promise<EstadoReenviarSorteo> {
   }
 
   const nombre = perfil?.nombre_completo ?? "Asociado";
-  await enviarBoletaSorteo({ correo, nombre, numero: fila.numero, mes: nombreMes(mes) });
+  await enviarBoletaSorteo({
+    correo: destinatariosAviso(correo),
+    nombre,
+    numero: fila.numero,
+    mes: nombreMes(mes),
+  });
 
   return { ok: true, correoEnmascarado: enmascararCorreo(correo) };
 }

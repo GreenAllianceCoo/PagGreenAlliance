@@ -82,10 +82,16 @@ select is_empty(
   $$ select p.proname::text
        from pg_proc p join pg_namespace n on n.oid = p.pronamespace
       where n.nspname = 'public' and p.prosecdef
-        and p.proname not in ('es_admin', 'resumen_clientes_asesor', 'mi_boleta_sorteo', 'boletas_confirmadas_sorteo')
+        and p.proname not in ('es_admin', 'resumen_clientes_asesor', 'mi_boleta_sorteo', 'boletas_confirmadas_sorteo',
+                              -- Se validan solas (es_admin() o puede_atender() / auth.uid() dentro):
+                              'agregar_nota_solicitud',
+                              'admin_actualizar_proceso_ejecutivo', 'crear_alerta_asociado', 'admin_marcar_alerta_atendida',
+                              'mi_proceso_ejecutivo', 'revelar_acumulado_comision', 'comisiones_periodo_asesor',
+                              'buscar_cliente_asesor', 'admin_editar_pago_comision', 'admin_anular_pago_comision',
+                              'tabla_credito_con_tasa', 'admin_tasas_solicitudes')
         and (has_function_privilege('authenticated', p.oid, 'execute')
              or has_function_privilege('anon', p.oid, 'execute')) $$,
-  'ninguna función security definer (salvo es_admin, resumen_clientes_asesor, mi_boleta_sorteo y boletas_confirmadas_sorteo) es ejecutable por anon o authenticated'
+  'ninguna función security definer fuera de la lista blanca (las que se validan solas) es ejecutable por anon o authenticated'
 );
 
 select * from finish();

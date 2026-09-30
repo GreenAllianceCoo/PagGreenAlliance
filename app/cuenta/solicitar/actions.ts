@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { MONTO_MINIMO } from "@/lib/credito";
+import { reglaCreditoDe } from "@/lib/asociado/servidor";
 
 /** F-06: el deslizador de SolicitudForm.tsx avanza en pasos de $50.000. */
 const PASO_MONTO = 50000;
@@ -17,6 +18,9 @@ export type EstadoSolicitud = {
  * «Enviar solicitud» de /cuenta/solicitar. Valida en el servidor, con la
  * sesión del usuario (RLS), e inserta en solicitudes_credito. La base vuelve a
  * validar tope, mínimo y pendiente (trigger chk_monto_solicitud e índice único).
+ * Regla de Sebas (spec-requerimientos-ricardo §8): solo si el asociado está
+ * activo y su proceso ejecutivo está en «operando»; el tope sale del GRUPO de
+ * crédito del grado (§1). Se niega aquí, antes de llegar a la base.
  */
 export async function crearSolicitud(
   _prevState: EstadoSolicitud,
@@ -48,7 +52,7 @@ export async function crearSolicitud(
 
   const { data: perfil } = await supabase
     .from("perfiles")
-    .select("grado")
+    .select("grado, activo")
     .eq("id", user.id)
     .single();
 
@@ -67,13 +71,16 @@ export async function crearSolicitud(
     return { error: "Ya tienes una solicitud pendiente de revisión." };
   }
 
-  const { data: paquete } = await supabase
-    .from("grados_credito")
-    .select("capacidad_maxima")
-    .eq("grado", perfil.grado)
-    .eq("porcentaje", porcentaje)
-    .single();
+  const { regla, cupo } = await reglaCreditoDe(supabase, {
+    activo: (perfil.activo as boolean | null | undefined) ?? null,
+    grado: perfil.grado,
+    tienePendiente: false,
+  });
+  if (!regla.puedeSolicitar) {
+    return { error: regla.mensaje };
+  }
 
+  const paquete = cupo.estado === "con_cupo" ? cupo.paquetes.find((p) => p.porcentaje === porcentaje) : undefined;
   if (!paquete) {
     return { error: "No hay un tope de crédito configurado para tu grado." };
   }

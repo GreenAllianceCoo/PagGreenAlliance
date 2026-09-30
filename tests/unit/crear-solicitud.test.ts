@@ -34,6 +34,14 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(),
 }));
 
+// lib/asociado/servidor.ts y lib/grados.ts son server-only y conocen el cliente de service role.
+vi.mock("server-only", () => ({}));
+vi.mock("@/lib/supabase/admin", () => ({
+  crearClienteAdmin: vi.fn(),
+  crearClienteAnonimoSinSesion: vi.fn(),
+}));
+vi.mock("@/lib/servidor/registro", () => ({ registrar: vi.fn() }));
+
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { crearSolicitud } from "@/app/cuenta/solicitar/actions";
@@ -47,6 +55,9 @@ const GRADOS: Record<string, Record<string, { capacidad_maxima: number; cuota_me
   OF: { "50": { capacidad_maxima: 2150000, cuota_mensual: 116000, plazo_meses: 3 }, "100": { capacidad_maxima: 4200000, cuota_mensual: 266000, plazo_meses: 3 } },
 };
 
+/** Catálogo `grados` (migración 20260929100100): grado → grupo de crédito (null = sin cupo). */
+const CATALOGO: Record<string, string | null> = { PP: "PP", PT: "PT", SI: "SI", IT: "IT", OF: "OF", TE: "OF", IJ: null, CS: null };
+
 const ID_SESION = "00000000-0000-4000-a000-00000000000a";
 const ID_OTRO = "00000000-0000-4000-a000-00000000000b";
 
@@ -56,6 +67,10 @@ type Escenario = {
   sinPerfil?: boolean;
   sinTope?: boolean;
   ultimaSolicitud?: { estado: string } | null;
+  /** perfiles.activo (regla §8). */
+  activo?: boolean;
+  /** Estado del proceso ejecutivo (mi_proceso_ejecutivo); null = sin proceso. Por defecto «operando». */
+  estadoProceso?: string | null;
   errorInsert?: { message: string; code?: string; details?: string; hint?: string } | null;
 };
 
@@ -71,6 +86,8 @@ function crearSupabaseFalso(escenario: Escenario = {}) {
     sinTope = false,
     ultimaSolicitud = null,
     errorInsert = null,
+    activo = true,
+    estadoProceso = "operando",
   } = escenario;
 
   const insertados: Record<string, unknown>[] = [];
@@ -80,15 +97,31 @@ function crearSupabaseFalso(escenario: Escenario = {}) {
 
     const resultado = () => {
       if (tabla === "perfiles") {
-        return { data: sinPerfil ? null : { grado, nombre_completo: "Asociado Prueba" }, error: null };
+        return { data: sinPerfil ? null : { grado, activo, nombre_completo: "Asociado Prueba" }, error: null };
       }
       if (tabla === "solicitudes_credito") {
         return { data: ultimaSolicitud ? [ultimaSolicitud] : [], error: null };
       }
+      if (tabla === "grados") {
+        const codigo = String(filtros.codigo);
+        if (!(codigo in CATALOGO)) return { data: null, error: null };
+        return {
+          data: { codigo, nombre: codigo, policia: true, ejercito: false, grupo_credito: CATALOGO[codigo], orden: 1, seleccionable: true },
+          error: null,
+        };
+      }
       if (tabla === "grados_credito") {
-        if (sinTope) return { data: null, error: { message: "JSON object requested, multiple (or no) rows returned" } };
-        const fila = GRADOS[String(filtros.grado)]?.[String(filtros.porcentaje)] ?? null;
-        return { data: fila, error: null };
+        // Paquetes del GRUPO (sin tasa): [{ porcentaje, capacidad_maxima, plazo_meses }].
+        if (sinTope) return { data: [], error: null };
+        const porGrupo = GRADOS[String(filtros.grado)] ?? {};
+        return {
+          data: Object.entries(porGrupo).map(([porcentaje, f]) => ({
+            porcentaje,
+            capacidad_maxima: f.capacidad_maxima,
+            plazo_meses: f.plazo_meses,
+          })),
+          error: null,
+        };
       }
       return { data: null, error: null };
     };
@@ -102,6 +135,7 @@ function crearSupabaseFalso(escenario: Escenario = {}) {
     consulta.order = vi.fn(() => consulta);
     consulta.limit = vi.fn(() => consulta);
     consulta.single = vi.fn(async () => resultado());
+    consulta.maybeSingle = vi.fn(async () => resultado());
     consulta.then = (ok: (v: unknown) => unknown, falla: (e: unknown) => unknown) =>
       Promise.resolve(resultado()).then(ok, falla);
     // await insert(...) devuelve { error } (la acción no pide la fila creada).
@@ -120,6 +154,13 @@ function crearSupabaseFalso(escenario: Escenario = {}) {
       })),
     },
     from,
+    // mi_proceso_ejecutivo(): 0 o 1 fila.
+    rpc: vi.fn(() => ({
+      maybeSingle: vi.fn(async () => ({
+        data: estadoProceso ? { estado: estadoProceso } : null,
+        error: null,
+      })),
+    })),
   };
 
   vi.mocked(createClient).mockResolvedValue(cliente as never);
@@ -372,5 +413,48 @@ describe("crearSolicitud · mensajes de error", () => {
     expect(resultado?.error).toBeTruthy();
     expect(resultado!.error).not.toContain("P0001");
     expect(resultado!.error).not.toContain("1000000");
+  });
+});
+
+// Regla de Sebas (spec-requerimientos-ricardo §8) y cupo por grupo de crédito (§1).
+describe("crearSolicitud · solo con el proceso operando y el asociado activo", () => {
+  it.each(["reparto", "sentencia", "entrega_titulos", "terminado", null])(
+    "rechaza con el proceso en %j y no inserta",
+    async (estadoProceso) => {
+      const { insertados } = crearSupabaseFalso({ estadoProceso });
+      const { resultado } = await enviar({ porcentaje: "50", monto: "500000" });
+      expect(resultado?.error).toBe("Podrás pedir tu crédito cuando tu proceso esté operando");
+      expect(insertados).toHaveLength(0);
+    },
+  );
+
+  it("rechaza si el asociado no está activo y no inserta", async () => {
+    const { insertados } = crearSupabaseFalso({ activo: false });
+    const { resultado } = await enviar({ porcentaje: "50", monto: "500000" });
+    expect(resultado?.error).toBe("Podrás pedir tu crédito cuando tu proceso esté operando");
+    expect(insertados).toHaveLength(0);
+  });
+
+  it("un grado sin grupo de crédito (IJ) recibe el aviso de la spec y no inserta", async () => {
+    const { insertados } = crearSupabaseFalso({ grado: "IJ" });
+    const { resultado } = await enviar({ porcentaje: "50", monto: "500000" });
+    expect(resultado?.error).toBe(
+      "Tu grado todavía no tiene cupo de crédito configurado; tu asesor te contactará",
+    );
+    expect(insertados).toHaveLength(0);
+  });
+
+  it("un Teniente (TE) usa los topes del grupo OF (R-02)", async () => {
+    const { insertados } = crearSupabaseFalso({ grado: "TE" });
+    const { redirigeA } = await enviar({ porcentaje: "100", monto: "4200000" });
+    expect(redirigeA).toBe("/cuenta");
+    expect(insertados).toHaveLength(1);
+  });
+
+  it("un Teniente no supera el tope de OF 100 % (4.200.000)", async () => {
+    const { insertados } = crearSupabaseFalso({ grado: "TE" });
+    const { resultado } = await enviar({ porcentaje: "100", monto: "4250000" });
+    expect(resultado?.error).toBeTruthy();
+    expect(insertados).toHaveLength(0);
   });
 });

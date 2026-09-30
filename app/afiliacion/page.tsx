@@ -9,8 +9,9 @@ export const metadata: Metadata = {
 };
 
 export default async function AfiliacionPage() {
-  // Se genera en cada visita (no en el build): los grados salen de `grados_credito`
-  // y los asesores de `obtener_asesores_publico()` (spec-fase-2 §1).
+  // Se genera en cada visita (no en el build): los grados salen del catálogo
+  // `grados` (con su institución) y los asesores de `obtener_asesores_publico()`
+  // (asesores + admins que atienden asociados, spec-requerimientos-ricardo §2.9).
   await connection();
   const [grados, asesores] = await Promise.all([gradosParaAfiliacion(), asesoresParaAfiliacion()]);
   return <FormularioAfiliacion grados={grados} asesores={asesores} />;

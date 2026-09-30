@@ -6,6 +6,7 @@ import { PanelAfiliacionDetalle } from "@/components/admin/PanelAfiliacionDetall
 import { IconoVolver } from "@/components/ui/Iconos";
 import { exigirAdmin } from "@/lib/admin/servidor";
 import { urlsFirmadasAfiliacion } from "@/lib/admin/fotos";
+import { FILTRO_ATIENDEN, nombreGradoEmbebido, textoCuentaNomina } from "@/lib/admin/afiliacion";
 import { enmascararCedula } from "@/lib/mascara";
 import { esEstadoAfiliacionValido, listarSolicitudesAfiliacion } from "../_datos";
 
@@ -13,13 +14,13 @@ export const metadata: Metadata = { title: "Solicitud de afiliación · Admin ·
 
 /** Detalle de una solicitud de afiliación: lista de hermanas + ficha con las 3 fotos (pieza 3e). */
 export default async function DetalleAfiliacionPage({ params }: { params: Promise<{ id: string }> }) {
-  const { supabase, nombre: nombreAdmin } = await exigirAdmin();
+  const { supabase, userId: userIdAdmin, nombre: nombreAdmin } = await exigirAdmin();
   const { id } = await params;
 
   const { data: solicitud } = await supabase
     .from("solicitudes_afiliacion")
     .select(
-      "id, nombre, cedula, grado, institucion, celular, nequi, email, mensaje, asesor_id, estado, foto_cedula_frente, foto_cedula_reverso, foto_selfie, created_at",
+      "id, nombre, cedula, grado, grados(nombre), institucion, celular, nequi, email, correo_institucional, nomina_entidad, nomina_tipo, nomina_numero, mensaje, asesor_id, estado, foto_cedula_frente, foto_cedula_reverso, foto_selfie, created_at",
     )
     .eq("id", id)
     .single();
@@ -62,9 +63,12 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
       const { data: listaAsesores } = await supabase
         .from("perfiles")
         .select("id, nombre_completo")
-        .eq("rol", "asesor")
+        // Asesores y admins que atienden asociados (spec-requerimientos-ricardo §2.9).
+        .or(FILTRO_ATIENDEN)
+        .eq("activo", true)
         .order("nombre_completo");
-      asesores = (listaAsesores ?? []).map((a) => ({ id: a.id, nombre: a.nombre_completo }));
+      // RS-17: el admin en sesión no aparece en el selector.
+      asesores = (listaAsesores ?? []).filter((a) => a.id !== userIdAdmin).map((a) => ({ id: a.id, nombre: a.nombre_completo }));
     }
   }
 
@@ -98,6 +102,9 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
           asesorNombre: asesor?.nombre_completo ?? null,
           estado: solicitud.estado,
           created_at: solicitud.created_at,
+          gradoNombre: nombreGradoEmbebido(solicitud.grados),
+          correoInstitucional: solicitud.correo_institucional,
+          cuentaNomina: textoCuentaNomina(solicitud.nomina_entidad, solicitud.nomina_tipo, solicitud.nomina_numero),
         }}
         fotos={fotos}
         // La cédula de las «hermanas» sale ya enmascarada del servidor: solo la de la ficha abierta viaja completa.

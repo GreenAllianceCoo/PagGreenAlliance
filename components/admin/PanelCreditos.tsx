@@ -11,8 +11,8 @@ import { coincideBusqueda } from "@/lib/admin/busqueda";
 import { formatearFecha, formatearPesos } from "@/lib/cuenta";
 import { formatTasa } from "@/lib/credito";
 import { enmascararCedula } from "@/lib/mascara";
-import { PAQUETES_DEMO, type PaqueteDemo } from "@/lib/asesor/datosDemo";
-import type { CodigoGrado } from "@/lib/validaciones/afiliacion";
+import type { PaqueteDemo } from "@/lib/asesor/datosDemo";
+import type { CodigoGrado } from "@/lib/asesor/datosDemo";
 import { HISTORIAL_NOTAS_INTERNAS_HABILITADO } from "@/lib/admin/flags";
 
 export type EstadoCredito = "pendiente" | "aprobado" | "rechazado";
@@ -39,20 +39,19 @@ const ESTADOS = ["pendiente", "aprobado", "rechazado"] as const;
 /**
  * Tope del paquete (grado + porcentaje) para el aviso «Dentro/Supera el
  * tope». `paquetesPorGrado` viene de `cargarPaquetesDemo` (la página de
- * servidor), que SIEMPRE intenta leer primero los topes reales de
- * `grados_credito`; solo cae a la copia de referencia (`PAQUETES_DEMO`) si
- * esa consulta falla. Así el aviso —y el bloqueo de «Aprobar» que depende de
+ * servidor), que lee los topes reales de `grados_credito`; si esa consulta
+ * falla no hay copia de respaldo (RS-08) y el aviso no se muestra. Así el aviso —y el bloqueo de «Aprobar» que depende de
  * él— usa el tope vigente de verdad, no una copia que puede desactualizarse.
  * De todos modos, aunque la UI se equivocara, el servidor (trigger
  * `chk_monto_solicitud` + `validar_monto_solicitud`) es quien de verdad
  * impide guardar un monto sobre el tope: esto es solo el aviso visual.
  */
 function topeDelPaquete(
-  paquetesPorGrado: Record<CodigoGrado, PaqueteDemo[]>,
+  paquetesPorGrado: Partial<Record<CodigoGrado, PaqueteDemo[]>>,
   grado: string,
   porcentaje: "50" | "100",
 ): number | undefined {
-  const paquetes = paquetesPorGrado[grado as CodigoGrado] ?? PAQUETES_DEMO[grado as CodigoGrado];
+  const paquetes = paquetesPorGrado[grado as CodigoGrado];
   return paquetes?.find((p) => p.porcentaje === porcentaje)?.capacidad_maxima;
 }
 
@@ -61,8 +60,8 @@ type Props = {
   estadoFiltro: EstadoCredito;
   /** Conteos de las 3 pestañas: solo la activa es exacta (viene de esta misma consulta); las otras 2 quedan sin número. */
   conteoFiltroActual: number;
-  /** Topes reales de `grados_credito` (con la copia de referencia como respaldo), para el aviso «Dentro/Supera el tope». */
-  paquetesPorGrado: Record<CodigoGrado, PaqueteDemo[]>;
+  /** Topes reales de `grados_credito` (vacío si no se pudieron leer: sin aviso de tope; RS-08: sin copia de respaldo). */
+  paquetesPorGrado: Partial<Record<CodigoGrado, PaqueteDemo[]>>;
   kpis: {
     creditosPendientes: number;
     afiliacionesPendientes: number;
@@ -136,7 +135,7 @@ export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquete
             href={`/admin/creditos?estado=${e}`}
             aria-current={estadoFiltro === e ? "page" : undefined}
             className={
-              "flex h-10 items-center gap-1.5 rounded-full px-4.5 text-14 font-bold no-underline " +
+              "flex h-11 items-center gap-1.5 rounded-full px-4.5 text-14 font-bold no-underline " +
               (estadoFiltro === e ? "bg-admin-texto text-admin-fondo" : "text-admin-texto-2 hover:bg-admin-superficie")
             }
           >
@@ -218,7 +217,7 @@ function DetalleCredito({
   onResuelto,
 }: {
   fila: FilaCreditoPanel;
-  paquetesPorGrado: Record<CodigoGrado, PaqueteDemo[]>;
+  paquetesPorGrado: Partial<Record<CodigoGrado, PaqueteDemo[]>>;
   onResuelto: (mensaje: string) => void;
 }) {
   const [paso, setPaso] = useState<"idle" | "aprobar" | "rechazar">("idle");

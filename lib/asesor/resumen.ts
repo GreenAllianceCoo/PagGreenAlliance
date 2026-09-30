@@ -81,7 +81,10 @@ export function normalizar(texto: string): string {
     .toLowerCase();
 }
 
-/** Filtra «mis clientes» por nombre/cédula y por el estado elegido en el desplegable. */
+/**
+ * Filtra «mis clientes» por nombre y por el estado. RS-12: la cédula de la
+ * lista ya viene enmascarada desde la base, así que NO se filtra por ella; la
+ * búsqueda por cédula va por la acción `buscarCliente`. Filtra por el estado elegido en el desplegable. */
 export function filtrarClientes(
   filas: FilaResumenAsesor[],
   opciones: { busqueda?: string; estado?: string },
@@ -90,7 +93,7 @@ export function filtrarClientes(
   const estado = opciones.estado ?? "todos";
   return filas.filter((fila) => {
     const coincideTexto =
-      !busqueda || normalizar(fila.nombre).includes(busqueda) || fila.cedula.includes(busqueda);
+      !busqueda || normalizar(fila.nombre).includes(busqueda);
     const coincideEstado = estado === "todos" || estadoCliente(fila).clave === estado;
     return coincideTexto && coincideEstado;
   });

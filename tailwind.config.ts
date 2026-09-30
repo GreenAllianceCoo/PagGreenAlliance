@@ -172,6 +172,7 @@ const config: Config = {
       },
       borderWidth: {
         "1.5": "1.5px",
+        "5": "5px", // aro del paso actual en la línea de 8 pasos (pieza 3k)
         "6": "6px",
       },
       // Curva «spring» del rediseño C+: transform/opacity únicamente (docs/Green Alliance C+.dc.html).
@@ -234,6 +235,11 @@ const config: Config = {
         },
         // Bloque «Asesor» del admin (pieza 3i, D-09, MOVIMIENTO): al asignar,
         // el bloque entero se funde hacia la versión de solo lectura.
+        // Formularios desplegables del admin (pieza 3o, MOVIMIENTO): translateY 6px→0 + fundido.
+        "ga-formulario": {
+          from: { opacity: "0", transform: "translateY(6px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
         "ga-asesor-listo": {
           from: { opacity: "0" },
           to: { opacity: "1" },
@@ -245,8 +251,32 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(4px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        // Sello de calidad de foto (pieza 3j, MOVIMIENTO): opacity + scale .9→1, 150 ms.
+        "ga-sello-chico": {
+          from: { opacity: "0", transform: "scale(.9)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
+        // Flash al capturar la selfie (pieza 3j): opacidad blanca 100 ms.
+        "ga-flash": {
+          from: { opacity: "0.9" },
+          to: { opacity: "0" },
+        },
+        // Hoja inferior de convenios en celular (pieza 3n): sube con transform + opacity.
+        "ga-hoja": {
+          from: { opacity: "0", transform: "translateY(24px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        // Modal de escritorio (piezas 3k, 3n): opacity + scale .96→1.
+        "ga-modal": {
+          from: { opacity: "0", transform: "scale(.96)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
       },
       animation: {
+        "ga-sello-chico": "ga-sello-chico 150ms ease-out both",
+        "ga-flash": "ga-flash 100ms linear both",
+        "ga-hoja": "ga-hoja 260ms cubic-bezier(.34,1.3,.64,1) both",
+        "ga-modal": "ga-modal 200ms cubic-bezier(.34,1.3,.64,1) both",
         "ga-entrada": "ga-entrada 400ms cubic-bezier(.34,1.3,.64,1) both",
         "ga-sello": "ga-sello 500ms cubic-bezier(.34,1.3,.64,1) both",
         "ga-sacude": "ga-sacude 240ms linear",
@@ -255,6 +285,7 @@ const config: Config = {
         "ga-fila-entra": "ga-fila-entra 320ms cubic-bezier(.34,1.3,.64,1) both",
         "ga-toast": "ga-toast 220ms ease-out both",
         "ga-lista": "ga-lista 200ms ease-out both",
+        "ga-formulario": "ga-formulario 200ms cubic-bezier(.34,1.3,.64,1) both",
         "ga-asesor-listo": "ga-asesor-listo 250ms cubic-bezier(.34,1.3,.64,1) both",
         "ga-error-chico": "ga-error-chico 150ms ease-out both",
       },

@@ -5,6 +5,7 @@ import { exigirAdmin } from "@/lib/admin/servidor";
 import { cargarKpisAdmin } from "@/lib/admin/kpis";
 import { cargarPaquetesDemo } from "@/lib/asesor/cargarPaquetesDemo";
 import { formatearPesos } from "@/lib/cuenta";
+import { registrar } from "@/lib/servidor/registro";
 
 export const metadata: Metadata = { title: "Créditos · Admin · Green Alliance" };
 
@@ -20,7 +21,6 @@ type FilaCruda = {
   estado: Estado;
   monto_solicitado: number;
   porcentaje_devolucion: "50" | "100";
-  tasa_interes_mensual: number;
   grado: string;
   fecha_solicitud: string;
   fecha_respuesta: string | null;
@@ -48,7 +48,7 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
     supabase
       .from("solicitudes_credito")
       .select(
-        "id, estado, monto_solicitado, porcentaje_devolucion, tasa_interes_mensual, grado, fecha_solicitud, fecha_respuesta, motivo_rechazo, perfiles:asociado_id(nombre_completo, cedula, telefono)",
+        "id, estado, monto_solicitado, porcentaje_devolucion, grado, fecha_solicitud, fecha_respuesta, motivo_rechazo, perfiles:asociado_id(nombre_completo, cedula, telefono)",
       )
       .eq("estado", estado)
       .order("fecha_solicitud", { ascending: false }),
@@ -57,12 +57,29 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
   ]);
 
   const crudas = (data ?? []) as unknown as FilaCruda[];
+
+  // Migración 20260930100300: authenticated (también el admin) ya no lee
+  // solicitudes_credito.tasa_interes_mensual por la API; el admin la pide con
+  // esta RPC (solo admin), por los ids de la lista.
+  const tasas = new Map<string, number>();
+  if (crudas.length > 0) {
+    const { data: filasTasa, error: errorTasas } = await supabase.rpc("admin_tasas_solicitudes", {
+      p_ids: crudas.map((f) => f.id),
+    });
+    if (errorTasas) {
+      registrar("error", { evento: "admin_tasas_solicitudes_fallo", codigo: errorTasas.code, mensaje: errorTasas.message });
+    }
+    for (const fila of (filasTasa ?? []) as { id: string; tasa_interes_mensual: number | string }[]) {
+      tasas.set(fila.id, Number(fila.tasa_interes_mensual));
+    }
+  }
+
   const filas: FilaCreditoPanel[] = crudas.map((f) => ({
     id: f.id,
     estado: f.estado,
     monto_solicitado: Number(f.monto_solicitado),
     porcentaje_devolucion: f.porcentaje_devolucion,
-    tasa_interes_mensual: Number(f.tasa_interes_mensual),
+    tasa_interes_mensual: tasas.get(f.id) ?? 0,
     grado: f.grado,
     fecha_solicitud: f.fecha_solicitud,
     fecha_respuesta: f.fecha_respuesta,
@@ -83,7 +100,7 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
           filas={filas}
           estadoFiltro={estado}
           conteoFiltroActual={filas.length}
-          paquetesPorGrado={paquetesPorGrado}
+          paquetesPorGrado={paquetesPorGrado ?? {}}
           kpis={{
             creditosPendientes: kpis.creditosPendientes,
             afiliacionesPendientes: kpis.afiliacionesPendientes,

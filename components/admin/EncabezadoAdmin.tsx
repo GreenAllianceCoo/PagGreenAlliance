@@ -10,6 +10,8 @@ type EncabezadoAdminProps = {
   nombre: string;
   /** Sección actual, para subrayarla (coincide con el primer tramo de la ruta). */
   seccion: Seccion;
+  /** Alertas pendientes (pieza 3m): se ve como contador junto a «Alertas» en las pestañas de celular. */
+  alertasPendientes?: number;
 };
 
 /**
@@ -23,7 +25,7 @@ type EncabezadoAdminProps = {
  * ocultan esta barra en `lg:` y usan en su lugar el menú lateral de
  * `AdminShell.tsx`.
  */
-export function EncabezadoAdmin({ nombre, seccion }: EncabezadoAdminProps) {
+export function EncabezadoAdmin({ nombre, seccion, alertasPendientes = 0 }: EncabezadoAdminProps) {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const idMenu = useId();
 
@@ -86,6 +88,9 @@ export function EncabezadoAdmin({ nombre, seccion }: EncabezadoAdminProps) {
               }
             >
               {s.etiqueta}
+              {s.clave === "alertas" && alertasPendientes > 0 ? (
+                <span className="ml-1.5 rounded-full bg-admin-rojo-fondo px-1.5 text-12 text-admin-rojo-2">{alertasPendientes}</span>
+              ) : null}
             </Link>
           ))}
         </nav>
@@ -134,6 +139,9 @@ export function EncabezadoAdmin({ nombre, seccion }: EncabezadoAdminProps) {
             }
           >
             {s.etiqueta}
+            {s.clave === "alertas" && alertasPendientes > 0 ? (
+              <span className="ml-1.5 rounded-full bg-admin-rojo-fondo px-1.5 text-12 text-admin-rojo-2">{alertasPendientes}</span>
+            ) : null}
           </Link>
         ))}
       </div>
