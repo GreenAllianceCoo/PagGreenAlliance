@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom";
 import Link from "next/link";
 import { resolverCredito, type EstadoAccionCredito } from "@/app/admin/creditos/actions";
 import { ChipEstado } from "./ChipEstado";
+import { MarcarDesembolsado } from "./MarcarDesembolsado";
 import { ToastAdmin } from "./ToastAdmin";
 import { TarjetaKpi } from "./TarjetaKpi";
 import { coincideBusqueda } from "@/lib/admin/busqueda";
@@ -26,6 +27,8 @@ export type FilaCreditoPanel = {
   grado: string;
   fecha_solicitud: string;
   fecha_respuesta: string | null;
+  /** §12.2: AAAA-MM-DD del desembolso; null = pendiente. */
+  fecha_desembolso: string | null;
   motivo_rechazo: string | null;
   nombre: string;
   cedula: string;
@@ -301,11 +304,17 @@ function DetalleCredito({
       ) : null}
 
       {fila.estado !== "pendiente" ? (
-        <p className="m-0 rounded-14 bg-admin-superficie-2 p-3.5 text-14 text-admin-texto-2">
-          {fila.estado === "aprobado"
-            ? "Este crédito ya fue aprobado. No hay más acciones disponibles."
-            : `Rechazado${fila.motivo_rechazo ? `. Motivo: ${fila.motivo_rechazo}` : "."}`}
-        </p>
+        <>
+          <p className="m-0 rounded-14 bg-admin-superficie-2 p-3.5 text-14 text-admin-texto-2">
+            {fila.estado === "aprobado"
+              ? "Este crédito ya fue aprobado. No hay más acciones disponibles."
+              : `Rechazado${fila.motivo_rechazo ? `. Motivo: ${fila.motivo_rechazo}` : "."}`}
+          </p>
+          {/* §12.2 (pieza 3q): la única acción que queda en un crédito aprobado. */}
+          {fila.estado === "aprobado" ? (
+            <MarcarDesembolsado solicitudId={fila.id} fechaDesembolso={fila.fecha_desembolso} onResuelto={onResuelto} />
+          ) : null}
+        </>
       ) : paso === "idle" ? (
         <div className="grid grid-cols-2 gap-2.5">
           <button

@@ -7,7 +7,7 @@
  * Dos conceptos distintos:
  *  - GRADO de la persona: texto con FK a `grados.codigo` (17 grados + «OF»
  *    heredado). Es lo que se guarda en perfiles.grado y en la afiliación.
- *  - GRUPO de crédito: el enum `grado_policial` (PP, PT, SI, IT, OF). Dice
+ *  - GRUPO de crédito: el enum `grado_policial` (PP, PT, SI, IT, OF, IJ, CT, MY, TC). Dice
  *    qué fila de `grados_credito` aplica. `grupo_credito = null` = el grado
  *    todavía no tiene cupo (IJ y militares SLP–SP).
  */
@@ -15,7 +15,7 @@
 import type { CodigoInstitucion } from "@/lib/validaciones/instituciones";
 
 /** Valores del enum public.grado_policial = grupos de crédito (mismo orden que en la base). */
-export const GRUPOS_CREDITO = ["PP", "PT", "SI", "IT", "OF"] as const;
+export const GRUPOS_CREDITO = ["PP", "PT", "SI", "IT", "OF", "IJ", "CT", "MY", "TC"] as const;
 export type GrupoCredito = (typeof GRUPOS_CREDITO)[number];
 
 export type GradoCatalogo = {

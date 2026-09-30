@@ -431,7 +431,7 @@ describe("crearSolicitud · solo con el proceso operando y el asociado activo", 
   it("rechaza si el asociado no está activo y no inserta", async () => {
     const { insertados } = crearSupabaseFalso({ activo: false });
     const { resultado } = await enviar({ porcentaje: "50", monto: "500000" });
-    expect(resultado?.error).toBe("Podrás pedir tu crédito cuando tu proceso esté operando");
+    expect(resultado?.error).toBe("Tu cuenta está inactiva. Comunícate con la cooperativa.");
     expect(insertados).toHaveLength(0);
   });
 

@@ -41,7 +41,7 @@ set local request.jwt.claims = '{"sub":"16000000-0000-4000-a000-00000000000c","r
 select throws_ok(
   $$ insert into public.solicitudes_credito (asociado_id, porcentaje_devolucion, monto_solicitado)
      values ('16000000-0000-4000-a000-00000000000c', '50', 500000) $$,
-  'P0001', 'Podrás pedir tu crédito cuando tu proceso esté operando',
+  'P0001', 'Tu cuenta está inactiva. Comunícate con la cooperativa.',
   'un asociado inactivo no pide crédito aunque su proceso esté operando'
 );
 
@@ -85,7 +85,7 @@ select throws_ok($$ select * from public.grados_credito $$, '42501', null,
   'select * sobre grados_credito falla para un asociado');
 select is(
   (select count(*)::int from (select grado, porcentaje, capacidad_maxima, plazo_meses from public.grados_credito) x),
-  10,
+  18,
   'el asociado sigue leyendo grado, porcentaje, tope y plazo'
 );
 select is_empty($$ select * from public.tabla_credito_con_tasa() $$, 'un asociado no obtiene la tasa por la función');
@@ -93,14 +93,14 @@ select is_empty($$ select * from public.tabla_credito_con_tasa() $$, 'un asociad
 set local request.jwt.claims = '{"sub":"16000000-0000-4000-a000-0000000000e1","role":"authenticated"}';
 select is(
   (select count(*)::int from public.tabla_credito_con_tasa() where tasa_interes_mensual > 0),
-  10,
-  'el asesor obtiene los 10 topes con tasa (demo)'
+  18,
+  'el asesor obtiene los 18 topes con tasa (demo)'
 );
 
 set local request.jwt.claims = '{"sub":"16000000-0000-4000-a000-0000000000ad","role":"authenticated"}';
 select is(
   (select count(*)::int from public.tabla_credito_con_tasa()),
-  10,
+  18,
   'el admin obtiene los topes con tasa (demo del admin)'
 );
 select lives_ok(

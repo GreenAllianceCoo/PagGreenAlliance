@@ -277,3 +277,99 @@ Plan: implementar ya la opción A. La cara con MediaPipe es opcional, porque sum
   - R-04 (dominio del correo institucional);
   - R-07 (conteo del crédito);
   - P-47, P-63, P-76, P-77, P-78, P-79, P-80, P-90, P-91, P-92, P-93 y P-97.
+
+## 12. Respuestas de Ricardo (30-sep, segunda tanda) y trabajo nuevo
+
+La rama de trabajo es `requerimientos-ricardo-2`, que sale de develop después del despliegue del 30-sep. Producción ya tiene las migraciones hasta `20260930100500`.
+
+### 12.1 Cupos de crédito por grado (Q-02 y R-02, **cerrados**). Reemplaza la tabla de grupos de la §1
+
+| Grado(s) | Grupo de crédito | 50 % | 100 % |
+|---|---|---|---|
+| PP | PP | 1.000.000 | 2.100.000 |
+| PT, SLP, C3, CS | PT | 1.300.000 | 2.700.000 |
+| SI, CP | SI | 1.500.000 | 3.000.000 |
+| IT, SS, **ST** | IT | 2.000.000 | 4.000.000 |
+| IJ, SV, **TE** | **IJ (grupo nuevo)** | 2.500.000 | 5.000.000 |
+| CT | **CT (grupo nuevo)** | 3.500.000 | 7.000.000 |
+| MY | **MY (grupo nuevo)** | 4.500.000 **[Supuesto R-11]** | 9.000.000 |
+| TC | **TC (grupo nuevo)** | 6.000.000 **[Supuesto R-11]** | 12.000.000 |
+
+- **ST ya no usa OF**, y ningún grado seleccionable usa OF. El grupo OF se conserva solo por los datos antiguos.
+- **[Supuesto R-11]** Ricardo solo dio el 100 % de MY y TC. El 50 % se toma como la mitad, igual que en todos los demás grupos.
+- **[Supuesto R-10]** No hay tasa para los grupos nuevos (IJ, CT, MY y TC). Mientras Ricardo no la dé, usan la tasa del grupo OF en cada porcentaje, y `cuota_mensual`/`total_credito` se calculan con la misma fórmula que las filas de OF. Queda marcado `TODO(confirmar: R-10)` y como pregunta abierta.
+- El plazo sigue siendo de 3 meses.
+
+### 12.2 Crédito: el conteo de 3 meses empieza con el desembolso (R-07 y P-47, **cerrados**)
+- El admin marca un crédito aprobado como **«Desembolsado»**, con fecha (por defecto hoy, en hora de Colombia) y quién lo hizo. El asociado no puede hacerlo.
+- **En la vista del asociado:**
+  - Antes del desembolso: «Aprobado · pendiente de desembolso».
+  - Después: el conteo de 3 meses desde `fecha_desembolso`.
+- **Aviso al asociado:** se ve en /cuenta y le llega un correo al personal. El institucional recibe el aviso sin datos, como siempre.
+
+### 12.3 Correo institucional con dominio obligatorio (R-04, **cerrado**)
+- Policía Nacional: `@policia.gov.co`.
+- Ejército Nacional: `@buzonejercito.mil.co` o `@ejercito.mil.co`. Hay que confirmarlo con una búsqueda web.
+- Se valida según la institución elegida, en zod y en la base, **solo para afiliaciones nuevas**; las filas viejas no se tocan.
+- Mensaje: «Usa tu correo institucional de la Policía (@policia.gov.co)» o su equivalente del Ejército.
+
+### 12.4 Selfie obligatoria, sin alternativa (P-78, **cerrado**)
+Sigue como está: es obligatoria. Si no hay permiso de cámara, se usa el input con `capture="user"`, que también es una selfie. No hay ninguna otra vía.
+
+### 12.5 Fecha de los 36 meses (P-90, **cerrado**)
+La fecha de «Operando» es la misma que la del primer descuento. No hay cambios.
+
+### 12.6 Dar de baja a un asociado (P-91, **cerrado**)
+- El admin puede **dar de baja** a un asociado desde /admin/asociados/[id], con un motivo obligatorio que queda en el historial.
+- La baja deja `activo=false` y **le quita el acceso de forma obligatoria**:
+  - no puede entrar a /cuenta: al ingresar ve «Tu cuenta está inactiva. Comunícate con la cooperativa.»;
+  - su sesión queda inservible, porque se revisa en el servidor en cada carga;
+  - no puede pedir crédito ni crear alertas.
+- Se puede reactivar, también con motivo.
+
+### 12.7 Comisiones y bonos (Q-01, **cerrado**)
+- Los bonos de 50 y 100 embargos son **acumulativos y nunca se reinician**. Cuentan los clientes del asesor que llegaron a «Operando» (con el asesor que tenían en ese momento, según el historial de RS-17). **Se excluyen los que se retiraron** (dados de baja o con retiro anticipado atendido), para que no se pague por un cliente que ya no está.
+- Los clientes operativos del mes también excluyen a los dados de baja.
+
+### 12.8 Landing (P-93, **cerrado**)
+- Cambiar «4 horas» o «aprobado en 4 horas» por **«aprobados en poco tiempo»**.
+- **Quitar «+200 asociados».**
+- En la **misión**, donde se nombra a la Policía, agregar al **Ejército Nacional**, por ejemplo «la familia de la Policía Nacional y el Ejército Nacional».
+
+### 12.9 Motivo de rechazo visible (P-97, **cerrado**)
+No hace falta; la cooperativa lo maneja de forma interna. No se implementa.
+
+### 12.10 Sorteo mensual (P-92, **cerrado**)
+- La plataforma asigna el número sola cuando el asociado se inscribe. Si ya funciona así, se deja igual.
+- **Sorteo:** el admin lo ejecuta desde /admin, una vez por mes.
+  - El servidor elige al azar a un participante del mes, con `gen_random_uuid()` o equivalente dentro de una función de la base.
+  - El resultado queda guardado y no se puede repetir para ese mes.
+- **Ganador visible para todos los asociados con sesión:** en /cuenta aparece «Ganador del sorteo de <mes>: <GRADO> <Nombre>». **Solo el grado y el nombre, sin cédula ni número de boleta.** El ganador recibe además su correo.
+- No se publica en la landing pública.
+
+### 12.11 Política de datos (P-14, P-76, P-77, P-79 y P-80, **cerrados**)
+- Datos de la cooperativa: los del certificado de la §11.
+- **No se reporta a centrales de riesgo.**
+- **Las fotos y los datos se conservan como mínimo 3 años y medio.**
+- Servidores:
+  - base de datos en Supabase, región **ca-central-1 (Canadá)**;
+  - app en Vercel (EE. UU., región por defecto);
+  - correos con Resend (EE. UU.).
+
+  Hay que informar esta transferencia internacional.
+- Vigencia: «Vigente desde el 1 de octubre de 2026».
+
+### 12.12 Para después (backlog; NO se implementa ahora)
+- Reconocimiento al **primer asesor** que llegue a los premios por asociados dentro de la plataforma.
+- **Carné virtual del asociado:** «Afiliado Titular», con nombre, grado, institución y cédula.
+
+### 12.13 Preguntas abiertas nuevas para Ricardo
+- R-10: la tasa de interés de los grupos nuevos IJ, CT, MY y TC.
+- R-11: el cupo al 50 % de MY y TC.
+- R-09: quién registra los pagos de comisión. Sebas y Ricardo lo definen.
+
+### 12.14 Decisiones de Sebas (30-sep, noche)
+- **SP (Sargento Primero) → grupo IJ**, porque su equivalente en la Policía es Intendente Jefe, igual que SV. Con esto, ningún grado seleccionable queda sin cupo.
+- **R-10 cerrado:** los grupos nuevos usan la tasa de OF. Por ahora no importa.
+- **R-11 cerrado:** el 50 % de MY y TC es la mitad (4,5 M y 6 M).
+- **Landing (30-sep, Sebas):** se quitó la tarjeta «Embargo solidario a 36 meses» y la mención en el paso 02; la grilla de servicios pasa a 3 columnas.

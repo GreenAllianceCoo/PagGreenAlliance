@@ -27,8 +27,8 @@ set local request.jwt.claims = '{"sub":"00000000-0000-4000-a000-00000000000a","r
 
 select is(
   (select count(*)::int from public.grados_credito),
-  10,
-  'un asociado puede leer los 10 topes de crédito'
+  18,
+  'un asociado puede leer los 18 topes de crédito'
 );
 
 with u as (

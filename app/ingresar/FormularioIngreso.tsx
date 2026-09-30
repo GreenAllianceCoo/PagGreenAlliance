@@ -8,7 +8,16 @@ import { enviarCodigoIngreso, type EstadoIngresoCedula } from "./actions";
 const ESTADO_INICIAL: EstadoIngresoCedula = {};
 
 /** Conecta la pantalla /ingresar con su Server Action (estado, carga y foco). */
-export function FormularioIngreso({ whatsapp, whatsappUrl }: { whatsapp: string; whatsappUrl: string | null }) {
+export function FormularioIngreso({
+  whatsapp,
+  whatsappUrl,
+  aviso,
+}: {
+  whatsapp: string;
+  whatsappUrl: string | null;
+  /** Aviso inicial (p. ej. «Tu cuenta está inactiva…», §12.6); se muestra como el error del campo. */
+  aviso?: string;
+}) {
   const [estado, accion, enviando] = useActionState(
     async (previo: EstadoIngresoCedula, formData: FormData) => {
       // Misma validación en el cliente para no viajar al servidor con un formato inválido.
@@ -31,7 +40,7 @@ export function FormularioIngreso({ whatsapp, whatsappUrl }: { whatsapp: string;
       whatsappUrl={whatsappUrl}
       accion={accion}
       cargando={enviando}
-      error={estado.error}
+      error={estado.error ?? aviso}
       valorCedula={estado.cedula}
     />
   );

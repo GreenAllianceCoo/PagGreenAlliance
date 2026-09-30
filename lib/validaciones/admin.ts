@@ -60,6 +60,62 @@ export const esquemaResolverCredito = z.discriminatedUnion("decision", [
   z.object({ id: z.uuid(), decision: z.literal("rechazado"), motivo: esquemaMotivoRechazo }),
 ]);
 
+/**
+ * «Marcar desembolsado» (§12.2): el crédito (id) y la fecha opcional (vacía =
+ * hoy en hora de Colombia, la pone la base). No puede ser futura; que no sea
+ * anterior a la aprobación y que el crédito esté aprobado lo comprueba la base.
+ */
+export const esquemaMarcarDesembolso = z.object({
+  id: z.uuid({ error: "Falta el id de la solicitud." }),
+  fecha: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (v ? v : undefined))
+    .pipe(
+      z
+        .string()
+        .refine(esFechaISO, { error: "Escribe una fecha válida." })
+        .refine((v) => v <= hoyBogota(), { error: "La fecha de desembolso no puede ser futura." })
+        .optional(),
+    ),
+});
+
+// ---------------------------------------------------------------------------
+// Baja / reactivación de asociados (§12.6)
+// ---------------------------------------------------------------------------
+
+export const CAMPOS_ESTADO_ASOCIADO = ["asociadoId", "motivo"] as const;
+export type CampoEstadoAsociado = (typeof CAMPOS_ESTADO_ASOCIADO)[number];
+
+/** «Dar de baja» / «Reactivar»: el motivo es obligatorio (5 a 300 caracteres, igual que la base). */
+export const esquemaCambiarEstadoAsociado = z.object({
+  asociadoId: z.uuid({ error: "Falta el asociado." }),
+  activo: z.enum(["true", "false"], { error: "Elige una acción válida." }).transform((v) => v === "true"),
+  motivo: z
+    .string({ error: "Escribe el motivo." })
+    .transform((v) => v.trim().replace(/\s+/g, " "))
+    .pipe(
+      z
+        .string()
+        .min(5, { error: "El motivo debe tener entre 5 y 300 caracteres." })
+        .max(300, { error: "El motivo debe tener entre 5 y 300 caracteres." }),
+    ),
+});
+
+// ---------------------------------------------------------------------------
+// Sorteo mensual (§12.10)
+// ---------------------------------------------------------------------------
+
+/** Mes del sorteo: «AAAA-MM» (input type=month) o «AAAA-MM-01»; sale siempre «AAAA-MM-01». */
+export const esquemaRealizarSorteo = z.object({
+  mes: z
+    .string({ error: "Elige el mes del sorteo." })
+    .trim()
+    .regex(/^\d{4}-(0[1-9]|1[0-2])(-01)?$/, { error: "Elige el mes del sorteo." })
+    .transform((v) => v.slice(0, 7) + "-01"),
+});
+
 // ---------------------------------------------------------------------------
 // Asesores
 // ---------------------------------------------------------------------------

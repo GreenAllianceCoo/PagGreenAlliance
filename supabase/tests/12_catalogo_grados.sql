@@ -11,7 +11,7 @@ select plan(22);
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('12000000-0000-4000-a000-00000000000a', 'g.pp@prueba.test',  '{"cedula":"1200000001","grado":"PP"}', '{"nombre_completo":"Asociado PP"}'),
   ('12000000-0000-4000-a000-00000000000b', 'g.te@prueba.test',  '{"cedula":"1200000002","grado":"TE"}', '{"nombre_completo":"Asociado TE"}'),
-  ('12000000-0000-4000-a000-00000000000c', 'g.ij@prueba.test',  '{"cedula":"1200000003","grado":"IJ"}', '{"nombre_completo":"Asociado IJ"}'),
+  ('12000000-0000-4000-a000-00000000000c', 'g.ij@prueba.test',  '{"cedula":"1200000003","grado":"SP"}', '{"nombre_completo":"Asociado SP"}'),
   ('12000000-0000-4000-a000-00000000000d', 'g.of@prueba.test',  '{"cedula":"1200000004","grado":"OF"}', '{"nombre_completo":"Asociado OF heredado"}'),
   ('12000000-0000-4000-a000-0000000000ad', 'g.adm@prueba.test', '{"cedula":"1200000009"}',              '{"nombre_completo":"Admin Grados"}');
 update public.perfiles set rol = 'admin' where id = '12000000-0000-4000-a000-0000000000ad';
@@ -39,14 +39,14 @@ select is(
 
 select is(
   (select array_agg(codigo order by orden) from public.grados where grupo_credito = 'OF' and seleccionable),
-  array['ST','TE','CT','MY','TC'],
-  'ST–TC usan el grupo OF (R-02)'
+  null::text[],
+  'ningún grado seleccionable usa el grupo OF (§12.1)'
 );
 
 select is(
   (select array_agg(codigo order by orden) from public.grados where grupo_credito is null),
-  array['IJ','SLP','C3','CS','CP','SS','SV','SP'],
-  'IJ y los grados militares no tienen grupo de crédito'
+  null::text[],
+  'ningún grado queda sin grupo de crédito (SP → IJ, §12.14)'
 );
 
 select is(
@@ -82,6 +82,11 @@ select throws_ok(
 -- ------------------------------------------------------------
 -- Asociado: no cambia el catálogo ni su grado; crédito según su grupo
 -- ------------------------------------------------------------
+-- Ningún grado real queda sin cupo (§12.14); para probar ese camino se le
+-- quita el grupo a SP solo dentro de esta transacción (rollback al final).
+reset role;
+update public.grados set grupo_credito = null where codigo = 'SP';
+
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"12000000-0000-4000-a000-00000000000c","role":"authenticated"}';
 
@@ -98,29 +103,29 @@ select throws_ok(
   $$ insert into public.solicitudes_credito (asociado_id, porcentaje_devolucion, monto_solicitado)
      values ('12000000-0000-4000-a000-00000000000c', '50', 500000) $$,
   'P0001', 'Tu grado todavía no tiene cupo de crédito configurado; tu asesor te contactará',
-  'un IJ (sin grupo) no puede pedir crédito'
+  'un grado sin grupo de crédito no puede pedir crédito'
 );
 
 set local request.jwt.claims = '{"sub":"12000000-0000-4000-a000-00000000000b","role":"authenticated"}';
 
 select throws_ok(
   $$ insert into public.solicitudes_credito (asociado_id, porcentaje_devolucion, monto_solicitado)
-     values ('12000000-0000-4000-a000-00000000000b', '100', 4200001) $$,
+     values ('12000000-0000-4000-a000-00000000000b', '100', 5000001) $$,
   'P0001', null,
-  'un TE no pasa el tope del grupo OF (4.200.000 al 100 %)'
+  'un TE no pasa el tope del grupo IJ (5.000.000 al 100 %, §12.1)'
 );
 
 select lives_ok(
   $$ insert into public.solicitudes_credito (asociado_id, porcentaje_devolucion, monto_solicitado)
-     values ('12000000-0000-4000-a000-00000000000b', '100', 4200000) $$,
-  'un TE pide hasta el tope del grupo OF'
+     values ('12000000-0000-4000-a000-00000000000b', '100', 5000000) $$,
+  'un TE pide hasta el tope del grupo IJ'
 );
 
 select is(
   (select grado::text || '|' || grado_asociado from public.solicitudes_credito
     where asociado_id = '12000000-0000-4000-a000-00000000000b'),
-  'OF|TE',
-  'la solicitud guarda el grupo (OF) y el grado real (TE)'
+  'IJ|TE',
+  'la solicitud guarda el grupo (IJ) y el grado real (TE)'
 );
 
 -- El OF heredado sigue pudiendo pedir con el tope OF.

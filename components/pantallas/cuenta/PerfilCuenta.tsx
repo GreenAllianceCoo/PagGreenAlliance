@@ -458,7 +458,7 @@ export function PerfilCuenta({
               </div>
               <span className="relative text-13 text-ga-verde-claro lg:text-14">
                 {conteoCredito.vencido ? "Tu plazo terminó." : `Faltan ${conteoCredito.faltaTexto}. `}
-                Cuenta desde que se aprobó tu crédito.
+                Cuenta desde que se te desembolsó el crédito.
               </span>
             </section>
           ) : null}

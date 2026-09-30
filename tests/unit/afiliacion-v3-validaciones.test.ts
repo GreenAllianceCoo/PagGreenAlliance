@@ -205,8 +205,11 @@ describe("afiliación v3 · dos correos (§2.8)", () => {
       "Tu correo personal debe ser distinto del institucional.",
     );
   });
-  it("aceptan cualquier dominio (R-04)", () => {
-    expect(errorDe("correo_institucional", conCambio({ correo_institucional: "juan@hotmail.com" }))).toBeUndefined();
+  it("exigen el dominio de la institución (§12.3)", () => {
+    expect(errorDe("correo_institucional", conCambio({ correo_institucional: "juan@hotmail.com" }))).toBe(
+      "Usa tu correo institucional de la Policía (@policia.gov.co)",
+    );
+    expect(errorDe("correo_institucional", conCambio({ correo_institucional: "Juan@Policia.gov.co" }))).toBeUndefined();
   });
 });
 

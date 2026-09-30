@@ -7,7 +7,7 @@ import { Logo } from "@/components/ui/Logo";
 export type AfiliacionEnviadaProps = {
   /** Correo enmascarado del solicitante (desde la cookie/flash del envío). */
   correoEnmascarado: string;
-  /** Tiempo de respuesta (lib/config.ts → TIEMPO_RESPUESTA), p. ej. «4 horas o menos». */
+  /** Tiempo de respuesta (lib/config.ts → TIEMPO_RESPUESTA), p. ej. «poco tiempo». */
   tiempoRespuesta: string;
 };
 

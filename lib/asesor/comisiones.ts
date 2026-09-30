@@ -75,6 +75,21 @@ export type FilaComisionesPeriodo = {
   total_operando_hoy: number;
 };
 
+/**
+ * Fila de public.bonos_acumulados_asesor() (§12.7, Q-01 cerrado). Los bonos de
+ * 50 y 100 embargos son ACUMULATIVOS y nunca se reinician: cuentan los clientes
+ * que llegaron a «Operando» con este asesor, menos los que se retiraron
+ * (dados de baja o con retiro anticipado atendido).
+ */
+export type FilaBonosAcumulados = {
+  asesor_id: string;
+  clientes_acumulados: number | string;
+  meta_bono_50: number | string;
+  alcanzo_bono_50: boolean;
+  meta_viaje_100: number | string;
+  alcanzo_viaje_100: boolean;
+};
+
 export type AvanceMeta = { actual: number; meta: number; porcentaje: number; alcanzado: boolean; faltan: number };
 
 function avance(actual: number, meta: number): AvanceMeta {
@@ -85,6 +100,14 @@ function avance(actual: number, meta: number): AvanceMeta {
     alcanzado: actual >= meta,
     faltan: Math.max(0, meta - actual),
   };
+}
+
+function avanceAcumulado(fila: FilaBonosAcumulados, cual: "bono50" | "viaje100"): AvanceMeta {
+  const actual = Number(fila.clientes_acumulados);
+  const meta = Number(cual === "bono50" ? fila.meta_bono_50 : fila.meta_viaje_100);
+  const base = avance(actual, meta);
+  const alcanzado = cual === "bono50" ? fila.alcanzo_bono_50 : fila.alcanzo_viaje_100;
+  return { ...base, alcanzado };
 }
 
 export type VistaComisiones = {
@@ -104,7 +127,10 @@ export type VistaComisiones = {
 };
 
 /** Vista de /asesor. Sin fila (quien llama no puede_atender) → null. */
-export function vistaComisiones(fila: FilaComisionesPeriodo | null | undefined): VistaComisiones | null {
+export function vistaComisiones(
+  fila: FilaComisionesPeriodo | null | undefined,
+  bonos?: FilaBonosAcumulados | null,
+): VistaComisiones | null {
   if (!fila) return null;
   const valorIngresos = Number(fila.valor_ingresos_nuevos);
   const valorOperativos = Number(fila.valor_clientes_operativos);
@@ -126,8 +152,10 @@ export function vistaComisiones(fila: FilaComisionesPeriodo | null | undefined):
     },
     totalPeriodo: formatearPesos(valorIngresos + valorOperativos),
     operandoHoy,
-    bono50: avance(operandoHoy, META_BONO),
-    viaje100: avance(operandoHoy, META_VIAJE),
+    // §12.7: con la fila de bonos acumulados, el avance es el ACUMULADO (nunca se reinicia); si no
+    // llegó (base sin la función), se cae a los operando de hoy, como antes.
+    bono50: bonos ? avanceAcumulado(bonos, "bono50") : avance(operandoHoy, META_BONO),
+    viaje100: bonos ? avanceAcumulado(bonos, "viaje100") : avance(operandoHoy, META_VIAJE),
   };
 }
 

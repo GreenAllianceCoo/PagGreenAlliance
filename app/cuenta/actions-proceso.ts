@@ -11,6 +11,8 @@
  */
 import { revalidatePath } from "next/cache";
 import { avisarAdminsDeAlerta, type TipoAlertaAsociado } from "@/lib/correo/alertas";
+import { asociadoActivo } from "@/lib/asociado/activo";
+import { MENSAJE_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 import { MENSAJE_ALERTA_ENVIADA } from "@/lib/procesoEjecutivo";
 import { registrar } from "@/lib/servidor/registro";
 import { createClient } from "@/lib/supabase/server";
@@ -39,6 +41,8 @@ async function crearAlertaAsociado(tipo: TipoAlertaAsociado): Promise<EstadoAler
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { error: MENSAJE_SIN_SESION };
+  // §12.6: un asociado dado de baja no crea alertas (la base también lo bloquea).
+  if (!(await asociadoActivo(supabase, user.id))) return { error: MENSAJE_CUENTA_INACTIVA };
 
   const { error } = await supabase.rpc("crear_alerta_asociado", { p_tipo: tipo });
   if (error) {

@@ -11,16 +11,11 @@ export const metadata: Metadata = {
 /**
  * /politica-de-datos (mapa de botones §5). No hay diseño: reutiliza el
  * encabezado y los tamaños de texto de /afiliacion.
- * BORRADOR (2026-09-24) según la Ley 1581 de 2012 y el Decreto 1377 de 2013
- * (compilado en el Decreto 1074 de 2015). Lo debe revisar la cooperativa, idealmente con
- * un abogado. Los datos que faltan van en <Pendiente>, resaltados en amarillo:
- * no desplegar a producción mientras quede alguno.
+ * Según la Ley 1581 de 2012 y el Decreto 1377 de 2013 (compilado en el
+ * Decreto 1074 de 2015). Datos de la cooperativa: certificado de la Cámara de
+ * Comercio del 8-sep-2026 (spec-requerimientos-ricardo §11 y §12.11). Sigue
+ * pendiente que la cooperativa la revise, idealmente con un abogado.
  */
-
-/** Dato que falta confirmar con la cooperativa (se ve resaltado a propósito). */
-function Pendiente({ children }: { children: ReactNode }) {
-  return <mark className="rounded bg-yellow-200 px-1 text-ga-navy">[{children}]</mark>;
-}
 
 function Seccion({ titulo, children }: { titulo: string; children: ReactNode }) {
   return (
@@ -53,22 +48,23 @@ export default function PoliticaDeDatosPage() {
             La aplicamos según la Ley 1581 de 2012 y el Decreto 1377 de 2013 (hoy compilado en el Decreto 1074 de 2015).
           </p>
           <p className={PARRAFO}>
-            Vigente desde el <Pendiente>fecha de publicación</Pendiente>.
+            Vigente desde el 1 de octubre de 2026.
           </p>
         </div>
 
         <Seccion titulo="1. Quién es el responsable">
           <ul className={LISTA}>
             <li>
-              <strong>Cooperativa Green Alliance</strong>, NIT <Pendiente>NIT</Pendiente>.
+              <strong>Cooperativa Green Alliance</strong> (sigla COOP GREEN), NIT 902.103.335-7, vigilada por la Superintendencia de la Economía Solidaria.
             </li>
             <li>
-              Domicilio: <Pendiente>dirección y ciudad</Pendiente>.
+              Domicilio y notificación judicial: Cr 78 No. 16 D 71, Bogotá D.C.
             </li>
             <li>
               Correo: <a className="enlace font-bold" href={`mailto:${CORREO_CONTACTO}`}>{CORREO_CONTACTO}</a>.
             </li>
             <li>WhatsApp: {WHATSAPP_NUMERO}.</li>
+            <li>Teléfono: 318 389 4034.</li>
           </ul>
         </Seccion>
 
@@ -99,8 +95,8 @@ export default function PoliticaDeDatosPage() {
           </p>
           <p className={PARRAFO}>
             No estás obligado a entregarnos datos sensibles. Si prefieres no subir las fotos, no podemos
-            verificar tu identidad por la página. En ese caso, escríbenos y te explicamos{" "}
-            <Pendiente>otra forma de verificar tu identidad, p. ej. en persona con tu asesor</Pendiente>.
+            verificar tu identidad ni afiliarte por la página: la selfie y las fotos de tu cédula son
+            obligatorias para la afiliación.
           </p>
           <p className={PARRAFO}>
             Las fotos se guardan en un almacenamiento privado. Solo las ven los administradores de la
@@ -142,9 +138,10 @@ export default function PoliticaDeDatosPage() {
             <li>Autoridades que lo pidan con base en la ley.</li>
           </ul>
           <p className={PARRAFO}>
-            Algunos de estos proveedores guardan la información en servidores fuera de Colombia{" "}
-            <Pendiente>país o región de los servidores</Pendiente>. Al aceptar esta política autorizas
-            esa transmisión. Ellos deben proteger tus datos con medidas iguales o mejores a las de esta
+            Estos proveedores guardan la información en servidores fuera de Colombia: la base de datos y las
+            fotos, en Supabase (Canadá, región ca-central-1); la página, en Vercel (Estados Unidos); y los
+            correos, en Resend (Estados Unidos). Esto es una transferencia internacional de datos personales.
+            Al aceptar esta política autorizas esa transmisión. Ellos deben proteger tus datos con medidas iguales o mejores a las de esta
             política.
           </p>
         </Seccion>
@@ -152,15 +149,17 @@ export default function PoliticaDeDatosPage() {
         <Seccion titulo="6. Cuánto tiempo guardamos tus datos">
           <ul className={LISTA}>
             <li>
-              <strong>Si tu afiliación se rechaza:</strong> borramos tus fotos a los{" "}
-              <Pendiente>número de días</Pendiente> días de la decisión.
+              <strong>Tus fotos y tus datos</strong> se conservan como mínimo 3 años y medio.
             </li>
             <li>
-              <strong>Si eres asociado:</strong> las fotos se guardan <Pendiente>plazo</Pendiente>.
-              Los demás datos se guardan mientras seas asociado y después durante el tiempo que exijan las
-              normas contables y del sector cooperativo <Pendiente>plazo, p. ej. 10 años</Pendiente>.
+              Después de ese plazo los conservamos mientras seas asociado y durante el tiempo que exijan
+              las normas contables y del sector cooperativo.
             </li>
           </ul>
+          <p className={PARRAFO}>
+            <strong>No reportamos a centrales de riesgo.</strong> Tus datos no se envían a
+            ninguna central de información crediticia.
+          </p>
         </Seccion>
 
         <Seccion titulo="7. Tus derechos">

@@ -17,10 +17,8 @@ import type { Convenio } from "@/lib/mock";
 
 export type LandingProps = {
   estadisticas: {
-    asociados: string;
     creditosAprobados: string;
     tiempoRespuesta: string;
-    tiempoRespuestaCorto?: string;
   };
   convenios: Convenio[];
   whatsapp: string;
@@ -62,13 +60,6 @@ const SERVICIOS: Array<{ titulo: string; texto: string; puntoBg: string; fondo: 
     puntoBg: "bg-ga-ambar",
     fondo: "bg-ga-ambar-fondo",
   },
-  {
-    titulo: "Embargo solidario a 36 meses",
-    texto: "Un alivio financiero pensado para que, con el tiempo, recuperes tu vida comercial ante los bancos.",
-    puntoBg: "bg-ga-menta",
-    fondo: "bg-ga-navy",
-    oscuro: true,
-  },
 ];
 
 // «Si hoy el banco te dice que no…» (pieza 2a): los 3 pasos del alivio de 3 años.
@@ -85,7 +76,7 @@ const PASOS_ALIVIO: Array<{ numero: string; fondo: string; numeroFg: string; tit
     fondo: "bg-ga-verde-claro",
     numeroFg: "text-ga-verde",
     titulo: "Recibes alivio",
-    texto: "Embargo solidario, microcréditos y orientación mientras ordenas tus cuentas.",
+    texto: "Microcréditos y orientación mientras ordenas tus cuentas.",
   },
   {
     numero: "03",
@@ -100,8 +91,6 @@ const PASOS_ALIVIO: Array<{ numero: string; fondo: string; numeroFg: string; tit
 const SEDES = ["Bogotá · sede principal", "Valledupar, Cesar", "Bosconia, Cesar", "La Jagua de Ibirico, Cesar", "Hatonuevo, La Guajira"];
 
 export function Landing({ estadisticas, convenios, whatsapp, correo, textoVigilancia }: LandingProps) {
-  const cifraRespuesta = estadisticas.tiempoRespuestaCorto ?? estadisticas.tiempoRespuesta;
-
   return (
     <div className="flex min-h-dvh flex-col overflow-x-clip bg-ga-fondo-suave">
       {/* Encabezado: píldora blanca flotante (pieza 2a). */}
@@ -167,17 +156,12 @@ export function Landing({ estadisticas, convenios, whatsapp, correo, textoVigila
               </a>
             </div>
             <div className="motion-safe:animate-ga-entrada mt-1 flex gap-8 [animation-delay:280ms] lg:gap-10">
-              <div className="flex flex-col gap-1">
-                <span className="font-display text-44 font-extrabold leading-none tracking-cifra text-ga-verde lg:text-64">
-                  {estadisticas.asociados}
-                </span>
-                <span className="text-14 text-ga-texto-2 lg:text-15">asociados activos</span>
-              </div>
+              {/* §12.8: sin «+200 asociados»; el tiempo de respuesta ya no es una cifra. */}
               <div className="flex flex-col gap-1">
                 <span className="font-display text-44 font-extrabold leading-none tracking-cifra text-ga-navy lg:text-64">
-                  {cifraRespuesta}
+                  Aprobados
                 </span>
-                <span className="text-14 text-ga-texto-2 lg:text-15">o menos de respuesta promedio</span>
+                <span className="text-14 text-ga-texto-2 lg:text-15">en poco tiempo</span>
               </div>
             </div>
           </div>
@@ -222,7 +206,7 @@ export function Landing({ estadisticas, convenios, whatsapp, correo, textoVigila
               Nuestra misión
             </span>
             <p className="relative m-0 max-w-[500px] font-display text-26 font-extrabold leading-110 tracking-titular text-ga-navy lg:text-34">
-              Ser escudo y lazo solidario para la familia policial.
+              Ser escudo y lazo solidario para la familia de la Policía Nacional y el Ejército Nacional.
             </p>
             <p className="relative m-0 text-16 leading-150 text-ga-texto-2 lg:text-17 lg:leading-155">
               <span className="lg:hidden">
@@ -293,7 +277,7 @@ export function Landing({ estadisticas, convenios, whatsapp, correo, textoVigila
           <h2 className="m-0 font-display text-28 font-extrabold tracking-titular text-ga-navy lg:text-44">
             Lo que encuentras en Green Alliance
           </h2>
-          <div className="flex flex-col gap-4 lg:grid lg:grid-cols-4 lg:gap-4">
+          <div className="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:gap-4">
             {SERVICIOS.map((s) => (
               <article
                 key={s.titulo}

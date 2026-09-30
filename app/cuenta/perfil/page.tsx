@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { RUTA_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 import { cargarPerfilAsociado } from "@/lib/asociado/servidor";
 import { vistaSolicitud, type FilaSolicitud } from "@/lib/cuenta";
 import { hoyBogota } from "@/lib/fechas";
@@ -29,7 +30,7 @@ export default async function PerfilPage() {
   // Con la sesión del usuario (RLS): solo ve lo suyo. Nunca la tasa.
   const { data: solicitudes } = await supabase
     .from("solicitudes_credito")
-    .select("estado, monto_solicitado, porcentaje_devolucion, plazo_meses, fecha_solicitud, fecha_respuesta")
+    .select("estado, monto_solicitado, porcentaje_devolucion, plazo_meses, fecha_solicitud, fecha_respuesta, fecha_desembolso")
     .eq("asociado_id", user.id)
     .order("fecha_solicitud", { ascending: false })
     .limit(1);
@@ -40,6 +41,9 @@ export default async function PerfilPage() {
     tienePendiente: ultima?.estado === "pendiente",
     hoy,
   });
+
+  // §12.6: cuenta dada de baja → sin datos; se cierra la sesión y se avisa en /ingresar.
+  if (perfil && !perfil.activo) redirect(RUTA_CUENTA_INACTIVA);
 
   return (
     <PerfilCliente

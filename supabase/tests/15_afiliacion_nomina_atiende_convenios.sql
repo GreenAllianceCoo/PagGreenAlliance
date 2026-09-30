@@ -43,7 +43,7 @@ select throws_ok($$ select pg_temp.afiliar('1500000105', 'p5@correo.test', 'i5@p
   '23514', null, 'rechaza una cuenta de 21 dígitos');
 select throws_ok($$ select pg_temp.afiliar('1500000106', 'p6@correo.test', 'i6@policia.gov.co', null, 'ahorros', '123456') $$,
   '23514', null, 'la cuenta de nómina va completa (entidad, tipo y número)');
-select throws_ok($$ select pg_temp.afiliar('1500000107', 'mismo@correo.test', 'mismo@correo.test', 'BBVA Colombia', 'ahorros', '123456') $$,
+select throws_ok($$ select pg_temp.afiliar('1500000107', 'mismo@policia.gov.co', 'mismo@policia.gov.co', 'BBVA Colombia', 'ahorros', '123456') $$,
   '23514', null, 'el correo institucional y el personal deben ser distintos');
 select throws_ok($$ select pg_temp.afiliar('1500000108', 'p8@correo.test', 'Inst@Policia.gov.co', 'BBVA Colombia', 'ahorros', '123456') $$,
   '23514', null, 'el correo institucional se guarda en minúsculas');
@@ -170,7 +170,9 @@ select set_eq(
         'agregar_nota_solicitud',
         'admin_actualizar_proceso_ejecutivo', 'crear_alerta_asociado', 'admin_marcar_alerta_atendida',
         'mi_proceso_ejecutivo', 'revelar_acumulado_comision', 'comisiones_periodo_asesor', 'buscar_cliente_asesor',
-        'admin_editar_pago_comision', 'admin_anular_pago_comision', 'tabla_credito_con_tasa', 'admin_tasas_solicitudes'],
+        'admin_editar_pago_comision', 'admin_anular_pago_comision', 'tabla_credito_con_tasa', 'admin_tasas_solicitudes',
+        'admin_marcar_desembolsado', 'admin_cambiar_estado_asociado', 'bonos_acumulados_asesor',
+        'admin_realizar_sorteo', 'ganador_sorteo_vigente'],
   'solo estas funciones security definer (que se validan solas) las ejecuta authenticated'
 );
 select is_empty(

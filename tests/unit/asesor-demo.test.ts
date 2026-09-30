@@ -23,6 +23,10 @@ const PAQUETES_DEMO: Record<CodigoGrado, PaqueteDemo[]> = {
   SI: [paquete("50", 1500000), paquete("100", 3000000)],
   IT: [paquete("50", 2000000), paquete("100", 4000000)],
   OF: [paquete("50", 2150000), paquete("100", 4200000)],
+  IJ: [paquete("50", 2500000), paquete("100", 5000000)],
+  CT: [paquete("50", 3500000), paquete("100", 7000000)],
+  MY: [paquete("50", 4500000), paquete("100", 9000000)],
+  TC: [paquete("50", 6000000), paquete("100", 12000000)],
 };
 
 describe("PAQUETES_DEMO de prueba / topeMaximoDemo · cambiar de grado cambia el tope", () => {

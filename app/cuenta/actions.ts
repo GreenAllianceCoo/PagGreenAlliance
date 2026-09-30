@@ -3,6 +3,8 @@
 import { registrar } from "@/lib/servidor/registro";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { asociadoActivo } from "@/lib/asociado/activo";
+import { MENSAJE_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 import { createClient } from "@/lib/supabase/server";
 import { erroresPorCampo, textoDe } from "@/lib/validaciones/comunes";
 import { esquemaTelefono } from "@/lib/validaciones/perfil";
@@ -43,6 +45,8 @@ export async function actualizarTelefono(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/ingresar");
+  // §12.6: sin acceso si la cuenta está dada de baja.
+  if (!(await asociadoActivo(supabase, user.id))) return { error: MENSAJE_CUENTA_INACTIVA, telefono: escrito };
 
   const { data, error } = await supabase
     .from("perfiles")

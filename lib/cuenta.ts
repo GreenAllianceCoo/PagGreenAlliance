@@ -1,6 +1,6 @@
 import type { PasoSolicitud } from "@/lib/mock";
 import {
-  fechaBogotaDeInstante,
+  formatearFechaCorta,
   formatearFechaLarga,
   hoyBogota,
   mesesYDiasEntre,
@@ -37,12 +37,14 @@ export type FilaSolicitud = {
   plazo_meses: number;
   fecha_solicitud: string;
   fecha_respuesta: string | null;
+  /** §12.2: fecha (AAAA-MM-DD) en que el admin marcó el desembolso; null = aún no desembolsado. */
+  fecha_desembolso?: string | null;
 };
 
 /**
- * Conteo regresivo del plazo del crédito (spec-requerimientos-ricardo §3.10).
- * TODO(confirmar: R-07) cuenta desde la APROBACIÓN (fecha_respuesta) mientras
- * no exista la fecha de desembolso (P-47).
+ * Conteo regresivo del plazo del crédito (spec-requerimientos-ricardo §3.10 y
+ * §12.2, R-07 cerrado): los 3 meses cuentan desde el DESEMBOLSO
+ * (`fecha_desembolso`). Antes del desembolso no hay conteo.
  */
 export type ConteoCredito = {
   desde: FechaISO;
@@ -65,10 +67,10 @@ export type VistaSolicitud = {
   conteo: ConteoCredito | null;
 };
 
-/** Conteo de un crédito aprobado: aprobación + plazo_meses (3), en días de Colombia. */
+/** Conteo de un crédito desembolsado: fecha_desembolso + plazo_meses (3), en días de Colombia. */
 export function conteoCredito(fila: FilaSolicitud, hoy: FechaISO = hoyBogota()): ConteoCredito | null {
-  if (fila.estado !== "aprobado" || !fila.fecha_respuesta || !fila.plazo_meses) return null;
-  const desde = fechaBogotaDeInstante(fila.fecha_respuesta);
+  if (fila.estado !== "aprobado" || !fila.fecha_desembolso || !fila.plazo_meses) return null;
+  const desde = fila.fecha_desembolso.slice(0, 10);
   const hasta = sumarMeses(desde, fila.plazo_meses);
   const restante = mesesYDiasEntre(hoy, hasta);
   return {
@@ -83,10 +85,10 @@ export function conteoCredito(fila: FilaSolicitud, hoy: FechaISO = hoyBogota()):
 }
 
 /**
- * Pasos Enviada → En revisión → Aprobada → Desembolso.
- * TODO(pendiente-spec): la base no tiene estado de desembolso; una aprobada
- * queda con «Desembolso» como paso actual. Tampoco hay diseño para rechazada:
- * el tercer paso pasa a llamarse «Rechazada».
+ * Pasos Enviada → En revisión → Aprobada → Desembolso. §12.2: una aprobada
+ * queda «Aprobado · pendiente de desembolso» hasta que el admin marca el
+ * desembolso; entonces el paso «Desembolso» se completa y arranca el conteo.
+ * Tampoco hay diseño para rechazada: el tercer paso pasa a llamarse «Rechazada».
  */
 export function vistaSolicitud(fila: FilaSolicitud, hoy: FechaISO = hoyBogota()): VistaSolicitud {
   const enviada = formatearFecha(fila.fecha_solicitud);
@@ -95,12 +97,15 @@ export function vistaSolicitud(fila: FilaSolicitud, hoy: FechaISO = hoyBogota())
   let estadoTexto: string;
   let pasos: PasoSolicitud[];
   if (fila.estado === "aprobado") {
-    estadoTexto = "Aprobada";
+    const desembolsada = Boolean(fila.fecha_desembolso);
+    estadoTexto = desembolsada ? "Desembolsado" : "Aprobado · pendiente de desembolso";
     pasos = [
       { etiqueta: "Enviada", estado: "hecho", fecha: enviada },
       { etiqueta: "En revisión", estado: "hecho" },
       { etiqueta: "Aprobada", estado: "hecho", fecha: respuesta },
-      { etiqueta: "Desembolso", estado: "actual" },
+      desembolsada
+        ? { etiqueta: "Desembolso", estado: "hecho", fecha: formatearFechaCorta(fila.fecha_desembolso!.slice(0, 10)) }
+        : { etiqueta: "Desembolso", estado: "actual" },
     ];
   } else if (fila.estado === "rechazado") {
     estadoTexto = "Rechazada";

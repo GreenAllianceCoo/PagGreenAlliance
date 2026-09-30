@@ -160,9 +160,11 @@ describe("crédito · conteo de 3 meses (R-07) y regla «solo operando» (§8)",
     fecha_solicitud: "2026-09-01T15:00:00Z",
     // 23:30 del 10-sep en Colombia = 04:30Z del 11-sep.
     fecha_respuesta: "2026-09-11T04:30:00Z",
+    // §12.2: el conteo arranca con el desembolso, no con la aprobación.
+    fecha_desembolso: "2026-09-10",
   };
 
-  it("cuenta desde la aprobación en hora de Colombia", () => {
+  it("cuenta desde el desembolso (§12.2) y no antes", () => {
     expect(conteoCredito(aprobada, "2026-09-30")).toMatchObject({
       desde: "2026-09-10",
       hasta: "2026-12-10",
@@ -171,6 +173,8 @@ describe("crédito · conteo de 3 meses (R-07) y regla «solo operando» (§8)",
       vencido: false,
     });
     expect(conteoCredito(aprobada, "2026-12-11")?.vencido).toBe(true);
+    expect(conteoCredito({ ...aprobada, fecha_desembolso: null }, "2026-09-30")).toBeNull();
+    expect(conteoCredito({ ...aprobada, fecha_desembolso: null }, "2026-09-30")).toBeNull();
   });
   it("solo para aprobadas; vistaSolicitud lo incluye", () => {
     expect(conteoCredito({ ...aprobada, estado: "pendiente" }, "2026-09-30")).toBeNull();
@@ -197,7 +201,7 @@ describe("crédito · conteo de 3 meses (R-07) y regla «solo operando» (§8)",
   it.each([
     [{ estadoProceso: "sentencia" }, "no_operando", MENSAJE_CREDITO_SOLO_OPERANDO],
     [{ estadoProceso: null }, "no_operando", MENSAJE_CREDITO_SOLO_OPERANDO],
-    [{ activo: false }, "inactivo", MENSAJE_CREDITO_SOLO_OPERANDO],
+    [{ activo: false }, "inactivo", "Tu cuenta está inactiva. Comunícate con la cooperativa."],
     [{ tieneCupo: false }, "sin_cupo", MENSAJE_SIN_CUPO],
     [{ tienePendiente: true }, "pendiente", expect.stringMatching(/pendiente/)],
     [{ cantidadTopes: 0 }, "sin_topes", expect.stringMatching(/topes/)],

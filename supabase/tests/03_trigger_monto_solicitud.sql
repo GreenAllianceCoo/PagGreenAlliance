@@ -110,7 +110,7 @@ select throws_ok(
 select is(
   (select string_agg(grado::text || porcentaje::text || '=' || tasa_interes_mensual::text, ' ' order by grado, porcentaje)
      from public.grados_credito),
-  'PP50=0.07900000 PT50=0.05076923 PT100=0.03740741 SI50=0.08200000 SI100=0.08200000 IT50=0.05050000 IT100=0.05050000 OF50=0.05395349 OF100=0.06333333',
+  'PP50=0.07900000 PT50=0.05076923 PT100=0.03740741 SI50=0.08200000 SI100=0.08200000 IT50=0.05050000 IT100=0.05050000 IJ50=0.05395349 IJ100=0.06333333 CT50=0.05395349 CT100=0.06333333 MY50=0.05395349 MY100=0.06333333 TC50=0.05395349 TC100=0.06333333 OF50=0.05395349 OF100=0.06333333',
   'cada grado y porcentaje tiene su tasa de interés mensual (interés de la tabla / tope)'
 );
 

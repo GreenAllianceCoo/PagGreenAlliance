@@ -1,6 +1,6 @@
 import "server-only";
 import { registrar } from "@/lib/servidor/registro";
-import { enviarPlantillaResend } from "@/lib/correo/resend";
+import { enviarCorreoTexto, enviarPlantillaResend } from "@/lib/correo/resend";
 
 /**
  * Correo con el número de boleta del sorteo mensual (docs/resend-plantillas.md
@@ -45,6 +45,38 @@ export async function enviarBoletaSorteo(datos: { correo: string | string[]; nom
       mes: datos.mes,
       mensaje: error instanceof Error ? error.message : String(error),
       ...(esProduccion ? {} : { numero: datos.numero }),
+    });
+  }
+}
+
+/**
+ * §12.10: aviso al ganador del sorteo del mes. Plantilla opcional
+ * `RESEND_TEMPLATE_SORTEO_GANADOR`; si no existe, texto plano. No lleva el
+ * número de boleta ni la cédula. No bloquea ni lanza.
+ */
+export async function enviarGanadorSorteo(datos: { correo: string | string[]; nombre: string; mes: string }) {
+  const plantilla = process.env.RESEND_TEMPLATE_SORTEO_GANADOR;
+  try {
+    if (plantilla) {
+      await enviarPlantillaResend({ para: datos.correo, plantilla, variables: { NOMBRE: datos.nombre, MES: datos.mes } });
+    } else {
+      await enviarCorreoTexto({
+        para: Array.isArray(datos.correo) ? datos.correo : [datos.correo],
+        asunto: "¡Ganaste el sorteo de Green Alliance!",
+        texto: [
+          `Hola ${datos.nombre},`,
+          "",
+          `Fuiste elegido como ganador del sorteo de ${datos.mes}. La cooperativa se pondrá en contacto contigo.`,
+          "",
+          "Cooperativa Green Alliance",
+        ].join("\n"),
+      });
+    }
+  } catch (error) {
+    registrar("error", {
+      evento: "sorteo_ganador_correo_fallo",
+      mes: datos.mes,
+      mensaje: error instanceof Error ? error.message : String(error),
     });
   }
 }
