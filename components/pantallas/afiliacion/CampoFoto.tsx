@@ -2,6 +2,10 @@
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { cx } from "@/components/ui/cx";
+import { comprimirFoto } from "@/lib/afiliacion/comprimirFoto";
+import { MENSAJE_FOTO_DUDOSA, type ResultadoCalidadFoto } from "@/lib/afiliacion/calidadFoto";
+import { AvisoFotoDudosa, SelloCalidadFoto } from "@/components/ui/SelloCalidadFoto";
+import { analizarFoto } from "./analizarFoto";
 
 /** `environment` abre la cámara trasera (fotos de la cédula); `user` la delantera (selfie). */
 export type CapturaCamara = "environment" | "user";
@@ -9,17 +13,9 @@ export type CapturaCamara = "environment" | "user";
 const TIPOS_PERMITIDOS = ["image/jpeg", "image/png", "image/webp"];
 /** Mismo límite del bucket privado `afiliacion-documentos` (spec-fase-2 §3). */
 const TAMANO_MAXIMO = 5 * 1024 * 1024;
-/** Lado más largo tras comprimir, en píxeles: de sobra para leer un documento. */
-const LADO_MAXIMO_PX = 1600;
-/**
- * S-03 (revisión de seguridad 2026-09-24): con 3 fotos de celular sin
- * comprimir (3-4 MB cada una) el envío completo supera el límite de 4,5 MB
- * de Vercel para Server Actions. Por eso AHORA se comprime SIEMPRE (no solo
- * cuando pesa más de TAMANO_MAXIMO), apuntando a este peso objetivo; junto
- * con `experimental.serverActions.bodySizeLimit` en next.config.mjs, el
- * envío de las 3 fotos queda muy por debajo del límite de Vercel.
- */
-const PESO_OBJETIVO = 300 * 1024;
+// Compresión: lib/afiliacion/comprimirFoto.ts (~2400 px, calidad 0,85, ≤ ~1,5 MB).
+// Las fotos suben directo al bucket con URLs firmadas (spec-requerimientos-ricardo
+// §2.10): ya no pasan por la Server Action y no hace falta reducirlas a 300 KB.
 
 type CampoFotoProps = {
   id: string;
@@ -42,6 +38,8 @@ export function CampoFoto({ id, name, label, ayuda, capture, error }: CampoFotoP
   const [archivo, setArchivo] = useState<File | null>(null);
   const [previa, setPrevia] = useState<string | null>(null);
   const [errorLocal, setErrorLocal] = useState<string | undefined>(undefined);
+  // Verificador (pieza 3j): null = sin analizar; solo avisa, nunca bloquea el envío.
+  const [calidad, setCalidad] = useState<ResultadoCalidadFoto | null>(null);
 
   const idAyuda = ayuda ? `${id}-ayuda` : undefined;
   const idError = `${id}-error`;
@@ -77,7 +75,7 @@ export function CampoFoto({ id, name, label, ayuda, capture, error }: CampoFotoP
       return;
     }
 
-    const final = await comprimirSiempre(elegido);
+    const final = await comprimirFoto(elegido);
     if (final.size > TAMANO_MAXIMO) {
       setErrorLocal("La foto pesa demasiado (máximo 5 MB).");
       if (inputRef.current) inputRef.current.value = "";
@@ -90,6 +88,8 @@ export function CampoFoto({ id, name, label, ayuda, capture, error }: CampoFotoP
       inputRef.current.files = datos.files;
     }
     setArchivo(final);
+    setCalidad(null);
+    void analizarFoto(final).then(setCalidad);
     setPrevia((anterior) => {
       if (anterior) URL.revokeObjectURL(anterior);
       return URL.createObjectURL(final);
@@ -118,11 +118,15 @@ export function CampoFoto({ id, name, label, ayuda, capture, error }: CampoFotoP
           ) : (
             <span className="px-3 text-center">Toca para tomar o subir la foto</span>
           )}
+          {previa && calidad?.aceptable ? <SelloCalidadFoto /> : null}
         </span>
         {previa ? (
           <span className="self-start text-13 font-bold text-ga-verde">Toca la foto para cambiarla</span>
         ) : null}
       </label>
+      {previa && calidad && !calidad.aceptable ? (
+        <AvisoFotoDudosa mensaje={MENSAJE_FOTO_DUDOSA} alRepetir={() => inputRef.current?.click()} />
+      ) : null}
       <input
         ref={inputRef}
         id={id}
@@ -147,42 +151,4 @@ export function CampoFoto({ id, name, label, ayuda, capture, error }: CampoFotoP
       ) : null}
     </div>
   );
-}
-
-/**
- * S-03: redimensiona SIEMPRE a máx. 1600 px de lado y reconvierte a JPEG,
- * bajando la calidad hasta acercarse a PESO_OBJETIVO (~300 KB) o hasta agotar
- * los intentos. Si por lo que sea el resultado no pesa menos que el original
- * (fotos ya pequeñas), se conserva el original tal cual: nunca se sube algo
- * más pesado de lo que el usuario eligió.
- */
-async function comprimirSiempre(archivo: File): Promise<File> {
-  try {
-    const bitmap = await createImageBitmap(archivo);
-    const escala = Math.min(1, LADO_MAXIMO_PX / Math.max(bitmap.width, bitmap.height));
-    const ancho = Math.max(1, Math.round(bitmap.width * escala));
-    const alto = Math.max(1, Math.round(bitmap.height * escala));
-    const lienzo = document.createElement("canvas");
-    lienzo.width = ancho;
-    lienzo.height = alto;
-    const contexto = lienzo.getContext("2d");
-    if (!contexto) return archivo;
-    contexto.drawImage(bitmap, 0, 0, ancho, alto);
-
-    // Baja la calidad JPEG en pasos hasta acercarse al peso objetivo.
-    let comprimido: File | null = null;
-    for (const calidad of [0.82, 0.7, 0.55, 0.4]) {
-      const blob = await new Promise<Blob | null>((resolver) => lienzo.toBlob(resolver, "image/jpeg", calidad));
-      if (!blob) continue;
-      const nombre = `${archivo.name.replace(/\.\w+$/, "")}.jpg`;
-      comprimido = new File([blob], nombre, { type: "image/jpeg" });
-      if (comprimido.size <= PESO_OBJETIVO) break;
-    }
-    if (!comprimido) return archivo;
-    // Si el original ya era más liviano que el resultado (foto ya chica),
-    // no tiene sentido "engordarla": se conserva el original.
-    return comprimido.size < archivo.size ? comprimido : archivo;
-  } catch {
-    return archivo;
-  }
 }

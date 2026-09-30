@@ -22,6 +22,10 @@ insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('00000000-0000-4000-a000-00000000000d', 'asociado.d@prueba.test', '{"cedula":"1000000005","grado":"PP"}', '{"nombre_completo":"Asociado D"}');
 update public.perfiles set rol = 'admin', grado = 'PP' where id = '00000000-0000-4000-a000-0000000000ad';
 
+-- 20260930100200: el crédito exige proceso ejecutivo en «operando» (spec §8).
+insert into public.procesos_ejecutivos (asociado_id, estado)
+select id, 'operando' from public.perfiles where id::text like '00000000-0000-4000-a000-%';
+
 -- Una solicitud pendiente de A y una de B
 insert into public.solicitudes_credito (id, asociado_id, porcentaje_devolucion, monto_solicitado, cuota_mensual) values
   ('10000000-0000-4000-a000-00000000000a', '00000000-0000-4000-a000-00000000000a', '50', 500000, 0),
@@ -100,9 +104,10 @@ with d as (
 ) select is(count(*)::int, 0, 'A no puede borrar su solicitud') from d;
 
 select is(
-  (select estado::text || '|' || monto_solicitado::text || '|' || tasa_interes_mensual::text
+  -- Sin tasa: desde 20260930100300 el asociado no puede leerla (su inmutabilidad la cubre 03).
+  (select estado::text || '|' || monto_solicitado::text
      from public.solicitudes_credito where id = '10000000-0000-4000-a000-00000000000a'),
-  'pendiente|500000|0.07900000',
+  'pendiente|500000',
   'la solicitud de A queda intacta tras los intentos de modificarla'
 );
 

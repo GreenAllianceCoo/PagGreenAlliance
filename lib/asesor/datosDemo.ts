@@ -2,7 +2,9 @@
 // «Es solo de la aplicación (...), no guarda nada en la base». Todo lo de
 // este archivo es ficticio a propósito: no debe parecerse a datos reales.
 
-import { GRADOS, type CodigoGrado } from "@/lib/validaciones/afiliacion";
+// Los «grados» del simulador son los GRUPOS de crédito (PP, PT, SI, IT, OF):
+// las filas de grados_credito, no los 17 grados del catálogo `grados`.
+import { GRUPOS_CREDITO as GRADOS, type GrupoCredito as CodigoGrado } from "@/lib/gradosCatalogo";
 import { MONTO_MINIMO, formatTasa } from "@/lib/credito";
 
 export { GRADOS };
@@ -24,33 +26,14 @@ export type PaqueteDemo = {
 };
 
 /**
- * Copia de los topes de `grados_credito` (migración 20260922000000), por si
- * `/asesor/demo` no logra leerlos de la base (o para las pruebas unitarias,
- * que no hablan con Supabase). La página siempre intenta leer la tabla real
- * primero: son datos públicos de referencia, no de un cliente.
+ * RS-08: aquí NO hay copia de respaldo de `grados_credito`. Este archivo lo
+ * importan componentes cliente (`"use client"`), y cualquier cifra que
+ * tenga — sobre todo la tasa de interés — viajaría en el JavaScript público
+ * del navegador. Los paquetes (con la tasa) llegan SOLO como prop desde el
+ * servidor, leídos con la RPC `tabla_credito_con_tasa()`
+ * (lib/asesor/cargarPaquetesDemo.ts). Si la RPC falla, la demo muestra un
+ * error; no inventa cifras.
  */
-export const PAQUETES_DEMO: Record<CodigoGrado, PaqueteDemo[]> = {
-  PP: [
-    { porcentaje: "50", capacidad_maxima: 1000000, tasa_interes_mensual: 0.079, plazo_meses: 3 },
-    { porcentaje: "100", capacidad_maxima: 2100000, tasa_interes_mensual: 0.079, plazo_meses: 3 },
-  ],
-  PT: [
-    { porcentaje: "50", capacidad_maxima: 1300000, tasa_interes_mensual: 0.079, plazo_meses: 3 },
-    { porcentaje: "100", capacidad_maxima: 2700000, tasa_interes_mensual: 0.079, plazo_meses: 3 },
-  ],
-  SI: [
-    { porcentaje: "50", capacidad_maxima: 1500000, tasa_interes_mensual: 0.079, plazo_meses: 3 },
-    { porcentaje: "100", capacidad_maxima: 3000000, tasa_interes_mensual: 0.079, plazo_meses: 3 },
-  ],
-  IT: [
-    { porcentaje: "50", capacidad_maxima: 2000000, tasa_interes_mensual: 0.079, plazo_meses: 3 },
-    { porcentaje: "100", capacidad_maxima: 4000000, tasa_interes_mensual: 0.079, plazo_meses: 3 },
-  ],
-  OF: [
-    { porcentaje: "50", capacidad_maxima: 2150000, tasa_interes_mensual: 0.079, plazo_meses: 3 },
-    { porcentaje: "100", capacidad_maxima: 4200000, tasa_interes_mensual: 0.079, plazo_meses: 3 },
-  ],
-};
 
 /** Nombre para mostrar de cada código de grado (mismo TODO(pendiente-spec) que /afiliacion y /cuenta). */
 export const NOMBRE_GRADO: Record<CodigoGrado, string> = {

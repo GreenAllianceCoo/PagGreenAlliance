@@ -21,6 +21,10 @@ update public.perfiles set rol = 'admin' where id = '00000000-0000-4000-a000-000
 update public.perfiles set rol = 'asesor' where id in
   ('00000000-0000-4000-a000-0000000000e1', '00000000-0000-4000-a000-0000000000e2');
 
+-- 20260930100200: el crédito exige proceso ejecutivo en «operando» (spec §8).
+insert into public.procesos_ejecutivos (asociado_id, estado)
+select id, 'operando' from public.perfiles where id::text like '00000000-0000-4000-a000-%';
+
 -- ------------------------------------------------------------
 -- Reglas de datos (como service role): asesor_id debe ser un asesor real
 -- ------------------------------------------------------------
@@ -106,19 +110,19 @@ select is(
 );
 
 select is(
-  (select count(*)::int from public.resumen_clientes_asesor() where origen = 'asociado' and cedula = '1000000001'),
+  (select count(*)::int from public.resumen_clientes_asesor() where origen = 'asociado' and cedula = public.enmascarar_cedula('1000000001')),
   1,
   'el asesor e1 ve al Asociado A por su cédula'
 );
 
 select is(
-  (select estado_credito::text from public.resumen_clientes_asesor() where origen = 'asociado' and cedula = '1000000001'),
+  (select estado_credito::text from public.resumen_clientes_asesor() where origen = 'asociado' and cedula = public.enmascarar_cedula('1000000001')),
   'pendiente',
   'el asesor e1 ve el estado de la última solicitud de crédito de su cliente'
 );
 
 select is(
-  (select estado_afiliacion::text from public.resumen_clientes_asesor() where origen = 'solicitud_afiliacion' and cedula = '1200000001'),
+  (select estado_afiliacion::text from public.resumen_clientes_asesor() where origen = 'solicitud_afiliacion' and cedula = public.enmascarar_cedula('1200000001')),
   'pendiente',
   'el asesor e1 ve el estado de la solicitud de afiliación que refirió'
 );

@@ -22,6 +22,9 @@ Abre Claude Code en el repo y escribe `/agents` para confirmar que aparecen los 
 | `ga-verificador-responsive` | Prueba de 320 a 1920 px y los patrones responsive | No, solo reporta | `tests/responsive/`, `test-results/` |
 | `ga-verificador-qa` | Prueba de punta a punta botones, validaciones, privacidad y fidelidad al diseño | No, solo reporta | `tests/e2e/`, `test-results/` |
 | `ga-disenador-lienzo` | Maqueta en el lienzo de Claude Design (`docs/Green Alliance C+.dc.html`) las pantallas o estados que falten, con la info que le pasan los otros agentes por `docs/diseno/pedidos.md`. Usa Sonnet | No | el lienzo, `docs/diseno/` |
+| `ga-revisor-diseno` | Compara lo construido con el lienzo C+ y reporta diferencias (textos, tokens, estados, reglas visibles) | No, solo reporta | `docs/verificaciones/` |
+| `ga-correos` | Correos de Resend: plantillas, quién recibe qué, aviso sin datos al institucional, volumen de envíos. Usa Sonnet | Sí (solo correos) | `lib/correo/`, `docs/resend-plantillas.md` |
+| `ga-enlace-cooperativa` | Lleva las preguntas, respuestas y decisiones con la cooperativa y redacta los mensajes para Ricardo. Usa Sonnet | No | `docs/cooperativa/`, specs (solo agregar) |
 | `ga-supervisor-avances` | Recibe los reportes de los demás agentes y actualiza el Excel de avances (pendientes, plan, Gantt, bitácora) | No | `docs/avances/`, casillas de `PENDIENTES.md` |
 
 ## Orden recomendado

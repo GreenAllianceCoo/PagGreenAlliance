@@ -5,6 +5,8 @@ import { registrar } from "@/lib/servidor/registro";
 import { exigirAdmin } from "@/lib/admin/servidor";
 import { correoDeCedula } from "@/lib/ingreso/servidor";
 import { enviarResultadoCredito } from "@/lib/correo/credito";
+import { destinatariosAviso } from "@/lib/correo/destinatarios";
+import { avisarCorreoInstitucional } from "@/lib/correo/institucional";
 import { esquemaResolverCredito } from "@/lib/validaciones/admin";
 
 export type EstadoAccionCredito = { error?: string; mensaje?: string };
@@ -78,12 +80,16 @@ export async function resolverCredito(
   // correo del asociado y no bloquea la respuesta si Resend falla.
   const { data: perfil } = await supabase
     .from("perfiles")
-    .select("nombre_completo, cedula")
+    .select("nombre_completo, cedula, correo_institucional")
     .eq("id", solicitud.asociado_id)
     .single();
   if (perfil) {
-    const correo = await correoDeCedula(perfil.cedula);
-    if (correo) {
+    // RS-02: montos y motivo SOLO al correo personal (Auth); al institucional,
+    // un aviso genérico sin datos.
+    const correoPersonal = await correoDeCedula(perfil.cedula);
+    const correo = destinatariosAviso(correoPersonal);
+    await avisarCorreoInstitucional(correoPersonal, perfil.correo_institucional);
+    if (correo.length > 0) {
       await enviarResultadoCredito({
         id: datos.id,
         nombre: perfil.nombre_completo,

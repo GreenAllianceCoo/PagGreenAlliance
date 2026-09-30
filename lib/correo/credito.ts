@@ -6,7 +6,8 @@ import { enviarPlantillaResend } from "@/lib/correo/resend";
 export async function enviarResultadoCredito(datos: {
   id: string;
   nombre: string;
-  correo: string;
+  /** Solo el correo personal (RS-02, lib/correo/destinatarios.ts). */
+  correo: string | string[];
   resultado: "aprobado" | "rechazado";
   monto: number;
   motivo?: string;

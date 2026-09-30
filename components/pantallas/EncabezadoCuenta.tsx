@@ -3,6 +3,8 @@ import { Logo } from "@/components/ui/Logo";
 
 /** Destino de «Nueva solicitud» (nav, accesos y estado vacío de /cuenta). */
 export const RUTA_NUEVA_SOLICITUD = "/cuenta/solicitar";
+/** «Perfil» del asociado (pieza 3k): pantalla propia, absorbe «Mis datos». */
+export const RUTA_PERFIL = "/cuenta/perfil";
 
 // Rediseño C+ (pieza 2b): el nav pasa de subrayado a píldora rellena
 // (verde-claro de fondo, texto verde-oscuro), como en el resto del design
@@ -14,7 +16,7 @@ const CLASE_INACTIVO =
 type EncabezadoCuentaProps = {
   nombre: string;
   /** Sección actual (subrayada y con aria-current). */
-  seccion: "inicio" | "solicitud";
+  seccion: "inicio" | "solicitud" | "perfil";
   /** Server Action de «Salir» (signOut → /ingresar). */
   accionSalir?: (formData: FormData) => void;
 };
@@ -61,6 +63,14 @@ export function EncabezadoCuenta({ nombre, seccion, accionSalir }: EncabezadoCue
           <a href={seccion === "inicio" ? "#convenios" : "/cuenta#convenios"} className={CLASE_INACTIVO}>
             Convenios
           </a>
+          {/* «Perfil» (pieza 3k): pantalla propia /cuenta/perfil; absorbe «Mis datos». */}
+          <Link
+            href={RUTA_PERFIL}
+            aria-current={seccion === "perfil" ? "page" : undefined}
+            className={seccion === "perfil" ? CLASE_ACTIVO : CLASE_INACTIVO}
+          >
+            Perfil
+          </Link>
         </nav>
         <div className="hidden items-center gap-3.5 text-15 lg:flex">
           {/* Nombre largo: no debe partir el header en 2 líneas entre 1024 y ~1150 px. */}

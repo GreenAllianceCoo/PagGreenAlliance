@@ -1,4 +1,9 @@
 import { z } from "zod";
+import { CONCEPTOS_COMISION, esDiaDeCorte, leerMontoPesos, MONTO_MAXIMO_PAGO } from "@/lib/asesor/comisiones";
+
+const MENSAJE_MONTO_TOPE = `El monto no puede pasar de $ ${MONTO_MAXIMO_PAGO.toLocaleString("es-CO")}.`;
+import { diasEntre, esFechaISO, hoyBogota } from "@/lib/fechas";
+import { ESTADOS_PROCESO } from "@/lib/procesoEjecutivo";
 import { esquemaCedula, esquemaCorreo, textoDe } from "./comunes";
 
 /**
@@ -89,3 +94,185 @@ export function leerFormularioAsesor(formData: FormData) {
     correo: textoDe(formData, "correo"),
   };
 }
+
+// ---------------------------------------------------------------------------
+// Requerimientos de Ricardo (spec-requerimientos-ricardo §6, pieza 3m)
+// ---------------------------------------------------------------------------
+
+/** Fecha opcional «AAAA-MM-DD» de un <input type="date">: vacío → null. */
+const esquemaFechaOpcional = z
+  .string()
+  .trim()
+  .transform((v) => (v === "" ? null : v))
+  .pipe(z.union([z.null(), z.string().refine(esFechaISO, { error: "Escribe una fecha válida." })]));
+
+/** Selector de estado del proceso + fecha de inicio del embargo (detalle del asociado). */
+export const esquemaActualizarProceso = z
+  .object({
+    asociadoId: z.uuid({ error: "Falta el asociado." }),
+    estado: z.enum(ESTADOS_PROCESO, { error: "Elige un paso del proceso." }),
+    fechaInicioEmbargo: esquemaFechaOpcional,
+  })
+  .superRefine((datos, ctx) => {
+    if (!datos.fechaInicioEmbargo) return;
+    if (datos.estado !== "operando" && datos.estado !== "terminado") {
+      ctx.addIssue({
+        code: "custom",
+        path: ["fechaInicioEmbargo"],
+        message: "La fecha de inicio del embargo solo se registra desde el paso «Operando».",
+      });
+      return;
+    }
+    if (datos.fechaInicioEmbargo < "2020-01-01") {
+      ctx.addIssue({ code: "custom", path: ["fechaInicioEmbargo"], message: "Revisa la fecha: es muy antigua." });
+    }
+    // La base rechaza más de un mes en el futuro (normalizar_proceso_ejecutivo).
+    if (diasEntre(hoyBogota(), datos.fechaInicioEmbargo) > 31) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["fechaInicioEmbargo"],
+        message: "La fecha de inicio del embargo no puede estar a más de un mes en el futuro.",
+      });
+    }
+  });
+export type CampoActualizarProceso = "asociadoId" | "estado" | "fechaInicioEmbargo";
+
+/** «Marcar atendida» de la bandeja de alertas. */
+export const esquemaMarcarAlerta = z.object({
+  alertaId: z.uuid({ error: "Falta la alerta." }),
+});
+
+/** «Registrar pago de comisión» (pagos_comision; sin update ni delete: se corrige con «Ajuste»). */
+export const esquemaPagoComision = z
+  .object({
+    asesorId: z.uuid({ error: "Elige el asesor." }),
+    periodoCorte: z
+      .string()
+      .trim()
+      .refine((v) => esFechaISO(v) && esDiaDeCorte(v), { error: "Elige el periodo (corte del día 15)." }),
+    concepto: z.enum(CONCEPTOS_COMISION, { error: "Elige el concepto." }),
+    monto: z
+      .string()
+      .transform((v, ctx) => {
+        const valor = leerMontoPesos(v);
+        if (valor === null) {
+          ctx.addIssue({ code: "custom", message: "Escribe el monto en pesos, sin decimales." });
+          return z.NEVER;
+        }
+        if (Math.abs(valor) > MONTO_MAXIMO_PAGO) {
+          ctx.addIssue({ code: "custom", message: MENSAJE_MONTO_TOPE });
+          return z.NEVER;
+        }
+        return valor;
+      }),
+    asociadoId: z
+      .string()
+      .trim()
+      .transform((v) => (v === "" ? null : v))
+      .pipe(z.union([z.null(), z.uuid({ error: "Elige un cliente válido." })])),
+    nota: z
+      .string()
+      .transform((v) => v.trim().replace(/\s+/g, " "))
+      .pipe(z.string().max(300, { error: "La nota puede tener máximo 300 caracteres." }))
+      .transform((v) => (v === "" ? null : v)),
+  })
+  .superRefine((datos, ctx) => {
+    // Mismas reglas que pagos_comision_monto_chk.
+    if (datos.concepto === "ajuste" && datos.monto === 0) {
+      ctx.addIssue({ code: "custom", path: ["monto"], message: "Un ajuste no puede ser de $0." });
+    } else if (datos.concepto === "viaje_100_embargos" && datos.monto < 0) {
+      ctx.addIssue({ code: "custom", path: ["monto"], message: "El monto no puede ser negativo." });
+    } else if (datos.concepto !== "ajuste" && datos.concepto !== "viaje_100_embargos" && datos.monto <= 0) {
+      ctx.addIssue({ code: "custom", path: ["monto"], message: "El monto debe ser mayor que cero (para descontar usa «Ajuste»)." });
+    }
+  });
+export type CampoPagoComision = "asesorId" | "periodoCorte" | "concepto" | "monto" | "asociadoId" | "nota";
+
+export function leerFormularioPagoComision(formData: FormData) {
+  return {
+    asesorId: textoDe(formData, "asesorId"),
+    periodoCorte: textoDe(formData, "periodoCorte"),
+    concepto: textoDe(formData, "concepto"),
+    monto: textoDe(formData, "monto"),
+    asociadoId: textoDe(formData, "asociadoId"),
+    nota: textoDe(formData, "nota"),
+  };
+}
+
+/** Interruptor «Atiende asociados» de /admin/asesores. */
+export const esquemaAtiendeAsociados = z.object({
+  perfilId: z.uuid({ error: "Falta la persona." }),
+  atiende: z.enum(["true", "false"], { error: "Valor inválido." }).transform((v) => v === "true"),
+});
+
+/** Motivo obligatorio de una corrección o anulación de pago (5 a 300, igual que la base). */
+const esquemaMotivoPago = z
+  .string()
+  .transform((v) => v.trim().replace(/\s+/g, " "))
+  .pipe(
+    z
+      .string()
+      .min(5, { error: "Escribe el motivo (mínimo 5 caracteres)." })
+      .max(300, { error: "El motivo puede tener máximo 300 caracteres." }),
+  );
+
+/**
+ * «Corregir pago» (admin_editar_pago_comision): monto, concepto y/o nota;
+ * vacío = no cambiar. La nota se borra con la casilla `borrarNota`.
+ */
+export const esquemaEditarPagoComision = z
+  .object({
+    pagoId: z.uuid({ error: "Falta el pago." }),
+    motivo: esquemaMotivoPago,
+    monto: z.string().transform((v, ctx) => {
+      if (v.trim() === "") return null;
+      const valor = leerMontoPesos(v);
+      if (valor === null) {
+        ctx.addIssue({ code: "custom", message: "Escribe el monto en pesos, sin decimales." });
+        return z.NEVER;
+      }
+      if (Math.abs(valor) > MONTO_MAXIMO_PAGO) {
+        ctx.addIssue({ code: "custom", message: MENSAJE_MONTO_TOPE });
+        return z.NEVER;
+      }
+      return valor;
+    }),
+    concepto: z
+      .string()
+      .trim()
+      .transform((v) => (v === "" ? null : v))
+      .pipe(z.union([z.null(), z.enum(CONCEPTOS_COMISION, { error: "Elige el concepto." })])),
+    nota: z
+      .string()
+      .transform((v) => v.trim().replace(/\s+/g, " "))
+      .pipe(z.string().max(300, { error: "La nota puede tener máximo 300 caracteres." })),
+    borrarNota: z.boolean(),
+  })
+  .transform(({ nota, borrarNota, ...resto }) => ({
+    ...resto,
+    // null = no cambiar; "" = borrar la nota (así lo entiende la RPC).
+    nota: borrarNota ? "" : nota === "" ? null : nota,
+  }))
+  .superRefine((datos, ctx) => {
+    if (datos.monto === null && datos.concepto === null && datos.nota === null) {
+      ctx.addIssue({ code: "custom", path: ["monto"], message: "No hay cambios para guardar." });
+    }
+  });
+export type CampoEditarPagoComision = "pagoId" | "motivo" | "monto" | "concepto" | "nota";
+
+export function leerFormularioEditarPago(formData: FormData) {
+  return {
+    pagoId: textoDe(formData, "pagoId"),
+    motivo: textoDe(formData, "motivo"),
+    monto: textoDe(formData, "monto"),
+    concepto: textoDe(formData, "concepto"),
+    nota: textoDe(formData, "nota"),
+    borrarNota: formData.get("borrarNota") === "on",
+  };
+}
+
+/** «Anular pago» (admin_anular_pago_comision): motivo obligatorio. */
+export const esquemaAnularPagoComision = z.object({
+  pagoId: z.uuid({ error: "Falta el pago." }),
+  motivo: esquemaMotivoPago,
+});

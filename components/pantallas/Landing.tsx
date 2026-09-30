@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ComprobanteSolicitud } from "@/components/pantallas/landing/ComprobanteSolicitud";
+import { ListaConvenios } from "@/components/pantallas/ListaConvenios";
 import { MatrizCirculos } from "@/components/pantallas/landing/MatrizCirculos";
 import { Logo } from "@/components/ui/Logo";
 import type { Convenio } from "@/lib/mock";
@@ -334,24 +335,8 @@ export function Landing({ estadisticas, convenios, whatsapp, correo, textoVigila
               Ver beneficios en mi cuenta
             </Link>
           </div>
-          <div className="flex flex-col gap-3 lg:grid lg:grid-cols-5 lg:gap-3.5">
-            {convenios.map((convenio) => (
-              <article key={convenio.nombre} className="flex flex-col gap-2.5 rounded-24 bg-white p-5">
-                <span className="text-13 font-bold uppercase tracking-[0.04em] text-ga-verde">
-                  {convenio.especialidad}
-                </span>
-                <strong className="font-display text-20 font-extrabold leading-115 text-ga-navy">
-                  {convenio.nombre}
-                </strong>
-                <span className="flex items-center gap-2 text-15 text-ga-texto-2">
-                  <span aria-hidden className="text-22">
-                    {convenio.emoji}
-                  </span>
-                  {convenio.nombreCorto}
-                </span>
-              </article>
-            ))}
-          </div>
+          {/* Detalle por marca (pieza 3n): modal en escritorio, hoja inferior en celular. */}
+          <ListaConvenios convenios={convenios} variante="landing" />
         </section>
 
         {/* Sedes */}

@@ -1,17 +1,18 @@
 "use client";
 
 import { useActionState, useEffect } from "react";
-import { Cuenta, type CuentaProps } from "@/components/pantallas/Cuenta";
+import { Perfil, type PerfilProps } from "@/components/pantallas/Perfil";
 import { esquemaTelefono } from "@/lib/validaciones/perfil";
-import { actualizarTelefono, cerrarSesion, type EstadoTelefono } from "./actions";
+import { actualizarTelefono, cerrarSesion, type EstadoTelefono } from "../actions";
+import { pedirRenovacion, pedirRetiroAnticipado } from "../actions-proceso";
 
 type Props = Omit<
-  CuentaProps,
-  "accionTelefono" | "accionSalir" | "errorTelefono" | "guardandoTelefono" | "mensajeTelefono"
+  PerfilProps,
+  "accionTelefono" | "accionSalir" | "errorTelefono" | "guardandoTelefono" | "mensajeTelefono" | "accionRetiro" | "accionRenovacion"
 >;
 
-/** Conecta /cuenta con «Guardar» (Mis datos) y «Salir». */
-export function CuentaCliente(props: Props) {
+/** Conecta /cuenta/perfil con «Guardar» (Mis datos), retiro anticipado, renovación y «Salir». */
+export function PerfilCliente(props: Props) {
   const [estado, accionTelefono, guardando] = useActionState(
     async (previo: EstadoTelefono, formData: FormData): Promise<EstadoTelefono> => {
       // Mismo esquema zod que el servidor.
@@ -29,7 +30,7 @@ export function CuentaCliente(props: Props) {
   }, [estado]);
 
   return (
-    <Cuenta
+    <Perfil
       {...props}
       telefono={estado.telefono ?? props.telefono}
       errorTelefono={estado.error}
@@ -37,6 +38,8 @@ export function CuentaCliente(props: Props) {
       mensajeTelefono={estado.mensaje}
       accionTelefono={accionTelefono}
       accionSalir={cerrarSesion}
+      accionRetiro={pedirRetiroAnticipado}
+      accionRenovacion={pedirRenovacion}
     />
   );
 }

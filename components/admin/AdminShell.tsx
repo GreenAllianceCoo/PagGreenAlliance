@@ -4,6 +4,8 @@ import Link from "next/link";
 import { cerrarSesion } from "@/app/cuenta/actions";
 import { SECCIONES, type Seccion } from "./secciones";
 import { EncabezadoAdmin } from "./EncabezadoAdmin";
+import { contarAlertasPendientes } from "@/lib/admin/alertas";
+import { createClient } from "@/lib/supabase/server";
 
 type AdminShellProps = {
   nombre: string;
@@ -25,6 +27,8 @@ type AdminShellProps = {
 const TONO_CHIP: Record<Seccion, string> = {
   afiliaciones: "bg-admin-ambar-fondo text-admin-ambar",
   creditos: "bg-admin-verde-fondo text-admin-verde",
+  asociados: "bg-admin-superficie-2 text-admin-texto-2",
+  alertas: "bg-admin-rojo-fondo text-admin-rojo-2",
   asesores: "bg-admin-superficie-2 text-admin-texto-2",
   sorteo: "bg-admin-superficie-2 text-admin-texto-2",
   demo: "bg-admin-superficie-2 text-admin-texto-2",
@@ -36,11 +40,14 @@ const TONO_CHIP: Record<Seccion, string> = {
  * `EncabezadoAdmin` (barra + pestañas en píldora, pieza 3h «El admin en
  * celular»).
  */
-export function AdminShell({ nombre, seccion, contadorSeccionActual, children }: AdminShellProps) {
+export async function AdminShell({ nombre, seccion, contadorSeccionActual, children }: AdminShellProps) {
+  // Contador del menú «Alertas» (pieza 3m): pendientes de retiro anticipado y renovación, en todas las secciones.
+  const alertasPendientes = await contarAlertasPendientes(await createClient());
+
   return (
     <div className="min-h-dvh bg-admin-fondo text-admin-texto lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
       <div className="lg:hidden">
-        <EncabezadoAdmin nombre={nombre} seccion={seccion} />
+        <EncabezadoAdmin nombre={nombre} seccion={seccion} alertasPendientes={alertasPendientes} />
       </div>
 
       <aside className="hidden flex-col gap-7 bg-admin-menu p-4 lg:flex">
@@ -58,7 +65,8 @@ export function AdminShell({ nombre, seccion, contadorSeccionActual, children }:
         <nav className="flex flex-col gap-1 text-15 font-bold">
           {SECCIONES.map((s) => {
             const activa = s.clave === seccion;
-            const chip = activa ? contadorSeccionActual : undefined;
+            // «Alertas» muestra siempre cuántas hay pendientes; las demás, el contador de su lista si están activas.
+            const chip = s.clave === "alertas" ? (alertasPendientes > 0 ? alertasPendientes : undefined) : activa ? contadorSeccionActual : undefined;
             return (
               <Link
                 key={s.href}

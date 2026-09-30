@@ -13,6 +13,12 @@ type EncabezadoAsesorProps = {
    * Si falta, el botón ámbar no se muestra (así lo usa /asesor/demo).
    */
   hrefDemo?: string;
+  /**
+   * Pestañas «Mis clientes» / «Comisiones» (pieza 3l). Sin `onPestana` (p. ej. /asesor/demo)
+   * queda la única etiqueta «Mis clientes», como antes.
+   */
+  pestana?: "clientes" | "comisiones";
+  onPestana?: (pestana: "clientes" | "comisiones") => void;
 };
 
 /**
@@ -25,20 +31,48 @@ type EncabezadoAsesorProps = {
  * fidelidad que EncabezadoCuenta: el lienzo no dibuja esta barra en 390 px,
  * el saludo y el título viven en el cuerpo de la página).
  */
-export function EncabezadoAsesor({ nombre, rol = "Asesor", accionSalir, hrefDemo }: EncabezadoAsesorProps) {
+export function EncabezadoAsesor({
+  nombre,
+  rol = "Asesor",
+  accionSalir,
+  hrefDemo,
+  pestana = "clientes",
+  onPestana,
+}: EncabezadoAsesorProps) {
+  const claseActiva = "rounded-full bg-ga-verde-claro px-4.5 py-2.5 text-16 font-bold text-ga-verde-oscuro";
+  const claseInactiva =
+    "rounded-full px-4.5 py-2.5 text-16 font-bold text-ga-texto-2 hover:bg-ga-fondo-suave hover:text-ga-verde";
   return (
     <header className="px-5 pt-6 md:mx-auto md:max-w-2xl lg:mx-0 lg:max-w-none lg:px-10 lg:pt-3.5">
       <div className="flex h-11 items-center justify-between gap-3 lg:h-16 lg:rounded-full lg:bg-white lg:pl-5 lg:pr-3 lg:shadow-pildora">
         <Link href="/" aria-label="Ir al inicio" className="block h-11 w-logo min-w-0 shrink lg:h-9">
           <Logo tone="dark" />
         </Link>
-        <nav aria-label="Principal" className="hidden lg:flex">
-          <span
-            aria-current="page"
-            className="rounded-full bg-ga-verde-claro px-4.5 py-2.5 text-16 font-bold text-ga-verde-oscuro"
-          >
-            Mis clientes
-          </span>
+        <nav aria-label="Principal" className="hidden items-center gap-1 lg:flex">
+          {onPestana ? (
+            <>
+              <button
+                type="button"
+                aria-current={pestana === "clientes" ? "page" : undefined}
+                onClick={() => onPestana("clientes")}
+                className={pestana === "clientes" ? claseActiva : claseInactiva}
+              >
+                Mis clientes
+              </button>
+              <button
+                type="button"
+                aria-current={pestana === "comisiones" ? "page" : undefined}
+                onClick={() => onPestana("comisiones")}
+                className={pestana === "comisiones" ? claseActiva : claseInactiva}
+              >
+                Comisiones
+              </button>
+            </>
+          ) : (
+            <span aria-current="page" className={claseActiva}>
+              Mis clientes
+            </span>
+          )}
         </nav>
         <div className="hidden items-center gap-2.5 text-15 lg:flex">
           <span className="flex max-w-[180px] flex-col items-end leading-120">

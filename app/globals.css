@@ -62,7 +62,7 @@
      del input SÍ usa ese mismo tono en modo claro (fila «Input» de `3a`).
      Se agrega con nombre propio para no reutilizar un token de admin fuera
      de su contexto. */
-  --ga-deshabilitado-texto: #9fb1bd;
+  --ga-deshabilitado-texto: #7c8b96; /* pieza 3p: más legible que #9FB1BD */
 
   /* Extras de la landing (pieza 2a) sin nombre propio en `3a`: son manchas
      y chips decorativos, no parte del sistema de color central. */

@@ -77,3 +77,52 @@ Formato de cada pedido:
 - Qué falta: bloque «Asesor» en la ficha, distinto del campo existente «Asesor que refirió». Aparece **solo** cuando la afiliación está `aprobada` y el perfil del asociado **no tiene** `asesor_id` todavía. Selector de asesores registrados + botón «Asignar asesor», con confirmación ligera y estados cargando/éxito/error. Si ya tiene asesor, se ve de solo lectura («Asesor: Andrés Rojas»), sin opción de cambiarlo por ahora. Si no hay asesores registrados, mensaje con enlace a /admin/asesores. Si la afiliación no está aprobada, el bloque no aparece en absoluto.
 - Datos y reglas: usa `perfiles.asesor_id`, que ya existe con su validación (`validar_perfil_asesor_id`, debe ser un perfil con `rol = 'asesor'`); no hace falta migración nueva, sí una Server Action nueva para asignar desde el admin.
 - Estado: Resuelto → 3i
+
+### D-10 · Afiliación v3 · /afiliacion
+- Pedido por: sesión principal (spec-requerimientos-ricardo-2026-09-29.md §1–2) · 2026-09-29
+- Prioridad: alta
+- Qué falta: institución → grado filtrado (17 grados), «Cuenta de nómina» en cascada (entidad con búsqueda → ahorros/corriente → número; caso billetera sin tipo de cuenta), correo institucional + correo personal, asesor con los nombres reales (Ricardo Varón, Miguel Rueda, Nany Barón, Rafael González, «No tengo asesor»), verificador de foto (nitidez/luz, aviso no bloqueante) y selfie con cámara en la página (vista de cámara, «Tomar selfie», repetir, permiso negado → alternativa), «¿Algo que debamos saber?».
+- Datos y reglas: spec §1 (grados por institución) y §2 (afiliación); el código de ingreso queda anclado al correo personal; el verificador de foto nunca bloquea el envío.
+- Estado: Resuelto → 3j
+
+### D-11 · Perfil del asociado · /cuenta «Perfil»
+- Pedido por: sesión principal (spec-requerimientos-ricardo-2026-09-29.md §3) · 2026-09-29
+- Prioridad: alta
+- Qué falta: línea de 8 pasos del proceso ejecutivo, conteo de 36 meses (antes/después de «Operando»), botón «Retiro anticipado» (sin suma, con modal del cobro de $10.000.000 y «Avisar al administrador»), botón «Renovar los 36 meses» (desactivado hasta los 24 meses), crédito con conteo de 3 meses.
+- Datos y reglas: spec §3; el asociado no ve la tasa de interés (decisión del 25-sep-2026); ninguna suma calculada en el botón de retiro.
+- Estado: Resuelto → 3k
+
+### D-12 · Panel del asesor · comisiones y búsqueda por cédula · /asesor
+- Pedido por: sesión principal (spec-requerimientos-ricardo-2026-09-29.md §5) · 2026-09-29
+- Prioridad: alta
+- Qué falta: pestaña «Comisiones» (corte el 15, ingresos nuevos $500.000 c/u, operativos $100.000 c/u, «Acumulado ganado a la fecha» oculto que se revela al tocar, avance a bonos 50/100 opcional, enlace al simulador) y búsqueda de cliente por cédula con estado del proceso y capacidad de endeudamiento (50 %/100 % o «sin cupo configurado»).
+- Datos y reglas: spec §0 (comisiones) y §5; sigue la regla F2-03 (solo sus propios clientes) y enmascara la cédula en listas.
+- Estado: Resuelto → 3l
+
+### D-13 · Admin · Asociados, Alertas, pagos de comisión y «Atiende asociados» · /admin
+- Pedido por: sesión principal (spec-requerimientos-ricardo-2026-09-29.md §6) · 2026-09-29
+- Prioridad: alta
+- Qué falta: selector de estado del proceso ejecutivo + fecha de inicio del embargo + historial en el detalle del asociado; bandeja de alertas de retiro/renovación con «Marcar atendida»; formulario para registrar pago de comisión; interruptor «Atiende asociados» en /admin/asesores.
+- Datos y reglas: spec §6; solo el admin cambia el proceso ejecutivo; Ricardo Varón queda con `atiende_asociados = true`.
+- Estado: Resuelto → 3m
+
+### D-14 · Convenios · detalle por marca · landing y /cuenta
+- Pedido por: sesión principal (spec-requerimientos-ricardo-2026-09-29.md §4) · 2026-09-29
+- Prioridad: media
+- Qué falta: detalle por marca (modal en escritorio, hoja inferior en celular) con descripción, viñetas, sedes, NIT y «Escribir por WhatsApp» con el glifo oficial.
+- Datos y reglas: spec §4, con los textos literales de «REQUERIMIENTO DE PAGINA WEB 2.pdf» (páginas 3–4) — cerrado el 2026-09-30 con los textos literales de la migración `20260929100600_convenios_servicios_sedes_y_datos.sql`.
+- Estado: Resuelto → 3n
+
+### D-15 · Admin · corregir y anular un pago de comisión + bitácora · /admin/asesores
+- Pedido por: ga-funcionalidad-botones · 2026-09-30
+- Prioridad: media
+- Qué falta: en la lista de pagos de comisión (3m), por cada pago vigente: «Corregir» (monto, concepto y/o nota; casilla «Borrar la nota») y «Anular», los dos con un campo «Motivo» obligatorio; estado del pago anulado (tachado o chip «Anulado» con motivo, quién y cuándo; no suma al total); y una vista «Bitácora» (por pago o general) con acción (Registro / Corrección / Anulación), quién, cuándo, motivo y los cambios «antes → después».
+- Datos y reglas: spec-requerimientos-ricardo §8 y migración 20260930100000. Acciones `editarPagoComision` y `anularPagoComision` (app/admin/asesores/actions.ts); loaders `listarPagosComision` (trae `anulado`, `motivoAnulacion`, `anuladoPor`, `anuladoEl`) y `listarBitacoraPagos` (lib/admin/equipo.ts). Motivo de 5 a 300 caracteres. Un pago anulado ya no se puede corregir. Los pagos nunca se borran. Errores posibles: «No hay cambios para guardar.», «Un pago anulado ya no se puede modificar.», «El monto no es válido para ese concepto (para descontar usa «Ajuste»).».
+- Estado: Resuelto → 3o (2026-09-30, ga-disenador-lienzo)
+
+### D-16 · Crédito bloqueado hasta «Operando» · /cuenta y /cuenta/solicitar
+- Pedido por: ga-funcionalidad-botones · 2026-09-30
+- Prioridad: alta
+- Qué falta: el estado de «Solicitar crédito» cuando el asociado NO puede pedir: botón deshabilitado (o reemplazado) con el texto «Podrás pedir tu crédito cuando tu proceso esté operando», tanto en la tarjeta de /cuenta como en /cuenta/solicitar. Los otros motivos ya tienen texto: grado sin cupo («Tu grado todavía no tiene cupo de crédito configurado; tu asesor te contactará»), solicitud pendiente y sin grado.
+- Datos y reglas: spec §8 (regla de Sebas): solo si el asociado está activo y su proceso ejecutivo está en «operando»; la base lo vuelve a exigir (trigger de 20260930100200). Datos: `perfilAsociado.credito` = `{ puedeSolicitar, motivo, mensaje }` con motivo `inactivo | sin_grado | sin_cupo | no_operando | pendiente | sin_topes` (lib/asociado/servidor.ts). Inactivo usa el mismo texto que «no operando».
+- Estado: Resuelto → 3p (2026-09-30, ga-disenador-lienzo)

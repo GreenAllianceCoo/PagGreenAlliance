@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { EncabezadoCuenta } from "@/components/pantallas/EncabezadoCuenta";
+import { AvisoCreditoBloqueado } from "@/components/ui/AvisoCreditoBloqueado";
 import { ButtonLink } from "@/components/ui/Button";
 import { IconoSalir, IconoVolver } from "@/components/ui/Iconos";
+import { MENSAJE_CREDITO_SIN_TOPES } from "@/lib/credito";
+import { reglaCreditoDe } from "@/lib/asociado/servidor";
 import { createClient } from "@/lib/supabase/server";
 import { cerrarSesion } from "../actions";
 import SolicitudForm from "./SolicitudForm";
@@ -28,7 +31,7 @@ export default async function SolicitarPage() {
 
   // Todo con la sesión del usuario (RLS): solo ve lo suyo.
   const [{ data: perfil }, { data: solicitudes }] = await Promise.all([
-    supabase.from("perfiles").select("nombre_completo, grado").eq("id", user.id).single(),
+    supabase.from("perfiles").select("nombre_completo, grado, activo").eq("id", user.id).single(),
     supabase
       .from("solicitudes_credito")
       .select("estado")
@@ -37,24 +40,18 @@ export default async function SolicitarPage() {
       .limit(1),
   ]);
 
-  const tienePendiente = solicitudes?.[0]?.estado === "pendiente";
-
-  const { data: paquetes } = perfil?.grado
-    ? await supabase
-        .from("grados_credito")
-        // Sin tasa_interes_mensual: es de uso interno y no debe llegar al navegador (25-sep).
-        .select("porcentaje, capacidad_maxima, plazo_meses")
-        .eq("grado", perfil.grado)
-        .order("porcentaje", { ascending: true })
-    : { data: null };
-
-  const aviso = !perfil?.grado
-    ? "Tu perfil aún no tiene un grado asignado. Habla con la cooperativa para poder solicitar un crédito."
-    : tienePendiente
-      ? "Ya tienes una solicitud pendiente de revisión. Espera la respuesta antes de enviar una nueva."
-      : !paquetes || paquetes.length === 0
-        ? "Aún no hay topes de crédito configurados para tu grado. Habla con la cooperativa."
-        : null;
+  // Regla de crédito (spec-requerimientos-ricardo §1 y §8): activo, grado con
+  // cupo (por su GRUPO de crédito) y proceso ejecutivo en «operando», sin
+  // otra pendiente. Los paquetes vienen sin tasa_interes_mensual (25-sep).
+  const { regla, cupo } = await reglaCreditoDe(supabase, {
+    activo: (perfil?.activo as boolean | null | undefined) ?? null,
+    grado: perfil?.grado ?? null,
+    tienePendiente: solicitudes?.[0]?.estado === "pendiente",
+  });
+  /** Para la pantalla (3k): si puede solicitar y, si no, por qué. */
+  const puedeSolicitar = regla.puedeSolicitar;
+  const aviso = regla.mensaje;
+  const paquetes = cupo.estado === "con_cupo" ? cupo.paquetes : null;
 
   return (
     <div className="min-h-dvh bg-ga-fondo-suave">
@@ -97,11 +94,10 @@ export default async function SolicitarPage() {
           <h2 id="solicitud-titulo" className="m-0 font-display text-18 font-extrabold lg:text-20">
             Solicita tu crédito
           </h2>
-          {aviso || !paquetes ? (
+          {!puedeSolicitar || !paquetes ? (
             <>
-              <p className="m-0 rounded-10 bg-ga-fondo-suave p-3 text-15 leading-150 text-ga-texto-2 lg:px-3.5">
-                {aviso}
-              </p>
+              {/* D-16: estado de crédito bloqueado (nunca un botón activo de solicitar). */}
+              <AvisoCreditoBloqueado mensaje={aviso ?? MENSAJE_CREDITO_SIN_TOPES} />
               <ButtonLink href="/cuenta" variante="secundario" className="lg:self-start lg:px-9">
                 Volver a mi cuenta
               </ButtonLink>

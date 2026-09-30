@@ -24,14 +24,18 @@ export function escaparVariables(variables: VariablesPlantilla): VariablesPlanti
   );
 }
 
-/** Envía una plantilla publicada en Resend sin exponer la llave al cliente. */
+/**
+ * Envía una plantilla publicada en Resend sin exponer la llave al cliente.
+ * `para` acepta varios correos; los avisos con datos del asociado van SOLO al
+ * personal (RS-02, lib/correo/destinatarios.ts).
+ */
 export async function enviarPlantillaResend({
   para,
   plantilla,
   variables,
   responderA,
 }: {
-  para: string;
+  para: string | string[];
   plantilla: string;
   variables: VariablesPlantilla;
   responderA?: string;
@@ -45,10 +49,35 @@ export async function enviarPlantillaResend({
     headers: { Authorization: `Bearer ${llave}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       from: remitente,
-      to: [para],
+      to: Array.isArray(para) ? para : [para],
       template: { id: plantilla, variables: escaparVariables(variables) },
       ...(responderA ? { reply_to: responderA } : {}),
     }),
+    signal: AbortSignal.timeout(10_000),
+  });
+
+  if (!respuesta.ok) {
+    const cuerpo = await respuesta.text().catch(() => "");
+    throw new Error(`Resend respondió ${respuesta.status}: ${cuerpo.slice(0, 300)}`);
+  }
+}
+
+/**
+ * Correo de texto simple, SIN plantilla, para avisos internos al equipo
+ * (p. ej. alerta de retiro anticipado a los admins) y para el aviso genérico
+ * SIN datos al correo institucional (lib/correo/institucional.ts, RS-02).
+ * Los avisos con datos al asociado usan solo las plantillas de docs/resend-plantillas.md.
+ */
+export async function enviarCorreoTexto({ para, asunto, texto }: { para: string[]; asunto: string; texto: string }) {
+  const llave = process.env.RESEND_API_KEY;
+  const remitente = process.env.EMAIL_FROM;
+  if (!llave || !remitente) throw new Error("Falta RESEND_API_KEY o EMAIL_FROM");
+  if (para.length === 0) return;
+
+  const respuesta = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${llave}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ from: remitente, to: para, subject: asunto, text: texto }),
     signal: AbortSignal.timeout(10_000),
   });
 
