@@ -25,7 +25,7 @@ const BENEFICIOS = [
   "Usa los convenios para asociados",
 ];
 
-/** Ingreso paso 1 · cédula (design/Ingreso-PC.dc.html + Ingreso-Movil.dc.html). */
+/** Ingreso paso 1 · cédula (pieza 3b del rediseño C+, docs/Green Alliance C+.dc.html). */
 export function IngresoCedula({
   whatsapp,
   whatsappUrl,
@@ -72,7 +72,7 @@ export function IngresoCedula({
     >
       <form action={accion} className={CLASES_FORM_INGRESO} noValidate>
         <ProgressSteps pasoActual={1} totalPasos={2} />
-        <h2 className="m-0 hidden text-32 font-extrabold text-ga-navy lg:block">
+        <h2 className="m-0 hidden font-display text-32 font-extrabold text-ga-navy lg:block">
           Ingresa con tu cédula
         </h2>
         <Field id="cedula" label="Número de cédula" tamano="lg" error={error}>

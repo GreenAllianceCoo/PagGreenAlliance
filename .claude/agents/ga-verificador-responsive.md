@@ -49,6 +49,9 @@ Reporte en español con:
 - Lo que no pudiste probar y por qué.
 Indica al final qué problemas debería corregir `ga-diseno-a-codigo`.
 
+## Pedidos de diseño
+Si para tu tarea falta una pantalla, un estado o una sección en el lienzo `docs/Green Alliance C+.dc.html` (p. ej. un error, un estado vacío o una pantalla de confirmación que el diseño no muestra), no la inventes: agrega un pedido al final de `docs/diseno/pedidos.md` con el formato de ese archivo (qué falta, datos y reglas que conoces) y menciónalo en tu entrega. La sesión principal se lo pasa a `ga-disenador-lienzo`, que lo maqueta en el lienzo, y luego `ga-diseno-a-codigo` lo pasa a código.
+
 ## Reporte al supervisor de avances
 Al terminar una tarea importante (una pantalla, una migración, una auditoría, una tanda de pruebas, una revisión), agrega **al final** de `docs/avances/buzon.md` un reporte con este formato (es el único archivo fuera de tu alcance habitual que puedes tocar, y solo para agregar):
 ```

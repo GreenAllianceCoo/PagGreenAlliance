@@ -8,7 +8,6 @@ import { MONTO_MINIMO } from "@/lib/credito";
 type Paquete = {
   porcentaje: "50" | "100";
   capacidad_maxima: number;
-  tasa_interes_mensual: number;
   plazo_meses: number;
 };
 
@@ -22,7 +21,7 @@ const initialState: EstadoSolicitud = {};
 
 /**
  * Formulario de solicitud de crédito: porcentaje de devolución (50 / 100),
- * monto (mínimo $100.000, máximo el tope del grado) y la tasa mensual del grado.
+ * monto (mínimo $100.000, máximo el tope del grado) y el plazo del grado.
  * La acción vuelve a validar todo en el servidor.
  */
 export default function SolicitudForm({ paquetes }: { paquetes: Paquete[] }) {
@@ -33,6 +32,11 @@ export default function SolicitudForm({ paquetes }: { paquetes: Paquete[] }) {
   const refErrorGeneral = useRef<HTMLParagraphElement>(null);
 
   const montoMinimo = Math.min(MONTO_MINIMO, paquete.capacidad_maxima);
+  // Solo para dibujar el relleno verde debajo del slider (pieza 3d): no es un
+  // cálculo nuevo, es el mismo `monto`/`montoMinimo`/`capacidad_maxima` que ya
+  // controla el input nativo.
+  const rangoMonto = paquete.capacidad_maxima - montoMinimo;
+  const porcentajeMonto = rangoMonto > 0 ? ((monto - montoMinimo) / rangoMonto) * 100 : 100;
   const errorPorcentaje = state.campo === "porcentaje" ? state.error : undefined;
   const errorMonto = state.campo === "monto" ? state.error : undefined;
   const errorGeneral = state.error && !state.campo ? state.error : undefined;
@@ -92,25 +96,40 @@ export default function SolicitudForm({ paquetes }: { paquetes: Paquete[] }) {
           <label htmlFor="monto" className="text-15 font-bold">
             Monto a desembolsar
           </label>
-          <output htmlFor="monto" className="text-24 font-extrabold text-ga-navy">
+          <output
+            htmlFor="monto"
+            className="font-display text-26 font-extrabold tracking-cifra text-ga-navy"
+          >
             {formatCOP(monto)}
           </output>
         </div>
-        <input
-          id="monto"
-          name="monto"
-          type="range"
-          min={montoMinimo}
-          max={paquete.capacidad_maxima}
-          step={PASO}
-          value={monto}
-          onChange={(e) => setMonto(Number(e.target.value))}
-          aria-valuetext={formatCOP(monto)}
-          aria-invalid={errorMonto ? true : undefined}
-          aria-describedby={["monto-ayuda", errorMonto ? "monto-error" : null].filter(Boolean).join(" ")}
-          // h-11: área de toque de al menos 44 px de alto (el track visual sigue delgado).
-          className="h-11 w-full accent-ga-verde"
-        />
+        {/* Pista + relleno verde: solo dibujo, encima va el <input type="range">
+            real (mismo name="monto", min/max/step/value sin cambios) con su
+            pista nativa oculta por .ga-deslizador (app/globals.css) para que
+            se vea esta de abajo. */}
+        <div className="relative flex h-11 items-center">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 h-2.5 overflow-hidden rounded-full bg-ga-verde-claro"
+          >
+            <div className="h-full rounded-full bg-ga-verde" style={{ width: `${porcentajeMonto}%` }} />
+          </div>
+          <input
+            id="monto"
+            name="monto"
+            type="range"
+            min={montoMinimo}
+            max={paquete.capacidad_maxima}
+            step={PASO}
+            value={monto}
+            onChange={(e) => setMonto(Number(e.target.value))}
+            aria-valuetext={formatCOP(monto)}
+            aria-invalid={errorMonto ? true : undefined}
+            aria-describedby={["monto-ayuda", errorMonto ? "monto-error" : null].filter(Boolean).join(" ")}
+            // h-11: área de toque de al menos 44 px de alto (el track visual sigue delgado).
+            className="ga-deslizador relative h-11 w-full"
+          />
+        </div>
         <div id="monto-ayuda" className="flex justify-between text-13 text-ga-texto-3">
           <span>Mínimo {formatCOP(montoMinimo)}</span>
           <span>Tope {formatCOP(paquete.capacidad_maxima)}</span>

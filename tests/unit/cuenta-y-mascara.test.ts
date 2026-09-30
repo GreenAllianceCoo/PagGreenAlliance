@@ -5,7 +5,7 @@
 import { describe, expect, it } from "vitest";
 import { enlaceWhatsapp } from "@/lib/config";
 import { formatearPesos, textoTope, vistaSolicitud, type FilaSolicitud } from "@/lib/cuenta";
-import { correoDeRelleno, enmascararCorreo } from "@/lib/mascara";
+import { correoDeRelleno, enmascararCedula, enmascararCorreo } from "@/lib/mascara";
 
 describe("enmascararCorreo", () => {
   it("deja 2 letras del usuario y oculta el dominio completo (F-01, correo de cualquier dominio)", () => {
@@ -40,6 +40,21 @@ describe("correoDeRelleno (F-01: relleno indistinguible de un correo real)", () 
   });
 });
 
+describe("enmascararCedula (carné de asociado, pieza 2b)", () => {
+  it("agrupa por miles y deja ver el primer grupo, 1 cifra del segundo y el último grupo", () => {
+    expect(enmascararCedula("1032109876")).toBe("1.0••.•••.876");
+    expect(enmascararCedula("1234567890")).toBe("1.2••.•••.890");
+  });
+  it("cédulas muy cortas (menos de 4 dígitos) se devuelven sin cambios: no hay nada que ocultar con sentido", () => {
+    expect(enmascararCedula("123")).toBe("123");
+  });
+  it("no toca lo que ya ve el propio asociado en «Mis datos»: es una función aparte de la cédula sin formato", () => {
+    // «Mis datos» sigue mostrando `perfiles.cedula` tal cual (sin puntos ni máscara);
+    // esta función es solo para el carné, que sí puede mostrarse en público.
+    expect(enmascararCedula("1234567890")).not.toBe("1234567890");
+  });
+});
+
 describe("enlaceWhatsapp", () => {
   it("arma https://wa.me/57<NÚMERO> con 10 dígitos", () => {
     expect(enlaceWhatsapp("3001234567")).toBe("https://wa.me/573001234567");
@@ -58,7 +73,6 @@ const BASE: FilaSolicitud = {
   monto_solicitado: 500000,
   porcentaje_devolucion: "50",
   plazo_meses: 3,
-  tasa_interes_mensual: 0.079,
   fecha_solicitud: "2026-09-23T15:00:00Z",
   fecha_respuesta: null,
 };
@@ -70,7 +84,6 @@ describe("vistaSolicitud", () => {
     expect(v.monto).toBe("$ 500.000");
     expect(v.modalidad).toBe("50%");
     expect(v.plazo).toBe("3 meses");
-    expect(v.tasa).toBe("7,9 %");
     expect(v.pasos.map((p) => p.estado)).toEqual(["hecho", "actual", "pendiente", "pendiente"]);
     expect(v.pasos[0].fecha).toBeTruthy();
   });
@@ -85,8 +98,8 @@ describe("vistaSolicitud", () => {
     expect(v.estadoTexto).toBe("Rechazada");
     expect(v.pasos[2].etiqueta).toBe("Rechazada");
   });
-  it("la tasa viene de la solicitud (numeric llega como texto)", () => {
-    expect(vistaSolicitud({ ...BASE, tasa_interes_mensual: "0.05050000" }).tasa).toBe("5,05 %");
+  it("no expone la tasa al asociado (uso interno, decisión 25-sep)", () => {
+    expect(vistaSolicitud(BASE)).not.toHaveProperty("tasa");
   });
 });
 

@@ -55,7 +55,8 @@ export function Field({
         </span>
       ) : null}
       {error ? (
-        <span id={idError} className="text-14 font-semibold text-ga-error">
+        // 13 px (pieza 3a: fila «Input», estado «Con error»); antes 14 px.
+        <span id={idError} className="text-13 font-semibold text-ga-error">
           {error}
         </span>
       ) : null}

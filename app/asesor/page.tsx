@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { EncabezadoAsesor } from "@/components/asesor/EncabezadoAsesor";
+import { BarraInferior } from "@/components/ui/BarraInferior";
 import { registrar } from "@/lib/servidor/registro";
 import { createClient } from "@/lib/supabase/server";
 import { sanitizarFilaResumen, type FilaResumenAsesor } from "@/lib/asesor/resumen";
@@ -49,38 +50,69 @@ export default async function AsesorPage() {
   );
 
   return (
-    <div className="min-h-dvh bg-ga-fondo-suave">
-      <EncabezadoAsesor nombre={perfil.nombre_completo ?? "Asesor"} accionSalir={cerrarSesionAsesor} />
+    <div className="min-h-dvh bg-ga-fondo-suave pb-24 lg:pb-0">
+      <EncabezadoAsesor
+        nombre={perfil.nombre_completo ?? "Asesor"}
+        accionSalir={cerrarSesionAsesor}
+        hrefDemo="/asesor/demo"
+      />
 
       <main className="flex flex-col gap-4 px-5 pb-6 pt-4 md:mx-auto md:max-w-3xl lg:max-w-none lg:gap-6 lg:px-14 lg:py-10">
-        <div className="flex flex-col gap-0.5">
-          <h1 className="m-0 text-24 font-extrabold text-ga-navy lg:text-32">
-            Hola, {perfil.nombre_completo ?? "Asesor"}
-          </h1>
-          <p className="m-0 text-15 text-ga-texto-3">
-            Aquí ves el avance de las personas que has referido y de tus asociados asignados.
-          </p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col gap-0.5 lg:gap-1.5">
+            <span className="text-15 text-ga-texto-3 lg:hidden">Hola, {perfil.nombre_completo ?? "Asesor"}</span>
+            <h1 className="m-0 font-display text-30 font-extrabold tracking-titular text-ga-navy lg:text-44">
+              Mis clientes
+            </h1>
+            <p className="m-0 hidden text-17 text-ga-texto-2 lg:block">
+              Las personas que referiste y los asociados que la cooperativa te asignó.
+            </p>
+          </div>
+          {/* Celular: acceso condensado a la cuenta de demostración (en escritorio vive en el encabezado). */}
+          <Link
+            href="/asesor/demo"
+            className="inline-flex h-11 shrink-0 items-center rounded-full bg-ga-ambar-fondo px-3.5 text-14 font-extrabold text-ga-ambar-texto no-underline lg:hidden"
+          >
+            Demo
+          </Link>
         </div>
 
-        <section
-          aria-labelledby="mis-clientes-titulo"
-          className="flex flex-col gap-4 rounded-18 bg-white p-5 lg:p-7"
-        >
-          <div className="flex items-center justify-between gap-3">
-            <h2 id="mis-clientes-titulo" className="m-0 text-18 font-extrabold lg:text-20">
-              Mis clientes
-            </h2>
-            {/* Cuenta de demostración para mostrarle la plataforma a un cliente (no guarda nada). */}
-            <Link
-              href="/asesor/demo"
-              className="text-14 font-bold text-ga-verde no-underline hover:underline lg:text-15"
-            >
-              Ver cuenta de demostración
-            </Link>
-          </div>
-          <ListaClientesCliente filas={filas} />
-        </section>
+        <ListaClientesCliente filas={filas} />
+
+        <p className="m-0 flex items-center gap-2.5 text-14 text-ga-texto-2 lg:text-15">
+          <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full bg-ga-verde" />
+          Por la privacidad de tus clientes, aquí no se muestran celular, correo, Nequi ni fotos.
+        </p>
       </main>
+
+      <BarraInferiorAsesor accionSalir={cerrarSesionAsesor} />
     </div>
+  );
+}
+
+/**
+ * Barra inferior flotante de celular (pieza 2c, mockup de 390 px): en
+ * escritorio «Mis clientes» y «Salir» ya viven en el encabezado en píldora;
+ * en celular ese encabezado se reduce solo al logo (ver EncabezadoAsesor),
+ * así que esta barra los reemplaza. Mismo patrón que `BarraInferiorCuenta`
+ * de components/pantallas/Cuenta.tsx (que no se puede editar).
+ */
+function BarraInferiorAsesor({ accionSalir }: { accionSalir?: (formData: FormData) => void }) {
+  return (
+    <BarraInferior>
+      <nav
+        aria-label="Navegación del asesor"
+        className="grid grid-cols-2 gap-1 rounded-full bg-white p-1.5 shadow-comprobante-movil"
+      >
+        <span className="flex h-13 items-center justify-center rounded-full bg-ga-verde-claro text-13 font-extrabold text-ga-verde-oscuro">
+          Clientes
+        </span>
+        <form action={accionSalir} className="contents">
+          <button type="submit" className="flex h-13 items-center justify-center rounded-full text-13 font-bold text-ga-texto-3">
+            Salir
+          </button>
+        </form>
+      </nav>
+    </BarraInferior>
   );
 }

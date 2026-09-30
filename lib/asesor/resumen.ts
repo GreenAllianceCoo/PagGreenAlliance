@@ -73,8 +73,8 @@ export function estadoCliente(fila: FilaResumenAsesor): EstadoCliente {
   return { clave: "asociado", etiqueta: "Asociado sin solicitud" };
 }
 
-/** Quita tildes para que la búsqueda no distinga «Perez» de «Pérez». */
-function normalizar(texto: string): string {
+/** Quita tildes para que la búsqueda no distinga «Perez» de «Pérez». Exportada: la usan también las tarjetas de resumen. */
+export function normalizar(texto: string): string {
   return texto
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
@@ -104,4 +104,76 @@ export function opcionesEstadoCliente(filas: FilaResumenAsesor[]): EstadoCliente
     if (!vistos.has(clave)) vistos.set(clave, etiqueta);
   }
   return [{ clave: "todos", etiqueta: "Todos los estados" }, ...[...vistos.entries()].map(([clave, etiqueta]) => ({ clave, etiqueta }))];
+}
+
+// ---------------------------------------------------------------------------
+// Rediseño C+ (pieza 2c): tarjetas de resumen «Pendiente/Contactado/Aprobada/
+// Rechazada» que también filtran, + chips del mismo estado. El lienzo solo
+// modela clientes en trámite de afiliación (su `CLIENTES` de ejemplo siempre
+// trae un estado `af`); la función real también devuelve asociados YA
+// afiliados (con o sin crédito). `categoriaAfiliacion` adapta ese modelo más
+// rico a las 4 categorías del diseño: un asociado ya es, por definición,
+// una afiliación «Aprobada» (así tenga o no una solicitud de crédito).
+// TODO(diseno: D-06): confirmar con ga-disenador-lienzo si esta es la regla
+// correcta o si un asociado con crédito rechazado debería verse distinto.
+// ---------------------------------------------------------------------------
+
+/** Las 4 categorías de la pieza 2c, en el mismo orden del lienzo. */
+export type CategoriaAfiliacion = "pendiente" | "contactado" | "aprobada" | "rechazada";
+
+export const CATEGORIAS_AFILIACION: CategoriaAfiliacion[] = ["pendiente", "contactado", "aprobada", "rechazada"];
+
+const ETIQUETA_CATEGORIA: Record<CategoriaAfiliacion, string> = {
+  pendiente: "Pendiente",
+  contactado: "Contactado",
+  aprobada: "Aprobada",
+  rechazada: "Rechazada",
+};
+
+export function etiquetaCategoriaAfiliacion(categoria: CategoriaAfiliacion): string {
+  return ETIQUETA_CATEGORIA[categoria];
+}
+
+/** Ver TODO(diseno: D-06) arriba: agrupa el estado real de una fila en una de las 4 categorías del diseño. */
+export function categoriaAfiliacion(fila: FilaResumenAsesor): CategoriaAfiliacion {
+  if (fila.origen === "solicitud_afiliacion") {
+    const estado = fila.estado_afiliacion ?? "pendiente";
+    if (estado === "contactado" || estado === "aprobada" || estado === "rechazada") return estado;
+    return "pendiente";
+  }
+  // origen === "asociado": su afiliación ya se aprobó (por eso es asociado).
+  return "aprobada";
+}
+
+/** Cuenta cuántas filas caen en cada categoría, para el número grande de cada tarjeta/chip. */
+export function contarPorCategoriaAfiliacion(filas: FilaResumenAsesor[]): Record<CategoriaAfiliacion, number> {
+  const conteo: Record<CategoriaAfiliacion, number> = { pendiente: 0, contactado: 0, aprobada: 0, rechazada: 0 };
+  for (const fila of filas) conteo[categoriaAfiliacion(fila)] += 1;
+  return conteo;
+}
+
+/** Filtra por categoría (tarjetas/chips) y por nombre (buscador «Buscar por nombre» de 2c). */
+export function filtrarPorCategoriaYNombre(
+  filas: FilaResumenAsesor[],
+  opciones: { categoria?: CategoriaAfiliacion | "todos"; busqueda?: string },
+): FilaResumenAsesor[] {
+  const categoria = opciones.categoria ?? "todos";
+  const busqueda = normalizar((opciones.busqueda ?? "").trim());
+  return filas.filter((fila) => {
+    const coincideCategoria = categoria === "todos" || categoriaAfiliacion(fila) === categoria;
+    const coincideTexto = !busqueda || normalizar(fila.nombre).includes(busqueda);
+    return coincideCategoria && coincideTexto;
+  });
+}
+
+const ETIQUETA_ULTIMO_CREDITO: Record<NonNullable<FilaResumenAsesor["estado_credito"]>, string> = {
+  pendiente: "En revisión",
+  aprobado: "Aprobado",
+  rechazado: "No aprobado",
+};
+
+/** Columna/chip «Último crédito» de la tabla (2c): «Sin crédito» si nunca ha pedido uno. */
+export function etiquetaUltimoCredito(fila: FilaResumenAsesor): string {
+  if (!fila.estado_credito) return "Sin crédito";
+  return ETIQUETA_ULTIMO_CREDITO[fila.estado_credito];
 }

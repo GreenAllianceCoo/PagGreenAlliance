@@ -23,6 +23,7 @@ import {
   opcionesContexto,
   pedirCodigo,
   RAIZ,
+  restaurarCreditoDeEjemplo,
   tokenDeUsuario,
   USUARIOS,
   usuarioRest,
@@ -89,20 +90,51 @@ async function borrarSolicitudesSinSolicitudes() {
   await adminRest(`solicitudes_credito?asociado_id=eq.${ID_SIN_SOLICITUDES}`, { method: "DELETE" });
 }
 
-/** Cambia el valor que se envía de un campo sin tocar el estado de React (simula un cliente manipulado). */
-async function forzarCampo(page: Page, nombre: string, valor: string) {
-  await page.evaluate(
-    ({ nombre, valor }) => {
-      const form = document.querySelector("main form") as HTMLFormElement;
-      form.querySelectorAll(`[name="${nombre}"]`).forEach((el) => el.removeAttribute("name"));
-      const oculto = document.createElement("input");
-      oculto.type = "hidden";
-      oculto.name = nombre;
-      oculto.value = valor;
-      form.appendChild(oculto);
-    },
-    { nombre, valor },
-  );
+/**
+ * Simula un «cliente manipulado» cambiando el valor de un campo en la
+ * petición de RED, no en el DOM.
+ *
+ * Manipular el DOM (quitar/agregar `name`/`value` a mano y luego enviar) NO
+ * sirve con los <form action={accionDeServidor}> de React 19: al enviar,
+ * React arma el `FormData` desde su propio árbol interno (no relee el DOM
+ * en vivo) y le pone a cada campo un PREFIJO propio de esa instancia del
+ * formulario (p. ej. `name="monto"` en el JSX viaja como `_1_monto` en el
+ * `multipart/form-data` real). Por eso un `name` tocado a mano no cambia
+ * nada de lo que en verdad se envía, y un `<input>` agregado a mano queda
+ * fuera del `FormData` que React construye: el servidor termina recibiendo
+ * el valor legítimo que ya tenía el formulario (p. ej. el tope), no el
+ * valor manipulado, y la prueba no prueba lo que dice probar.
+ *
+ * La forma confiable es interceptar la petición HTTP real (`page.route`) y
+ * reescribir el cuerpo `multipart/form-data` antes de que salga: no importa
+ * qué prefijo interno use React, solo hay que encontrar la parte cuyo
+ * `name` TERMINA en `_${campo}` y cambiarle el valor.
+ */
+async function forzarCampoYEnviar(page: Page, campo: string, valor: string) {
+  await page.route("**/cuenta/solicitar", async (route) => {
+    const peticion = route.request();
+    if (peticion.method() !== "POST") return route.continue();
+    const cuerpo = peticion.postData() ?? "";
+    const limite = /^--.+$/m.exec(cuerpo)?.[0];
+    if (!limite) return route.continue();
+    const partes = cuerpo.split(limite);
+    const regexCampo = new RegExp(`(name="[^"]*_${campo}")\r\n\r\n([^\r\n]*)`);
+    let tocado = false;
+    const nuevasPartes = partes.map((parte) => {
+      if (!tocado && regexCampo.test(parte)) {
+        tocado = true;
+        return parte.replace(regexCampo, `$1\r\n\r\n${valor}`);
+      }
+      return parte;
+    });
+    if (!tocado) return route.continue();
+    await route.continue({ postData: nuevasPartes.join(limite) });
+  });
+  await page.getByRole("button", { name: "Enviar solicitud" }).click();
+  // Deja pasar la única petición manipulada; el resto de la prueba navega a
+  // otra URL o recarga, así que no hace falta desarmar la ruta explícitamente.
+  await page.waitForTimeout(300);
+  await page.unroute("**/cuenta/solicitar");
 }
 
 async function axeGraves(page: Page, nombre: string, testInfo: TestInfo) {
@@ -191,6 +223,11 @@ test.describe("I1 · /login y /dashboard ya no existen", () => {
 test.describe("I2 · /cuenta/solicitar", () => {
   test.beforeEach(async () => {
     await borrarSolicitudesSinSolicitudes();
+    // Repone el crédito de ejemplo (cédula 1234567890) si k-roles.spec.ts ya
+    // lo resolvió en esta misma sesión de base de datos: lo necesita la
+    // prueba «Con solicitud pendiente (asociado 1234567890)» (ver
+    // restaurarCreditoDeEjemplo en utils.ts).
+    await restaurarCreditoDeEjemplo();
     await limpiarLimites();
   });
   test.afterAll(borrarSolicitudesSinSolicitudes);
@@ -310,8 +347,10 @@ test.describe("I2 · /cuenta/solicitar", () => {
       await page.goto("/cuenta/solicitar");
       await page.waitForLoadState("networkidle");
       await page.getByText("50% de devolución", { exact: true }).click();
-      await forzarCampo(page, c.campo, c.valor);
-      await page.getByRole("button", { name: "Enviar solicitud" }).click();
+      // Deja que termine el re-render del clic anterior (elegir el paquete)
+      // antes de manipular y enviar en un solo turno: ver forzarCampoYEnviar.
+      await page.waitForTimeout(150);
+      await forzarCampoYEnviar(page, c.campo, c.valor);
       await expect(page.getByText(c.error), `${c.campo}=${c.valor}`).toBeVisible();
       await expect(page).toHaveURL(/\/cuenta\/solicitar$/);
       if (c.campo === "monto") {
@@ -330,8 +369,8 @@ test.describe("I2 · /cuenta/solicitar", () => {
     await page.goto("/cuenta/solicitar");
     await page.waitForLoadState("networkidle");
     await page.getByText("50% de devolución", { exact: true }).click();
-    await forzarCampo(page, "monto", "123457");
-    await page.getByRole("button", { name: "Enviar solicitud" }).click();
+    await page.waitForTimeout(150);
+    await forzarCampoYEnviar(page, "monto", "123457");
     await page.waitForTimeout(3000);
     const filas = await solicitudesDe(ID_SIN_SOLICITUDES);
     fs.mkdirSync(CARPETA_QA, { recursive: true });
@@ -420,10 +459,18 @@ test.describe("I2 · /cuenta/solicitar", () => {
     await expect(page.getByRole("radio", { name: "100% de devolución" })).toHaveCount(1);
     await expect(page.getByRole("slider", { name: "Monto a desembolsar" })).toHaveCount(1);
 
-    // Tab hasta el primer radio; foco visible en su tarjeta.
+    // Tab hasta el primer radio; foco visible en su tarjeta. En celular
+    // (pieza 2b) el encabezado agrega el ícono «Cerrar sesión» entre
+    // «Volver» y el formulario (en escritorio esa acción está en otro
+    // lugar del encabezado): se tabula hasta llegar al radio en vez de
+    // asumir un solo Tab, para que la prueba sirva en los dos viewports.
     await page.getByRole("link", { name: "Volver", exact: true }).focus();
-    await page.keyboard.press("Tab");
-    const enfocado = await page.evaluate(() => (document.activeElement as HTMLInputElement | null)?.name);
+    let enfocado: string | null | undefined;
+    for (let i = 0; i < 3; i++) {
+      await page.keyboard.press("Tab");
+      enfocado = await page.evaluate(() => (document.activeElement as HTMLInputElement | null)?.name);
+      if (enfocado === "porcentaje") break;
+    }
     expect(enfocado).toBe("porcentaje");
     const outline = await page.evaluate(() => {
       const span = (document.activeElement as HTMLElement).nextElementSibling as HTMLElement;
@@ -698,9 +745,7 @@ test.describe("I6 · Marcadores pendientes visibles", () => {
     fs.mkdirSync(CARPETA_QA, { recursive: true });
     fs.writeFileSync(path.join(CARPETA_QA, `i-marcadores-${testInfo.project.name}.json`), JSON.stringify(inventario, null, 2));
     test.info().annotations.push({ type: "marcadores", description: JSON.stringify(inventario) });
-    // Nunca deben verse los marcadores de datos DEL USUARIO en sus páginas. En la landing,
-    // «[Nombre], [grado] · asociado desde [año]» es un testimonio pendiente de la cooperativa
-    // (se reporta como bloqueo de contenido, no como falla de esta prueba).
+    // Nunca deben verse los marcadores de datos DEL USUARIO en sus páginas.
     const privadas = [...(inventario["/cuenta"] ?? []), ...(inventario["/cuenta/solicitar"] ?? [])].join(" ");
     expect(privadas).not.toContain("[Nombre]");
     expect(privadas).not.toContain("[TOPE]");

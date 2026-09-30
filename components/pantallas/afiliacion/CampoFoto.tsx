@@ -102,7 +102,8 @@ export function CampoFoto({ id, name, label, ayuda, capture, error }: CampoFotoP
         <span className="text-15 font-bold">{label}</span>
         <span
           className={cx(
-            "relative flex h-36 w-full cursor-pointer items-center justify-center overflow-hidden rounded-12 border-1.5 border-dashed border-ga-borde bg-ga-fondo-suave text-14 text-ga-texto-3",
+            "relative flex h-36 w-full cursor-pointer items-center justify-center overflow-hidden rounded-12 border-1.5 border-dashed border-ga-borde-input bg-ga-fondo-suave text-14 text-ga-texto-3",
+            "transition-colors duration-150",
             mensajeError && "border-ga-error",
           )}
         >
@@ -112,7 +113,7 @@ export function CampoFoto({ id, name, label, ayuda, capture, error }: CampoFotoP
             <img
               src={previa}
               alt={`Vista previa: ${label.toLowerCase()}`}
-              className="h-full w-full object-cover"
+              className="motion-safe:animate-ga-aparecer h-full w-full object-cover"
             />
           ) : (
             <span className="px-3 text-center">Toca para tomar o subir la foto</span>
@@ -140,7 +141,7 @@ export function CampoFoto({ id, name, label, ayuda, capture, error }: CampoFotoP
         </span>
       ) : null}
       {mensajeError ? (
-        <span id={idError} className="text-14 font-semibold text-ga-error">
+        <span id={idError} className="text-13 font-semibold text-ga-error">
           {mensajeError}
         </span>
       ) : null}

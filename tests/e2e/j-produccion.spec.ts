@@ -23,8 +23,13 @@ import {
 
 const ID_CON_SOLICITUD = "4c7808d8-085f-42ed-9e5d-f53c117b4cd1";
 const ID_SIN_SOLICITUDES = "7d1f0c2a-3b4e-4f5a-8b6c-9d0e1f2a3b4c";
-/** Dominios que usa lib/mascara.ts#correoDeRelleno para cédulas no registradas. */
-const DOMINIOS_RELLENO = ["gmail.com", "hotmail.com", "outlook.com", "yahoo.com"];
+// lib/mascara.ts (revisión de privacidad 25-sep): el dominio va SIEMPRE
+// como «•••» (oculto por completo), tanto para un correo real como para el
+// de relleno de una cédula inexistente. Ya no hay «dominios de relleno» que
+// listar: antes se veían sus primeras letras, lo que de hecho era un riesgo
+// (si el dominio real no calzaba con la lista de relleno, se podía deducir
+// que la cédula existía). El patrón único reemplaza a DOMINIOS_RELLENO.
+const PATRON_MASCARA = /^[a-z]{2}•••@•••$/;
 
 function cookieIngreso(datos: { c: string; m: string; u: number }) {
   const llave = createHash("sha256").update(ENV_LOCAL.INGRESO_COOKIE_SECRET ?? "").digest();
@@ -37,9 +42,8 @@ function cookieIngreso(datos: { c: string; m: string; u: number }) {
 async function mascaraEnPaso2(page: Page) {
   // En escritorio el correo va en el panel verde, fuera de <main>.
   const texto = (await page.locator("body").innerText()).replace(/\s+/g, " ");
-  const m = /([a-z0-9]{1,2}•••@[a-z0-9.-]+)/i.exec(texto);
-  // Sin el punto final de la frase («…@gmail.com.»).
-  return (m?.[1] ?? "").replace(/[.]+$/, "");
+  const m = /([a-z]{1,2}•••@•••)/i.exec(texto);
+  return m?.[1] ?? "";
 }
 
 // ---------------------------------------------------------------------------
@@ -64,16 +68,14 @@ test.describe("J1 · Máscara del paso 2 y existencia de la cédula", () => {
     fs.mkdirSync(CARPETA_QA, { recursive: true });
     fs.writeFileSync(path.join(CARPETA_QA, "j1-mascaras.json"), JSON.stringify({ noRegistradas: vistas, registrada: real }, null, 2));
 
-    // Todas las no registradas usan uno de los 4 dominios comunes.
+    // Todas las no registradas (y la registrada) tienen EXACTAMENTE la misma
+    // forma: 2 letras + «•••@•••». Ningún dominio se ve nunca, así que no hay
+    // nada que distinga a una cédula real de una inventada.
     for (const [c, m] of Object.entries(vistas)) {
-      expect(DOMINIOS_RELLENO, `${c} → ${m}`).toContain(m.split("@")[1]);
+      expect(m, `${c} → «${m}»`).toMatch(PATRON_MASCARA);
     }
     expect(real).toBe(USUARIOS.sinSolicitudes.mascara);
-    // Si el dominio real no está entre los de relleno, quien pruebe cédulas sabe cuáles existen.
-    expect(
-      DOMINIOS_RELLENO,
-      `La cédula registrada muestra «${real}»; ninguna cédula no registrada puede mostrar ese dominio → se deduce que existe`,
-    ).toContain(real.split("@")[1]);
+    expect(real).toMatch(PATRON_MASCARA);
   });
 
   test("«Reenviar código» con cédula no registrada: mismo mensaje que con una registrada", async ({ context, page }, testInfo) => {

@@ -3,6 +3,43 @@ import { Button } from "@/components/ui/Button";
 import { OtpInput } from "@/components/ui/OtpInput";
 import { ProgressSteps } from "@/components/ui/ProgressSteps";
 
+// Mismo valor que ESPERA_REENVIO_SEGUNDOS (lib/ingreso/servidor.ts): no se
+// importa aquí porque ese módulo trae `import "server-only"` y este
+// componente también se usa en el cliente. Solo se usa para dibujar el aro.
+const TOTAL_REENVIO_SEGUNDOS = 45;
+
+/**
+ * Aro que se vacía con `stroke-dashoffset` mientras corre el contador de
+ * reenvío (MOVIMIENTO de la pieza 3b). Se deriva de `tiempoReenvio` (texto
+ * «m:ss» que ya calcula FormularioCodigo.tsx): no hace falta un estado ni un
+ * intervalo propio, solo se redibuja cuando cambia el texto, una vez por
+ * segundo, como pide la nota («sin repintar cada segundo salvo el número»).
+ */
+function AroReenvio({ tiempo }: { tiempo: string }) {
+  const [minutos, segundos] = tiempo.split(":").map(Number);
+  const restantes = (minutos || 0) * 60 + (segundos || 0);
+  const fraccion = Math.max(0, Math.min(1, restantes / TOTAL_REENVIO_SEGUNDOS));
+  const radio = 7;
+  const circunferencia = 2 * Math.PI * radio;
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" className="shrink-0">
+      <circle cx="8" cy="8" r={radio} fill="none" strokeWidth="2" className="stroke-ga-linea" />
+      <circle
+        cx="8"
+        cy="8"
+        r={radio}
+        fill="none"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeDasharray={circunferencia}
+        strokeDashoffset={circunferencia * (1 - fraccion)}
+        transform="rotate(-90 8 8)"
+        className="stroke-ga-verde transition-[stroke-dashoffset] duration-1000 ease-linear motion-reduce:transition-none"
+      />
+    </svg>
+  );
+}
+
 export type IngresoCodigoProps = {
   /** Correo enmascarado (ju•••@•••) leído de la cookie del paso 1. */
   correoEnmascarado: string;
@@ -32,7 +69,7 @@ export type IngresoCodigoProps = {
   cambiarHref?: string;
 };
 
-/** Ingreso paso 2 · código (design/Codigo-PC.dc.html + Codigo-Movil.dc.html). */
+/** Ingreso paso 2 · código (pieza 3b del rediseño C+, docs/Green Alliance C+.dc.html). */
 export function IngresoCodigo({
   correoEnmascarado,
   whatsapp,
@@ -88,7 +125,7 @@ export function IngresoCodigo({
             </a>
           }
         />
-        <h2 className="m-0 hidden text-32 font-extrabold text-ga-navy lg:block">
+        <h2 className="m-0 hidden font-display text-32 font-extrabold text-ga-navy lg:block">
           Escribe el código
         </h2>
         <OtpInput name="codigo" valores={digitos} error={error} onCambio={onCambioCodigo} />
@@ -110,7 +147,11 @@ export function IngresoCodigo({
           >
             Reenviar código
           </button>
-          {tiempoReenvio ? <> en {tiempoReenvio}</> : null}
+          {tiempoReenvio ? (
+            <span className="inline-flex items-center gap-1 align-middle">
+              <AroReenvio tiempo={tiempoReenvio} /> en {tiempoReenvio}
+            </span>
+          ) : null}
         </p>
         {/* Solo para lectores de pantalla: confirma el reenvío sin cambiar el diseño. */}
         <p role="status" aria-live="polite" className="sr-only">

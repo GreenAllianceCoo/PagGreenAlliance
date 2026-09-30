@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 import {
   esquemaAprobarAfiliacion,
+  esquemaAsignarAsesor,
   esquemaCambiarEstadoAfiliacion,
   esquemaCrearAsesor,
   esquemaResolverCredito,
@@ -32,6 +33,31 @@ describe("esquemaAprobarAfiliacion", () => {
   });
   it("rechaza sin id", () => {
     expect(esquemaAprobarAfiliacion.safeParse({}).success).toBe(false);
+  });
+});
+
+describe("esquemaAsignarAsesor (P-96)", () => {
+  const id = "00000000-0000-4000-a000-000000000003";
+  const asesorId = "00000000-0000-4000-a000-000000000004";
+
+  it("acepta dos uuid válidos", () => {
+    expect(esquemaAsignarAsesor.safeParse({ id, asesorId }).success).toBe(true);
+  });
+
+  it("rechaza sin id de la solicitud", () => {
+    expect(esquemaAsignarAsesor.safeParse({ asesorId }).success).toBe(false);
+  });
+
+  it("rechaza sin id del asesor", () => {
+    expect(esquemaAsignarAsesor.safeParse({ id }).success).toBe(false);
+  });
+
+  it.each(["", "no-es-uuid", "123"])("rechaza un id de solicitud inválido (%j)", (idInvalido) => {
+    expect(esquemaAsignarAsesor.safeParse({ id: idInvalido, asesorId }).success).toBe(false);
+  });
+
+  it.each(["", "no-es-uuid", "123"])("rechaza un id de asesor inválido (%j)", (asesorIdInvalido) => {
+    expect(esquemaAsignarAsesor.safeParse({ id, asesorId: asesorIdInvalido }).success).toBe(false);
   });
 });
 

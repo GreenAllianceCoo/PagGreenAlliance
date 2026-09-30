@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { contextoConSesion, esEscritorio, tokenDeUsuario, USUARIOS, usuarioRest } from "./utils";
+import { contextoConSesion, esEscritorio, restaurarCreditoDeEjemplo, tokenDeUsuario, USUARIOS, usuarioRest } from "./utils";
 
 /** C. /cuenta: protección, datos propios, «Mis datos» y «Salir». */
 
@@ -14,6 +14,10 @@ test.describe("C1 · Sin sesión", () => {
 });
 
 test.describe("C2 · Con sesión: datos del propio usuario", () => {
+  // Repone el crédito de ejemplo si k-roles.spec.ts ya lo resolvió en esta
+  // misma sesión de base de datos (ver restaurarCreditoDeEjemplo en utils.ts).
+  test.beforeAll(restaurarCreditoDeEjemplo);
+
   test("Asociado con solicitud: nombre, estado, monto, modalidad, tasa y tope de su grado", async ({ browser }, testInfo) => {
     const u = USUARIOS.conSolicitud;
     const ctx = await contextoConSesion(browser, "conSolicitud", testInfo);

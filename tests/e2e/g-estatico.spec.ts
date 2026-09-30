@@ -65,3 +65,8 @@ test("Sin textos de ejemplo del diseño fijos en pantallas de producción", () =
   const usosMock = CODIGO.filter((f) => /(CORREO_ENMASCARADO_EJEMPLO|ASOCIADO_EJEMPLO|SOLICITUD_EJEMPLO|OTP_EJEMPLO|TIEMPO_REENVIO_EJEMPLO)/.test(leer(f)) && rel(f) !== "lib/mock.ts");
   expect(usosMock.map(rel)).toEqual([]);
 });
+
+test("Ninguna pantalla dice «Correo institucional» (spec-fase-2 §2: el correo acepta cualquier dominio)", () => {
+  const malos = CODIGO.filter((f) => sinComentarios(leer(f)).includes("Correo institucional"));
+  expect(malos.map(rel)).toEqual([]);
+});

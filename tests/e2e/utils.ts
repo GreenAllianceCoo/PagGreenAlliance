@@ -119,6 +119,33 @@ export async function borrarAfiliaciones(cedula: string) {
   });
 }
 
+/**
+ * Repone el crédito de ejemplo del seed (cédula `USUARIOS.conSolicitud`,
+ * $500.000 al 50 %) si otra prueba ya lo resolvió en esta misma sesión de
+ * base de datos (p. ej. k-roles.spec.ts, que aprueba/rechaza los créditos
+ * pendientes para probar los atajos de /admin/creditos). Una solicitud
+ * resuelta es inmutable en la base (trigger `sellar_revision_solicitud`:
+ * «Una solicitud ya resuelta no puede cambiar de estado»), así que en vez de
+ * actualizarla se borra y se vuelve a crear igual que el seed. Sin esto, las
+ * pruebas de C/E/I que dependen de que ese crédito siga «pendiente» quedan
+ * frágiles según el orden en que corran los archivos de prueba.
+ */
+export async function restaurarCreditoDeEjemplo() {
+  const { cuerpo: perfiles } = await adminRest(
+    `perfiles?select=id&cedula=eq.${encodeURIComponent(USUARIOS.conSolicitud.cedula)}`,
+  );
+  const id = (Array.isArray(perfiles) ? perfiles : [])[0] as { id: string } | undefined;
+  if (!id) return;
+  const { cuerpo: filas } = await adminRest(`solicitudes_credito?select=id,estado&asociado_id=eq.${id.id}`);
+  const fila = (Array.isArray(filas) ? filas : [])[0] as { id: string; estado: string } | undefined;
+  if (!fila || fila.estado === "pendiente") return;
+  await adminRest(`solicitudes_credito?id=eq.${fila.id}`, { method: "DELETE" });
+  await adminRest("solicitudes_credito", {
+    method: "POST",
+    body: JSON.stringify({ asociado_id: id.id, porcentaje_devolucion: "50", monto_solicitado: 500000 }),
+  });
+}
+
 /** Token de usuario por contraseña (seed: Prueba123!). No envía correos. */
 export async function tokenDeUsuario(correo: string) {
   const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
@@ -294,42 +321,70 @@ export function revisarOrden(texto: string, esperados: string[]) {
 }
 
 // ---------------------------------------------------------------------------
-// Formulario de afiliación
+// Formulario de afiliación (v2: spec-fase-2.md §2 — nombres/apellidos
+// separados, institución, Nequi, asesor y 3 fotos. Antes solo había un campo
+// «Nombres y apellidos» sin los demás: alineado con
+// components/pantallas/Afiliacion.tsx y tests/e2e/d-afiliacion.spec.ts).
 // ---------------------------------------------------------------------------
 
 export type DatosFormulario = {
-  nombre: string;
+  nombres: string;
+  apellidos: string;
   cedula: string;
   grado: string;
-  unidad: string;
+  institucion: "policia" | "ejercito";
+  nequi: string;
   celular: string;
   email: string;
+  /** Texto visible del `<option>`, o "" para «No tengo asesor». */
+  asesor: string;
   mensaje: string;
   acepto: boolean;
 };
 
 export function datosValidos(cedula = cedulaUnica()): DatosFormulario {
   return {
-    nombre: "Laura Gómez Prueba",
+    nombres: "Laura",
+    apellidos: "Gómez Prueba",
     cedula,
     grado: "PT",
-    unidad: "Estación Centro",
+    institucion: "policia",
+    nequi: "3009998877",
     celular: "3104567890",
-    email: "laura.qa@correo.com",
+    email: `laura.qa.${cedula}@policia.gov.co`,
+    asesor: "",
     mensaje: "Prueba automática de QA.",
     acepto: true,
   };
 }
 
-/** Llena el formulario (espera a que hidrate: el orden de campos cambia en escritorio). */
+/** PNG 1×1 válido y liviano: alcanza para pasar la validación de tipo/tamaño de CampoFoto. */
+const PNG_1PX = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+  "base64",
+);
+
+export function fotoDePrueba(nombre: string) {
+  return { name: nombre, mimeType: "image/png" as const, buffer: PNG_1PX };
+}
+
+/** Llena el formulario v2 (espera a que hidrate: el orden de campos cambia en escritorio/celular). */
 export async function llenarAfiliacion(page: Page, d: Partial<DatosFormulario>) {
   await page.waitForLoadState("networkidle");
-  if (d.nombre !== undefined) await page.getByLabel("Nombres y apellidos").fill(d.nombre);
+  if (d.nombres !== undefined) await page.getByLabel("Nombres").fill(d.nombres);
+  if (d.apellidos !== undefined) await page.getByLabel("Apellidos").fill(d.apellidos);
   if (d.cedula !== undefined) await page.getByLabel("Número de cédula").fill(d.cedula);
   if (d.grado !== undefined) await page.getByLabel("Grado").selectOption(d.grado);
-  if (d.unidad !== undefined) await page.getByLabel("Unidad o dependencia").fill(d.unidad);
-  if (d.celular !== undefined) await page.getByLabel("Celular (WhatsApp)").fill(d.celular);
+  if (d.institucion !== undefined) await page.getByLabel("Institución").selectOption(d.institucion);
+  if (d.nequi !== undefined) await page.getByLabel("Número Nequi").fill(d.nequi);
+  if (d.celular !== undefined) await page.getByLabel("Celular").fill(d.celular);
   if (d.email !== undefined) await page.getByLabel("Correo electrónico").fill(d.email);
+  if (d.asesor !== undefined) {
+    await page.getByLabel("Asesor").selectOption(d.asesor ? { label: d.asesor } : { index: 0 });
+  }
+  await page.locator('input[name="foto_cedula_frente"]').setInputFiles(fotoDePrueba("frente.png"));
+  await page.locator('input[name="foto_cedula_reverso"]').setInputFiles(fotoDePrueba("reverso.png"));
+  await page.locator('input[name="foto_selfie"]').setInputFiles(fotoDePrueba("selfie.png"));
   if (d.mensaje !== undefined) await page.getByLabel("¿Algo que debamos saber?").fill(d.mensaje);
   if (d.acepto !== undefined) await page.locator("#af-datos").setChecked(d.acepto);
 }

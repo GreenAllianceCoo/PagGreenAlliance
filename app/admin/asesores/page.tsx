@@ -5,7 +5,7 @@ import { exigirAdmin } from "@/lib/admin/servidor";
 
 export const metadata: Metadata = { title: "Asesores · Admin · Green Alliance" };
 
-/** Lista de asesores (con cuántos clientes y afiliaciones tiene cada uno) + alta. */
+/** Lista de asesores (con cuántos clientes y afiliaciones tiene cada uno) + alta (pieza 3f). */
 export default async function AsesoresPage() {
   const { supabase, nombre } = await exigirAdmin();
 
@@ -27,26 +27,27 @@ export default async function AsesoresPage() {
 
   return (
     <AdminShell nombre={nombre} seccion="asesores">
-      <h1 className="m-0 text-24 font-extrabold text-ga-navy lg:text-30">Asesores</h1>
+      <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Asesores</h1>
 
       <FormularioAsesor />
 
-      <section className="flex flex-col gap-2 rounded-18 bg-white p-5 lg:p-7">
-        <h2 className="m-0 text-18 font-extrabold">Asesores registrados</h2>
+      <section className="flex flex-col gap-2 rounded-20 bg-admin-superficie p-5.5">
+        <h2 className="m-0 font-display text-20 font-extrabold">Asesores registrados</h2>
         {conConteos.length === 0 ? (
-          <p className="m-0 text-15 text-ga-texto-3">Todavía no hay asesores.</p>
+          <p className="m-0 text-15 text-admin-texto-3">Todavía no hay asesores.</p>
         ) : (
           <ul className="m-0 flex list-none flex-col gap-2 p-0">
-            {conConteos.map((a) => (
+            {conConteos.map((a, indice) => (
               <li
                 key={a.id}
-                className="flex flex-col gap-1 rounded-12 bg-ga-fondo-suave p-3.5 sm:flex-row sm:items-center sm:justify-between"
+                style={{ animationDelay: `${indice * 60}ms` }}
+                className="flex flex-col gap-1 rounded-14 bg-admin-superficie-2 p-3.5 motion-safe:animate-ga-fila-entra sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex flex-col">
-                  <span className="text-16 font-bold text-ga-texto">{a.nombre_completo}</span>
-                  <span className="text-14 text-ga-texto-3">Cédula {a.cedula}</span>
+                  <span className="text-16 font-extrabold text-white">{a.nombre_completo}</span>
+                  <span className="text-13 text-admin-texto-3">Cédula {a.cedula}</span>
                 </div>
-                <span className="text-14 text-ga-texto-2">
+                <span className="text-14 text-admin-texto-2">
                   {a.clientes} {a.clientes === 1 ? "cliente" : "clientes"} · {a.afiliaciones}{" "}
                   {a.afiliaciones === 1 ? "afiliación referida" : "afiliaciones referidas"}
                 </span>
@@ -57,7 +58,9 @@ export default async function AsesoresPage() {
         {/* TODO(pendiente-spec): desactivar un asesor. No hay columna «activo» en
             perfiles ni mecanismo descrito en la spec para esto; falta confirmar con
             la cooperativa cómo debe comportarse (¿deja de aparecer en el desplegable
-            de /afiliacion? ¿se reasignan sus clientes?). */}
+            de /afiliacion? ¿se reasignan sus clientes?). La pieza 3f del lienzo
+            confirma que tampoco está en el diseño («No incluye "asignar asociados a
+            un asesor"»). */}
       </section>
     </AdminShell>
   );

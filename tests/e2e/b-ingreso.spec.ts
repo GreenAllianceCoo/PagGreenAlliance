@@ -81,7 +81,11 @@ test.describe("B2/B3 · Privacidad: misma respuesta exista o no la cédula", () 
     const noRegistrada = await medir(CEDULA_NO_REGISTRADA);
 
     // Mismo mensaje en el paso 1 (se vio en ambos) y misma pantalla en el paso 2.
-    const estructura = (t: string) => t.replace(/[a-z]{2}•••@[a-z.]+/g, "<CORREO>");
+    // lib/mascara.ts oculta el dominio COMPLETO (no solo el usuario): «ju•••@•••»,
+    // tanto para un correo real como para el de relleno de una cédula inexistente
+    // (si se viera cualquier parte del dominio, un correo real y uno de mentira
+    // se distinguirían, delatando que la cédula existe).
+    const estructura = (t: string) => t.replace(/[a-z]{2}•••@•••/g, "<CORREO>");
     expect(estructura(noRegistrada.texto)).toBe(estructura(registrada.texto));
 
     // Tiempo: diferencia <= 1 s.
@@ -97,7 +101,7 @@ test.describe("B2/B3 · Privacidad: misma respuesta exista o no la cédula", () 
     expect(registrada.texto).toContain(u.mascara);
     expect(registrada.html).not.toContain(u.correo);
     for (const c of cuerpos) expect(c).not.toContain(u.correo);
-    expect(noRegistrada.texto).toMatch(/[a-z]{2}•••@(gmail|hotmail|outlook|yahoo)\.com/);
+    expect(noRegistrada.texto).toMatch(/[a-z]{2}•••@•••/);
 
     // La cookie del paso 1 es httpOnly y no tiene el correo en claro.
     const cookies = await page.context().cookies();

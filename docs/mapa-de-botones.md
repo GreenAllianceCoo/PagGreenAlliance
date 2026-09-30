@@ -21,10 +21,18 @@ Estados:
 | `Logo.dc.html` | componente `<Logo tone="light|dark" />` |
 
 ## 1. Landing `/`
+Rediseño C+ (25-sep-2026): esta pantalla ya sigue la pieza `2a` de
+`docs/Green Alliance C+.dc.html` (`ga-diseno-a-codigo`). El nav de esa pieza
+trae «Apoyos», «Cómo funciona», «Convenios», «Afíliate» (no «Historias»); la
+sección de testimonios («Lo que hicieron con su crédito») no está en `2a`, así
+que se conservó con el estilo nuevo pero **sin enlace en el nav** (sigue
+teniendo el ancla `#c-historias` por si se quiere enlazar después).
 | Elemento | Dónde | Estado | Comportamiento |
 |---|---|---|---|
 | Logo | header | Definido | → `/` |
-| «Apoyos» / «Historias» / «Convenios» | nav escritorio | Definido | Scroll a `#c-apoyos`, `#c-historias`, `#c-convenios` |
+| «Apoyos» | nav escritorio | Definido | Scroll a `#c-apoyos` (ahora «Lo que encuentras en Green Alliance») |
+| «Cómo funciona» | nav escritorio | Definido | Scroll a `#c-como-funciona` («Si hoy el banco te dice que no…») |
+| «Convenios» | nav escritorio | Definido | Scroll a `#c-convenios` |
 | «Afíliate» | nav escritorio | Definido | → `/afiliacion` |
 | «Mi cuenta» (escritorio) / «Ingresar» (celular) | header | Definido | → `/ingresar` (si ya hay sesión → `/cuenta`) |
 | «Solicitar crédito» | hero | Definido | → `/ingresar` (si ya hay sesión → `/cuenta`) |

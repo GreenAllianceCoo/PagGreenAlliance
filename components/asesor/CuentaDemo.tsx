@@ -34,6 +34,13 @@ type CuentaDemoProps = {
   encabezado?: ReactNode;
   /** A dónde vuelven la flecha y el botón, con su texto (por defecto, «Volver a Mis clientes» → /asesor). */
   volver?: { href: string; texto: string };
+  /**
+   * Título/subtítulo de la franja ámbar «Modo demostración» (pieza 2c/3h).
+   * Los valores por defecto son los de la pieza 3h (admin): sirven tal cual
+   * para /asesor/demo y /admin/demo sin que cada página tenga que repetirlos.
+   */
+  tituloDemo?: string;
+  subtituloDemo?: string;
 };
 
 const VOLVER_ASESOR = { href: "/asesor", texto: "Volver a Mis clientes" };
@@ -50,6 +57,8 @@ export function CuentaDemo({
   accionSalir,
   encabezado,
   volver = VOLVER_ASESOR,
+  tituloDemo = "Modo demostración",
+  subtituloDemo = "Nada de lo que hagas aquí se guarda",
 }: CuentaDemoProps) {
   const gradosDisponibles = GRADOS.filter((g) => (paquetesPorGrado[g]?.length ?? 0) > 0);
   const [grado, setGrado] = useState<CodigoGrado>(gradosDisponibles[0] ?? "PP");
@@ -90,13 +99,27 @@ export function CuentaDemo({
   }
 
   return (
-    <div className="min-h-dvh bg-ga-fondo-suave">
-      {encabezado ?? <EncabezadoAsesor nombre={nombreAsesor} accionSalir={accionSalir} />}
+    // Marco ámbar de 4 px «siempre visible» (pieza 2c, DECISIONES): recuerda en
+    // TODA la pantalla que nada de esto se guarda. Reemplaza la franja azul
+    // simple que había antes (pieza 3h, «Backend: ninguno»): mismo componente,
+    // mismo cambio para las 3 cuentas fantasma (asesor y admin).
+    <div className="min-h-dvh bg-ga-fondo-suave ring-4 ring-inset ring-ga-ambar">
+      {/* Banner «Modo demostración»: pegado arriba (siempre visible al hacer scroll),
+          con «Salir de la demo» al alcance del pulgar derecho. */}
+      <div className="sticky top-0 z-40 flex items-center justify-between gap-3 bg-ga-ambar px-4 py-2.5 text-ga-texto lg:px-5">
+        <span className="flex flex-col leading-125">
+          <strong className="text-15 font-extrabold">{tituloDemo}</strong>
+          <span className="text-13 font-semibold">{subtituloDemo}</span>
+        </span>
+        <Link
+          href={volver.href}
+          className="inline-flex h-11 shrink-0 items-center whitespace-nowrap rounded-full bg-ga-texto px-4 text-14 font-extrabold text-white no-underline"
+        >
+          Salir de la demo
+        </Link>
+      </div>
 
-      {/* Franja de modo demostración: visible en toda la pantalla. */}
-      <p className="m-0 bg-ga-navy px-5 py-2.5 text-center text-14 font-bold text-white lg:text-15">
-        Modo demostración: nada se guarda
-      </p>
+      {encabezado ?? <EncabezadoAsesor nombre={nombreAsesor} accionSalir={accionSalir} />}
 
       <main className="flex flex-col gap-4 px-5 pb-6 pt-4 md:mx-auto md:max-w-2xl lg:max-w-none lg:gap-6 lg:px-14 lg:py-10">
         <div className="flex items-center gap-3">
@@ -259,6 +282,9 @@ export function CuentaDemo({
             <ButtonLink href={volver.href} variante="terciario" className="gap-2">
               {volver.texto}
             </ButtonLink>
+            <p className="m-0 text-center text-14 leading-150 text-ga-texto-3">
+              Nada de lo que hagas aquí se guarda ni se envía.
+            </p>
           </div>
         </div>
 
