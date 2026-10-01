@@ -52,6 +52,7 @@
   --ga-gris-azulado: #e8edf2; /* fondo de tarjetas claras sobre navy (p. ej. «Orientación financiera»), chip «Enviada» */
   --ga-menta: #8fd6b5; /* menta brillante: cifras y chips sobre navy */
   --ga-menta-suave: #bfe3d2;
+  --ga-verde-mancha: #1a5a48; /* mancha decorativa inferior del carné virtual (pieza 3u) */
   --ga-ambar-fondo-fuerte: #ffe3a8; /* resalte del titular «reglas claras», punto decorativo del hero */
   --ga-ambar-fondo-suave: #fff8ea; /* fondo del sello redondo (isotipo) del comprobante */
   --ga-ambar-texto-2: #5c3a00; /* texto «sedes» sobre --ga-ambar-fondo en celular */

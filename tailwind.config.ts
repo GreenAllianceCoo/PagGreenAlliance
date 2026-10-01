@@ -46,6 +46,7 @@ const config: Config = {
           "borde-input": "var(--ga-borde-input)",
           "gris-azulado": "var(--ga-gris-azulado)",
           menta: "var(--ga-menta)",
+          "verde-mancha": "var(--ga-verde-mancha)",
           "menta-suave": "var(--ga-menta-suave)",
           "ambar-fondo-fuerte": "var(--ga-ambar-fondo-fuerte)",
           "ambar-fondo-suave": "var(--ga-ambar-fondo-suave)",

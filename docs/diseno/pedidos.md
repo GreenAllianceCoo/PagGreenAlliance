@@ -55,14 +55,14 @@ Formato de cada pedido:
 - Prioridad: media
 - Qué falta: la pieza `2c` modela «Mis clientes» con datos ficticios en los que TODO cliente tiene un estado de afiliación (`CLIENTES` del script: `af` siempre es Pendiente/Contactado/Aprobada/Rechazada). El modelo real (`resumen_clientes_asesor()`) es más rico: además de solicitudes de afiliación (`origen: 'solicitud_afiliacion'`, con `estado_afiliacion`), el asesor también ve asociados YA afiliados (`origen: 'asociado'`), que pueden tener su propio estado de crédito (`estado_credito`: pendiente/aprobado/rechazado/ninguno) pero no tienen `estado_afiliacion`. El lienzo no dice qué tarjeta/chip debe contar a esos asociados.
 - Datos y reglas: implementé la regla «un asociado ya es, por definición, una afiliación Aprobada» (agrupa `origen: 'asociado'` en la tarjeta/chip «Aprobada» sin importar su estado de crédito) — `lib/asesor/resumen.ts`, función `categoriaAfiliacion` (marcada `TODO(diseno: D-06)`). Falta decidir: (a) si esa regla es correcta, o si un asociado con crédito rechazado debería verse distinto de uno recién afiliado; (b) si la columna/chip «Último crédito» de la tabla (En revisión/Aprobado/No aprobado/Sin crédito) debe aparecer en el lienzo con su propio color, o si ya está cubierta por el design system `3a`.
-- Estado: Pendiente
+- Estado: Resuelto → 3u (2026-10-01, ga-disenador-lienzo)
 
 ### D-07 · Landing · sección «Lo que hicieron con su crédito» (testimonios)
 - Pedido por: ga-verificador-qa · 2026-09-27
 - Prioridad: baja
 - Qué falta: la pieza `2a` no incluye esta sección (así lo documenta el propio código, `components/pantallas/Landing.tsx`: «Historias: no está en la pieza 2a del lienzo C+, se conserva con el estilo nuevo... sin enlace en el nav»). Al no tener respaldo en el lienzo, hoy vive con el texto de ejemplo de `lib/mock.ts#TESTIMONIOS_EJEMPLO` visible en producción, con corchetes literales: «[Testimonio real de un asociado: qué necesitaba y qué logró.]» y «[Nombre], [grado] · asociado desde [año]» (visto en escritorio y celular, ver `tests/e2e/e-diseno.spec.ts`, prueba «Hallazgo: testimonios de ejemplo con corchetes visibles»).
 - Datos y reglas: decidir (a) si la sección se mantiene en el rediseño C+ (y en ese caso, agregarla a `2a` con enlace en el nav, como tenía la landing anterior) o se retira; (b) si se mantiene, de dónde salen los testimonios reales (¿tabla nueva? ¿contenido fijo redactado por la cooperativa?) para reemplazar el texto de ejemplo antes de producción.
-- Estado: Pendiente
+- Estado: Resuelto → 3u (2026-10-01, ga-disenador-lienzo)
 
 ### D-08 · Admin · botón «Escribir por WhatsApp» habilitado · /admin/afiliaciones/[id]
 - Pedido por: sesión principal (Sebas, P-95 aprobado) · 2026-09-27
@@ -150,3 +150,17 @@ Formato de cada pedido:
 - Prioridad: baja
 - Qué falta: maqueta del formulario con radios, cupo por grado, sin tasa, estados bloqueado y pendiente.
 - Estado: Resuelto → 3t (2026-09-30, ga-disenador-lienzo)
+
+### D-25 · Asociado · carné virtual «Afiliado Titular» · /cuenta (actividades 5.12 / P-109)
+- Pedido por: ga-diseno-a-codigo · 2026-10-01
+- Prioridad: media
+- Qué falta: el lienzo no tiene pieza propia del carné virtual (solo la tarjeta pequeña de 2b). Se implementó provisional en `components/ui/CarneVirtual.tsx` con tokens existentes: logo apilado blanco, «Afiliado Titular», nombre, grado, institución, cédula enmascarada y chip de estado. Falta diseño final (versión celular y PC, posible QR/ficha para mostrar en convenios).
+- Datos y reglas: nombre, grado, institución, cédula (enmascarada), activo. Nunca la tasa.
+- Estado: Resuelto → 3u (2026-10-01, ga-disenador-lienzo)
+
+### D-26 · Admin · Convenios administrables y logo de marca · /admin/convenios, landing y /cuenta
+- Pedido por: sesión principal · 2026-10-01
+- Prioridad: media
+- Qué falta: pieza para /admin/convenios (lista ordenable con crear, editar, ocultar, subir/bajar, eliminar con confirmación y subida de logo) y la ubicación del logo de la marca en tarjetas, chips y detalle de convenio.
+- Datos y reglas: ver `components/admin/GestorConvenios.tsx` y `components/pantallas/ListaConvenios.tsx`. Logo PNG/JPG/WebP/SVG, máximo 1 MB; sin logo se muestra el emoji.
+- Estado: Resuelto → 3v y 3w (2026-10-01, ga-disenador-lienzo)

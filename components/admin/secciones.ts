@@ -12,6 +12,7 @@ export const SECCIONES = [
   { href: "/admin/asociados", etiqueta: "Asociados", clave: "asociados" },
   { href: "/admin/asesores", etiqueta: "Asesores", clave: "asesores" },
   { href: "/admin/alertas", etiqueta: "Alertas", clave: "alertas" },
+  { href: "/admin/convenios", etiqueta: "Convenios", clave: "convenios" },
   { href: "/admin/sorteo", etiqueta: "Sorteo", clave: "sorteo" },
   { href: "/admin/demo", etiqueta: "Demostración", clave: "demo" },
 ] as const;

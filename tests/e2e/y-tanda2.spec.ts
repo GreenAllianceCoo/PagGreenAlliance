@@ -276,6 +276,8 @@ test.describe("Y5 · Admin: desembolso, baja, sorteo y dashboards", () => {
   test("Desembolso (§12.2): «Aprobado · pendiente de desembolso» → «Desembolsado»", async ({
     browser,
   }, testInfo) => {
+    // k-roles deja el crédito de ejemplo aprobado/rechazado: se restaura a «pendiente».
+    await restaurarCreditoDeEjemplo();
     const admin = await tokenDeUsuario(ADMIN.correo);
     const { cuerpo } = await adminRest(
       "solicitudes_credito?select=id&asociado_id=eq.4c7808d8-085f-42ed-9e5d-f53c117b4cd1&estado=eq.pendiente",

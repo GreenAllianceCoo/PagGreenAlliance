@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Badge, type EstadoBadge } from "@/components/ui/Badge";
+import { CarneVirtual } from "@/components/ui/CarneVirtual";
 import { clasesBoton } from "@/components/ui/Button";
 import { AvisoCreditoBloqueado } from "@/components/ui/AvisoCreditoBloqueado";
 import { ListaConvenios } from "@/components/pantallas/ListaConvenios";
@@ -12,7 +13,6 @@ import { PasosSolicitud } from "@/components/ui/PasosSolicitud";
 import { SorteoDelMes, type SorteoDelMesProps } from "@/components/sorteo/SorteoDelMes";
 import type { PerfilAsociado } from "@/lib/asociado/servidor";
 import type { ConteoCredito } from "@/lib/cuenta";
-import { enmascararCedula } from "@/lib/mascara";
 import type { Convenio, PasoSolicitud } from "@/lib/mock";
 
 export type CuentaProps = {
@@ -141,64 +141,6 @@ function SolicitudVacia({ creditoBloqueado }: { creditoBloqueado?: string | null
         </p>
       </div>
     </>
-  );
-}
-
-/**
- * Carné de asociado (pieza 2b): tarjeta navy oscura con el isotipo, nombre,
- * cédula enmascarada y grado — los únicos datos que ya existen en `perfiles`.
- * `institucion` y `activo` son opcionales a propósito: la base todavía no los
- * tiene (ver CuentaProps), así que sin esos datos esta tarjeta simplemente no
- * los dibuja en vez de inventarlos.
- */
-function CarneAsociado({
-  nombre,
-  cedula,
-  grado,
-  institucion,
-  activo,
-}: {
-  nombre: string;
-  cedula: string;
-  grado: string;
-  institucion?: string;
-  activo?: boolean;
-}) {
-  return (
-    <section
-      aria-label="Carné de asociado"
-      className="relative flex flex-col gap-2.5 overflow-hidden rounded-28 bg-ga-verde-oscuro p-5.5 text-white lg:p-7"
-    >
-      {/* Mancha decorativa (mismo patrón que --ga-blob-* de la landing, pero
-          en un tono propio del carné): círculo simple, sin el radio elíptico
-          por esquina del mockup (sintaxis arbitraria de Tailwind poco fiable
-          con «/» dentro de `rounded-[...]`). */}
-      <span aria-hidden="true" className="absolute -right-12 -top-14 h-44 w-44 rounded-full bg-ga-verde" />
-      <div className="relative flex items-center justify-between gap-3">
-        <Image
-          src="/logos/blanco/green-alliance-isotipo-blanco.svg"
-          alt=""
-          width={40}
-          height={40}
-          className="h-9 w-9 lg:h-10 lg:w-10"
-        />
-        {/* activo === undefined: sin el dato todavía (columna pendiente), no se muestra el chip. */}
-        {activo !== undefined ? (
-          <span className="rounded-full bg-ga-menta px-2.5 py-1 text-13 font-extrabold text-ga-navy-chip-oscuro">
-            {activo ? "Asociado activo" : "Asociado inactivo"}
-          </span>
-        ) : null}
-      </div>
-      <span className="relative text-13 font-bold uppercase tracking-etiqueta text-ga-menta-suave">
-        Carné de asociado
-      </span>
-      <strong className="relative font-display text-20 font-extrabold lg:text-24">{nombre}</strong>
-      <span className="relative text-14 text-ga-verde-claro" style={{ fontVariantNumeric: "tabular-nums" }}>
-        C.C. {enmascararCedula(cedula)} · {grado}
-        {institucion ? ` · ${institucion}` : ""}
-      </span>
-      <span className="relative text-14 text-ga-menta-suave">Muéstralo en cada empresa en convenio.</span>
-    </section>
   );
 }
 
@@ -441,7 +383,7 @@ export function Cuenta({
         {/* Carné (pieza 2b): con los datos que ya existen hoy (nombre, cédula
             enmascarada, grado); institución y «activo» quedan para cuando
             exista esa columna. */}
-        <CarneAsociado nombre={nombre} cedula={cedula} grado={grado} institucion={institucion} activo={activo} />
+        <CarneVirtual nombre={nombre} cedula={cedula} grado={grado} institucion={institucion} activo={activo} />
 
         <section
           id="convenios"
