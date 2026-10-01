@@ -368,6 +368,10 @@ export function Landing({ estadisticas, convenios, whatsapp, correo, textoVigila
               WhatsApp {whatsapp} · {correo}
             </span>
             <span className="hidden lg:inline"> · </span>
+            <Link href="/politica-de-datos" className="enlace font-bold">
+              Política de datos
+            </Link>
+            <span className="hidden lg:inline"> · </span>
             <span className="inline-flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-ga-verde" aria-hidden />
               {textoVigilancia}

@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 30-sep-2026 (C+ y tanda 1 de Ricardo en producción; tanda 2 §12 hecha en local, falta desplegar; Carlos Pardo sale del proyecto, se le pagan 150.000 COP).
+Actualizado: 30-sep-2026 (tanda 2 §12 en develop e4b8350, faltan migraciones 20260930200* y develop→main; convenios con videos y PDF; política de datos v1 en revisión del Dr. Breinner).
 
 ## Dónde quedamos
 

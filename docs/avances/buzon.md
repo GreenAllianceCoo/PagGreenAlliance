@@ -14,14 +14,9 @@ Formato (copiar debajo de la línea, uno por tarea):
 
 ---
 
-## 2026-09-30 · ga-auditor-supabase
-- Actividades: §12.14 (SP → IJ), R-10, R-11
-- Estado: Hecho
-- Qué se hizo: SP se agregó al remapeo a IJ en la migración 20260930200100 (sin aplicar); TODO R-10/R-11 marcados como decididos por Sebas; pgTAP 12 y 19 y comentario del seed ajustados. db reset, test db y vitest en verde.
-- Bloqueos o trabajo nuevo: Sebas aplica la migración en remoto.
 
-## 2026-09-30 · ga-diseno-a-codigo
-- Actividades: P-xx (convenios: medios en el detalle)
+## 2026-09-30 · ga-funcionalidad-botones
+- Actividades: P-xx (política de datos v1.0, sin ID en el plan)
 - Estado: Hecho
-- Qué se hizo: videos de AMB Móvil, Dr. Ribero y Dream & Go Visas y PDF de Racing Tours en el detalle de convenio (mapa por NIT en lib/convenios.ts; archivos renombrados a public/convenios/).
-- Bloqueos o trabajo nuevo: ninguno (sin poster; Locos por los Viajes sin medio).
+- Qué se hizo: /politica-de-datos publica las 28 secciones + aprobación + anexo de la plataforma, con índice por anclas, aviso «En revisión jurídica» en 7.3, 8 y 18, botón «Descargar en PDF» (window.print) y enlace en el pie de la landing y en la casilla de /afiliacion.
+- Bloqueos o trabajo nuevo: Por definir: horario de atención, órgano y acta de aprobación; TODO(backend): guardar VERSION_POLITICA_DATOS junto a acepto_datos_at (no hay columna de versión).

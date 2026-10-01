@@ -672,7 +672,7 @@
       "estado": "En curso",
       "origen": "Agregado",
       "agente": "ga-diseno-a-codigo",
-      "bloqueo": "24-sep: borrador completo (10 secciones, Ley 1581 y Decreto 1377, con la autorización de datos sensibles para fotos y selfie) ya en la página. Falta que la cooperativa dé NIT/dirección/ciudad (P-75), fecha de vigencia (P-76), país o región de los servidores (P-77), alternativa sin selfie (P-78), plazos de conservación (P-79) y si reportan a centrales de riesgo Ley 1266 (P-80); y que un abogado la revise (P-81). Bloquea el despliegue (6.5)."
+      "bloqueo": "30-sep: política v1 del Dr. Breinner publicada en la rama politica-datos-v1; falta su revisión de 7.3, 8 y 18 (selfie como dato sensible; aclarar que no se reporta a centrales)."
     },
     {
       "id": "5.5",
@@ -1132,6 +1132,18 @@
       "estado": "Pendiente",
       "origen": "Agregado",
       "agente": "ga-disenador-lienzo + ga-diseno-a-codigo"
+    },
+    {
+      "id": "5.13",
+      "fase": 5,
+      "actividad": "Convenios: videos (AMB Móvil, Dr. Ribero, Dream & Go, Locos por los Viajes) y PDF de Racing Tours en el detalle de cada marca",
+      "peso": 1,
+      "depende": [
+        "5.2"
+      ],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "ga-diseno-a-codigo"
     }
   ],
   "pendientes": [
@@ -2019,7 +2031,7 @@
       "id": "P-81",
       "categoria": "Verificación y cierre",
       "area": "Legal",
-      "tarea": "Revisión de la política de datos por un abogado",
+      "tarea": "Revisión de la política de datos por un abogado (Dr. Breinner: secciones 7.3, 8 y 18)",
       "responsable": "Sebas",
       "prioridad": "Alta",
       "estado": "Pendiente",
@@ -2818,6 +2830,27 @@
       "tareas": "4.14, 6.21, 6.22, 5.11, 5.12",
       "cambio": "Tanda 2 (§12) hecha en local",
       "detalle": "Lienzo 3q, migraciones 20260930200000–200600 (pgTAP 464/464), acciones y UI (vitest 516, build en verde). Sin aplicar en producción. Backlog §12.12 agregado."
+    },
+    {
+      "fecha": "2026-09-30",
+      "agente": "ga-auditor-supabase",
+      "tareas": "4.14, 6.22",
+      "cambio": "SP remapeado a IJ (§12.14)",
+      "detalle": "En la migración 20260930200100 (sin aplicar); R-10/R-11 decididos; pgTAP, db reset y vitest en verde."
+    },
+    {
+      "fecha": "2026-09-30",
+      "agente": "ga-diseno-a-codigo",
+      "tareas": "5.13",
+      "cambio": "Medios en el detalle de convenios",
+      "detalle": "Videos y PDF de Racing Tours mapeados por NIT en lib/convenios.ts; develop 4357939 (video de Locos en politica-datos-v1)."
+    },
+    {
+      "fecha": "2026-09-30",
+      "agente": "sesión principal (Sebas)",
+      "tareas": "5.4, 6.21, 6.22; P-81",
+      "cambio": "Política v1 en publicación; tanda 2 en develop",
+      "detalle": "Tanda 2 en develop e4b8350 con 7 migraciones 20260930200* por aplicar y develop a main pendiente (6.22). Política v1 del Dr. Breinner con 7.3, 8 y 18 en revisión. E2E desactualizadas (6.21). Copia de seguridad de producción del 30-sep."
     }
   ]
 }

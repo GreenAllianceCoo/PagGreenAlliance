@@ -1,0 +1,334 @@
+GREEN ALLIANCE
+POLÍTICA DE PRIVACIDAD Y TRATAMIENTO DE DATOS PERSONALES
+Versión: 1.0Fecha de adopción: [FECHA]Fecha de entrada en vigencia: [FECHA]Responsable: GREEN ALLIANCENIT: [NIT]Domicilio: [CIUDAD – DEPARTAMENTO]Dirección: [DIRECCIÓN]Correo electrónico para protección de datos: [CORREO ELECTRÓNICO]Teléfono: [TELÉFONO]
+1. OBJETO
+GREEN ALLIANCE, en adelante “LA COOPERATIVA”, adopta la presente Política de Privacidad y Tratamiento de Datos Personales, con el propósito de establecer los lineamientos, principios, procedimientos y condiciones bajo los cuales se realizará la recolección, almacenamiento, uso, circulación, actualización, transmisión, transferencia y supresión de datos personales de sus asociados, clientes, usuarios, trabajadores, contratistas, proveedores, beneficiarios, codeudores, deudores, potenciales clientes y demás personas naturales cuyos datos sean objeto de tratamiento por parte de LA COOPERATIVA.
+La presente política tiene como finalidad garantizar el derecho fundamental al hábeas data, la intimidad, el buen nombre y la autodeterminación informativa, de conformidad con el artículo 15 de la Constitución Política y las disposiciones contenidas, principalmente, en la Ley Estatutaria 1581 de 2012, el Decreto 1377 de 2013, incorporado al Decreto 1074 de 2015, y demás normas que las modifiquen, adicionen o reglamenten.
+Cuando LA COOPERATIVA realice tratamiento de información financiera, crediticia, comercial o de servicios en calidad de fuente, usuario u operador, se observarán adicionalmente las disposiciones especiales contenidas en la Ley 1266 de 2008, sus modificaciones y demás normas aplicables al hábeas data financiero. La Ley 1266 regula específicamente la información financiera, crediticia, comercial y de servicios. (Sede Electrónica)
+2. ALCANCE
+La presente política aplica a todas las bases de datos, archivos físicos, digitales, electrónicos, audiovisuales, sistemas de información y demás medios en los cuales LA COOPERATIVA almacene o trate datos personales.
+Su aplicación comprende, entre otros, a:
+Asociados.
+Clientes y usuarios.
+Solicitantes de productos o servicios.
+Deudores y obligados.
+Codeudores, fiadores y garantes.
+Beneficiarios.
+Referencias personales y comerciales suministradas legítimamente.
+Trabajadores y candidatos a procesos de selección.
+Contratistas y proveedores.
+Representantes legales y personas de contacto de terceros.
+Visitantes.
+Aliados comerciales.
+Personas que se comuniquen con LA COOPERATIVA a través de canales físicos o digitales.
+Cualquier otra persona natural cuyos datos personales sean objeto de tratamiento por LA COOPERATIVA.
+3. MARCO NORMATIVO
+La presente política se fundamenta, entre otras, en las siguientes disposiciones:
+Constitución Política de Colombia, especialmente artículo 15.
+Ley 1581 de 2012 – Régimen General de Protección de Datos Personales.
+Decreto 1377 de 2013.
+Decreto 1074 de 2015, en lo relacionado con protección de datos personales.
+Ley 1266 de 2008 – Régimen especial de hábeas data financiero, crediticio, comercial y de servicios.
+Ley 2157 de 2021 y demás disposiciones que modifiquen o adicionen el régimen de hábeas data financiero.
+Ley 2300 de 2023, cuando resulte aplicable a las comunicaciones comerciales y de cobranza.
+Demás normas, decretos, circulares, instrucciones y decisiones de las autoridades competentes que regulen la protección y tratamiento de datos personales.
+La Ley 1581 establece como principios, entre otros, la legalidad, finalidad, libertad, veracidad o calidad, transparencia, acceso y circulación restringida, seguridad y confidencialidad. (Función Pública)
+4. DEFINICIONES
+Para efectos de esta política se tendrán en cuenta las siguientes definiciones:
+4.1. Autorización
+Consentimiento previo, expreso e informado otorgado por el Titular para llevar a cabo el tratamiento de sus datos personales, salvo las excepciones establecidas legalmente.
+4.2. Base de datos
+Conjunto organizado de datos personales objeto de tratamiento.
+4.3. Dato personal
+Cualquier información vinculada o que pueda asociarse a una persona natural determinada o determinable.
+4.4. Dato público
+Dato que por su naturaleza puede estar contenido en registros, documentos públicos o ser de conocimiento general, de conformidad con la legislación aplicable.
+4.5. Dato privado
+Información que, por su naturaleza, tiene carácter reservado y cuyo conocimiento está limitado al Titular.
+4.6. Dato semiprivado
+Información que no tiene naturaleza íntima, reservada ni pública y cuyo conocimiento puede interesar al Titular y a determinado sector o grupo de personas.
+4.7. Dato sensible
+Información cuyo tratamiento indebido puede afectar la intimidad del Titular o generar discriminación, incluyendo datos relativos a salud, biométricos, orientación política, convicciones religiosas o filosóficas, pertenencia sindical, origen racial o étnico, vida sexual, entre otros establecidos por la ley.
+4.8. Encargado del tratamiento
+Persona natural o jurídica, pública o privada, que realiza tratamiento de datos personales por cuenta de LA COOPERATIVA.
+4.9. Responsable del tratamiento
+LA COOPERATIVA, en cuanto determina las finalidades y medios del tratamiento de los datos personales.
+4.10. Titular
+Persona natural cuyos datos personales son objeto de tratamiento.
+4.11. Tratamiento
+Cualquier operación realizada sobre datos personales, incluyendo recolección, almacenamiento, uso, circulación, consulta, actualización, transmisión, transferencia y supresión.
+5. PRINCIPIOS PARA EL TRATAMIENTO DE DATOS PERSONALES
+LA COOPERATIVA aplicará los siguientes principios:
+5.1. Legalidad
+El tratamiento de datos personales se realizará conforme a la Constitución, la ley y demás disposiciones aplicables.
+5.2. Finalidad
+Los datos serán tratados para finalidades legítimas, determinadas, explícitas e informadas al Titular.
+5.3. Libertad
+El tratamiento se realizará con autorización previa, expresa e informada del Titular, salvo los casos exceptuados por la ley.
+5.4. Veracidad o calidad
+LA COOPERATIVA procurará que la información sea veraz, completa, exacta, actualizada, comprobable y comprensible.
+5.5. Transparencia
+El Titular podrá conocer, en cualquier momento y conforme a la ley, la existencia de información personal que le concierna y el tratamiento que se realiza sobre ella.
+5.6. Acceso y circulación restringida
+Los datos personales serán tratados exclusivamente por las personas autorizadas y dentro de los límites establecidos por la Constitución, la ley y esta política.
+5.7. Seguridad
+LA COOPERATIVA implementará medidas técnicas, humanas, administrativas y organizacionales razonables para evitar pérdida, adulteración, consulta, utilización o acceso no autorizado o fraudulento.
+5.8. Confidencialidad
+Las personas que intervengan en el tratamiento de datos personales deberán mantener la reserva de la información, incluso después de terminada su relación laboral, contractual o comercial con LA COOPERATIVA.
+6. DATOS PERSONALES QUE PODRÁ TRATAR LA COOPERATIVA
+Dependiendo de la relación existente con el Titular y de las finalidades correspondientes, LA COOPERATIVA podrá tratar información como:
+Nombre y apellidos.
+Documento de identidad.
+Fecha y lugar de nacimiento.
+Nacionalidad.
+Dirección de residencia.
+Teléfono.
+Correo electrónico.
+Información laboral.
+Información profesional.
+Información económica y patrimonial.
+Información financiera.
+Información relacionada con obligaciones crediticias.
+Información comercial.
+Información relacionada con referencias.
+Información contractual.
+Información relacionada con productos y servicios adquiridos.
+Información necesaria para procesos de conocimiento del cliente o asociado.
+Información relacionada con garantías, obligaciones, codeudores y beneficiarios.
+Información necesaria para procesos de cobranza.
+Información contenida en documentos aportados por el Titular.
+Datos derivados de comunicaciones con LA COOPERATIVA.
+Registros de atención al cliente.
+Registros audiovisuales o de seguridad, cuando existan.
+Datos biométricos, únicamente cuando exista una finalidad legítima y se cumplan los requisitos legales aplicables.
+LA COOPERATIVA recolectará únicamente la información que resulte pertinente, necesaria y proporcional para cumplir las finalidades informadas.
+7. FINALIDADES DEL TRATAMIENTO
+LA COOPERATIVA podrá tratar los datos personales para las siguientes finalidades:
+7.1. Gestión de asociados y clientes
+Gestionar solicitudes de vinculación.
+Verificar y actualizar información.
+Administrar la relación contractual o asociativa.
+Gestionar productos y servicios.
+Atender solicitudes, peticiones, quejas y reclamos.
+Mantener actualizados los registros de asociados y clientes.
+7.2. Gestión de productos financieros, crediticios o comerciales
+Cuando corresponda a las actividades autorizadas de LA COOPERATIVA:
+Analizar solicitudes de crédito.
+Realizar estudios de capacidad de pago.
+Analizar riesgos.
+Verificar información suministrada.
+Gestionar obligaciones.
+Administrar garantías.
+Realizar seguimiento a obligaciones.
+Gestionar pagos y recaudos.
+Realizar procesos de cobranza.
+Gestionar acuerdos de pago.
+Administrar información relacionada con deudores, codeudores, fiadores y garantes.
+7.3. Información financiera y crediticia
+Cuando legalmente corresponda, LA COOPERATIVA podrá consultar, reportar, almacenar, actualizar y utilizar información financiera, crediticia, comercial y de servicios conforme al régimen especial aplicable.
+Cuando actúe como fuente de información ante operadores legalmente autorizados, el tratamiento se realizará de acuerdo con la autorización otorgada por el Titular y con las obligaciones establecidas en la Ley 1266 de 2008 y sus modificaciones.
+La información financiera y crediticia estará sujeta a los principios de veracidad, integridad, actualización, circulación restringida, seguridad y confidencialidad.
+7.4. Cumplimiento de obligaciones legales
+Los datos podrán ser tratados para:
+Cumplir obligaciones legales.
+Atender requerimientos de autoridades administrativas o judiciales.
+Atender requerimientos de organismos de vigilancia y control.
+Cumplir obligaciones tributarias.
+Cumplir obligaciones contables.
+Cumplir obligaciones relacionadas con prevención del lavado de activos y financiación del terrorismo, cuando resulten aplicables.
+Cumplir disposiciones relacionadas con protección al consumidor y protección de datos personales.
+7.5. Gestión comercial
+Con autorización cuando sea requerida:
+Informar sobre productos y servicios.
+Enviar información comercial.
+Realizar campañas de mercadeo.
+Realizar encuestas de satisfacción.
+Comunicar promociones, beneficios y novedades.
+Gestionar programas de fidelización.
+El Titular podrá solicitar en cualquier momento el cese del uso de sus datos para finalidades de mercadeo directo, sin perjuicio de los tratamientos que sean necesarios para cumplir obligaciones legales o contractuales.
+7.6. Gestión administrativa
+Los datos podrán ser utilizados para:
+Facturación.
+Contabilidad.
+Gestión de cartera.
+Gestión documental.
+Auditoría.
+Control interno.
+Gestión de proveedores.
+Gestión de contratistas.
+Seguridad física y lógica.
+Administración de sistemas de información.
+8. TRATAMIENTO DE DATOS SENSIBLES
+LA COOPERATIVA evitará recolectar datos sensibles cuando estos no sean necesarios para una finalidad legítima.
+Cuando excepcionalmente sea necesario tratar datos sensibles, se informará al Titular de manera previa sobre:
+El carácter sensible del dato.
+La finalidad específica del tratamiento.
+El carácter facultativo de otorgar la autorización.
+Los derechos que le asisten.
+El tratamiento de datos sensibles se realizará únicamente cuando exista fundamento legal para ello y bajo medidas reforzadas de seguridad y confidencialidad.
+9. DATOS DE NIÑOS, NIÑAS Y ADOLESCENTES
+LA COOPERATIVA no realizará tratamiento de datos personales de niños, niñas y adolescentes salvo cuando dicho tratamiento sea legalmente procedente, respete sus derechos fundamentales y atienda a su interés superior.
+Cuando sea necesario, se solicitará la autorización del representante legal y se aplicarán las condiciones especiales establecidas por la legislación colombiana.
+10. AUTORIZACIÓN DEL TITULAR
+LA COOPERATIVA solicitará autorización para el tratamiento de datos personales mediante mecanismos físicos, electrónicos, telefónicos, digitales, formularios, contratos, aplicaciones, páginas web u otros medios que permitan acreditar posteriormente la autorización.
+La autorización deberá permitir demostrar:
+Identificación del Titular.
+Fecha de autorización.
+Medio utilizado.
+Finalidades informadas.
+Datos objeto de tratamiento.
+Aceptación del Titular, cuando corresponda.
+LA COOPERATIVA conservará la prueba de las autorizaciones obtenidas durante el tiempo legalmente necesario.
+11. DERECHOS DE LOS TITULARES
+De conformidad con la Ley 1581 de 2012, los Titulares tendrán, entre otros, los siguientes derechos:
+Conocer los datos personales que reposen en las bases de datos de LA COOPERATIVA.
+Solicitar la actualización de sus datos.
+Solicitar la rectificación de información incorrecta, incompleta o inexacta.
+Solicitar prueba de la autorización otorgada.
+Conocer el uso dado a sus datos personales.
+Presentar consultas y reclamos.
+Solicitar, cuando legalmente proceda, la supresión de sus datos.
+Revocar la autorización cuando resulte jurídicamente procedente.
+Acceder gratuitamente a sus datos personales.
+Presentar quejas ante la Superintendencia de Industria y Comercio, una vez agotados los mecanismos internos correspondientes, cuando ello sea exigible.
+Estos derechos se encuentran expresamente reconocidos por el artículo 8 de la Ley 1581 de 2012. (Función Pública)
+12. PROCEDIMIENTO PARA CONSULTAS
+El Titular, sus causahabientes o representantes legalmente acreditados podrán presentar consultas para conocer la información personal que repose en las bases de datos de LA COOPERATIVA.
+La solicitud deberá contener, como mínimo:
+Nombre completo del Titular.
+Número de identificación.
+Descripción de la solicitud.
+Dirección física o electrónica para recibir respuesta.
+Documentos que acrediten la representación, cuando corresponda.
+Las consultas serán atendidas dentro de los términos establecidos por la legislación vigente.
+Actualmente, el artículo 14 de la Ley 1581 contempla un término máximo de diez (10) días hábiles para responder las consultas, con posibilidad de una extensión en los términos establecidos por la propia norma. (Función Pública)
+13. PROCEDIMIENTO PARA RECLAMOS
+El Titular podrá presentar reclamos cuando considere que la información:
+Es incorrecta.
+Está incompleta.
+Debe ser actualizada.
+Debe ser rectificada.
+Está siendo tratada indebidamente.
+Está siendo utilizada para una finalidad diferente a la autorizada.
+Está siendo tratada en contravención de la legislación vigente.
+El reclamo deberá contener:
+Identificación del Titular.
+Descripción de los hechos.
+Petición concreta.
+Dirección o correo electrónico para recibir respuesta.
+Documentos y pruebas que considere pertinentes.
+Cuando el reclamo esté completo, LA COOPERATIVA lo tramitará dentro de los términos establecidos legalmente.
+La Ley 1581 establece actualmente un término de quince (15) días hábiles para resolver los reclamos, con la posibilidad de una ampliación en las condiciones previstas por la ley. (Función Pública)
+14. CANALES PARA EL EJERCICIO DE LOS DERECHOS
+Los Titulares podrán ejercer sus derechos a través de:
+Correo electrónico: [CORREO DE PROTECCIÓN DE DATOS]
+Dirección física: [DIRECCIÓN]
+Teléfono: [TELÉFONO]
+Página web: [PÁGINA WEB, SI APLICA]
+Horario de atención: [HORARIO]
+LA COOPERATIVA podrá establecer canales adicionales para facilitar el ejercicio de los derechos de los Titulares.
+15. SEGURIDAD DE LA INFORMACIÓN
+LA COOPERATIVA implementará medidas técnicas, humanas, administrativas y organizacionales razonables destinadas a proteger los datos personales contra:
+Acceso no autorizado.
+Uso indebido.
+Alteración.
+Pérdida.
+Destrucción.
+Divulgación no autorizada.
+Fraude.
+Tratamientos no autorizados.
+El acceso a información personal estará limitado a las personas que, por sus funciones, necesiten conocerla.
+Los trabajadores, contratistas, proveedores y terceros autorizados que tengan acceso a información personal deberán observar las obligaciones de confidencialidad correspondientes.
+16. TRANSMISIÓN Y TRANSFERENCIA DE DATOS
+LA COOPERATIVA podrá transmitir o transferir datos personales a terceros cuando ello sea necesario para la prestación de servicios, ejecución contractual, cumplimiento de obligaciones legales, gestión administrativa, tecnológica, contable, jurídica, financiera o de seguridad.
+Cuando corresponda, LA COOPERATIVA exigirá a dichos terceros el cumplimiento de las obligaciones legales de protección, seguridad y confidencialidad de la información.
+Las transferencias internacionales de datos se realizarán únicamente en los casos y bajo las condiciones permitidas por la legislación colombiana.
+17. ENCARGADOS DEL TRATAMIENTO
+LA COOPERATIVA podrá contratar terceros que actúen como Encargados del Tratamiento.
+Estos terceros podrán prestar servicios relacionados con:
+Tecnología.
+Almacenamiento de información.
+Gestión documental.
+Contabilidad.
+Auditoría.
+Cobranza.
+Mensajería.
+Comunicaciones.
+Servicios jurídicos.
+Seguridad.
+Administración de plataformas.
+Servicios de apoyo administrativo.
+Los Encargados deberán tratar los datos exclusivamente para las finalidades autorizadas y cumplir las obligaciones de seguridad y confidencialidad establecidas por LA COOPERATIVA y la legislación vigente.
+18. INFORMACIÓN FINANCIERA, CREDITICIA Y COMERCIAL
+Cuando LA COOPERATIVA trate información financiera, crediticia, comercial o de servicios, deberá observar las disposiciones especiales del régimen de hábeas data financiero.
+En particular, LA COOPERATIVA procurará que la información reportada sea:
+Veraz.
+Completa.
+Exacta.
+Actualizada.
+Comprobable.
+Comprensible.
+Cuando corresponda efectuar reportes a operadores de información, LA COOPERATIVA observará las reglas aplicables respecto de autorización, comunicación, actualización, rectificación, permanencia y retiro de la información.
+Los Titulares podrán ejercer sus derechos de actualización, rectificación y demás derechos previstos en la legislación aplicable.
+La Ley 1266 de 2008 constituye el régimen especial colombiano para la información financiera, crediticia, comercial y de servicios. (Sede Electrónica)
+19. DATOS UTILIZADOS PARA COBRANZA
+Cuando LA COOPERATIVA realice actividades de gestión de cartera y cobranza, utilizará los datos de contacto necesarios para ejercer legítimamente dicha actividad.
+Las comunicaciones de cobranza se realizarán respetando las disposiciones legales aplicables, incluyendo las normas relativas a horarios, canales, frecuencia de contacto, protección de datos personales y demás garantías reconocidas al consumidor o deudor.
+20. VIDEOVIGILANCIA
+Cuando LA COOPERATIVA utilice sistemas de videovigilancia, las imágenes serán tratadas para finalidades relacionadas con:
+Seguridad de personas.
+Protección de bienes.
+Prevención de incidentes.
+Control de acceso.
+Investigación de eventos de seguridad.
+Cumplimiento de obligaciones legales.
+La utilización de sistemas de videovigilancia estará sujeta a medidas de seguridad y acceso restringido.
+21. CONSERVACIÓN DE LA INFORMACIÓN
+Los datos personales serán conservados durante el tiempo que resulte necesario para cumplir las finalidades para las cuales fueron recolectados, mientras subsista una relación contractual, comercial, asociativa o legal, o durante el término requerido para cumplir obligaciones legales, contables, fiscales, judiciales, administrativas o regulatorias.
+Una vez cumplida la finalidad y vencidos los términos de conservación aplicables, LA COOPERATIVA procederá a eliminar, anonimizar, archivar o conservar la información conforme a las obligaciones legales correspondientes.
+22. CONFIDENCIALIDAD
+Toda persona que tenga acceso a información personal administrada por LA COOPERATIVA deberá mantener estricta reserva sobre la misma.
+Esta obligación continuará incluso después de terminada la relación laboral, contractual, comercial o institucional.
+La información únicamente podrá ser revelada cuando:
+El Titular lo autorice.
+Exista autorización legal.
+Una autoridad competente lo requiera.
+Exista orden judicial.
+Sea necesario para ejecutar una obligación contractual o legal.
+Se encuentre dentro de las excepciones previstas por la legislación.
+23. INCIDENTES DE SEGURIDAD
+LA COOPERATIVA establecerá procedimientos internos para identificar, gestionar, documentar y atender incidentes que puedan comprometer la seguridad de los datos personales.
+Cuando se presente una vulneración de seguridad que genere riesgos para los Titulares, LA COOPERATIVA adoptará las medidas correctivas correspondientes y realizará las comunicaciones o reportes a las autoridades competentes cuando exista obligación legal de hacerlo.
+24. RESPONSABILIDAD DE LOS TRABAJADORES Y CONTRATISTAS
+Los trabajadores, funcionarios, contratistas y demás personas autorizadas para acceder a información personal deberán:
+Utilizar la información únicamente para el cumplimiento de sus funciones.
+Mantener la confidencialidad.
+Evitar compartir credenciales.
+Proteger documentos físicos y digitales.
+Reportar incidentes de seguridad.
+Abstenerse de copiar o divulgar información sin autorización.
+Cumplir las políticas internas de seguridad de la información.
+El incumplimiento podrá generar las consecuencias laborales, contractuales, civiles o legales correspondientes.
+25. MODIFICACIONES A LA POLÍTICA
+LA COOPERATIVA podrá modificar esta política cuando sea necesario por cambios legislativos, regulatorios, tecnológicos, operativos o administrativos.
+Cuando las modificaciones afecten sustancialmente los derechos o finalidades informadas a los Titulares, LA COOPERATIVA comunicará los cambios mediante los mecanismos legalmente aplicables.
+La versión vigente permanecerá disponible para consulta de los Titulares.
+26. VIGENCIA
+La presente Política de Privacidad y Tratamiento de Datos Personales entra en vigencia a partir del [FECHA] y permanecerá vigente mientras LA COOPERATIVA realice actividades de tratamiento de datos personales.
+27. RESPONSABLE DE LA POLÍTICA
+La administración, implementación, seguimiento y actualización de la presente política estará a cargo de:
+GREEN ALLIANCE
+Responsable: [NOMBRE DEL RESPONSABLE / ÁREA]
+Cargo: [CARGO]
+Correo electrónico: [CORREO]
+Teléfono: [TELÉFONO]
+Dirección: [DIRECCIÓN]
+28. DECLARACIÓN INSTITUCIONAL
+GREEN ALLIANCE reconoce que la protección de los datos personales constituye una obligación legal y un compromiso institucional con sus asociados, clientes, trabajadores, proveedores, contratistas y demás Titulares.
+En consecuencia, LA COOPERATIVA se compromete a tratar la información personal de manera lícita, segura, transparente y responsable, respetando los derechos constitucionales y legales de los Titulares y adoptando las medidas necesarias para prevenir el acceso, uso, divulgación, modificación, pérdida o tratamiento no autorizado de la información.
+La presente política deberá ser conocida y aplicada por todas las personas que, en razón de sus funciones o relación con LA COOPERATIVA, tengan acceso a datos personales.
+APROBACIÓN
+La presente Política de Privacidad y Tratamiento de Datos Personales fue aprobada por [ÓRGANO COMPETENTE DE GREEN ALLIANCE] mediante [ACTA / DECISIÓN No.], de fecha [FECHA].
+GREEN ALLIANCE
+[NOMBRE DEL REPRESENTANTE LEGAL]Representante LegalC.C. [●]NIT. [●]
+Versión 1.0 – [FECHA]

@@ -491,7 +491,7 @@ export function Afiliacion({
             de mi cédula (frente y reverso) y mi selfie como dato sensible, para gestionar mi
             afiliación, según su{" "}
             {/* Abre en otra pestaña para no perder lo escrito en el formulario.
-                /politica-de-datos es un borrador con datos <Pendiente> por confirmar. */}
+                /politica-de-datos: política v1.0 (VERSION_POLITICA_DATOS en lib/politica-datos.ts). */}
             <a href="/politica-de-datos" target="_blank" rel="noopener" className="enlace font-bold">
               política de datos
             </a>{" "}
