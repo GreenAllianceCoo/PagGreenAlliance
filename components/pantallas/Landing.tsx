@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ComprobanteSolicitud } from "@/components/pantallas/landing/ComprobanteSolicitud";
 import { ListaConvenios } from "@/components/pantallas/ListaConvenios";
 import { MatrizCirculos } from "@/components/pantallas/landing/MatrizCirculos";
+import { IconoWhatsapp } from "@/components/ui/Iconos";
 import { Logo } from "@/components/ui/Logo";
 import type { Convenio } from "@/lib/mock";
 
@@ -22,6 +23,8 @@ export type LandingProps = {
   };
   convenios: Convenio[];
   whatsapp: string;
+  /** §13.1: enlace wa.me con mensaje corto (lib/config.ts WHATSAPP_URL_PIE). Sin valor, el número va como texto. */
+  whatsappUrl?: string | null;
   correo: string;
   textoVigilancia: string;
 };
@@ -90,7 +93,7 @@ const PASOS_ALIVIO: Array<{ numero: string; fondo: string; numeroFg: string; tit
 // Sedes (pieza 2a): Bogotá + 4 sucursales.
 const SEDES = ["Bogotá · sede principal", "Valledupar, Cesar", "Bosconia, Cesar", "La Jagua de Ibirico, Cesar", "Hatonuevo, La Guajira"];
 
-export function Landing({ estadisticas, convenios, whatsapp, correo, textoVigilancia }: LandingProps) {
+export function Landing({ estadisticas, convenios, whatsapp, whatsappUrl, correo, textoVigilancia }: LandingProps) {
   return (
     <div className="flex min-h-dvh flex-col overflow-x-clip bg-ga-fondo-suave">
       {/* Encabezado: píldora blanca flotante (pieza 2a). */}
@@ -365,7 +368,21 @@ export function Landing({ estadisticas, convenios, whatsapp, correo, textoVigila
           <span className="flex flex-col gap-2.5 lg:block">
             {/* TODO(pendiente-spec): número de WhatsApp y correo confirmados en lib/config.ts. */}
             <span>
-              WhatsApp {whatsapp} · {correo}
+              {whatsappUrl ? (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Escribir a la cooperativa por WhatsApp, ${whatsapp} (se abre en una pestaña nueva)`}
+                  className="enlace inline-flex items-center gap-1.5 align-middle font-bold"
+                >
+                  <IconoWhatsapp tamano={18} />
+                  WhatsApp {whatsapp}
+                </a>
+              ) : (
+                <>WhatsApp {whatsapp}</>
+              )}{" "}
+              · {correo}
             </span>
             <span className="hidden lg:inline"> · </span>
             <Link href="/politica-de-datos" className="enlace font-bold">

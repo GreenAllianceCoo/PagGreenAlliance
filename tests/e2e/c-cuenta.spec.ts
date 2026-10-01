@@ -1,5 +1,12 @@
 import { expect, test } from "@playwright/test";
-import { contextoConSesion, esEscritorio, restaurarCreditoDeEjemplo, tokenDeUsuario, USUARIOS, usuarioRest } from "./utils";
+import {
+  contextoConSesion,
+  esEscritorio,
+  restaurarCreditoDeEjemplo,
+  tokenDeUsuario,
+  USUARIOS,
+  usuarioRest,
+} from "./utils";
 
 /** C. /cuenta: protección, datos propios, «Mis datos» y «Salir». */
 
@@ -18,12 +25,16 @@ test.describe("C2 · Con sesión: datos del propio usuario", () => {
   // misma sesión de base de datos (ver restaurarCreditoDeEjemplo en utils.ts).
   test.beforeAll(restaurarCreditoDeEjemplo);
 
-  test("Asociado con solicitud: nombre, estado, monto, modalidad, tasa y tope de su grado", async ({ browser }, testInfo) => {
+  test("Asociado con solicitud: nombre, estado, monto, modalidad, tasa y tope de su grado", async ({
+    browser,
+  }, testInfo) => {
     const u = USUARIOS.conSolicitud;
     const ctx = await contextoConSesion(browser, "conSolicitud", testInfo);
     const page = await ctx.newPage();
     await page.goto("/cuenta");
-    await expect(page.locator("h1")).toContainText(`Hola, ${u.nombre}`.replace("Hola, ", ""));
+    await expect(page.locator("h1")).toContainText(
+      `Hola, ${u.nombre}`.replace("Hola, ", ""),
+    );
     const texto = (await page.locator("main").innerText()).replace(/\s+/g, " ");
     expect(texto).toContain("Tu solicitud");
     expect(texto).toContain("En revisión");
@@ -35,17 +46,17 @@ test.describe("C2 · Con sesión: datos del propio usuario", () => {
     // Tope PP = 2.100.000 (máximo entre 50 % y 100 %).
     expect(texto).toContain("Tope disponible para tu grado");
     expect(texto).toContain("$ 2.100.000");
-    // Mis datos (solo lectura + celular editable).
-    expect(texto).toContain("Mis datos");
-    expect(texto).toContain(u.cedula);
-    expect(texto).toContain(u.grado);
+    // «Mis datos» se movió a /cuenta/perfil (pieza 3k); Inicio ya no lo muestra.
+    expect(texto).not.toContain("Mis datos");
     // No hay datos de la otra asociada.
     expect(texto).not.toContain(USUARIOS.sinSolicitudes.nombre);
     expect(texto).not.toContain(USUARIOS.sinSolicitudes.cedula);
     await ctx.close();
   });
 
-  test("Asociada sin solicitudes: estado vacío, no ve la solicitud de otro", async ({ browser }, testInfo) => {
+  test("Asociada sin solicitudes: estado vacío, no ve la solicitud de otro", async ({
+    browser,
+  }, testInfo) => {
     const u = USUARIOS.sinSolicitudes;
     const ctx = await contextoConSesion(browser, "sinSolicitudes", testInfo);
     const page = await ctx.newPage();
@@ -58,26 +69,38 @@ test.describe("C2 · Con sesión: datos del propio usuario", () => {
     // Tope SI = 3.000.000.
     expect(texto).toContain("$ 3.000.000");
     // «Nueva solicitud» del estado vacío → /cuenta/solicitar.
-    await page.locator("main section").first().getByRole("link", { name: "Nueva solicitud" }).click();
+    await page
+      .locator("main section")
+      .first()
+      .getByRole("link", { name: "Nueva solicitud" })
+      .click();
     await expect(page).toHaveURL(/\/cuenta\/solicitar$/);
     await ctx.close();
   });
 
   test("RLS: con el token de un asociado no se leen solicitudes ni perfiles de otro", async () => {
     const token = await tokenDeUsuario(USUARIOS.sinSolicitudes.correo);
-    const solicitudes = await usuarioRest("solicitudes_credito?select=id,asociado_id", token);
+    const solicitudes = await usuarioRest(
+      "solicitudes_credito?select=id,asociado_id",
+      token,
+    );
     expect(solicitudes.status).toBe(200);
     expect(solicitudes.cuerpo).toEqual([]);
     const perfiles = await usuarioRest("perfiles?select=cedula", token);
-    expect(perfiles.cuerpo).toEqual([{ cedula: USUARIOS.sinSolicitudes.cedula }]);
+    expect(perfiles.cuerpo).toEqual([
+      { cedula: USUARIOS.sinSolicitudes.cedula },
+    ]);
   });
 });
 
-test.describe("C · «Mis datos»", () => {
-  test("Nombre, cédula y grado de solo lectura; el celular se valida y se guarda", async ({ browser }, testInfo) => {
+test.describe("C · «Mis datos» en /cuenta/perfil", () => {
+  test("Nombre, cédula y grado de solo lectura; el celular se valida y se guarda", async ({
+    browser,
+  }, testInfo) => {
     const ctx = await contextoConSesion(browser, "sinSolicitudes", testInfo);
     const page = await ctx.newPage();
-    await page.goto("/cuenta");
+    await page.goto("/cuenta/perfil");
+    await expect(page.locator("h1")).toHaveText("Tu perfil");
     const seccion = page.locator('section[aria-labelledby="mis-datos-titulo"]');
     // Solo hay un campo editable: el celular.
     await expect(seccion.locator("input, select, textarea")).toHaveCount(1);
@@ -90,10 +113,13 @@ test.describe("C · «Mis datos»", () => {
     await expect(seccion.getByLabel("Celular")).toBeFocused();
 
     // Válido: se guarda y persiste al recargar.
-    const nuevo = testInfo.project.name === "escritorio" ? "3157654321" : "3169876543";
+    const nuevo =
+      testInfo.project.name === "escritorio" ? "3157654321" : "3169876543";
     await seccion.getByLabel("Celular").fill(nuevo);
     await seccion.getByRole("button", { name: "Guardar" }).click();
-    await expect(seccion.getByRole("status")).toHaveText("Guardamos tu celular.");
+    await expect(seccion.getByRole("status")).toHaveText(
+      "Guardamos tu celular.",
+    );
     await page.reload();
     await expect(page.locator("#telefono")).toHaveValue(nuevo);
     await ctx.close();
@@ -104,16 +130,69 @@ test.describe("C · «Mis datos»", () => {
     const r = await usuarioRest(
       `perfiles?id=eq.7d1f0c2a-3b4e-4f5a-8b6c-9d0e1f2a3b4c`,
       token,
-      { method: "PATCH", body: JSON.stringify({ nombre_completo: "Hackeado" }) },
+      {
+        method: "PATCH",
+        body: JSON.stringify({ nombre_completo: "Hackeado" }),
+      },
     );
     const perfil = await usuarioRest("perfiles?select=nombre_completo", token);
-    expect(perfil.cuerpo).toEqual([{ nombre_completo: USUARIOS.sinSolicitudes.nombre }]);
+    expect(perfil.cuerpo).toEqual([
+      { nombre_completo: USUARIOS.sinSolicitudes.nombre },
+    ]);
     expect(r.status).toBeGreaterThanOrEqual(400);
   });
 });
 
+test.describe("C · Barra del asociado (celular): Inicio / Solicitar / Sorteo / Perfil", () => {
+  test("Cada pestaña lleva a su destino", async ({ browser }, testInfo) => {
+    test.skip(
+      esEscritorio(testInfo),
+      "La barra inferior solo existe en celular",
+    );
+    const ctx = await contextoConSesion(browser, "sinSolicitudes", testInfo);
+    const page = await ctx.newPage();
+    await page.goto("/cuenta");
+    const barra = page.getByRole("navigation", {
+      name: "Navegación del asociado",
+    });
+    await expect(barra.getByRole("link")).toHaveText([
+      "Inicio",
+      "Solicitar",
+      "Sorteo",
+      "Perfil",
+    ]);
+    await expect(barra.getByRole("link", { name: "Inicio" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await barra.getByRole("link", { name: "Perfil" }).click();
+    await expect(page).toHaveURL(/\/cuenta\/perfil$/);
+    await expect(page.locator("h1")).toHaveText("Tu perfil");
+    await page
+      .getByRole("navigation", { name: "Navegación del asociado" })
+      .getByRole("link", { name: "Solicitar" })
+      .click();
+    await expect(page).toHaveURL(/\/cuenta\/solicitar$/);
+    await page.goto("/cuenta");
+    await page
+      .getByRole("navigation", { name: "Navegación del asociado" })
+      .getByRole("link", { name: "Sorteo" })
+      .click();
+    await expect(page).toHaveURL(/\/cuenta#sorteo$/);
+    await expect(page.locator("#sorteo")).toBeInViewport();
+    await ctx.close();
+  });
+
+  test("/cuenta/perfil sin sesión → /ingresar", async ({ page }) => {
+    await page.goto("/cuenta/perfil");
+    await expect(page).toHaveURL(/\/ingresar$/);
+  });
+});
+
 test.describe("C3 · «Salir»", () => {
-  test("Cierra sesión → /ingresar; volver atrás no muestra datos de la cuenta", async ({ browser }, testInfo) => {
+  test("Cierra sesión → /ingresar; volver atrás no muestra datos de la cuenta", async ({
+    browser,
+  }, testInfo) => {
     const u = USUARIOS.sinSolicitudes;
     const ctx = await contextoConSesion(browser, "sinSolicitudes", testInfo);
     const page = await ctx.newPage();
@@ -139,7 +218,9 @@ test.describe("C3 · «Salir»", () => {
     await expect(page).toHaveURL(/\/ingresar$/);
     // Las cookies de sesión de Supabase ya no están.
     const cookies = await ctx.cookies();
-    expect(cookies.filter((c) => c.name.startsWith("sb-") && c.value)).toEqual([]);
+    expect(cookies.filter((c) => c.name.startsWith("sb-") && c.value)).toEqual(
+      [],
+    );
     await ctx.close();
   });
 });

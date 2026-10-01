@@ -13,6 +13,7 @@ import {
   type SubidasAfiliacion,
 } from "@/lib/afiliacion/fotos";
 import { cargarCatalogoGrados } from "@/lib/grados";
+import { VERSION_POLITICA_DATOS } from "@/lib/politica-datos";
 import { dentroDelLimite, ipDelCliente } from "@/lib/servidor/limite";
 import { registrar } from "@/lib/servidor/registro";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
@@ -181,6 +182,8 @@ export async function enviarAfiliacion(
       ...fotos.columnas,
       mensaje: datos.mensaje,
       acepto_datos_at: new Date().toISOString(),
+      // Versión de la política que aceptó (queda sellada en la base; no se puede cambiar después).
+      version_politica_datos: VERSION_POLITICA_DATOS,
     })
     .select("id")
     .single();

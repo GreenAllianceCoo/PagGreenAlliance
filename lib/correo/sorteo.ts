@@ -1,45 +1,32 @@
 import "server-only";
 import { registrar } from "@/lib/servidor/registro";
-import { enviarCorreoTexto, enviarPlantillaResend } from "@/lib/correo/resend";
+import { enviarConRespaldo } from "@/lib/correo/resend";
 
 /**
  * Correo con el número de boleta del sorteo mensual (docs/resend-plantillas.md
- * §4). El número SOLO sale de aquí (correo) o del registro estructurado del
- * servidor para poder probar en local: nunca se devuelve al navegador
- * (spec-fase-2.md §4, "El número que devuelve la función solo lo ve el
- * servidor").
+ * §4). El número SOLO sale por correo (plantilla o, si falta/falla, texto
+ * plano con el mismo contenido) o, fuera de producción, en el registro del
+ * servidor; nunca se devuelve al navegador (spec-fase-2.md §4).
  */
 export async function enviarBoletaSorteo(datos: { correo: string | string[]; nombre: string; numero: string; mes: string }) {
-  const plantilla = process.env.RESEND_TEMPLATE_SORTEO_BOLETA;
-
-  // S-05 (revisión de seguridad 2026-09-24): el número SOLO se registra fuera
-  // de producción. En Vercel/producción, next.config.mjs ya exige
-  // RESEND_TEMPLATE_SORTEO_BOLETA (y RESEND_API_KEY/EMAIL_FROM) en el build,
-  // así que este "sin plantilla" no debería poder pasar ahí; aun así, por si
-  // Resend falla en tiempo de ejecución, nunca se deja el número en un log
-  // que pueda terminar en una herramienta de monitoreo de terceros.
+  // S-05: en producción el número jamás se deja en un log que pueda ir a monitoreo de terceros.
   const esProduccion = process.env.NODE_ENV === "production";
-
-  if (!plantilla) {
-    // Resend no está configurado (típico en local): se registra el número
-    // para poder probar el flujo igual, pero jamás se muestra en la interfaz.
-    registrar("info", {
-      evento: "sorteo_boleta_no_enviada_sin_plantilla",
-      mes: datos.mes,
-      ...(esProduccion ? {} : { numero: datos.numero }),
-    });
-    return;
-  }
-
   try {
-    await enviarPlantillaResend({
+    await enviarConRespaldo({
       para: datos.correo,
-      plantilla,
+      variablePlantilla: "RESEND_TEMPLATE_SORTEO_BOLETA",
       variables: { NOMBRE: datos.nombre, NUMERO_BOLETA: datos.numero, MES: datos.mes },
+      asunto: "Tu boleta del sorteo de Green Alliance",
+      texto: [
+        `Hola ${datos.nombre},`,
+        "",
+        `Tu número de boleta para el sorteo de ${datos.mes} es ${datos.numero}.`,
+        "",
+        "Cooperativa Green Alliance",
+      ].join("\n"),
     });
   } catch (error) {
-    // Tampoco aquí se pierde la posibilidad de probar en local si Resend
-    // falla por falta de llave: se deja el número en el registro (nunca en producción).
+    // Local sin llave de Resend: se deja el número en el registro para probar (nunca en producción).
     registrar("error", {
       evento: "sorteo_boleta_correo_fallo",
       mes: datos.mes,
@@ -50,28 +37,25 @@ export async function enviarBoletaSorteo(datos: { correo: string | string[]; nom
 }
 
 /**
- * §12.10: aviso al ganador del sorteo del mes. Plantilla opcional
- * `RESEND_TEMPLATE_SORTEO_GANADOR`; si no existe, texto plano. No lleva el
+ * §12.10: aviso al ganador del sorteo del mes. Plantilla
+ * `RESEND_TEMPLATE_SORTEO_GANADOR` con respaldo en texto plano. No lleva el
  * número de boleta ni la cédula. No bloquea ni lanza.
  */
 export async function enviarGanadorSorteo(datos: { correo: string | string[]; nombre: string; mes: string }) {
-  const plantilla = process.env.RESEND_TEMPLATE_SORTEO_GANADOR;
   try {
-    if (plantilla) {
-      await enviarPlantillaResend({ para: datos.correo, plantilla, variables: { NOMBRE: datos.nombre, MES: datos.mes } });
-    } else {
-      await enviarCorreoTexto({
-        para: Array.isArray(datos.correo) ? datos.correo : [datos.correo],
-        asunto: "¡Ganaste el sorteo de Green Alliance!",
-        texto: [
-          `Hola ${datos.nombre},`,
-          "",
-          `Fuiste elegido como ganador del sorteo de ${datos.mes}. La cooperativa se pondrá en contacto contigo.`,
-          "",
-          "Cooperativa Green Alliance",
-        ].join("\n"),
-      });
-    }
+    await enviarConRespaldo({
+      para: datos.correo,
+      variablePlantilla: "RESEND_TEMPLATE_SORTEO_GANADOR",
+      variables: { NOMBRE: datos.nombre, MES: datos.mes },
+      asunto: "¡Ganaste el sorteo de Green Alliance!",
+      texto: [
+        `Hola ${datos.nombre},`,
+        "",
+        `Fuiste elegido como ganador del sorteo de ${datos.mes}. La cooperativa se pondrá en contacto contigo.`,
+        "",
+        "Cooperativa Green Alliance",
+      ].join("\n"),
+    });
   } catch (error) {
     registrar("error", {
       evento: "sorteo_ganador_correo_fallo",

@@ -1,8 +1,12 @@
 import "server-only";
 import { registrar } from "@/lib/servidor/registro";
-import { enviarCorreoTexto, enviarPlantillaResend } from "@/lib/correo/resend";
+import { enviarConRespaldo } from "@/lib/correo/resend";
 
-/** Aviso del resultado. Se conecta al flujo administrativo cuando esté implementado. */
+/**
+ * Aviso del resultado. §13.4: si falta `RESEND_TEMPLATE_CREDITO_APROBADO` /
+ * `_RECHAZADO` o la plantilla falla, cae a texto plano con el mismo contenido
+ * y registra `correo_plantilla_faltante` (sin datos personales).
+ */
 export async function enviarResultadoCredito(datos: {
   id: string;
   nombre: string;
@@ -12,30 +16,28 @@ export async function enviarResultadoCredito(datos: {
   monto: number;
   motivo?: string;
 }) {
-  const plantilla = datos.resultado === "aprobado"
-    ? process.env.RESEND_TEMPLATE_CREDITO_APROBADO
-    : process.env.RESEND_TEMPLATE_CREDITO_RECHAZADO;
-
-  if (!plantilla) {
-    registrar("error", {
-      evento: "credito_resultado_no_enviado",
-      motivo: "falta_plantilla",
-      resultado: datos.resultado,
-      solicitud_id: datos.id,
-    });
-    return;
-  }
-
+  const aprobado = datos.resultado === "aprobado";
+  // Con puntos de miles (1.500.000): la plantilla le antepone «$».
+  const monto = Math.round(datos.monto).toLocaleString("es-CO");
   try {
-    await enviarPlantillaResend({
+    await enviarConRespaldo({
       para: datos.correo,
-      plantilla,
-      variables: {
-        NOMBRE: datos.nombre,
-        // Con puntos de miles (1.500.000): la plantilla le antepone «$».
-        MONTO: Math.round(datos.monto).toLocaleString("es-CO"),
-        MOTIVO: datos.motivo ?? "",
-      },
+      variablePlantilla: aprobado ? "RESEND_TEMPLATE_CREDITO_APROBADO" : "RESEND_TEMPLATE_CREDITO_RECHAZADO",
+      variables: { NOMBRE: datos.nombre, MONTO: monto, MOTIVO: datos.motivo ?? "" },
+      asunto: aprobado
+        ? "Tu crédito de Green Alliance fue aprobado"
+        : "Respuesta a tu solicitud de crédito de Green Alliance",
+      texto: [
+        `Hola ${datos.nombre},`,
+        "",
+        aprobado
+          ? `Tu solicitud de crédito por $ ${monto} fue aprobada.`
+          : `Tu solicitud de crédito por $ ${monto} no fue aprobada.${datos.motivo ? ` Motivo: ${datos.motivo}` : ""}`,
+        "",
+        "Ingresa a tu cuenta para ver el detalle.",
+        "",
+        "Cooperativa Green Alliance",
+      ].join("\n"),
     });
   } catch (error) {
     registrar("error", {
@@ -49,8 +51,8 @@ export async function enviarResultadoCredito(datos: {
 
 /**
  * §12.2: aviso de que el crédito ya se desembolsó (arranca el conteo de 3
- * meses). Solo al correo PERSONAL (lleva el monto). Usa la plantilla
- * `RESEND_TEMPLATE_CREDITO_DESEMBOLSADO` si existe; si no, texto plano.
+ * meses). Solo al correo PERSONAL (lleva el monto). Plantilla
+ * `RESEND_TEMPLATE_CREDITO_DESEMBOLSADO`, con respaldo en texto plano.
  * No bloquea ni lanza.
  */
 export async function enviarDesembolsoCredito(datos: {
@@ -63,31 +65,53 @@ export async function enviarDesembolsoCredito(datos: {
   fechaTexto: string;
 }) {
   const monto = Math.round(datos.monto).toLocaleString("es-CO");
-  const plantilla = process.env.RESEND_TEMPLATE_CREDITO_DESEMBOLSADO;
   try {
-    if (plantilla) {
-      await enviarPlantillaResend({
-        para: datos.correo,
-        plantilla,
-        variables: { NOMBRE: datos.nombre, MONTO: monto, FECHA: datos.fechaTexto },
-      });
-    } else {
-      await enviarCorreoTexto({
-        para: datos.correo,
-        asunto: "Tu crédito de Green Alliance fue desembolsado",
-        texto: [
-          `Hola ${datos.nombre},`,
-          "",
-          `Tu crédito por $ ${monto} fue desembolsado el ${datos.fechaTexto}. Desde esa fecha empieza a contar tu plazo de 3 meses.`,
-          "",
-          "Cooperativa Green Alliance",
-        ].join("\n"),
-      });
-    }
+    await enviarConRespaldo({
+      para: datos.correo,
+      variablePlantilla: "RESEND_TEMPLATE_CREDITO_DESEMBOLSADO",
+      variables: { NOMBRE: datos.nombre, MONTO: monto, FECHA: datos.fechaTexto },
+      asunto: "Tu crédito de Green Alliance fue desembolsado",
+      texto: [
+        `Hola ${datos.nombre},`,
+        "",
+        `Tu crédito por $ ${monto} fue desembolsado el ${datos.fechaTexto}. Desde esa fecha empieza a contar tu plazo de 3 meses.`,
+        "",
+        "Cooperativa Green Alliance",
+      ].join("\n"),
+    });
   } catch (error) {
     registrar("error", {
       evento: "credito_desembolso_correo_fallo",
       solicitud_id: datos.id,
+      mensaje: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
+/**
+ * §13.2: aviso al asociado de que ya puede pedir un nuevo crédito. Solo al
+ * correo PERSONAL. NUNCA lleva el motivo (nota interna del admin). Plantilla
+ * opcional `RESEND_TEMPLATE_CREDITO_HABILITADO` con respaldo en texto plano.
+ */
+export async function enviarCreditoHabilitado(datos: { id: string; nombre: string; correo: string[] }) {
+  try {
+    await enviarConRespaldo({
+      para: datos.correo,
+      variablePlantilla: "RESEND_TEMPLATE_CREDITO_HABILITADO",
+      variables: { NOMBRE: datos.nombre },
+      asunto: "Ya puedes solicitar un nuevo crédito en Green Alliance",
+      texto: [
+        `Hola ${datos.nombre},`,
+        "",
+        "La cooperativa habilitó tu cuenta para que puedas hacer una nueva solicitud de crédito. Ingresa a tu cuenta y elige «Nueva solicitud».",
+        "",
+        "Cooperativa Green Alliance",
+      ].join("\n"),
+    });
+  } catch (error) {
+    registrar("error", {
+      evento: "credito_habilitado_correo_fallo",
+      asociado_id: datos.id,
       mensaje: error instanceof Error ? error.message : String(error),
     });
   }

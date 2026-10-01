@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 30-sep-2026 (tanda 2 §12 en develop e4b8350, faltan migraciones 20260930200* y develop→main; convenios con videos y PDF; política de datos v1 en revisión del Dr. Breinner).
+Actualizado: 01-oct-2026 (dashboards 4.7/4.8 y pedidos §13 (4.15) hechos en código; migraciones 20261001000000 y 20261001100000 sin aplicar; Docker caído: db reset, pgTAP y e2e pendientes).
 
 ## Dónde quedamos
 

@@ -92,6 +92,8 @@ export type DetalleProcesoAsociado = {
   estado: EstadoProceso | null;
   fechaInicioEmbargo: string | null;
   historial: CambioProceso[];
+  /** §13.2: true si la última solicitud está rechazada y aún no se habilitó. */
+  puedeHabilitarCredito: boolean;
 };
 
 /** Detalle del proceso de un asociado + historial (más reciente primero). null si no existe. */
@@ -99,7 +101,7 @@ export async function cargarDetalleProceso(
   supabase: SupabaseClient,
   asociadoId: string,
 ): Promise<DetalleProcesoAsociado | null> {
-  const [{ data: perfil }, { data: proceso }, { data: historial }] = await Promise.all([
+  const [{ data: perfil }, { data: proceso }, { data: historial }, { data: ultimas }] = await Promise.all([
     supabase.from("perfiles").select("id, nombre_completo, cedula, grado, institucion, asesor_id, activo").eq("id", asociadoId).maybeSingle(),
     supabase.from("procesos_ejecutivos").select("estado, fecha_inicio_embargo").eq("asociado_id", asociadoId).maybeSingle(),
     supabase
@@ -108,8 +110,27 @@ export async function cargarDetalleProceso(
       .eq("asociado_id", asociadoId)
       .order("created_at", { ascending: false })
       .limit(100),
+    supabase
+      .from("solicitudes_credito")
+      .select("id, estado")
+      .eq("asociado_id", asociadoId)
+      .order("fecha_solicitud", { ascending: false })
+      .limit(1),
   ]);
   if (!perfil) return null;
+
+  // §13.2: ¿la última está rechazada y sin habilitar? (el historial solo lo lee el admin)
+  const ultima = ultimas?.[0] as { id: string; estado: string } | undefined;
+  let puedeHabilitarCredito = false;
+  if (ultima?.estado === "rechazado") {
+    const { data: habilitada } = await supabase
+      .from("historial_solicitudes")
+      .select("id")
+      .eq("entidad_id", ultima.id)
+      .eq("accion", "credito_habilitado")
+      .limit(1);
+    puedeHabilitarCredito = !habilitada || habilitada.length === 0;
+  }
 
   const adminIds = [...new Set((historial ?? []).map((h) => h.admin_id as string | null).filter(Boolean))] as string[];
   const { data: admins } = adminIds.length
@@ -131,6 +152,7 @@ export async function cargarDetalleProceso(
     },
     estado: esEstadoProceso(proceso?.estado) ? proceso.estado : null,
     fechaInicioEmbargo: (proceso?.fecha_inicio_embargo as string | null) ?? null,
+    puedeHabilitarCredito,
     historial: (historial ?? []).map((h) => ({
       id: Number(h.id),
       estadoAnterior: etiqueta(h.estado_anterior),

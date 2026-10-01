@@ -8,6 +8,8 @@ type Props = {
   valor: string | number | undefined;
   /** Color del número: por defecto el texto claro; «ambar»/«verde» para resaltar (pieza 2d). */
   tono?: "normal" | "ambar" | "verde";
+  /** Línea pequeña bajo la cifra (p. ej. monto desembolsado). */
+  nota?: string;
 };
 
 const TONOS = {
@@ -22,7 +24,7 @@ const TONOS = {
  * mes»). Si `valor` llegara `undefined` (no debería, ver el comentario del
  * tipo `Props`) se muestra un guion en vez de un número inventado.
  */
-export function TarjetaKpi({ etiqueta, valor, tono = "normal" }: Props) {
+export function TarjetaKpi({ etiqueta, valor, tono = "normal", nota }: Props) {
   return (
     <div className="flex flex-col gap-1.5 rounded-20 bg-admin-superficie px-5 py-4.5">
       <span className="text-14 text-admin-texto-3">{etiqueta}</span>
@@ -33,6 +35,7 @@ export function TarjetaKpi({ etiqueta, valor, tono = "normal" }: Props) {
       >
         {valor ?? "—"}
       </span>
+      {nota ? <span className="text-13 text-admin-texto-3">{nota}</span> : null}
     </div>
   );
 }

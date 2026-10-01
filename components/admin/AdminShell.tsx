@@ -25,6 +25,7 @@ type AdminShellProps = {
 };
 
 const TONO_CHIP: Record<Seccion, string> = {
+  resumen: "bg-admin-superficie-2 text-admin-texto-2",
   afiliaciones: "bg-admin-ambar-fondo text-admin-ambar",
   creditos: "bg-admin-verde-fondo text-admin-verde",
   asociados: "bg-admin-superficie-2 text-admin-texto-2",

@@ -27,7 +27,7 @@ vi.mock("next/headers", () => ({
 }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn() }));
 vi.mock("@/lib/supabase/admin", () => ({ crearClienteAdmin: vi.fn() }));
-vi.mock("@/lib/correo/resend", () => ({ enviarPlantillaResend: vi.fn(async () => {}) }));
+vi.mock("@/lib/correo/resend", () => ({ enviarConRespaldo: vi.fn(async () => {}) }));
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";

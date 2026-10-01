@@ -5,19 +5,23 @@ import { useState } from "react";
 import type { EstadoAcumulado, EstadoBuscarCliente } from "@/app/asesor/actions";
 import { BuscarClientePorCedula } from "@/components/asesor/BuscarClientePorCedula";
 import { EncabezadoAsesor } from "@/components/asesor/EncabezadoAsesor";
+import { ResumenAsesor } from "@/components/asesor/ResumenAsesor";
 import { PanelComisiones } from "@/components/asesor/PanelComisiones";
 import { ListaClientesCliente } from "@/app/asesor/ListaClientesCliente";
 import { BarraInferior } from "@/components/ui/BarraInferior";
 import { cx } from "@/components/ui/cx";
 import type { VistaComisiones } from "@/lib/asesor/comisiones";
+import type { MetricasAsesor } from "@/lib/asesor/metricas";
 import type { FilaResumenAsesor } from "@/lib/asesor/resumen";
 
-type Pestana = "clientes" | "comisiones";
+type Pestana = "resumen" | "clientes" | "comisiones";
 
 type PanelAsesorProps = {
   nombre: string;
   filas: FilaResumenAsesor[];
   comisiones: VistaComisiones | null;
+  /** Conteos de la pestaña «Resumen» (4.8); null = no se pudieron cargar. */
+  metricas: MetricasAsesor | null;
   accionSalir?: (formData: FormData) => void;
   /** `revelarAcumulado` (app/asesor/actions.ts). */
   revelar: () => Promise<EstadoAcumulado>;
@@ -31,8 +35,8 @@ const RUTA_SIMULADOR = "/asesor/demo";
  * Panel del asesor (piezas 2c y 3l): pestañas «Mis clientes» (lista + búsqueda por cédula)
  * y «Comisiones». Es una sola pantalla: un solo <h1> visible a la vez.
  */
-export function PanelAsesor({ nombre, filas, comisiones, accionSalir, revelar, buscar }: PanelAsesorProps) {
-  const [pestana, setPestana] = useState<Pestana>("clientes");
+export function PanelAsesor({ nombre, filas, comisiones, metricas, accionSalir, revelar, buscar }: PanelAsesorProps) {
+  const [pestana, setPestana] = useState<Pestana>("resumen");
 
   return (
     <div className="min-h-dvh bg-ga-fondo-suave pb-24 lg:pb-0">
@@ -45,7 +49,15 @@ export function PanelAsesor({ nombre, filas, comisiones, accionSalir, revelar, b
       />
 
       <main className="flex flex-col gap-4 px-5 pb-6 pt-4 md:mx-auto md:max-w-3xl lg:max-w-none lg:gap-6 lg:px-14 lg:py-10">
-        {pestana === "clientes" ? (
+        {pestana === "resumen" ? (
+          <>
+            <div className="flex flex-col gap-0.5 lg:gap-1.5">
+              <span className="text-15 text-ga-texto-3 lg:hidden">Hola, {nombre}</span>
+              <h1 className="m-0 font-display text-30 font-extrabold tracking-titular text-ga-navy lg:text-44">Resumen</h1>
+            </div>
+            <ResumenAsesor metricas={metricas} comisiones={comisiones} onIrAComisiones={() => setPestana("comisiones")} />
+          </>
+        ) : pestana === "clientes" ? (
           <>
             <div className="flex items-start justify-between gap-3">
               <div className="flex flex-col gap-0.5 lg:gap-1.5">
@@ -90,9 +102,9 @@ export function PanelAsesor({ nombre, filas, comisiones, accionSalir, revelar, b
       <BarraInferior>
         <nav
           aria-label="Navegación del asesor"
-          className="grid grid-cols-3 gap-1 rounded-full bg-white p-1.5 shadow-comprobante-movil"
+          className="grid grid-cols-4 gap-1 rounded-full bg-white p-1.5 shadow-comprobante-movil"
         >
-          {(["clientes", "comisiones"] as const).map((clave) => (
+          {(["resumen", "clientes", "comisiones"] as const).map((clave) => (
             <button
               key={clave}
               type="button"
@@ -103,7 +115,7 @@ export function PanelAsesor({ nombre, filas, comisiones, accionSalir, revelar, b
                 pestana === clave ? "bg-ga-verde-claro font-extrabold text-ga-verde-oscuro" : "font-bold text-ga-texto-3",
               )}
             >
-              {clave === "clientes" ? "Clientes" : "Comisiones"}
+              {clave === "resumen" ? "Resumen" : clave === "clientes" ? "Clientes" : "Comisiones"}
             </button>
           ))}
           <form action={accionSalir} className="contents">

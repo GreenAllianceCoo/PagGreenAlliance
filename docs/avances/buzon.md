@@ -14,9 +14,3 @@ Formato (copiar debajo de la línea, uno por tarea):
 
 ---
 
-
-## 2026-09-30 · ga-funcionalidad-botones
-- Actividades: P-xx (política de datos v1.0, sin ID en el plan)
-- Estado: Hecho
-- Qué se hizo: /politica-de-datos publica las 28 secciones + aprobación + anexo de la plataforma, con índice por anclas, aviso «En revisión jurídica» en 7.3, 8 y 18, botón «Descargar en PDF» (window.print) y enlace en el pie de la landing y en la casilla de /afiliacion.
-- Bloqueos o trabajo nuevo: Por definir: horario de atención, órgano y acta de aprobación; TODO(backend): guardar VERSION_POLITICA_DATOS junto a acepto_datos_at (no hay columna de versión).

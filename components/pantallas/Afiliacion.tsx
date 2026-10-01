@@ -208,7 +208,7 @@ export function Afiliacion({
               <Select
                 {...control}
                 name="institucion"
-                defaultValue={institucion}
+                value={institucion}
                 onChange={(e) => alCambiarInstitucion(esInstitucion(e.target.value) ? e.target.value : "")}
               >
                 <option value="">Selecciona tu institución</option>
@@ -239,7 +239,7 @@ export function Afiliacion({
                 {...control}
                 name="grado_id"
                 disabled={!institucion}
-                defaultValue={grado}
+                value={grado}
                 onChange={(e) => setGrado(e.target.value)}
                 className="motion-safe:animate-ga-aparecer"
               >
