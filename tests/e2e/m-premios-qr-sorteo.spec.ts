@@ -213,6 +213,28 @@ test.describe("M2 · Carné con QR", () => {
     await ctx.close();
   });
 
+  test("«Descargar PDF» entrega el carné en PDF; sin sesión no", async ({ browser }, testInfo) => {
+    test.setTimeout(120_000);
+    const ctx = await contextoConSesion(browser, "sinSolicitudes", testInfo);
+    const page = await ctx.newPage();
+    await page.goto("/cuenta/carne");
+    const enlace = page.getByRole("link", { name: "Descargar PDF" });
+    await expect(enlace).toBeVisible();
+    const r = await ctx.request.get("/cuenta/carne/pdf");
+    expect(r.status()).toBe(200);
+    expect(r.headers()["content-type"]).toContain("application/pdf");
+    expect(r.headers()["content-disposition"]).toContain('attachment; filename="carne-green-alliance.pdf"');
+    expect(r.headers()["cache-control"]).toContain("no-store");
+    expect((await r.body()).subarray(0, 5).toString("latin1")).toBe("%PDF-");
+    await ctx.close();
+
+    const anon = await browser.newContext({ baseURL: testInfo.project.use.baseURL });
+    const sin = await anon.request.get("/cuenta/carne/pdf", { maxRedirects: 0 });
+    expect(sin.headers()["content-type"] ?? "").not.toContain("application/pdf");
+    expect(sin.status()).not.toBe(200);
+    await anon.close();
+  });
+
   test("/cuenta/carne sin sesión → /ingresar", async ({ page }) => {
     await page.goto("/cuenta/carne");
     await page.waitForURL("**/ingresar");

@@ -32,3 +32,9 @@ Formato (copiar debajo de la línea, uno por tarea):
 - Estado: Hecho
 - Qué se hizo: migración 20261002400000_ajustes_entrega.sql (sin aplicar) con tope de toques por meta, aperturas y toques separados en admin, verificar_carne solo para activos, regenerar con tope de 1/min y grado con nombre en inscritos; pgTAP 26; tarjeta de inscritos enlaza a /admin/sorteo; limpieza de datos de ejemplo y TODOs viejos.
 - Bloqueos o trabajo nuevo: Sebas debe aplicar la migración nueva (db push --linked) junto con las 4 anteriores.
+
+## 2026-10-01 · ga-funcionalidad-botones
+- Actividades: P-xx (carné: botón «Descargar PDF»; sin ID en plan.json)
+- Estado: Hecho
+- Qué se hizo: «Descargar PDF» en /cuenta/carne; route handler /cuenta/carne/pdf (sesión, solo el propio asociado, inactivo 403, attachment, no-store) con pdf-lib + qrcode (mismo token); vitest (4) y e2e M2 en escritorio y celular. tsc, lint, vitest (599) y build OK.
+- Bloqueos o trabajo nuevo: ninguno. Dependencia nueva: pdf-lib. Diseño del PDF sin revisión visual de ga-diseno-a-codigo.

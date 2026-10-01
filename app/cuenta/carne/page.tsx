@@ -81,6 +81,16 @@ export default async function CarneQrPage() {
           Quien lo escanee verá tu nombre, grado, institución y si estás activo. No muestra tu cédula, celular ni
           datos de crédito. Si lo compartiste por error, regenéralo: el código anterior deja de funcionar.
         </p>
+        {svg ? (
+          // Descarga directa (route handler): <a download>, no navegación de Next.
+          <a
+            href="/cuenta/carne/pdf"
+            download="carne-green-alliance.pdf"
+            className="flex h-12 items-center justify-center rounded-full bg-ga-verde px-8 text-15 font-extrabold text-white no-underline transition-colors duration-200 hover:bg-ga-verde-oscuro hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
+          >
+            Descargar PDF
+          </a>
+        ) : null}
         <BotonRegenerar />
       </section>
     </main>
