@@ -109,7 +109,6 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
         fotos={fotos}
         // La cédula de las «hermanas» sale ya enmascarada del servidor: solo la de la ficha abierta viaja completa.
         hermanas={hermanas.map((h) => ({ ...h, cedula: enmascararCedula(h.cedula) }))}
-        // TODO(diseno: D-09): «Asignar asesor» (P-96). Ver PanelAfiliacionDetalle.tsx.
         perfilAsociado={perfilAsociado}
         asesores={asesores}
       />

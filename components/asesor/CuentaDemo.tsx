@@ -349,11 +349,11 @@ export function CuentaDemo({
           </div>
         </div>
 
-        <section className="flex flex-col gap-4 rounded-18 bg-white p-5 lg:px-7 lg:py-6">
+        <section id="convenios-ejemplo" className="flex flex-col gap-4 rounded-18 bg-white p-5 lg:px-7 lg:py-6">
           <h2 className="m-0 text-18 font-extrabold">Convenios de ejemplo</h2>
           <div className="flex flex-col gap-3 lg:grid lg:grid-cols-5">
             {CONVENIOS.map((convenio) => (
-              <ConvenioCard key={convenio.nombre} convenio={convenio} variante="enlace" href="#" />
+              <ConvenioCard key={convenio.nombre} convenio={convenio} variante="enlace" href="#convenios-ejemplo" />
             ))}
           </div>
         </section>

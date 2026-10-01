@@ -158,7 +158,6 @@ export function PanelComisiones({ comisiones, revelar, hrefSimulador }: PanelCom
             </p>
           ) : null}
 
-          {/* TODO(confirmar: Q-01) los bonos cuentan hoy los embargos operando ahora, no los históricos. */}
           <section aria-labelledby="bonos-titulo" className="flex flex-col gap-3.5 rounded-20 bg-white p-5 lg:rounded-26 lg:px-6 lg:py-6">
             <h2 id="bonos-titulo" className="m-0 text-14 font-extrabold uppercase tracking-[0.04em] text-ga-texto-3">
               Avance hacia los bonos <span className="font-medium normal-case text-ga-deshabilitado-texto">(opcional)</span>

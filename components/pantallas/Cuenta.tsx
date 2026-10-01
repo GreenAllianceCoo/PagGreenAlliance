@@ -222,8 +222,7 @@ function ColumnaLateral({
         {sorteo ? <SorteoDelMes {...sorteo} /> : null}
       </nav>
 
-      {/* https://wa.me/57<NÚMERO> con NEXT_PUBLIC_WHATSAPP. Sin número: sin enlace (aria-disabled).
-          TODO(pendiente-spec): falta el número real. */}
+      {/* https://wa.me/57<NÚMERO> con NEXT_PUBLIC_WHATSAPP. Sin número: sin enlace (aria-disabled). */}
       {whatsappUrl ? (
         <a
           href={whatsappUrl}

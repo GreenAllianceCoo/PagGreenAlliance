@@ -27,6 +27,13 @@ type FilaBoleta = {
   cedula: string | null;
 };
 
+type FilaInscrito = {
+  nombre_completo: string | null;
+  grado: string | null;
+  cedula_enmascarada: string | null;
+  estado: string;
+};
+
 /** Boletas confirmadas del mes elegido (pieza 3g). */
 export default async function SorteoPage({
   searchParams,
@@ -44,11 +51,14 @@ export default async function SorteoPage({
   // select directo (ni el admin): solo por esta RPC, que se autofiltra por
   // es_admin() dentro (quien no sea admin recibe 0 filas).
   const mesClave = `${anio}-${String(mes).padStart(2, "0")}`;
-  const [{ data, error }, { data: sorteoHecho }] = await Promise.all([
+  const [{ data, error }, { data: sorteoHecho }, { data: inscritosData }] = await Promise.all([
     supabase.rpc("boletas_confirmadas_sorteo", { p_anio: anio, p_mes: mes }),
     // §12.10: el admin lee sorteos_mensuales (RLS); una fila = ya se realizó.
     supabase.from("sorteos_mensuales").select("mes").eq("mes", `${mesClave}-01`).maybeSingle(),
+    // Inscritos del mes (nombre, grado, cédula enmascarada; sin número de boleta). Solo admin.
+    supabase.rpc("admin_inscritos_sorteo", { p_anio: anio, p_mes: mes }),
   ]);
+  const inscritos = (inscritosData ?? []) as FilaInscrito[];
 
   const boletas = (data ?? []) as FilaBoleta[];
   // Rango razonable para el selector: desde que existe la app hasta el año siguiente.
@@ -120,6 +130,27 @@ export default async function SorteoPage({
           </ul>
         </>
       )}
+
+      <section aria-labelledby="inscritos-sorteo" className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5">
+        <h2 id="inscritos-sorteo" className="m-0 font-display text-18 font-extrabold">
+          Inscritos del mes · {inscritos.length}
+        </h2>
+        {inscritos.length === 0 ? (
+          <span className="text-15 text-admin-texto-3">Nadie se ha inscrito en este mes.</span>
+        ) : (
+          <ul className="m-0 flex list-none flex-col gap-2 p-0">
+            {inscritos.map((i, n) => (
+              <li key={n} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-15">
+                <span className="font-bold text-white">{i.nombre_completo ?? "—"}</span>
+                <span className="text-admin-texto-2">
+                  {i.grado ?? "Sin grado"} · <span className="font-mono tracking-cedula">{i.cedula_enmascarada ?? "—"}</span>
+                  {i.estado === "confirmada" ? " · confirmada" : " · sin confirmar"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </AdminShell>
   );
 }

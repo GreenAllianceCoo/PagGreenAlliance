@@ -173,13 +173,15 @@ select set_eq(
         'admin_editar_pago_comision', 'admin_anular_pago_comision', 'tabla_credito_con_tasa', 'admin_tasas_solicitudes',
         'admin_marcar_desembolsado', 'admin_cambiar_estado_asociado', 'bonos_acumulados_asesor',
         'admin_realizar_sorteo', 'ganador_sorteo_vigente',
-        'admin_metricas_dashboard', 'asesor_metricas_dashboard', 'admin_habilitar_credito', 'mi_habilitacion_credito'],
+        'admin_metricas_dashboard', 'asesor_metricas_dashboard', 'admin_habilitar_credito', 'mi_habilitacion_credito',
+        'mis_premios_asesor', 'registrar_clic_premios', 'admin_premios_asesores', 'mi_carne_token', 'regenerar_carne_token', 'verificar_carne', 'admin_inscritos_sorteo'],
   'solo estas funciones security definer (que se validan solas) las ejecuta authenticated'
 );
 select is_empty(
   $$ select p.proname::text
        from pg_proc p join pg_namespace n on n.oid = p.pronamespace
       where n.nspname = 'public' and p.prosecdef
+        and p.proname <> 'verificar_carne' -- pública a propósito: solo nombre, grado, institución y activo
         and has_function_privilege('anon', p.oid, 'execute') $$,
   'anon no ejecuta ninguna función security definer'
 );
