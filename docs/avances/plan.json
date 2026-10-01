@@ -969,11 +969,10 @@
       "depende": [
         "6.1"
       ],
-      "estado": "Bloqueado",
+      "estado": "En curso",
       "origen": "Agregado",
       "agente": "ga-verificador-qa (antes Carlos Pardo)",
-      "nota": "25-sep: la máscara ahora oculta también el dominio, formato «xx•••@•••» (ver P-85). 29-sep: entrega revisada sin pruebas propias (ver 5.10); NO fusionable, se pidió rehacer sobre rediseno-c-plus (además ga-verificador-qa ya reescribió b-ingreso y j-produccion el 27-sep como parte de 4.11/6.17, así que el alcance real que falta se reduce a lo que quede desactualizado tras fusionar develop).",
-      "bloqueo": "Docker Desktop se cayó y Supabase local no responde: Sebas reinicia Docker, supabase db reset y corre Playwright (-c tests/e2e/playwright.config.ts)."
+      "nota": "25-sep: la máscara ahora oculta también el dominio, formato «xx•••@•••» (ver P-85). 29-sep: entrega revisada sin pruebas propias (ver 5.10); NO fusionable, se pidió rehacer sobre rediseno-c-plus (además ga-verificador-qa ya reescribió b-ingreso y j-produccion el 27-sep como parte de 4.11/6.17, así que el alcance real que falta se reduce a lo que quede desactualizado tras fusionar develop). 01-oct: e2e al día con v3 y máscara nueva (escritorio 171/4, celular 143/3, fallas corregidas y confirmadas); sigue En curso solo porque depende de 6.1."
     },
     {
       "id": "6.16",
@@ -1105,10 +1104,9 @@
       "depende": [
         "4.14"
       ],
-      "estado": "Bloqueado",
+      "estado": "Hecho",
       "origen": "Agregado",
-      "agente": "ga-verificador-qa",
-      "bloqueo": "Docker Desktop se cayó y Supabase local no responde: Sebas reinicia Docker, supabase db reset y corre Playwright (-c tests/e2e/playwright.config.ts)."
+      "agente": "ga-verificador-qa"
     },
     {
       "id": "6.22",
@@ -1712,9 +1710,9 @@
       "tarea": "F-01: el select «Grado» se vacía tras un error de validación",
       "responsable": "ga-funcionalidad-botones",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "2.11",
-      "nota": "Falla media de la verificación QA 1 (docs/verificaciones/2026-09-23-verificacion-1.md)."
+      "nota": "Falla media de la verificación QA 1 (docs/verificaciones/2026-09-23-verificacion-1.md). 01-oct: corregido (formulario se rehace con key; conserva Institución/Grado)."
     },
     {
       "id": "P-49",
@@ -2427,9 +2425,9 @@
       "tarea": "Docker: db reset + test db local y aplicar la migración 20261001100000 en producción",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "En curso",
       "gantt": "6.24",
-      "nota": "01-oct: Docker Desktop no arranca («unable to start»)."
+      "nota": "01-oct: Docker Desktop no arranca («unable to start»). 01-oct: Docker de vuelta; db test local en verde (22 archivos, 497 pruebas). Falta solo db push --linked de 20261001000000 y 20261001100000 y fusionar develop→main."
     }
   ],
   "bitacora": [
@@ -3006,6 +3004,41 @@
       "tareas": "4.15, 4.7, 4.8",
       "cambio": "4.7, 4.8 y 4.15 Hecho",
       "detalle": "Ícono WhatsApp en el pie, botón «Habilitar nuevo crédito», selector segmentado en la demo, 8 estados y KPI Desembolsos del mes en admin, chips en asesor. e2e sin ejecutar."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "ga-diseno-a-codigo",
+      "tareas": "4.7, 4.8, 4.15",
+      "cambio": "Verificación visual tanda §13",
+      "detalle": "CuentaDemo, WhatsApp en el pie, paneles por estado y desembolsos, HabilitarCredito; tsc, lint, vitest 552 y build en verde."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "ga-auditor-supabase",
+      "tareas": "6.24, P-113",
+      "cambio": "pgTAP 20261001* en verde",
+      "detalle": "Arreglado admin_habilitar_credito (array_append) y pruebas 21 y 10; 22 archivos, 497 pruebas. Falta aplicar en remoto."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "ga-funcionalidad-botones",
+      "tareas": "P-48",
+      "cambio": "QA-01 a QA-05 de /afiliacion corregidos",
+      "detalle": "Texto restaurado, contador, formulario con key (conserva selects, cierra F-01), aviso de fotos rechazadas, tabIndex de SelectBusqueda."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "ga-verificador-qa",
+      "tareas": "6.21, 6.15",
+      "cambio": "6.21 Hecho; 6.15 desbloqueada (En curso)",
+      "detalle": "E2E ajustadas a v3/S-06/crédito: escritorio 171/4, celular 143/3, fallas corregidas y confirmadas. Bug QA-06 reportado."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "sesión principal",
+      "tareas": "6.23, 6.24",
+      "cambio": "QA-06 corregido y develop subido",
+      "detalle": "Aviso de cuenta inactiva en app/ingresar/actions.ts; y-tanda2 escritorio 14/14; commit 7526e7d en develop. Pendiente de Sebas: db push --linked de 20261001000000 y 20261001100000 y fusionar develop→main."
     }
   ]
 }

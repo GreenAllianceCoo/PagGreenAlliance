@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 01-oct-2026 (dashboards 4.7/4.8 y pedidos §13 (4.15) hechos en código; migraciones 20261001000000 y 20261001100000 sin aplicar; Docker caído: db reset, pgTAP y e2e pendientes).
+Actualizado: 01-oct-2026 (QA-01..06 corregidos, e2e y pgTAP en verde, develop en 7526e7d; falta db push --linked de 20261001000000 y 20261001100000 y fusionar develop→main).
 
 ## Dónde quedamos
 
