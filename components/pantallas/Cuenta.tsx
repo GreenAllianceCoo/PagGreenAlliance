@@ -16,6 +16,8 @@ import { enmascararCedula } from "@/lib/mascara";
 import type { Convenio, PasoSolicitud } from "@/lib/mock";
 
 export type CuentaProps = {
+  /** §12.10 (pieza 3q): ganador del sorteo vigente; solo grado y nombre. `null`/ausente = sin banda. */
+  ganadorSorteo?: { mesTexto: string; grado: string; nombre: string } | null;
   nombre: string;
   /** Tope de crédito según el grado (`grados_credito`). */
   tope: string;
@@ -312,6 +314,7 @@ export function Cuenta({
   accionSalir,
   whatsappUrl,
   perfilAsociado,
+  ganadorSorteo,
 }: CuentaProps) {
   // D-16: mensaje si NO puede pedir crédito (no operando, inactivo, sin cupo…); null = puede.
   const creditoBloqueado = perfilAsociado && !perfilAsociado.credito.puedeSolicitar ? perfilAsociado.credito.mensaje : null;
@@ -362,6 +365,18 @@ export function Cuenta({
             </button>
           </form>
         </div>
+
+        {ganadorSorteo ? (
+          <p
+            role="status"
+            className="m-0 flex items-center gap-2.5 rounded-20 bg-ga-ambar-fondo px-4 py-3 text-15 font-bold text-ga-ambar-texto motion-safe:animate-ga-aparecer lg:px-5 lg:text-16"
+          >
+            <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full bg-ga-ambar" />
+            <span>
+              Ganador del sorteo de {ganadorSorteo.mesTexto}: {ganadorSorteo.grado} {ganadorSorteo.nombre}
+            </span>
+          </p>
+        ) : null}
 
         <div className="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:gap-6">
           <section className="relative flex flex-col gap-4 overflow-hidden rounded-28 bg-white p-5 lg:col-span-2 lg:gap-5.5 lg:p-8">

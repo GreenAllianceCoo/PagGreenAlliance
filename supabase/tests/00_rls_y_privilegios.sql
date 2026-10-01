@@ -88,7 +88,9 @@ select is_empty(
                               'admin_actualizar_proceso_ejecutivo', 'crear_alerta_asociado', 'admin_marcar_alerta_atendida',
                               'mi_proceso_ejecutivo', 'revelar_acumulado_comision', 'comisiones_periodo_asesor',
                               'buscar_cliente_asesor', 'admin_editar_pago_comision', 'admin_anular_pago_comision',
-                              'tabla_credito_con_tasa', 'admin_tasas_solicitudes')
+                              'tabla_credito_con_tasa', 'admin_tasas_solicitudes',
+                              'admin_marcar_desembolsado', 'admin_cambiar_estado_asociado', 'bonos_acumulados_asesor',
+                              'admin_realizar_sorteo', 'ganador_sorteo_vigente')
         and (has_function_privilege('authenticated', p.oid, 'execute')
              or has_function_privilege('anon', p.oid, 'execute')) $$,
   'ninguna función security definer fuera de la lista blanca (las que se validan solas) es ejecutable por anon o authenticated'

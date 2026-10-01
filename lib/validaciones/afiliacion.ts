@@ -1,5 +1,9 @@
 import { z } from "zod";
 import {
+  correoInstitucionalValido,
+  MENSAJE_DOMINIO_INSTITUCIONAL,
+} from "@/lib/validaciones/dominiosInstitucionales";
+import {
   esBilletera,
   esEntidadDeLista,
   OPCION_OTRA_ENTIDAD,
@@ -235,6 +239,19 @@ function reglasCruzadas(ctx: ContextoAfiliacion) {
     // Asesor: de la lista que da la base (asesores + admins que atienden).
     if (datos.asesor_id && !ctx.asesores.some((a) => a.id === datos.asesor_id)) {
       z4.addIssue({ code: "custom", path: ["asesor_id"], message: MENSAJES_AFILIACION.asesorLista });
+    }
+
+    // §12.3 (R-04): el correo institucional debe ser del dominio de la institución elegida.
+    if (
+      esInstitucion(datos.institucion) &&
+      datos.correo_institucional &&
+      !correoInstitucionalValido(datos.correo_institucional, datos.institucion)
+    ) {
+      z4.addIssue({
+        code: "custom",
+        path: ["correo_institucional"],
+        message: MENSAJE_DOMINIO_INSTITUCIONAL[datos.institucion],
+      });
     }
 
     // Correos distintos (también lo exige un check de la base).

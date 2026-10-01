@@ -126,3 +126,9 @@ Formato de cada pedido:
 - Qué falta: el estado de «Solicitar crédito» cuando el asociado NO puede pedir: botón deshabilitado (o reemplazado) con el texto «Podrás pedir tu crédito cuando tu proceso esté operando», tanto en la tarjeta de /cuenta como en /cuenta/solicitar. Los otros motivos ya tienen texto: grado sin cupo («Tu grado todavía no tiene cupo de crédito configurado; tu asesor te contactará»), solicitud pendiente y sin grado.
 - Datos y reglas: spec §8 (regla de Sebas): solo si el asociado está activo y su proceso ejecutivo está en «operando»; la base lo vuelve a exigir (trigger de 20260930100200). Datos: `perfilAsociado.credito` = `{ puedeSolicitar, motivo, mensaje }` con motivo `inactivo | sin_grado | sin_cupo | no_operando | pendiente | sin_topes` (lib/asociado/servidor.ts). Inactivo usa el mismo texto que «no operando».
 - Estado: Resuelto → 3p (2026-09-30, ga-disenador-lienzo)
+
+### D-17 a D-21 · Sorteo con ganador, desembolso, baja, dominio de correo y textos de landing (spec §12)
+- Pedido por: sesión principal (respuestas de Ricardo) · 2026-09-30
+- Prioridad: alta
+- Qué falta: D-17 banda «Ganador del sorteo» y crédito «pendiente de desembolso» en /cuenta; D-18 «Tu cuenta está inactiva…»; D-19 admin: «Marcar desembolsado», «Dar de baja»/«Reactivar» y «Realizar sorteo»; D-20 error de dominio del correo institucional (3j); D-21 textos de landing (aprobados en poco tiempo, sin +200, misión con Ejército Nacional).
+- Estado: Resuelto → 3q (2026-09-30, ga-disenador-lienzo)

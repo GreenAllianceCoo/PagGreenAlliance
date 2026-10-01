@@ -18,6 +18,7 @@ vi.mock("@/lib/correo/institucional", () => ({ avisarCorreoInstitucional: vi.fn(
 // F2-04 / S-01: actions-sorteo.ts ahora importa dentroDelLimite (lib/servidor/limite.ts,
 // "server-only" real) para el tope de «Reenviar mi boleta»; se simula igual que el resto.
 vi.mock("@/lib/servidor/limite", () => ({ dentroDelLimite: vi.fn().mockResolvedValue(true) }));
+vi.mock("@/lib/asociado/activo", () => ({ asociadoActivo: vi.fn().mockResolvedValue(true) }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
 import { createClient } from "@/lib/supabase/server";

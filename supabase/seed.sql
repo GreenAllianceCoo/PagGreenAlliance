@@ -204,7 +204,7 @@ update public.perfiles
 --     correo operando.prueba@greenalliance.test · cliente del asesor de
 --     prueba · proceso en «operando» desde hace 25 meses (ya puede pedir la
 --     renovación; retiro anticipado disponible).
---   Asociado 4 · cédula 1234567894 · grado IJ (SIN cupo de crédito) ·
+--   Asociado 4 · cédula 1234567894 · grado SP (grupo IJ, §12.14; el correo «sin.cupo» es histórico) ·
 --     Policía · correo sin.cupo@greenalliance.test · cliente del asesor de
 --     prueba · proceso en «operando» desde el inicio del periodo de
 --     comisiones en curso (= 1 ingreso nuevo del periodo para el asesor).
@@ -249,7 +249,7 @@ insert into auth.users (
   'sin.cupo@greenalliance.test',
   extensions.crypt('Prueba123!', extensions.gen_salt('bf')),
   now(),
-  '{"provider":"email","providers":["email"],"cedula":"1234567894","grado":"IJ"}',
+  '{"provider":"email","providers":["email"],"cedula":"1234567894","grado":"SP"}',
   '{"nombre_completo":"Asociada Sin Cupo de Prueba","telefono":"3005550004"}',
   now(), now(), '', '', '', ''
 );
@@ -282,8 +282,8 @@ update public.perfiles
  where id = '3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b01';
 
 update public.perfiles
-   set cedula = '1234567894', grado = 'IJ', institucion = 'policia',
-       correo_institucional = 'sin.cupo@policia.gov.co',
+   set cedula = '1234567894', grado = 'SP', institucion = 'ejercito',
+       correo_institucional = 'sin.cupo@buzonejercito.mil.co',
        nomina_entidad = 'Nequi', nomina_tipo = 'deposito_electronico', nomina_numero = '3005550004',
        asesor_id = '9f2e6a1c-6b3d-4a2e-9c7a-1d2e3f4a5b6c'
  where id = '3a9c1e52-7b1d-4c3e-8f2a-5d6e7f8a9b02';

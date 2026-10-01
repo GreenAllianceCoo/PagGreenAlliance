@@ -1,6 +1,6 @@
 import "server-only";
 import { registrar } from "@/lib/servidor/registro";
-import { enviarPlantillaResend } from "@/lib/correo/resend";
+import { enviarCorreoTexto, enviarPlantillaResend } from "@/lib/correo/resend";
 
 /** Aviso del resultado. Se conecta al flujo administrativo cuando esté implementado. */
 export async function enviarResultadoCredito(datos: {
@@ -41,6 +41,52 @@ export async function enviarResultadoCredito(datos: {
     registrar("error", {
       evento: "credito_resultado_correo_fallo",
       resultado: datos.resultado,
+      solicitud_id: datos.id,
+      mensaje: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
+/**
+ * §12.2: aviso de que el crédito ya se desembolsó (arranca el conteo de 3
+ * meses). Solo al correo PERSONAL (lleva el monto). Usa la plantilla
+ * `RESEND_TEMPLATE_CREDITO_DESEMBOLSADO` si existe; si no, texto plano.
+ * No bloquea ni lanza.
+ */
+export async function enviarDesembolsoCredito(datos: {
+  id: string;
+  nombre: string;
+  correo: string[];
+  monto: number;
+  /** AAAA-MM-DD */
+  fecha: string;
+  fechaTexto: string;
+}) {
+  const monto = Math.round(datos.monto).toLocaleString("es-CO");
+  const plantilla = process.env.RESEND_TEMPLATE_CREDITO_DESEMBOLSADO;
+  try {
+    if (plantilla) {
+      await enviarPlantillaResend({
+        para: datos.correo,
+        plantilla,
+        variables: { NOMBRE: datos.nombre, MONTO: monto, FECHA: datos.fechaTexto },
+      });
+    } else {
+      await enviarCorreoTexto({
+        para: datos.correo,
+        asunto: "Tu crédito de Green Alliance fue desembolsado",
+        texto: [
+          `Hola ${datos.nombre},`,
+          "",
+          `Tu crédito por $ ${monto} fue desembolsado el ${datos.fechaTexto}. Desde esa fecha empieza a contar tu plazo de 3 meses.`,
+          "",
+          "Cooperativa Green Alliance",
+        ].join("\n"),
+      });
+    }
+  } catch (error) {
+    registrar("error", {
+      evento: "credito_desembolso_correo_fallo",
       solicitud_id: datos.id,
       mensaje: error instanceof Error ? error.message : String(error),
     });

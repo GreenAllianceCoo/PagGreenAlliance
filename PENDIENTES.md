@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 29-sep-2026 (rediseño C+ fusionado a develop: 6.18 Hecho tras suite e2e 290/290; falta solo que Sebas apruebe el PR develop → main para desplegar en producción, con el arreglo de la tasa incluido. Sebas aprobó el botón «Escribir por WhatsApp» y «asignar asesor» en el detalle de afiliación del admin (P-95/P-96 Hechos) y decidió quitar la sección de testimonios de la landing (P-103 Hecho). La primera entrega de Carlos Pardo (ZIP sobre una base anterior al rediseño) no es fusionable; se le pidió rehacerla sobre rediseno-c-plus con un PR por tarea. Ver docs/avances/Avances_Green_Alliance.xlsx)
+Actualizado: 30-sep-2026 (tanda 2 §12 en develop e4b8350, faltan migraciones 20260930200* y develop→main; convenios con videos y PDF; política de datos v1 en revisión del Dr. Breinner).
 
 ## Dónde quedamos
 
@@ -131,7 +131,7 @@ Desarrollador externo, trabaja en su propia rama y entrega por PR a `develop`; c
 - [ ] Dashboard de clientes en `/admin` (métricas, lista con buscador/filtros, detalle y reasignar asesor).
 - [ ] Dashboard del asesor en `/asesor` (métricas de sus clientes, detalle sin celular/correo/Nequi/fotos).
 - [ ] Convenios administrables desde `/admin` (crear, editar, ocultar, ordenar, logo en Storage).
-- [ ] Ley 1581: borrado automático de fotos de afiliaciones rechazadas y motivo de rechazo en `/admin`.
+- [x] Ley 1581: borrado automático de fotos de afiliaciones rechazadas y motivo de rechazo en `/admin`. 30-sep: hecho por agentes (Carlos salió).
 - [ ] Pruebas en celulares reales (Android e iPhone) con informe y capturas.
 - [x] Actualizar `tests/e2e` b-ingreso, i-despliegue y j-produccion al formato nuevo de máscara de correo. 27-sep: se adelantó ga-verificador-qa (b-ingreso y j-produccion corregidos, i-despliegue ya estaba al día).
 

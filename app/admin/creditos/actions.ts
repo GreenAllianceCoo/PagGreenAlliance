@@ -4,10 +4,11 @@ import { revalidatePath } from "next/cache";
 import { registrar } from "@/lib/servidor/registro";
 import { exigirAdmin } from "@/lib/admin/servidor";
 import { correoDeCedula } from "@/lib/ingreso/servidor";
-import { enviarResultadoCredito } from "@/lib/correo/credito";
+import { enviarDesembolsoCredito, enviarResultadoCredito } from "@/lib/correo/credito";
+import { formatearFechaLarga } from "@/lib/fechas";
 import { destinatariosAviso } from "@/lib/correo/destinatarios";
 import { avisarCorreoInstitucional } from "@/lib/correo/institucional";
-import { esquemaResolverCredito } from "@/lib/validaciones/admin";
+import { esquemaMarcarDesembolso, esquemaResolverCredito } from "@/lib/validaciones/admin";
 
 export type EstadoAccionCredito = { error?: string; mensaje?: string };
 
@@ -103,4 +104,82 @@ export async function resolverCredito(
 
   revalidatePath("/admin/creditos");
   return { mensaje: datos.decision === "aprobado" ? "Crédito aprobado." : "Crédito rechazado." };
+}
+
+/** Textos de admin_marcar_desembolsado() listos para mostrar (los demás errores se ocultan). */
+const MENSAJES_DESEMBOLSO = [
+  "Solo un crédito aprobado se puede marcar como desembolsado",
+  "Este crédito ya fue marcado como desembolsado",
+  "La fecha de desembolso no puede ser futura",
+  "La fecha de desembolso no puede ser anterior a la aprobación",
+  "No puede marcar el desembolso de su propio crédito; debe hacerlo otro administrador",
+  "La solicitud no existe",
+];
+
+/**
+ * «Marcar desembolsado» de /admin/creditos (spec §12.2). Solo el admin, por la
+ * RPC `admin_marcar_desembolsado` (la base valida estado, fecha y que no sea
+ * el propio crédito, y deja el historial). Sin fecha = hoy en Colombia. Después
+ * avisa: correo con el monto al personal y aviso sin datos al institucional.
+ * Campos del formulario: `id` y `fecha` (opcional, AAAA-MM-DD).
+ */
+export async function marcarDesembolsado(
+  _previo: EstadoAccionCredito,
+  formData: FormData,
+): Promise<EstadoAccionCredito> {
+  const { supabase } = await exigirAdmin();
+
+  const resultado = esquemaMarcarDesembolso.safeParse({
+    id: formData.get("id"),
+    fecha: formData.get("fecha") ?? undefined,
+  });
+  if (!resultado.success) {
+    return { error: resultado.error.issues[0]?.message ?? "Datos inválidos." };
+  }
+  const datos = resultado.data;
+
+  const { data, error } = await supabase
+    .rpc("admin_marcar_desembolsado", { p_solicitud_id: datos.id, p_fecha: datos.fecha ?? null })
+    .maybeSingle();
+  if (error || !data) {
+    const conocido = MENSAJES_DESEMBOLSO.find((m) => error?.message?.includes(m));
+    if (!conocido) {
+      registrar("error", { evento: "credito_desembolso_fallo", codigo: error?.code, mensaje: error?.message, solicitud_id: datos.id });
+    }
+    return { error: conocido ? `${conocido}.` : "No pudimos marcar el desembolso. Intenta de nuevo." };
+  }
+  const fecha = String((data as { fecha_desembolso: string }).fecha_desembolso).slice(0, 10);
+
+  // Aviso al asociado (no bloquea la respuesta si algo falla).
+  const { data: solicitud } = await supabase
+    .from("solicitudes_credito")
+    .select("asociado_id, monto_solicitado")
+    .eq("id", datos.id)
+    .single();
+  if (solicitud) {
+    const { data: perfil } = await supabase
+      .from("perfiles")
+      .select("nombre_completo, cedula, correo_institucional")
+      .eq("id", solicitud.asociado_id)
+      .single();
+    if (perfil) {
+      const correoPersonal = await correoDeCedula(perfil.cedula);
+      const correo = destinatariosAviso(correoPersonal);
+      await avisarCorreoInstitucional(correoPersonal, perfil.correo_institucional);
+      if (correo.length > 0) {
+        await enviarDesembolsoCredito({
+          id: datos.id,
+          nombre: perfil.nombre_completo,
+          correo,
+          monto: Number(solicitud.monto_solicitado),
+          fecha,
+          fechaTexto: formatearFechaLarga(fecha),
+        });
+      }
+    }
+  }
+
+  revalidatePath("/admin/creditos");
+  revalidatePath("/cuenta");
+  return { mensaje: "Desembolso registrado." };
 }

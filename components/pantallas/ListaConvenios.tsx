@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import { IconoWhatsapp } from "@/components/ui/Iconos";
 import { Modal } from "@/components/ui/Modal";
-import type { Convenio } from "@/lib/convenios";
+import { MEDIO_POR_NIT, type Convenio } from "@/lib/convenios";
 
 type ListaConveniosProps = {
   convenios: Convenio[];
@@ -23,6 +23,7 @@ function Vineta() {
  */
 function DetalleConvenio({ convenio, onCerrar }: { convenio: Convenio; onCerrar: () => void }) {
   const idTitulo = useId();
+  const medio = convenio.nit ? MEDIO_POR_NIT[convenio.nit] : undefined;
   return (
     <Modal abierto onCerrar={onCerrar} tituloId={idTitulo}>
       <div className="flex flex-col gap-3.5 lg:gap-4.5">
@@ -34,6 +35,29 @@ function DetalleConvenio({ convenio, onCerrar }: { convenio: Convenio; onCerrar:
             {convenio.nombre}
           </h2>
         </div>
+        {medio?.tipo === "video" ? (
+          // Sin autoplay; el arrastre de la hoja vive solo en el «grip», no captura los gestos del video.
+          <video
+            controls
+            playsInline
+            preload="none"
+            aria-label={`Video de ${convenio.nombre}`}
+            className="aspect-video w-full rounded-22 bg-ga-navy object-contain"
+          >
+            <source src={medio.src} type="video/mp4" />
+          </video>
+        ) : null}
+        {medio?.tipo === "pdf" ? (
+          <a
+            href={medio.src}
+            download
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex min-h-12.5 items-center justify-center gap-2 rounded-full bg-ga-verde px-5.5 py-2 text-center text-14 font-extrabold text-white no-underline transition-colors duration-200 hover:bg-ga-verde-oscuro hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde lg:text-15"
+          >
+            Descargar presentación (PDF) · {medio.tamano}
+          </a>
+        ) : null}
         {convenio.descripcion ? (
           <p className="m-0 text-14 leading-150 text-ga-texto-2 lg:text-16 lg:leading-155">{convenio.descripcion}</p>
         ) : null}

@@ -20,6 +20,7 @@ import {
   MENSAJE_LIMITE_VERIFICACION,
   segundosParaReenviar,
 } from "@/lib/ingreso/servidor";
+import { MENSAJE_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 import { createClient } from "@/lib/supabase/server";
 
 // ---------------------------------------------------------------------------
@@ -105,7 +106,12 @@ export async function verificarCodigoIngreso(
   } = await supabase.auth.getUser();
   let destino = "/cuenta";
   if (user) {
-    const { data: perfil } = await supabase.from("perfiles").select("rol").eq("id", user.id).single();
+    const { data: perfil } = await supabase.from("perfiles").select("rol, activo").eq("id", user.id).single();
+    // §12.6: cuenta dada de baja → se cierra la sesión recién abierta y se avisa.
+    if (perfil?.activo === false) {
+      await supabase.auth.signOut();
+      return { error: MENSAJE_CUENTA_INACTIVA };
+    }
     if (perfil?.rol === "admin") destino = "/admin";
     else if (perfil?.rol === "asesor") destino = "/asesor";
   }

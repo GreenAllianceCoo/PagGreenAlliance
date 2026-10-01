@@ -21,7 +21,7 @@ export function enlaceWhatsapp(numero: string | undefined) {
 export const WHATSAPP_URL = enlaceWhatsapp(WHATSAPP_DIGITOS);
 
 // Tiempo de respuesta a una solicitud de afiliación (confirmado por la cooperativa).
-export const TIEMPO_RESPUESTA = "4 horas o menos";
+export const TIEMPO_RESPUESTA = "poco tiempo";
 
 // Correo de contacto público.
 export const CORREO_CONTACTO = "soporte@greenallianceco.com";

@@ -1,3 +1,4 @@
+import { MENSAJE_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 // Reglas del crédito que la app necesita conocer. La base las vuelve a
 // validar (trigger chk_monto_solicitud, migración 20260923173355).
 
@@ -10,8 +11,8 @@ export function formatTasa(tasa: number) {
 
 /** Texto de la regla de Sebas (spec-requerimientos-ricardo §8). */
 export const MENSAJE_CREDITO_SOLO_OPERANDO = "Podrás pedir tu crédito cuando tu proceso esté operando";
-/** Mismo texto que el trigger chk_credito_proceso_operando (20260930100200) para inactivos. */
-export const MENSAJE_CREDITO_INACTIVO = MENSAJE_CREDITO_SOLO_OPERANDO;
+/** §12.6: mismo texto que el trigger de crédito de la base para inactivos (20260930200400). */
+export const MENSAJE_CREDITO_INACTIVO = MENSAJE_CUENTA_INACTIVA;
 export const MENSAJE_CREDITO_SIN_GRADO =
   "Tu perfil aún no tiene un grado asignado. Habla con la cooperativa para poder solicitar un crédito.";
 export const MENSAJE_CREDITO_PENDIENTE =

@@ -18,7 +18,7 @@ import { cx } from "@/components/ui/cx";
 const PASOS = ["Enviada", "En revisión", "Aprobada", "Desembolso"] as const;
 const MENSAJES = [
   "Recibimos tu solicitud.",
-  "Esto suele tardar 4 horas o menos.",
+  "Te respondemos en poco tiempo.",
   "¡Aprobada! Te avisamos por correo.",
   "El desembolso va en camino.",
 ] as const;

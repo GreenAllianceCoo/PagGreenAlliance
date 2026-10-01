@@ -6,6 +6,7 @@ import { AvisoCreditoBloqueado } from "@/components/ui/AvisoCreditoBloqueado";
 import { ButtonLink } from "@/components/ui/Button";
 import { IconoSalir, IconoVolver } from "@/components/ui/Iconos";
 import { MENSAJE_CREDITO_SIN_TOPES } from "@/lib/credito";
+import { RUTA_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 import { reglaCreditoDe } from "@/lib/asociado/servidor";
 import { createClient } from "@/lib/supabase/server";
 import { cerrarSesion } from "../actions";
@@ -39,6 +40,9 @@ export default async function SolicitarPage() {
       .order("fecha_solicitud", { ascending: false })
       .limit(1),
   ]);
+
+  // §12.6: cuenta dada de baja → sin datos; se cierra la sesión y se avisa en /ingresar.
+  if (perfil?.activo === false) redirect(RUTA_CUENTA_INACTIVA);
 
   // Regla de crédito (spec-requerimientos-ricardo §1 y §8): activo, grado con
   // cupo (por su GRUPO de crédito) y proceso ejecutivo en «operando», sin

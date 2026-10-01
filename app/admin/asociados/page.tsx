@@ -64,9 +64,17 @@ export default async function AsociadosPage({ searchParams }: { searchParams: Pr
                     {enmascararCedula(f.cedula)} · {f.grado ?? "Sin grado"}
                   </span>
                 </span>
-                <span className={"inline-flex self-start rounded-full px-2.5 py-1 text-13 font-extrabold " + tono}>
-                  {f.estadoProcesoTexto}
-                  {paso ? ` (${paso}/8)` : ""}
+                <span className="flex flex-wrap items-center gap-2">
+                  {/* §12.6 (pieza 3q): chip «Inactivo» para los dados de baja. */}
+                  {f.activo ? null : (
+                    <span className="inline-flex rounded-full bg-admin-rojo-fondo px-2.5 py-1 text-13 font-extrabold text-admin-rojo-2">
+                      Inactivo
+                    </span>
+                  )}
+                  <span className={"inline-flex self-start rounded-full px-2.5 py-1 text-13 font-extrabold " + tono}>
+                    {f.estadoProcesoTexto}
+                    {paso ? ` (${paso}/8)` : ""}
+                  </span>
                 </span>
               </Link>
             );

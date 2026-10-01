@@ -5,6 +5,7 @@ import { actualizarProcesoEjecutivo, type EstadoActualizarProceso } from "@/app/
 import type { DetalleProcesoAsociado as Detalle } from "@/lib/admin/asociados";
 import { ESTADOS_PROCESO, ETIQUETA_ESTADO_PROCESO } from "@/lib/procesoEjecutivo";
 import { BotonAdmin, CampoAdmin, EntradaAdmin, SelectAdmin } from "./CamposAdmin";
+import { BajaAsociado } from "./BajaAsociado";
 import { ToastAdmin } from "./ToastAdmin";
 
 const INICIAL: EstadoActualizarProceso = {};
@@ -81,6 +82,19 @@ export function DetalleProcesoAsociado({ detalle, bloqueado = false }: { detalle
           Guardar cambios
         </BotonAdmin>
       </form>
+
+      {/* §12.6 (pieza 3q): dar de baja / reactivar con motivo obligatorio. */}
+      <div className="flex flex-col gap-2.5 border-t border-admin-borde-sutil pt-4">
+        <h2 className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Estado de la cuenta</h2>
+        <BajaAsociado
+          key={String(asociado.activo)}
+          asociadoId={asociado.id}
+          nombre={asociado.nombre}
+          activo={asociado.activo}
+          bloqueado={bloqueado}
+          onResuelto={setToast}
+        />
+      </div>
 
       <div className="flex flex-col gap-2.5">
         <h2 className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Historial del proceso</h2>

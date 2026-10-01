@@ -87,9 +87,9 @@ describe("vistaSolicitud", () => {
     expect(v.pasos.map((p) => p.estado)).toEqual(["hecho", "actual", "pendiente", "pendiente"]);
     expect(v.pasos[0].fecha).toBeTruthy();
   });
-  it("aprobada: Aprobada hecha con fecha de respuesta", () => {
+  it("aprobada sin desembolso: «Aprobado · pendiente de desembolso» (§12.2)", () => {
     const v = vistaSolicitud({ ...BASE, estado: "aprobado", fecha_respuesta: "2026-09-25T15:00:00Z" });
-    expect(v.estadoTexto).toBe("Aprobada");
+    expect(v.estadoTexto).toBe("Aprobado · pendiente de desembolso");
     expect(v.pasos.map((p) => p.estado)).toEqual(["hecho", "hecho", "hecho", "actual"]);
     expect(v.pasos[2].fecha).toBeTruthy();
   });

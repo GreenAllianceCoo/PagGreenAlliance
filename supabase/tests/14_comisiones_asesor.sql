@@ -67,7 +67,7 @@ select is(
 select is(
   (select grado || '|' || grado_nombre || '|' || estado_proceso || '|' || cupo_50 || '|' || cupo_100
      from public.buscar_cliente_asesor(' 1400000001 ')),
-  'TE|Teniente|operando|2150000|4200000',
+  'TE|Teniente|operando|2500000|5000000',
   'buscar por cédula: su cliente, con estado del proceso y cupos del grupo OF'
 );
 

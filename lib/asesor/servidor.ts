@@ -2,7 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { puedeAtender } from "@/lib/asesor/puedeAtender";
-import { vistaComisiones, type FilaComisionesPeriodo, type VistaComisiones } from "@/lib/asesor/comisiones";
+import { vistaComisiones, type FilaBonosAcumulados, type FilaComisionesPeriodo, type VistaComisiones } from "@/lib/asesor/comisiones";
 import { registrar } from "@/lib/servidor/registro";
 import { createClient } from "@/lib/supabase/server";
 
@@ -44,12 +44,17 @@ export async function cargarComisionesAsesor(
   supabase: SupabaseClient,
   fecha?: string,
 ): Promise<VistaComisiones | null> {
-  const { data, error } = await supabase
-    .rpc("comisiones_periodo_asesor", fecha ? { p_fecha: fecha } : {})
-    .maybeSingle();
+  const [{ data, error }, { data: bonos, error: errorBonos }] = await Promise.all([
+    supabase.rpc("comisiones_periodo_asesor", fecha ? { p_fecha: fecha } : {}).maybeSingle(),
+    // §12.7: bonos acumulativos (nunca se reinician; excluyen a los retirados).
+    supabase.rpc("bonos_acumulados_asesor").maybeSingle(),
+  ]);
   if (error) {
     registrar("error", { evento: "comisiones_periodo_fallo", codigo: error.code, mensaje: error.message });
     return null;
   }
-  return vistaComisiones(data as FilaComisionesPeriodo | null);
+  if (errorBonos) {
+    registrar("error", { evento: "bonos_acumulados_fallo", codigo: errorBonos.code, mensaje: errorBonos.message });
+  }
+  return vistaComisiones(data as FilaComisionesPeriodo | null, (bonos as FilaBonosAcumulados | null) ?? null);
 }

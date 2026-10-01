@@ -86,6 +86,8 @@ export type DetalleProcesoAsociado = {
     institucion: string | null;
     /** Asesor del asociado (RS-01: si es el admin en sesión, no puede cambiar el proceso). */
     asesorId: string | null;
+    /** §12.6: false = dado de baja. */
+    activo: boolean;
   };
   estado: EstadoProceso | null;
   fechaInicioEmbargo: string | null;
@@ -98,7 +100,7 @@ export async function cargarDetalleProceso(
   asociadoId: string,
 ): Promise<DetalleProcesoAsociado | null> {
   const [{ data: perfil }, { data: proceso }, { data: historial }] = await Promise.all([
-    supabase.from("perfiles").select("id, nombre_completo, cedula, grado, institucion, asesor_id").eq("id", asociadoId).maybeSingle(),
+    supabase.from("perfiles").select("id, nombre_completo, cedula, grado, institucion, asesor_id, activo").eq("id", asociadoId).maybeSingle(),
     supabase.from("procesos_ejecutivos").select("estado, fecha_inicio_embargo").eq("asociado_id", asociadoId).maybeSingle(),
     supabase
       .from("historial_proceso_ejecutivo")
@@ -125,6 +127,7 @@ export async function cargarDetalleProceso(
       grado: (perfil.grado as string | null) ?? null,
       institucion: nombreInstitucion(perfil.institucion),
       asesorId: (perfil.asesor_id as string | null) ?? null,
+      activo: perfil.activo !== false,
     },
     estado: esEstadoProceso(proceso?.estado) ? proceso.estado : null,
     fechaInicioEmbargo: (proceso?.fecha_inicio_embargo as string | null) ?? null,

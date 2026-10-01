@@ -24,6 +24,7 @@ type FilaCruda = {
   grado: string;
   fecha_solicitud: string;
   fecha_respuesta: string | null;
+  fecha_desembolso: string | null;
   motivo_rechazo: string | null;
   perfiles: { nombre_completo: string; cedula: string; telefono: string | null } | null;
 };
@@ -48,7 +49,7 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
     supabase
       .from("solicitudes_credito")
       .select(
-        "id, estado, monto_solicitado, porcentaje_devolucion, grado, fecha_solicitud, fecha_respuesta, motivo_rechazo, perfiles:asociado_id(nombre_completo, cedula, telefono)",
+        "id, estado, monto_solicitado, porcentaje_devolucion, grado, fecha_solicitud, fecha_respuesta, fecha_desembolso, motivo_rechazo, perfiles:asociado_id(nombre_completo, cedula, telefono)",
       )
       .eq("estado", estado)
       .order("fecha_solicitud", { ascending: false }),
@@ -83,6 +84,7 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
     grado: f.grado,
     fecha_solicitud: f.fecha_solicitud,
     fecha_respuesta: f.fecha_respuesta,
+    fecha_desembolso: f.fecha_desembolso ? String(f.fecha_desembolso).slice(0, 10) : null,
     motivo_rechazo: f.motivo_rechazo,
     nombre: f.perfiles?.nombre_completo ?? "—",
     cedula: f.perfiles?.cedula ?? "—",

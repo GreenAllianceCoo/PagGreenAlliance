@@ -4,7 +4,12 @@ import { revalidatePath } from "next/cache";
 import { exigirAdmin } from "@/lib/admin/servidor";
 import { registrar } from "@/lib/servidor/registro";
 import { erroresPorCampo, textoDe } from "@/lib/validaciones/comunes";
-import { esquemaActualizarProceso, type CampoActualizarProceso } from "@/lib/validaciones/admin";
+import {
+  esquemaActualizarProceso,
+  esquemaCambiarEstadoAsociado,
+  type CampoActualizarProceso,
+  type CampoEstadoAsociado,
+} from "@/lib/validaciones/admin";
 
 export type EstadoActualizarProceso = {
   errores?: Partial<Record<CampoActualizarProceso, string>>;
@@ -63,4 +68,62 @@ export async function actualizarProcesoEjecutivo(
   revalidatePath("/admin/asociados");
   revalidatePath(`/admin/asociados/${asociadoId}`);
   return { mensaje: "Proceso actualizado." };
+}
+
+export type EstadoCambiarEstadoAsociado = {
+  errores?: Partial<Record<CampoEstadoAsociado, string>>;
+  error?: string;
+  mensaje?: string;
+};
+
+/** Textos de admin_cambiar_estado_asociado() listos para mostrar. */
+const MENSAJES_ESTADO_ASOCIADO = [
+  "No puedes cambiar tu propio estado; debe hacerlo otro administrador",
+  "El motivo debe tener entre 5 y 300 caracteres",
+  "El asociado no existe",
+  "El asociado ya está activo",
+  "El asociado ya está dado de baja",
+];
+
+/**
+ * «Dar de baja» / «Reactivar» del detalle del asociado (spec §12.6). Solo el
+ * admin, por la RPC `admin_cambiar_estado_asociado` (motivo obligatorio,
+ * historial en `historial_estado_asociado`; un update directo de
+ * `perfiles.activo` lo rechaza la base). La baja deja `activo = false`: el
+ * servidor corta /cuenta en cada carga, así que la sesión queda inservible.
+ * Campos del formulario: `asociadoId`, `activo` («false» = dar de baja,
+ * «true» = reactivar) y `motivo`.
+ */
+export async function cambiarEstadoAsociado(
+  _previo: EstadoCambiarEstadoAsociado,
+  formData: FormData,
+): Promise<EstadoCambiarEstadoAsociado> {
+  const { supabase } = await exigirAdmin();
+
+  const resultado = esquemaCambiarEstadoAsociado.safeParse({
+    asociadoId: textoDe(formData, "asociadoId"),
+    activo: textoDe(formData, "activo"),
+    motivo: textoDe(formData, "motivo"),
+  });
+  if (!resultado.success) {
+    return { errores: erroresPorCampo<CampoEstadoAsociado | "activo">(resultado.error) as EstadoCambiarEstadoAsociado["errores"] };
+  }
+  const { asociadoId, activo, motivo } = resultado.data;
+
+  const { error } = await supabase.rpc("admin_cambiar_estado_asociado", {
+    p_asociado_id: asociadoId,
+    p_activo: activo,
+    p_motivo: motivo,
+  });
+  if (error) {
+    const conocido = MENSAJES_ESTADO_ASOCIADO.find((m) => error.message?.includes(m));
+    if (!conocido) {
+      registrar("error", { evento: "admin_estado_asociado_fallo", codigo: error.code, mensaje: error.message });
+    }
+    return { error: conocido ? `${conocido}.` : "No pudimos guardar el cambio. Intenta de nuevo." };
+  }
+
+  revalidatePath("/admin/asociados");
+  revalidatePath(`/admin/asociados/${asociadoId}`);
+  return { mensaje: activo ? "Asociado reactivado." : "Asociado dado de baja." };
 }

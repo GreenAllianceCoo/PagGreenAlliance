@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { RUTA_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 import { cargarPerfilAsociado } from "@/lib/asociado/servidor";
 import { WHATSAPP_URL } from "@/lib/config";
 import { cargarConvenios } from "@/lib/conveniosServidor";
 import { textoTope, vistaSolicitud, type FilaSolicitud } from "@/lib/cuenta";
 import { hoyBogota } from "@/lib/fechas";
 import { enmascararCorreo } from "@/lib/mascara";
+import { cargarGanadorSorteo } from "@/lib/sorteo/ganador";
 import { activarVistaPreviaSorteo } from "@/lib/sorteo/demo";
 import { fechaBogota } from "@/lib/sorteo/fecha";
 import { vistaSorteo, type FilaBoletaSorteo } from "@/lib/sorteo/vista";
@@ -38,11 +40,11 @@ export default async function CuentaPage({
   const { anio, mes } = fechaBogota(ahora);
 
   // Todo con la sesión del usuario (RLS): solo ve lo suyo. Nunca la tasa.
-  const [{ data: solicitudes }, { data: boletaCruda }, convenios] = await Promise.all([
+  const [{ data: solicitudes }, { data: boletaCruda }, convenios, ganadorSorteo] = await Promise.all([
     supabase
       .from("solicitudes_credito")
       .select(
-        "estado, monto_solicitado, porcentaje_devolucion, plazo_meses, fecha_solicitud, fecha_respuesta",
+        "estado, monto_solicitado, porcentaje_devolucion, plazo_meses, fecha_solicitud, fecha_respuesta, fecha_desembolso",
       )
       .eq("asociado_id", user.id)
       .order("fecha_solicitud", { ascending: false })
@@ -51,6 +53,7 @@ export default async function CuentaPage({
     // solo devuelve valor cuando la boleta ya está "confirmada".
     supabase.rpc("mi_boleta_sorteo", { p_anio: anio, p_mes: mes }).maybeSingle(),
     cargarConvenios(),
+    cargarGanadorSorteo(supabase),
   ]);
   const boleta = boletaCruda as FilaBoletaSorteo | null;
   const ultima = (solicitudes?.[0] as FilaSolicitud | undefined) ?? null;
@@ -62,6 +65,9 @@ export default async function CuentaPage({
     tienePendiente: ultima?.estado === "pendiente",
     hoy,
   });
+
+  // §12.6: cuenta dada de baja → sin datos; se cierra la sesión y se avisa en /ingresar.
+  if (perfil && !perfil.activo) redirect(RUTA_CUENTA_INACTIVA);
 
   // Vista previa del sorteo SOLO en desarrollo (?sorteo=demo).
   const { sorteo: parametroSorteo } = await searchParams;
@@ -96,6 +102,7 @@ export default async function CuentaPage({
       whatsappUrl={WHATSAPP_URL}
       accionSalir={cerrarSesion}
       perfilAsociado={perfil}
+      ganadorSorteo={ganadorSorteo}
     />
   );
 }

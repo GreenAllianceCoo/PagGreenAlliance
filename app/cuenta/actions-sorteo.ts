@@ -9,6 +9,8 @@
  * (cookies), igual que el resto de /cuenta.
  */
 import { revalidatePath } from "next/cache";
+import { asociadoActivo } from "@/lib/asociado/activo";
+import { MENSAJE_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 import { registrar } from "@/lib/servidor/registro";
 import { dentroDelLimite } from "@/lib/servidor/limite";
 import { enviarBoletaSorteo } from "@/lib/correo/sorteo";
@@ -78,9 +80,11 @@ export async function participarSorteo(): Promise<EstadoParticiparSorteo> {
   // pero la Server Action es la barrera real: nadie participa llamándola directo.
   const { data: perfil } = await supabase
     .from("perfiles")
-    .select("nombre_completo, rol, correo_institucional")
+    .select("nombre_completo, rol, correo_institucional, activo")
     .eq("id", user.id)
     .single();
+  // §12.6: un asociado dado de baja no participa (la base también lo bloquea).
+  if (perfil?.activo === false) return { error: MENSAJE_CUENTA_INACTIVA };
   if (perfil?.rol !== "asociado") {
     registrar("warn", { evento: "sorteo_participar_rol_no_asociado", rol: perfil?.rol });
     return { error: MENSAJE_ERROR_GENERICO };
@@ -126,6 +130,8 @@ export async function confirmarBoletaSorteo(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { error: MENSAJE_SIN_SESION };
+
+  if (!(await asociadoActivo(supabase, user.id))) return { error: MENSAJE_CUENTA_INACTIVA };
 
   const resultado = esquemaNumeroBoleta.safeParse(leerNumeroBoleta(formData));
   if (!resultado.success) return { error: MENSAJE_NUMERO_BOLETA_INVALIDO };
@@ -202,6 +208,8 @@ export async function reenviarBoletaSorteo(): Promise<EstadoReenviarSorteo> {
     registrar("error", { evento: "sorteo_reenviar_sin_correo" });
     return { error: MENSAJE_ERROR_GENERICO };
   }
+
+  if (!(await asociadoActivo(supabase, user.id))) return { error: MENSAJE_CUENTA_INACTIVA };
 
   const dentro = await dentroDelLimite("sorteo_reenviar", user.id, MAX_REENVIOS_POR_DIA, VENTANA_REENVIO_SEGUNDOS);
   if (!dentro) {

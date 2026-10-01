@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { RealizarSorteo } from "@/components/admin/RealizarSorteo";
 import { SelectorMes } from "@/components/admin/SelectorMes";
 import { exigirAdmin } from "@/lib/admin/servidor";
+import { nombreMes } from "@/lib/sorteo/fecha";
 
 export const metadata: Metadata = { title: "Sorteo · Admin · Green Alliance" };
 
@@ -41,7 +43,12 @@ export default async function SorteoPage({
   // F2-01 (20260924000600): la columna `numero` ya no se puede leer por
   // select directo (ni el admin): solo por esta RPC, que se autofiltra por
   // es_admin() dentro (quien no sea admin recibe 0 filas).
-  const { data, error } = await supabase.rpc("boletas_confirmadas_sorteo", { p_anio: anio, p_mes: mes });
+  const mesClave = `${anio}-${String(mes).padStart(2, "0")}`;
+  const [{ data, error }, { data: sorteoHecho }] = await Promise.all([
+    supabase.rpc("boletas_confirmadas_sorteo", { p_anio: anio, p_mes: mes }),
+    // §12.10: el admin lee sorteos_mensuales (RLS); una fila = ya se realizó.
+    supabase.from("sorteos_mensuales").select("mes").eq("mes", `${mesClave}-01`).maybeSingle(),
+  ]);
 
   const boletas = (data ?? []) as FilaBoleta[];
   // Rango razonable para el selector: desde que existe la app hasta el año siguiente.
@@ -53,6 +60,10 @@ export default async function SorteoPage({
         <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Sorteo mensual</h1>
         <SelectorMes anio={anio} mes={mes} anios={anios} />
       </div>
+
+      {error ? null : (
+        <RealizarSorteo mes={mesClave} mesTexto={nombreMes(mes)} yaRealizado={Boolean(sorteoHecho)} hayParticipantes={boletas.length > 0} />
+      )}
 
       {error ? (
         <p className="m-0 rounded-12 bg-admin-superficie p-4 text-15 text-admin-rojo-2">No pudimos cargar las boletas.</p>

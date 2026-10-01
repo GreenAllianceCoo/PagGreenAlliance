@@ -4,10 +4,11 @@
 
 // Los «grados» del simulador son los GRUPOS de crédito (PP, PT, SI, IT, OF):
 // las filas de grados_credito, no los 17 grados del catálogo `grados`.
-import { GRUPOS_CREDITO as GRADOS, type GrupoCredito as CodigoGrado } from "@/lib/gradosCatalogo";
+import { GRUPOS_CREDITO, type GrupoCredito as CodigoGrado } from "@/lib/gradosCatalogo";
 import { MONTO_MINIMO, formatTasa } from "@/lib/credito";
 
-export { GRADOS };
+/** §12.1: el grupo OF solo queda por datos antiguos; ningún grado seleccionable lo usa, así que el simulador no lo ofrece. */
+export const GRADOS: readonly CodigoGrado[] = GRUPOS_CREDITO.filter((g) => g !== "OF");
 export type { CodigoGrado };
 
 /** «Cliente» de ejemplo que se le muestra a la persona interesada. Nunca es un dato real. */
@@ -42,6 +43,10 @@ export const NOMBRE_GRADO: Record<CodigoGrado, string> = {
   SI: "SI",
   IT: "IT",
   OF: "OF",
+  IJ: "IJ",
+  CT: "CT",
+  MY: "MY",
+  TC: "TC",
 };
 
 /** Tope más alto (entre 50 % y 100 %) del grado elegido, para la tarjeta «Tope disponible». */

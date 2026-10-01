@@ -58,10 +58,7 @@ export const GRADOS_EJEMPLO: Grado[] = [];
 
 /** Cifras de la landing (pendientes de confirmar con la cooperativa). */
 export const ESTADISTICAS_EJEMPLO = {
-  asociados: "+200",
   creditosAprobados: "[N]",
-  tiempoRespuesta: "4 horas o menos",
-  /** El diseño de celular abrevia el placeholder a «[T]» por falta de espacio. */
-  tiempoRespuestaCorto: "≤ 4 h",
+  tiempoRespuesta: "poco tiempo",
 };
 
