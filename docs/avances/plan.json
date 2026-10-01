@@ -733,10 +733,10 @@
         "4.1",
         "5.1"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
-      "agente": "ga-funcionalidad-botones (antes Carlos Pardo)",
-      "nota": "29-sep: primera entrega NO fusionable — usa columnas y un bucket de Storage inexistentes, y las acciones no tienen exigirAdmin ni validación. Se le pidió rehacer sobre rediseno-c-plus con PR propio; ver P-69."
+      "agente": "ga-funcionalidad-botones + ga-auditor-supabase",
+      "nota": "29-sep: primera entrega NO fusionable — usa columnas y un bucket de Storage inexistentes, y las acciones no tienen exigirAdmin ni validación. Se le pidió rehacer sobre rediseno-c-plus con PR propio; ver P-69. 01-oct: hecho por agentes (ga-auditor-supabase migración 20261002000000 + F2-08; ga-funcionalidad-botones /admin/convenios con exigirAdmin+zod, logo en bucket convenios-logos; revisión de seguridad sin críticos, S-30 SVG quitado, S-32 corregido, S-31 aceptado bajo; e2e l-convenios-carne en verde). Falta aplicar 20261002000000 en producción (6.25/P-114)."
     },
     {
       "id": "5.10",
@@ -1141,9 +1141,10 @@
       "depende": [
         "6.22"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
-      "agente": "ga-disenador-lienzo + ga-diseno-a-codigo"
+      "agente": "ga-disenador-lienzo + ga-diseno-a-codigo",
+      "nota": "01-oct: CarneVirtual.tsx en /cuenta alineado al lienzo 3u (D-25), acotado a 700 px (QA-08). QR en el carné: decisión de la cooperativa (P-115)."
     },
     {
       "id": "5.13",
@@ -1166,9 +1167,10 @@
       "depende": [
         "4.14"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
-      "agente": "Sebas"
+      "agente": "Sebas",
+      "nota": "01-oct: aplicada en producción."
     },
     {
       "id": "6.24",
@@ -1179,6 +1181,20 @@
         "4.15",
         "4.7",
         "4.8"
+      ],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "Sebas",
+      "nota": "01-oct: aplicada en producción."
+    },
+    {
+      "id": "6.25",
+      "fase": 6,
+      "actividad": "Aplicar la migración 20261002000000 (convenios administrables, bucket convenios-logos, F2-08) en producción y fusionar develop→main (e2523de)",
+      "peso": 1,
+      "simultanea": false,
+      "depende": [
+        "5.9"
       ],
       "estado": "Pendiente",
       "origen": "Agregado",
@@ -1743,9 +1759,9 @@
       "tarea": "Correo «Ingreso aceptado» (plantilla ga-ingreso-aceptado): acción del admin que aprueba la afiliación, crea el usuario y envía el correo",
       "responsable": "ga-funcionalidad-botones",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "4.5",
-      "nota": "No implementado en la app. Requiere RESEND_TEMPLATE_INGRESO_ACEPTADO (P-44). Ver docs/resend-plantillas.md."
+      "nota": "01-oct: verificado en el código: aprobarAfiliacion (app/admin/afiliaciones/actions.ts) crea el usuario y envía enviarIngresoAceptado (lib/correo/ingreso.ts)."
     },
     {
       "id": "P-52",
@@ -1765,9 +1781,9 @@
       "tarea": "A 320 px la línea «COOPERATIVA» del logo mide ~5 px de alto (opcional: ocultarla o achicar «Ingresar» bajo 360 px)",
       "responsable": "Yo",
       "prioridad": "Baja",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "",
-      "nota": "Menor y opcional, reportado por ga-verificador-responsive el 23-sep."
+      "nota": "Menor y opcional, reportado por ga-verificador-responsive el 23-sep. 01-oct: el logo horizontal oculta «COOPERATIVA» bajo 360 px."
     },
     {
       "id": "P-54",
@@ -1787,9 +1803,9 @@
       "tarea": "Opcional: revocar la secuencia limites_intentos_id_seq a anon y authenticated",
       "responsable": "Yo + ga-auditor-supabase",
       "prioridad": "Baja",
-      "estado": "En curso",
+      "estado": "Hecho",
       "gantt": "6.8",
-      "nota": "Sugerido por ga-auditor-supabase en la auditoría de P-43. 30-sep: revoke incluido en la migración 20261001000000 (pgTAP 20 en verde); falta aplicarla (6.23)."
+      "nota": "Sugerido por ga-auditor-supabase en la auditoría de P-43. 30-sep: revoke incluido en la migración 20261001000000 (pgTAP 20 en verde); falta aplicarla (6.23). 01-oct: aplicada en producción con 20261001000000."
     },
     {
       "id": "P-56",
@@ -1809,9 +1825,9 @@
       "tarea": "Agregar /asesor al matcher de proxy.ts y redirigir por rol tras el login",
       "responsable": "ga-funcionalidad-botones",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "4.6",
-      "nota": "Hoy un asesor que ingresa cae en /cuenta, no en /asesor; la página /asesor igual se protege por su cuenta si se navega directo."
+      "nota": "01-oct: verificado en el código: /asesor en el matcher de proxy.ts y redirección por rol en app/ingresar/actions.ts."
     },
     {
       "id": "P-58",
@@ -1908,9 +1924,9 @@
       "tarea": "Dashboard de clientes en /admin: métricas (asociados por grado/institución, afiliaciones y créditos pendientes, montos del mes, inscritos al sorteo), lista con buscador/filtros, detalle de cliente y reasignar asesor",
       "responsable": "Carlos Pardo",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "4.7",
-      "nota": "Encargo externo (500.000 COP) por PR a develop. Ver P-73. 30-sep: Carlos salió; pasa a ga-funcionalidad-botones."
+      "nota": "Encargo externo (500.000 COP) por PR a develop. Ver P-73. 30-sep: Carlos salió; pasa a ga-funcionalidad-botones. 01-oct: verificado en el código y cerrado con 4.7 (ResumenAdmin, /admin/asociados con buscador y detalle, asignarAsesor). «Inscritos al sorteo» sigue en P-111."
     },
     {
       "id": "P-67",
@@ -1919,9 +1935,9 @@
       "tarea": "Dashboard del asesor en /asesor: métricas de sus clientes y detalle de cliente sin celular, correo, Nequi ni fotos",
       "responsable": "Carlos Pardo",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "4.8",
-      "nota": "Encargo externo (500.000 COP) por PR a develop. Ver P-73. 30-sep: Carlos salió; pasa a ga-funcionalidad-botones."
+      "nota": "Encargo externo (500.000 COP) por PR a develop. Ver P-73. 30-sep: Carlos salió; pasa a ga-funcionalidad-botones. 01-oct: verificado en el código y cerrado con 4.8 (/asesor con métricas; el loader no selecciona celular, correo, Nequi ni fotos)."
     },
     {
       "id": "P-68",
@@ -1930,9 +1946,9 @@
       "tarea": "Convenios administrables desde /admin (crear, editar, ocultar, ordenar, logo en Storage); landing y /cuenta leen de la tabla convenios",
       "responsable": "Carlos Pardo",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "5.9",
-      "nota": "Encargo externo (500.000 COP) por PR a develop. Ver P-73. 30-sep: Carlos salió; pasa a ga-funcionalidad-botones."
+      "nota": "Encargo externo (500.000 COP) por PR a develop. Ver P-73. 30-sep: Carlos salió; pasa a ga-funcionalidad-botones. 01-oct: hecho por agentes (5.9); falta aplicar 20261002000000 (P-114)."
     },
     {
       "id": "P-69",
@@ -1985,9 +2001,9 @@
       "tarea": "Pagar a Carlos Pardo 150.000 COP (cierre del encargo; no sigue en el proyecto)",
       "responsable": "Sebas",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "",
-      "nota": "Pago único por P-66 a P-71 (4.7, 4.8, 5.9, 5.10, 6.14, 6.15). Cada PR de Carlos lo revisa un agente ga-* antes de fusionarlo a develop."
+      "nota": "Pago único por P-66 a P-71 (4.7, 4.8, 5.9, 5.10, 6.14, 6.15). Cada PR de Carlos lo revisa un agente ga-* antes de fusionarlo a develop. 01-oct: pagado por Sebas."
     },
     {
       "id": "P-74",
@@ -2150,9 +2166,9 @@
       "tarea": "F2-08: tr_componer_nombre_afiliacion no cubre el update directo de solicitudes_afiliacion.nombre por un admin",
       "responsable": "ga-auditor-supabase",
       "prioridad": "Baja",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "1.6",
-      "nota": "Documentado en docs/auditorias/2026-09-24-fase-2.md; confirmado sin corregir por ga-revisor-seguridad el 25-sep. Un admin puede reescribir `nombre` por SQL directo, y ese texto lo usan el correo «Ingreso aceptado» y el nombre_completo del perfil. Solo afecta a admins."
+      "nota": "Documentado en docs/auditorias/2026-09-24-fase-2.md; confirmado sin corregir por ga-revisor-seguridad el 25-sep. Un admin puede reescribir `nombre` por SQL directo, y ese texto lo usan el correo «Ingreso aceptado» y el nombre_completo del perfil. Solo afecta a admins. 01-oct: corregido en la migración 20261002000000 (pgTAP 05 ajustado); se aplica con P-114."
     },
     {
       "id": "P-89",
@@ -2381,9 +2397,9 @@
       "tarea": "Backlog: carné virtual del asociado",
       "responsable": "ga-diseno-a-codigo",
       "prioridad": "Baja",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "5.12",
-      "nota": "Spec §12.12"
+      "nota": "Spec §12.12 01-oct: carné virtual en /cuenta (5.12)."
     },
     {
       "id": "P-110",
@@ -2392,9 +2408,9 @@
       "tarea": "Aplicar la migración 20261001000000 antes de desplegar (sin ella falla el insert de afiliación por la columna version_politica_datos)",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.23",
-      "nota": "30-sep: reportado por ga-auditor-supabase y ga-funcionalidad-botones."
+      "nota": "30-sep: reportado por ga-auditor-supabase y ga-funcionalidad-botones. 01-oct: aplicada en producción."
     },
     {
       "id": "P-111",
@@ -2425,9 +2441,31 @@
       "tarea": "Docker: db reset + test db local y aplicar la migración 20261001100000 en producción",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "En curso",
+      "estado": "Hecho",
       "gantt": "6.24",
-      "nota": "01-oct: Docker Desktop no arranca («unable to start»). 01-oct: Docker de vuelta; db test local en verde (22 archivos, 497 pruebas). Falta solo db push --linked de 20261001000000 y 20261001100000 y fusionar develop→main."
+      "nota": "01-oct: Docker Desktop no arranca («unable to start»). 01-oct: Docker de vuelta; db test local en verde (22 archivos, 497 pruebas). Falta solo db push --linked de 20261001000000 y 20261001100000 y fusionar develop→main. 01-oct: 20261001000000 y 20261001100000 aplicadas en producción."
+    },
+    {
+      "id": "P-114",
+      "categoria": "Configuración",
+      "area": "Base de datos",
+      "tarea": "Aplicar la migración 20261002000000 en producción y fusionar develop→main (commit e2523de)",
+      "responsable": "Sebas",
+      "prioridad": "Alta",
+      "estado": "Pendiente",
+      "gantt": "6.25",
+      "nota": "01-oct: sin ella /admin/convenios y la lectura de convenios por visible/orden fallan en producción (el loader tiene respaldo en CONVENIOS). Probar subida de logo con un admin real."
+    },
+    {
+      "id": "P-115",
+      "categoria": "Decisión",
+      "area": "/cuenta",
+      "tarea": "¿El carné virtual lleva un código QR?",
+      "responsable": "Cooperativa",
+      "prioridad": "Baja",
+      "estado": "Pendiente",
+      "gantt": "5.12",
+      "nota": "01-oct: planteado por ga-disenador-lienzo al maquetar 3u."
     }
   ],
   "bitacora": [
@@ -3039,6 +3077,62 @@
       "tareas": "6.23, 6.24",
       "cambio": "QA-06 corregido y develop subido",
       "detalle": "Aviso de cuenta inactiva en app/ingresar/actions.ts; y-tanda2 escritorio 14/14; commit 7526e7d en develop. Pendiente de Sebas: db push --linked de 20261001000000 y 20261001100000 y fusionar develop→main."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "ga-diseno-a-codigo",
+      "tareas": "5.12, P-109, P-53",
+      "cambio": "Carné virtual y logo bajo 360 px",
+      "detalle": "CarneVirtual.tsx en /cuenta; el logo horizontal oculta «COOPERATIVA» bajo 360 px. Pidió D-25 al lienzo."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "ga-auditor-supabase",
+      "tareas": "5.9, P-68, P-88",
+      "cambio": "Migración 20261002000000 y F2-08",
+      "detalle": "Convenios administrables (orden, visible, logo_path, medios, bucket convenios-logos solo admin) y corrección F2-08; pgTAP 23 archivos / 522 pruebas en verde. Sin aplicar en producción (6.25/P-114)."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "ga-funcionalidad-botones",
+      "tareas": "5.9, P-68",
+      "cambio": "/admin/convenios hecho",
+      "detalle": "CRUD con exigirAdmin + zod + registro, logo validado en servidor; landing y /cuenta leen de la tabla con respaldo; 30 pruebas unitarias nuevas, vitest 582 y build en verde."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "ga-revisor-seguridad",
+      "tareas": "5.9, P-68",
+      "cambio": "Revisión sin críticos ni altos",
+      "detalle": "S-30 (filtro SVG saltable) y S-32 corregidos según la sesión principal; S-31 aceptado como bajo. npm audit 0."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "ga-disenador-lienzo",
+      "tareas": "5.12, 5.9",
+      "cambio": "Lienzo t3: 3u, 3v, 3w (D-25, D-26)",
+      "detalle": "Carné virtual, /admin/convenios y logo en tarjetas/chips/detalle. Decisión pendiente de la cooperativa sobre QR en el carné (P-115)."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "ga-verificador-qa",
+      "tareas": "5.9, 5.12, 6.3",
+      "cambio": "e2e final en verde",
+      "detalle": "Escritorio 174/3 (fallas de prueba corregidas), celular 146/0; nueva l-convenios-carne.spec.ts. QA-07 (textos con SVG) y QA-08 corregidos."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "ga-diseno-a-codigo",
+      "tareas": "5.12, 5.9",
+      "cambio": "D-25 y D-26 al código",
+      "detalle": "Carné con wordmark blanco y enlace a convenios (700 px); logo de marca en tarjeta, chip y detalle con respaldo; GestorConvenios al lienzo 3v."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "sesión principal",
+      "tareas": "6.23, 6.24, P-73, P-51, P-57, P-66, P-67, 6.25",
+      "cambio": "Migraciones aplicadas, pago a Carlos y cierres verificados",
+      "detalle": "20261001000000 y 20261001100000 aplicadas en producción; pago de 150.000 COP a Carlos hecho. P-51, P-57, P-66 y P-67 verificados contra el código y cerrados. Nuevo 6.25/P-114: Sebas aplica 20261002000000 y fusiona develop→main (e2523de)."
     }
   ]
 }

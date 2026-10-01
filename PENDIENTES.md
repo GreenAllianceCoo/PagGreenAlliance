@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 01-oct-2026 (QA-01..06 corregidos, e2e y pgTAP en verde, develop en 7526e7d; falta db push --linked de 20261001000000 y 20261001100000 y fusionar develop→main).
+Actualizado: 01-oct-2026 (migraciones 20261001000000 y 20261001100000 aplicadas; convenios administrables y carné hechos; falta aplicar 20261002000000 y fusionar develop→main, e2523de).
 
 ## Dónde quedamos
 
@@ -128,9 +128,9 @@ Se decidió código por correo en vez de contraseña. Configurar en el panel de 
 
 Desarrollador externo, trabaja en su propia rama y entrega por PR a `develop`; cada PR lo revisa un agente `ga-*` antes de fusionar.
 
-- [ ] Dashboard de clientes en `/admin` (métricas, lista con buscador/filtros, detalle y reasignar asesor).
-- [ ] Dashboard del asesor en `/asesor` (métricas de sus clientes, detalle sin celular/correo/Nequi/fotos).
-- [ ] Convenios administrables desde `/admin` (crear, editar, ocultar, ordenar, logo en Storage).
+- [x] Dashboard de clientes en `/admin` (métricas, lista con buscador/filtros, detalle y reasignar asesor).
+- [x] Dashboard del asesor en `/asesor` (métricas de sus clientes, detalle sin celular/correo/Nequi/fotos).
+- [x] Convenios administrables desde `/admin` (crear, editar, ocultar, ordenar, logo en Storage).
 - [x] Ley 1581: borrado automático de fotos de afiliaciones rechazadas y motivo de rechazo en `/admin`. 30-sep: hecho por agentes (Carlos salió).
 - [ ] Pruebas en celulares reales (Android e iPhone) con informe y capturas.
 - [x] Actualizar `tests/e2e` b-ingreso, i-despliegue y j-produccion al formato nuevo de máscara de correo. 27-sep: se adelantó ga-verificador-qa (b-ingreso y j-produccion corregidos, i-despliegue ya estaba al día).
