@@ -1102,10 +1102,9 @@
       "peso": 1,
       "simultanea": false,
       "depende": [
-        "4.14",
-        "6.21"
+        "4.14"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "Sebas"
     },
@@ -1363,20 +1362,20 @@
       "tarea": "Plantilla del correo con {{ .Token }} (código, no enlace)",
       "responsable": "Yo (panel Supabase/Resend)",
       "prioridad": "Alta",
-      "estado": "En curso",
+      "estado": "Hecho",
       "gantt": "2.4",
-      "nota": "23-sep: supabase/templates/codigo-ingreso.html rediseñada (HTML con la marca Green Alliance) y probada en local (llega a Mailpit con el código). Falta que Sebas la pegue en Authentication → Emails → Templates → Magic Link del panel de producción."
+      "nota": "23-sep: supabase/templates/codigo-ingreso.html rediseñada (HTML con la marca Green Alliance) y probada en local (llega a Mailpit con el código). Falta que Sebas la pegue en Authentication → Emails → Templates → Magic Link del panel de producción. 30-sep: Sebas lo hizo en producción."
     },
     {
       "id": "P-21",
       "categoria": "Configuración",
       "area": "Resend",
-      "tarea": "Revisar el límite de Resend (plan gratis ≈ 100 correos/día)",
+      "tarea": "(Cancelado) Revisar el límite de Resend (plan gratis ≈ 100 correos/día)",
       "responsable": "Yo",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "2.4",
-      "nota": "30-sep: con ~500 asociados el plan gratis se queda corto; confirmar plan."
+      "nota": "30-sep: con ~500 asociados el plan gratis se queda corto; confirmar plan. 30-sep: Sebas decide que el límite de Resend no es problema por ahora; se quita."
     },
     {
       "id": "P-22",
@@ -1616,9 +1615,9 @@
       "tarea": "Aplicar en producción la migración 20260923210000_limite_de_intentos.sql",
       "responsable": "Sebas (ga-auditor-supabase revisa antes)",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.8",
-      "nota": "Crea la tabla limites_intentos y la función registrar_intento, que usan /afiliacion, /ingresar y «Reenviar código» (dentroDelLimite). Sin ella esos límites fallan en producción. Antes del despliegue (6.5). 23-sep: auditada por ga-auditor-supabase, se puede aplicar tal cual (docs/auditorias/2026-09-23-limite-de-intentos.md); falta que Sebas haga db push."
+      "nota": "Crea la tabla limites_intentos y la función registrar_intento, que usan /afiliacion, /ingresar y «Reenviar código» (dentroDelLimite). Sin ella esos límites fallan en producción. Antes del despliegue (6.5). 23-sep: auditada por ga-auditor-supabase, se puede aplicar tal cual (docs/auditorias/2026-09-23-limite-de-intentos.md); falta que Sebas haga db push. 30-sep: Sebas lo hizo en producción."
     },
     {
       "id": "P-44",
@@ -1638,9 +1637,9 @@
       "tarea": "Panel de producción: OTP de 6 dígitos, vencimiento del código en 600 s (10 min) e intervalo entre correos ≤ 45 s",
       "responsable": "Yo (panel Supabase/Resend)",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "2.4",
-      "nota": "Complementa P-19 (SMTP) y P-20 (plantilla Magic Link con {{ .Token }})."
+      "nota": "Complementa P-19 (SMTP) y P-20 (plantilla Magic Link con {{ .Token }}). 30-sep: Sebas lo hizo en producción."
     },
     {
       "id": "P-46",
@@ -2298,9 +2297,9 @@
       "tarea": "CRON_SECRET de 32+ caracteres, publicar plantilla ga-aviso-institucional y crear RESEND_TEMPLATE_AVISO_INSTITUCIONAL",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.22",
-      "nota": ""
+      "nota": "30-sep: Sebas lo hizo en producción."
     },
     {
       "id": "P-106",
@@ -2851,6 +2850,13 @@
       "tareas": "5.4, 6.21, 6.22; P-81",
       "cambio": "Política v1 en publicación; tanda 2 en develop",
       "detalle": "Tanda 2 en develop e4b8350 con 7 migraciones 20260930200* por aplicar y develop a main pendiente (6.22). Política v1 del Dr. Breinner con 7.3, 8 y 18 en revisión. E2E desactualizadas (6.21). Copia de seguridad de producción del 30-sep."
+    },
+    {
+      "fecha": "2026-09-30",
+      "agente": "sesión principal (Sebas)",
+      "tareas": "6.22; P-20, P-21, P-43, P-45, P-105",
+      "cambio": "Tanda 2 en producción y pendientes de configuración cerrados",
+      "detalle": "Sebas aplicó las 7 migraciones 20260930200* y fusionó develop→main. Hechos: P-20 (plantilla del código), P-43 (límite de intentos), P-45 (ajustes OTP), P-105 (CRON_SECRET y plantilla del aviso institucional). P-21 cancelado: el límite de Resend no preocupa por ahora. P-54 y P-73 siguen pendientes."
     }
   ]
 }
