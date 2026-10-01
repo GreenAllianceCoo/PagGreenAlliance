@@ -34,7 +34,7 @@ test.describe("H · Solicitud de crédito", () => {
     await page.locator("main section").first().getByRole("link", { name: "Nueva solicitud" }).click();
     await expect(page).toHaveURL(/\/cuenta\/solicitar$/);
 
-    await page.getByRole("radio", { name: /^50 %/ }).check();
+    await page.getByRole("radio", { name: /^50 %/ }).check({ force: true });
     // Monto por defecto = tope del grado SI al 50 % ($1.500.000). La tasa (8,2 %) se guarda pero no se muestra (25-sep).
     await expect(page.getByText("$1.500.000").first()).toBeVisible();
     await expect(page.getByText("8,2 %")).toHaveCount(0);

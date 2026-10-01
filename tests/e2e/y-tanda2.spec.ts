@@ -107,7 +107,7 @@ test.describe("Y1 · Landing", () => {
 // Y2 · F-01: Institución y Grado no se vacían tras un error del servidor
 // ---------------------------------------------------------------------------
 test.describe("Y2 · F-01 /afiliacion", () => {
-  test("Tras rechazo del servidor (cédula con solicitud pendiente) los selects conservan su valor", async ({
+  test("S-06: cédula con solicitud pendiente responde igual que un envío exitoso y no guarda otra fila", async ({
     page,
   }) => {
     const cedula = cedulaUnica();
@@ -133,12 +133,12 @@ test.describe("Y2 · F-01 /afiliacion", () => {
         .getAttribute("value");
       await page.locator("#af-grado").selectOption(grado ?? "");
       await page.getByRole("button", { name: "Enviar solicitud" }).click();
-      await expect(page.locator("#af-cc-error")).toBeVisible({
-        timeout: 30_000,
-      });
-      await expect(page).toHaveURL(/\/afiliacion$/);
-      await expect(page.locator("#af-institucion")).toHaveValue("ejercito");
-      await expect(page.locator("#af-grado")).toHaveValue(grado ?? "");
+      await page.waitForURL("**/afiliacion/enviada", { timeout: 30_000 });
+      await expect(page.locator("#af-cc-error")).toHaveCount(0);
+      const { cuerpo } = await adminRest(
+        `solicitudes_afiliacion?select=id&cedula=eq.${cedula}`,
+      );
+      expect((cuerpo as unknown[]).length).toBe(1);
     } finally {
       await borrarAfiliaciones(cedula);
     }
@@ -161,7 +161,7 @@ test.describe("Y3 · /cuenta/solicitar", () => {
     await expect(r50).not.toBeChecked();
     await expect(r100).not.toBeChecked();
     const texto = await page.locator("main").innerText();
-    expect(texto).toContain("$ 3.000.000"); // cupo grupo SI al 100 %
+    expect(texto).toContain("$3.000.000"); // cupo grupo SI al 100 %
     expect(texto).not.toMatch(/inter[eé]s|tasa/i);
     await ctx.close();
   });
@@ -253,7 +253,9 @@ test.describe("Y4 · RPC de admin cerradas para anon y asociados", () => {
       expect(a.status, JSON.stringify(a.cuerpo)).toBeGreaterThanOrEqual(400);
       const token = await tokenDeUsuario(USUARIOS.sinSolicitudes.correo);
       const u = await rpc(nombre, token, cuerpo);
-      expect(u.status, JSON.stringify(u.cuerpo)).toBeGreaterThanOrEqual(400);
+      // 200 con null (sin datos) también es no-fuga (migración 20261001100000).
+      if (u.status < 300) expect(u.cuerpo, JSON.stringify(u.cuerpo)).toBeNull();
+      else expect(u.status).toBeGreaterThanOrEqual(400);
     });
   }
   test("asesor_metricas_dashboard: un asociado no ve conteos de asesor", async () => {
@@ -283,6 +285,7 @@ test.describe("Y5 · Admin: desembolso, baja, sorteo y dashboards", () => {
     try {
       const ap = await usuarioRest(`solicitudes_credito?id=eq.${id}`, admin, {
         method: "PATCH",
+        headers: { Prefer: "return=minimal" },
         body: JSON.stringify({ estado: "aprobado" }),
       });
       expect(ap.status, JSON.stringify(ap.cuerpo)).toBeLessThan(300);

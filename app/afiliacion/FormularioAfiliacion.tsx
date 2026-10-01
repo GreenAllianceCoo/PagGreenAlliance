@@ -36,8 +36,8 @@ const MENSAJE_SUBIDA_FALLO = "No pudimos subir tus fotos. Revisa tu conexión e 
 export function FormularioAfiliacion({ grados, asesores }: { grados: GradoCatalogo[]; asesores: Asesor[] }) {
   const esquemaDatos = crearEsquemaDatosAfiliacion({ grados, asesores });
 
-  const [estado, accion, enviando] = useActionState(
-    async (previo: EstadoAfiliacion, formData: FormData): Promise<EstadoAfiliacion> => {
+  async function procesar(previo: EstadoAfiliacion, formData: FormData): Promise<EstadoAfiliacion> {
+    {
       const texto = leerTextoAfiliacion(formData);
       const archivos = leerArchivosAfiliacion(formData);
 
@@ -83,9 +83,18 @@ export function FormularioAfiliacion({ grados, asesores }: { grados: GradoCatalo
       for (const campo of campos) envio.set(campo, subidas.fotos[campo].ruta);
       envio.set("fotos_ticket", subidas.ticket);
       return enviarAfiliacion(previo, envio);
+    }
+  }
+
+  const [estado, accion, enviando] = useActionState(
+    async (previo: EstadoAfiliacion, formData: FormData): Promise<EstadoAfiliacion> => {
+      const n = (previo.n ?? 0) + 1;
+      const r = await procesar(previo, formData);
+      return { ...r, n };
     },
     ESTADO_INICIAL,
   );
+
 
   // Foco al primer campo con error (en el orden en que aparecen en pantalla).
   useEffect(() => {
@@ -95,7 +104,10 @@ export function FormularioAfiliacion({ grados, asesores }: { grados: GradoCatalo
   }, [estado]);
 
   return (
+    // `key`: React 19 limpia el formulario tras cada acción; al rehacerlo con `valores`
+    // se conservan Institución, Grado y el resto de lo escrito (F-01).
     <Afiliacion
+      key={estado.n ?? 0}
       grados={grados}
       asesores={asesores}
       accion={accion}

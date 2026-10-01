@@ -120,17 +120,17 @@ begin
   returning id into v_hist;
 
   -- Lo que todavía impediría pedir (mismas reglas que los triggers de insert).
-  if not v_perfil.activo then v_bloq := v_bloq || 'inactivo'; end if;
+  if not v_perfil.activo then v_bloq := array_append(v_bloq, 'inactivo'); end if;
   if v_perfil.grado is null then
-    v_bloq := v_bloq || 'sin_grado';
+    v_bloq := array_append(v_bloq, 'sin_grado');
   elsif not exists (select 1 from public.grados g
                     where g.codigo = v_perfil.grado and g.grupo_credito is not null) then
-    v_bloq := v_bloq || 'sin_cupo';
+    v_bloq := array_append(v_bloq, 'sin_cupo');
   end if;
   if not exists (select 1 from public.procesos_ejecutivos pe
                  where pe.asociado_id = p_asociado_id
                    and pe.estado = 'operando'::public.estado_proceso_ejecutivo) then
-    v_bloq := v_bloq || 'no_operando';
+    v_bloq := array_append(v_bloq, 'no_operando');
   end if;
 
   return query select p_asociado_id, v_sol.id, v_hist, v_bloq;

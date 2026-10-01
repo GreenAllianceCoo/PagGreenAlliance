@@ -144,8 +144,13 @@ export function Afiliacion({
           </div>
           <div className="flex items-start gap-2.5 rounded-12 bg-ga-fondo-suave p-3.5 text-14 leading-150 text-ga-texto-2 lg:rounded-14 lg:bg-white lg:p-4 lg:text-15">
             <IconoInfo tamano={20} className="mt-px shrink-0 text-ga-verde lg:mt-0.5" />
-            <span>
-              El código para ingresar a tu cuenta llegará a tu <b>correo personal</b>, no al institucional.
+            <span className="flex flex-col gap-1.5">
+              <span>
+                Esto no crea tu cuenta todavía. Cuando tu afiliación quede activa, podrás ingresar con tu cédula.
+              </span>
+              <span>
+                El código para ingresar a tu cuenta llegará a tu <b>correo personal</b>, no al institucional.
+              </span>
             </span>
           </div>
           <ListaNumerada
@@ -474,7 +479,7 @@ export function Afiliacion({
                   defaultValue={valores.mensaje}
                   onChange={(e) => setLargoMensaje(e.target.value.length)}
                 />
-                <span aria-hidden="true" className="self-end text-12 text-ga-deshabilitado-texto">
+                <span aria-hidden="true" className="self-end text-12 text-ga-texto-3">
                   {largoMensaje}/500
                 </span>
               </>

@@ -394,7 +394,7 @@ test.describe("I2 · /cuenta/solicitar", () => {
   }, testInfo) => {
     const { ctx, page } = await sesionSinSolicitudes(browser, testInfo);
     await page.goto("/cuenta/solicitar");
-    await page.getByText("100% de devolución", { exact: true }).click();
+    await page.getByRole("radio", { name: /^100 %/ }).check({ force: true });
     await page.locator("#monto").focus();
     await page.keyboard.press("Home");
     await expect(page.locator("output[for=monto]")).toHaveText("$100.000");
@@ -484,7 +484,7 @@ test.describe("I2 · /cuenta/solicitar", () => {
     for (const c of casos) {
       await page.goto("/cuenta/solicitar");
       await page.waitForLoadState("networkidle");
-      await page.getByText("50% de devolución", { exact: true }).click();
+      await page.getByRole("radio", { name: /^50 %/ }).check({ force: true });
       // Deja que termine el re-render del clic anterior (elegir el paquete)
       // antes de manipular y enviar en un solo turno: ver forzarCampoYEnviar.
       await page.waitForTimeout(150);
@@ -523,7 +523,7 @@ test.describe("I2 · /cuenta/solicitar", () => {
     const { ctx, page } = await sesionSinSolicitudes(browser, testInfo);
     await page.goto("/cuenta/solicitar");
     await page.waitForLoadState("networkidle");
-    await page.getByText("50% de devolución", { exact: true }).click();
+    await page.getByRole("radio", { name: /^50 %/ }).check({ force: true });
     await page.waitForTimeout(150);
     await forzarCampoYEnviar(page, "monto", "123457");
     await page.waitForTimeout(3000);
@@ -662,13 +662,10 @@ test.describe("I2 · /cuenta/solicitar", () => {
     expect(await axeGraves(page, "cuenta-solicitar", testInfo)).toEqual([]);
     // Todos los campos con nombre accesible.
     await expect(
-      page.getByRole("radio", { name: "50% de devolución" }),
+      page.getByRole("radio", { name: /^50 %/ }),
     ).toHaveCount(1);
     await expect(
-      page.getByRole("radio", { name: "100% de devolución" }),
-    ).toHaveCount(1);
-    await expect(
-      page.getByRole("slider", { name: "Monto a desembolsar" }),
+      page.getByRole("radio", { name: /^100 %/ }),
     ).toHaveCount(1);
 
     // Tab hasta el primer radio; foco visible en su tarjeta. En celular
@@ -698,6 +695,10 @@ test.describe("I2 · /cuenta/solicitar", () => {
       .locator('input[name="porcentaje"]:checked')
       .getAttribute("value");
     expect(["50", "100"]).toContain(marcado);
+    // El deslizador del monto aparece al elegir el porcentaje y tiene nombre accesible.
+    const slider = page.getByRole("slider");
+    await expect(slider).toHaveCount(1);
+    expect(await slider.evaluate((el) => (el as HTMLInputElement).labels?.length ?? 0)).toBeGreaterThan(0);
     await ctx.close();
   });
 });

@@ -383,10 +383,7 @@ test.describe("E · Inicio del asociado /cuenta", () => {
       fechaEnviada,
       "no se encontró «Enviada <fecha>»: revisar seed/ventana del sorteo",
     ).toBeTruthy();
-    expect(
-      proximoSorteo,
-      "no se encontró «Próximo sorteo: …»: ¿está la ventana 1-5 abierta hoy?",
-    ).toBeTruthy();
+    // «Próximo sorteo: …» solo sale con la ventana 1-5 cerrada: la prueba no depende de la fecha.
 
     const esperados = esEscritorio(testInfo)
       ? [
@@ -415,7 +412,7 @@ test.describe("E · Inicio del asociado /cuenta", () => {
           "Tu solicitud usa",
           "$ 500.000",
           "Nueva solicitud",
-          proximoSorteo!,
+          ...(proximoSorteo ? [proximoSorteo] : []),
           "Hablar con la cooperativa",
           "CARNÉ DE ASOCIADO",
           u.nombre,
@@ -444,7 +441,7 @@ test.describe("E · Inicio del asociado /cuenta", () => {
           "$ 500.000",
           "Nueva solicitud",
           "Convenios",
-          proximoSorteo!,
+          ...(proximoSorteo ? [proximoSorteo] : []),
           "Hablar con la cooperativa",
           "CARNÉ DE ASOCIADO",
           u.nombre,
@@ -468,7 +465,7 @@ test.describe("E · Inicio del asociado /cuenta", () => {
       bordeHablar,
       "«Hablar con la cooperativa» debe llevar el borde verde (terciario)",
     ).toBe(VERDE);
-    await revisarEstilos(page, ["Guardar"], [], "h1 .font-display");
+    await revisarEstilos(page, [] /* «Guardar» está en /cuenta/perfil (v3) */, [], "h1 .font-display");
     await ctx.close();
   });
 
@@ -533,13 +530,13 @@ test.describe("E · Afiliación /afiliacion", () => {
           "Ya activo, ingresas con tu cédula.",
           ...camposComunes,
           "Enviar solicitud",
-          "El equipo te contactará por WhatsApp o a tu correo.",
+          "El equipo te contactará por WhatsApp o a tu correo personal.",
         ]
       : [
           ...comun,
           ...camposComunes,
           "Enviar solicitud",
-          "El equipo te contactará por WhatsApp o a tu correo.",
+          "El equipo te contactará por WhatsApp o a tu correo personal.",
         ];
     await revisarTextos(page, esperados, "afiliacion", testInfo);
     await revisarEstilos(page, ["Enviar solicitud"], []);

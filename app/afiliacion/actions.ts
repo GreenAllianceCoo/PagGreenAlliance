@@ -36,6 +36,8 @@ export type EstadoAfiliacion = {
   errorGeneral?: string;
   /** Lo que escribió el usuario, para no borrarlo si hay error (sin fotos: se vuelven a subir). */
   valores?: ValoresAfiliacion;
+  /** Número de respuesta (lo pone el cliente): cambia en cada envío para rehacer el formulario con `valores`. */
+  n?: number;
 };
 
 export type ResultadoPrepararSubida =
@@ -158,6 +160,13 @@ export async function enviarAfiliacion(
     registrar("warn", { evento: "afiliacion_fotos_no_verificadas", motivo: fotos.motivo, campo: fotos.campo });
     await descartarFotos();
     const mensaje = MENSAJE_FOTO_VERIFICACION[fotos.motivo] ?? MENSAJE_FOTOS_FALLO;
+    // Bytes que no son imagen real (aunque declaren .jpg): aviso general que no delata la regla de seguridad.
+    if (fotos.motivo === "tipo") {
+      return {
+        errorGeneral: "No pudimos subir tus fotos. Revisa que sean imágenes JPG, PNG o WEBP e intenta de nuevo.",
+        valores,
+      };
+    }
     return fotos.campo ? { errores: { [fotos.campo]: mensaje }, valores } : { errorGeneral: mensaje, valores };
   }
 

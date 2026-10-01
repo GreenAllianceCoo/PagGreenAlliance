@@ -459,7 +459,7 @@ export async function llenarAfiliacion(
       .locator("#af-institucion")
       .selectOption(d.institucion || { index: 0 });
   }
-  if (d.grado) {
+  if (d.grado && d.institucion !== "") {
     await expect(page.locator("#af-grado")).toBeEnabled();
     await page.locator("#af-grado").selectOption(d.grado);
   }

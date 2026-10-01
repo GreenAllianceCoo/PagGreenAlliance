@@ -15,11 +15,11 @@ update public.perfiles set asesor_id = '21000000-0000-4000-a000-0000000000e1' wh
 -- Solicitudes ya resueltas (sin pasar por los triggers de creación).
 alter table public.solicitudes_credito disable trigger user;
 insert into public.solicitudes_credito (id, asociado_id, porcentaje_devolucion, monto_solicitado, cuota_mensual,
-  grado, grado_asociado, estado, motivo_rechazo, fecha_respuesta, fecha_desembolso, fecha_solicitud) values
+  grado, grado_asociado, estado, motivo_rechazo, fecha_respuesta, fecha_desembolso, fecha_solicitud, tasa_interes_mensual) values
   ('21100000-0000-4000-a000-00000000000a', '21000000-0000-4000-a000-00000000000a', '50', 300000, 0,
-   'PP', 'PP', 'rechazado', 'Capacidad insuficiente', now(), null, now()),
+   'PP', 'PP', 'rechazado', 'Capacidad insuficiente', now(), null, now(), 0.02),
   ('21100000-0000-4000-a000-00000000000b', '21000000-0000-4000-a000-00000000000b', '50', 400000, 0,
-   'PP', 'PP', 'aprobado', null, now(), (now() at time zone 'America/Bogota')::date, now());
+   'PP', 'PP', 'aprobado', null, now(), (now() at time zone 'America/Bogota')::date, now(), 0.02);
 alter table public.solicitudes_credito enable trigger user;
 
 select has_function('public', 'admin_habilitar_credito', array['uuid', 'text'], 'existe admin_habilitar_credito');
@@ -42,7 +42,7 @@ select throws_ok($$ select * from public.admin_habilitar_credito('21000000-0000-
 select throws_ok($$ select * from public.admin_habilitar_credito('21000000-0000-4000-a000-00000000000b', 'No aplica aqui') $$,
   'P0001', 'El asociado no tiene un crédito rechazado por habilitar', 'solo si la última está rechazada');
 select is((select bloqueos from public.admin_habilitar_credito('21000000-0000-4000-a000-00000000000a', 'Revisado con tesorería')),
-  array['no_operando'], 'habilita y avisa lo que aún bloquea');
+  array['no_operando']::text[], 'habilita y avisa lo que aún bloquea');
 select throws_ok($$ select * from public.admin_habilitar_credito('21000000-0000-4000-a000-00000000000a', 'Otra vez igual') $$,
   'P0001', 'Este rechazo ya fue habilitado', 'no se habilita dos veces');
 select is((select count(*)::int from public.historial_solicitudes

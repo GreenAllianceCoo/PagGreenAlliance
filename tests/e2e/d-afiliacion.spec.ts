@@ -466,9 +466,9 @@ test.describe("D3 · Reglas de validación por campo", () => {
     },
     {
       campo: "mensaje",
-      nombre: "mensaje de 501",
+      nombre: "mensaje de 501 (maxLength=500 recorta)",
       cambio: { mensaje: "m".repeat(501) },
-      valido: false,
+      valido: true,
     },
   ];
 
@@ -489,6 +489,9 @@ test.describe("D3 · Reglas de validación por campo", () => {
         await expect(page.locator(ERROR[caso.campo])).toHaveCount(0);
       } else {
         await expect(page.locator(ERROR[caso.campo])).toBeVisible();
+      }
+      if (caso.campo === "mensaje") {
+        expect(((await page.locator("#af-msg").inputValue()) ?? "").length).toBeLessThanOrEqual(500);
       }
       await expect(page).toHaveURL(/\/afiliacion$/);
     });
@@ -726,12 +729,13 @@ test.describe("D7 · El servidor detecta el tipo real del archivo (magic bytes, 
 });
 
 test.describe("D8 · Opciones de los desplegables", () => {
-  test("Grado: PP, PT, SI, IT, OF (desde grados_credito)", async ({ page }) => {
+  test("Grado (Policía): grados de la institución desde el catálogo, sin el heredado OF", async ({ page }) => {
     await page.goto("/afiliacion");
+    await page.locator("#af-institucion").selectOption("policia");
     const opciones = await page
       .locator("#af-grado option")
       .evaluateAll((os) => os.map((o) => (o as HTMLOptionElement).value));
-    expect(opciones).toEqual(["", "PP", "PT", "SI", "IT", "OF"]);
+    expect(opciones).toEqual(["", "PP", "PT", "SI", "IT", "IJ", "ST", "TE", "CT", "MY", "TC"]);
     await expect(page.locator("#af-grado option").first()).toHaveText(
       "Selecciona tu grado",
     );
@@ -815,7 +819,7 @@ test.describe("D9 · Envío feliz con 3 fotos grandes (foto de cámara sin compr
     ] as const) {
       const ruta = fila[columna];
       expect(ruta, columna).toMatch(
-        new RegExp(`^afiliacion-documentos/${cedula}/.+\\.(jpe?g|png|webp)$`),
+        /^afiliacion-documentos\/solicitudes\/[0-9a-f-]{36}\/.+\.(jpe?g|png|webp)$/,
       );
       expect(
         await objetoExisteEnBucket(ruta as string),

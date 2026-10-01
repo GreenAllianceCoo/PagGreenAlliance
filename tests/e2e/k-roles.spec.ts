@@ -138,9 +138,9 @@ test("admin entra a /admin y aprueba la afiliación de ejemplo (2 pasos)", async
   await expect(
     page.getByRole("link", { name: "Salir de la demo" }),
   ).toBeVisible();
-  await page.getByLabel("Grado del cliente").selectOption("OF");
+  await page.getByLabel("Grado del cliente").selectOption("SI");
   await expect(
-    page.getByText(/Tope disponible para el grado OF/),
+    page.getByText(/Tope disponible para el grado/),
   ).toBeVisible();
   await page.getByRole("link", { name: "Volver al panel" }).first().click();
   await page.waitForURL(/\/admin(\/afiliaciones)?$/);
