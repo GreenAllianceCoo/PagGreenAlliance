@@ -132,3 +132,21 @@ Formato de cada pedido:
 - Prioridad: alta
 - Qué falta: D-17 banda «Ganador del sorteo» y crédito «pendiente de desembolso» en /cuenta; D-18 «Tu cuenta está inactiva…»; D-19 admin: «Marcar desembolsado», «Dar de baja»/«Reactivar» y «Realizar sorteo»; D-20 error de dominio del correo institucional (3j); D-21 textos de landing (aprobados en poco tiempo, sin +200, misión con Ejército Nacional).
 - Estado: Resuelto → 3q (2026-09-30, ga-disenador-lienzo)
+
+### D-22 · Admin · dashboard «Resumen de clientes» · /admin (actividad 4.7)
+- Pedido por: sesión principal · 2026-09-30
+- Prioridad: media
+- Qué falta: asociados por grado e institución, por estado del proceso ejecutivo, afiliaciones y créditos pendientes, alertas pendientes y desembolsos del mes (solo cifras).
+- Estado: Resuelto → 3r (2026-09-30, ga-disenador-lienzo)
+
+### D-23 · Asesor · dashboard «Resumen» · /asesor (actividad 4.8)
+- Pedido por: sesión principal · 2026-09-30
+- Prioridad: media
+- Qué falta: clientes por estado del proceso, créditos pendientes, afiliaciones referidas y avance a bonos integrado con la pestaña Comisiones, sin datos personales.
+- Estado: Resuelto → 3s (2026-09-30, ga-disenador-lienzo)
+
+### D-24 · Asociado · /cuenta/solicitar con radios 50/100 (actividad 5.6)
+- Pedido por: sesión principal · 2026-09-30
+- Prioridad: baja
+- Qué falta: maqueta del formulario con radios, cupo por grado, sin tasa, estados bloqueado y pendiente.
+- Estado: Resuelto → 3t (2026-09-30, ga-disenador-lienzo)

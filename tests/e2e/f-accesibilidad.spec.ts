@@ -169,34 +169,45 @@ test.describe("F · Solo teclado", () => {
   test("/afiliacion: orden de Tab, Espacio marca la casilla, trampa fuera del orden", async ({ page }) => {
     await page.goto("/afiliacion");
     await page.waitForLoadState("networkidle");
-    // Formulario v2 (spec-fase-2 §2): sin reordenar por CSS entre viewports,
+    // Formulario v3 (Entidad bancaria → Nequi; la lista de SelectBusqueda tiene tabIndex=-1): sin reordenar por CSS entre viewports,
     // el orden del DOM es el mismo en escritorio y celular.
     const esperado = [
       "af-nombres",
       "af-apellidos",
       "af-cc",
-      "af-grado",
-      "af-nequi",
       "af-institucion",
+      "af-grado",
+      "af-nomina-entidad",
+      "af-nequi",
       "af-cel",
+      "af-correo-inst",
       "af-email",
       "af-asesor",
       "af-foto-frente",
       "af-foto-reverso",
-      "af-foto-selfie",
+      "tomar-selfie", // botón «Tomar selfie» (el input de la selfie es sr-only)
       "af-msg",
       "af-datos",
       "politica",
       "enviar",
     ];
+    // El grado se habilita al elegir la institución (v3).
+    await page.locator("#af-institucion").selectOption("policia");
     await page.locator("#af-nombres").focus();
     const vistos: string[] = [];
     for (let i = 0; i < esperado.length; i++) {
+      // Botón de herramientas de desarrollo de Next (solo en `next dev`): no es de la app.
+      if (await page.evaluate(() => document.activeElement?.tagName === "NEXTJS-PORTAL")) {
+        await page.keyboard.press("Tab");
+        i--;
+        continue;
+      }
       const id = await page.evaluate(() => {
         const el = document.activeElement as HTMLElement;
         if (el.id) return el.id;
         if (el.getAttribute("href") === "/politica-de-datos") return "politica";
         if (el.textContent?.includes("Enviar solicitud")) return "enviar";
+        if (el.textContent?.includes("Tomar selfie")) return "tomar-selfie";
         return el.outerHTML.slice(0, 60);
       });
       vistos.push(id);
@@ -231,8 +242,9 @@ test.describe("F · Solo teclado", () => {
       await focoVisible(page);
     }
     const nombres = Array.from(alcanzados).join(" | ");
-    expect(nombres).toContain("Nueva solicitud");
-    expect(nombres).toContain("Guardar");
+    // Con solicitud pendiente el mosaico está apagado; en celular se llega por «Solicitar» de la barra.
+    expect(nombres).toMatch(/Nueva solicitud|Solicitar/);
+    // «Guardar» se movió a /cuenta/perfil (v3); Inicio ya no tiene formulario.
     expect(nombres).toMatch(esEscritorio(testInfo) ? /Salir/ : /Cerrar sesión/);
     await ctx.close();
   });

@@ -238,15 +238,22 @@ test.describe("A · Cuenta", () => {
     }
 
     await page.goto("/cuenta");
-    await page.getByRole("navigation", { name: "Accesos" }).getByRole("link", { name: "Nueva solicitud" }).click();
-    await expect(page).toHaveURL(/\/cuenta\/solicitar$/);
-    // El formulario de solicitud vuelve a /cuenta.
-    await page.getByRole("link", { name: "Volver", exact: true }).click();
+    // Con una solicitud pendiente el mosaico «Nueva solicitud» de Accesos queda apagado (pieza 3p).
+    await expect(
+      page.getByRole("navigation", { name: "Accesos" }).getByRole("link", { name: "Nueva solicitud" }),
+    ).toHaveAttribute("aria-disabled", "true");
+    // /cuenta/solicitar abre directo y su «Volver» lleva a /cuenta.
+    await page.goto("/cuenta/solicitar");
+    await page.getByRole("link", { name: /^Volver/ }).first().click();
     await expect(page).toHaveURL(/\/cuenta$/);
 
     // Tarjetas de convenio (Pendiente, href="#"): no rompen la página.
     await page.goto("/cuenta");
-    await page.locator("#convenios a").first().click();
+    // Convenios como botones con diálogo (Y1): abre y Esc lo cierra sin romper la página.
+    await page.locator("#convenios button").first().click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
     await expect(page).toHaveURL(/\/cuenta#?$/);
     await expect(page.locator("h1")).toContainText("Hola,");
 

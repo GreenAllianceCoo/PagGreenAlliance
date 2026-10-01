@@ -172,7 +172,8 @@ select set_eq(
         'mi_proceso_ejecutivo', 'revelar_acumulado_comision', 'comisiones_periodo_asesor', 'buscar_cliente_asesor',
         'admin_editar_pago_comision', 'admin_anular_pago_comision', 'tabla_credito_con_tasa', 'admin_tasas_solicitudes',
         'admin_marcar_desembolsado', 'admin_cambiar_estado_asociado', 'bonos_acumulados_asesor',
-        'admin_realizar_sorteo', 'ganador_sorteo_vigente'],
+        'admin_realizar_sorteo', 'ganador_sorteo_vigente',
+        'admin_metricas_dashboard', 'asesor_metricas_dashboard', 'admin_habilitar_credito', 'mi_habilitacion_credito'],
   'solo estas funciones security definer (que se validan solas) las ejecuta authenticated'
 );
 select is_empty(

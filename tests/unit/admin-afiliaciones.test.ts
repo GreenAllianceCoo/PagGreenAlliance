@@ -11,12 +11,12 @@ vi.mock("next/headers", () => ({
 }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn() }));
 vi.mock("@/lib/supabase/admin", () => ({ crearClienteAdmin: vi.fn() }));
-vi.mock("@/lib/correo/resend", () => ({ enviarPlantillaResend: vi.fn(async () => {}) }));
+vi.mock("@/lib/correo/resend", () => ({ enviarConRespaldo: vi.fn(async () => {}) }));
 vi.mock("@/lib/correo/institucional", () => ({ avisarCorreoInstitucional: vi.fn(async () => {}) }));
 
 import { createClient } from "@/lib/supabase/server";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
-import { enviarPlantillaResend } from "@/lib/correo/resend";
+import { enviarConRespaldo } from "@/lib/correo/resend";
 import { avisarCorreoInstitucional } from "@/lib/correo/institucional";
 import { aprobarAfiliacion, cambiarEstadoAfiliacion } from "@/app/admin/afiliaciones/actions";
 
@@ -147,7 +147,7 @@ function formulario(campos: Record<string, string>) {
 beforeEach(() => {
   vi.mocked(createClient).mockReset();
   vi.mocked(crearClienteAdmin).mockReset();
-  vi.mocked(enviarPlantillaResend).mockClear();
+  vi.mocked(enviarConRespaldo).mockClear();
   vi.mocked(avisarCorreoInstitucional).mockClear();
 });
 
@@ -158,7 +158,7 @@ describe("aprobarAfiliacion · crea la cuenta una sola vez (idempotente)", () =>
     expect(resultado.error).toBeUndefined();
     expect(usuariosCreados).toHaveLength(1);
     expect(actualizacionesEstado).toEqual([{ estado: "aprobada" }]);
-    expect(enviarPlantillaResend).toHaveBeenCalledTimes(1);
+    expect(enviarConRespaldo).toHaveBeenCalledTimes(1);
   });
 
   it("si la solicitud ya estaba aprobada, no crea un segundo usuario ni reenvía el correo", async () => {
@@ -166,7 +166,7 @@ describe("aprobarAfiliacion · crea la cuenta una sola vez (idempotente)", () =>
     const resultado = await aprobarAfiliacion({}, formulario({ id: ID_SOLICITUD }));
     expect(resultado.mensaje).toContain("ya estaba aprobada");
     expect(usuariosCreados).toHaveLength(0);
-    expect(enviarPlantillaResend).not.toHaveBeenCalled();
+    expect(enviarConRespaldo).not.toHaveBeenCalled();
   });
 
   it("si ya existe un perfil con esa cédula (estado desincronizado), no duplica la cuenta", async () => {
@@ -174,7 +174,7 @@ describe("aprobarAfiliacion · crea la cuenta una sola vez (idempotente)", () =>
     const resultado = await aprobarAfiliacion({}, formulario({ id: ID_SOLICITUD }));
     expect(resultado.error).toBeUndefined();
     expect(usuariosCreados).toHaveLength(0);
-    expect(enviarPlantillaResend).not.toHaveBeenCalled();
+    expect(enviarConRespaldo).not.toHaveBeenCalled();
   });
 
   it("si Auth falla al crear el usuario, devuelve error y no marca la solicitud como aprobada", async () => {
@@ -207,15 +207,15 @@ describe("aprobarAfiliacion · afiliación v3 (spec-requerimientos-ricardo §2.8
   it("RS-02: «Ingreso aceptado» (con la cédula) va SOLO al personal; al institucional, el aviso sin datos", async () => {
     crearSupabaseFalso({ v3: true });
     await aprobarAfiliacion({}, formulario({ id: ID_SOLICITUD }));
-    expect(enviarPlantillaResend).toHaveBeenCalledTimes(1);
-    expect(enviarPlantillaResend).toHaveBeenCalledWith(expect.objectContaining({ para: ["camilo.personal@gmail.com"] }));
+    expect(enviarConRespaldo).toHaveBeenCalledTimes(1);
+    expect(enviarConRespaldo).toHaveBeenCalledWith(expect.objectContaining({ para: ["camilo.personal@gmail.com"] }));
     expect(avisarCorreoInstitucional).toHaveBeenCalledWith("camilo.personal@gmail.com", "camilo@policia.gov.co");
   });
 
   it("sin correo institucional (solicitud antigua) solo va al personal", async () => {
     crearSupabaseFalso();
     await aprobarAfiliacion({}, formulario({ id: ID_SOLICITUD }));
-    expect(enviarPlantillaResend).toHaveBeenCalledWith(expect.objectContaining({ para: ["camilo@policia.gov.co"] }));
+    expect(enviarConRespaldo).toHaveBeenCalledWith(expect.objectContaining({ para: ["camilo@policia.gov.co"] }));
   });
 
   it("si el asesor ya no atiende, aprueba igual sin asesor y lo avisa", async () => {

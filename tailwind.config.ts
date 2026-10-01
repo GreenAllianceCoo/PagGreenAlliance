@@ -217,6 +217,15 @@ const config: Config = {
         },
         // Agregados por ga-diseno-a-codigo (tanda 4b, pieza 2d «MOVIMIENTO»):
         // fila nueva de la lista de admin: entra desde arriba (−8px → 0).
+        // Dashboards 3r/3s: las barras se llenan (scaleX 0→1) y las tarjetas entran con fundido + 8 px.
+        "ga-barra": {
+          from: { transform: "scaleX(0)" },
+          to: { transform: "scaleX(1)" },
+        },
+        "ga-tarjeta-entra": {
+          from: { opacity: "0", transform: "translateY(8px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
         "ga-fila-entra": {
           from: { opacity: "0", transform: "translateY(-8px)" },
           to: { opacity: "1", transform: "translateY(0)" },
@@ -282,6 +291,8 @@ const config: Config = {
         "ga-sacude": "ga-sacude 240ms linear",
         "ga-trazo": "ga-trazo 400ms cubic-bezier(.34,1.3,.64,1) both",
         "ga-aparecer": "ga-aparecer 200ms ease-out both",
+        "ga-barra": "ga-barra 400ms cubic-bezier(.34,1.3,.64,1) both",
+        "ga-tarjeta-entra": "ga-tarjeta-entra 350ms cubic-bezier(.34,1.3,.64,1) both",
         "ga-fila-entra": "ga-fila-entra 320ms cubic-bezier(.34,1.3,.64,1) both",
         "ga-toast": "ga-toast 220ms ease-out both",
         "ga-lista": "ga-lista 200ms ease-out both",

@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { registrar } from "@/lib/servidor/registro";
 import { exigirAdmin } from "@/lib/admin/servidor";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
-import { enviarPlantillaResend } from "@/lib/correo/resend";
+import { enviarIngresoAceptado } from "@/lib/correo/ingreso";
 import { destinatariosAviso } from "@/lib/correo/destinatarios";
 import { avisarCorreoInstitucional } from "@/lib/correo/institucional";
 import { datosPerfilDeAfiliacion } from "@/lib/admin/afiliacion";
@@ -167,26 +167,14 @@ export async function aprobarAfiliacion(
   if (cuentaNueva) {
     // El aviso institucional sale siempre que haya correo institucional (no depende de la plantilla).
     await avisarCorreoInstitucional(solicitud.email, solicitud.correo_institucional);
-    const plantilla = process.env.RESEND_TEMPLATE_INGRESO_ACEPTADO;
-    if (!plantilla) {
-      registrar("error", { evento: "ingreso_aceptado_no_enviado", motivo: "falta_plantilla", solicitud_id: id });
-    } else {
-      try {
-        await enviarPlantillaResend({
-          // RS-02: con la cédula, SOLO al personal (el de Auth).
-          para: destinatariosAviso(solicitud.email),
-          plantilla,
-          variables: { NOMBRE: solicitud.nombre, CEDULA: solicitud.cedula, URL_INGRESO: await urlIngreso() },
-        });
-      } catch (e) {
-        // La cuenta ya quedó creada: el correo no bloquea la aprobación (spec §Afiliaciones).
-        registrar("error", {
-          evento: "ingreso_aceptado_correo_fallo",
-          mensaje: e instanceof Error ? e.message : String(e),
-          solicitud_id: id,
-        });
-      }
-    }
+    await enviarIngresoAceptado({
+      id,
+      nombre: solicitud.nombre,
+      cedula: solicitud.cedula,
+      // RS-02: con la cédula, SOLO al personal (el de Auth).
+      correo: destinatariosAviso(solicitud.email),
+      urlIngreso: await urlIngreso(),
+    });
   }
 
   revalidatePath("/admin/afiliaciones");

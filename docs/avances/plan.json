@@ -1,6 +1,6 @@
 {
   "parametros": {
-    "actualizado": "2026-09-30",
+    "actualizado": "2026-10-01",
     "bloques_por_semana": 10,
     "nota_bloque": "1 bloque = 1 punto de peso ≈ media jornada de trabajo. Se puede cambiar en la hoja Resumen."
   },
@@ -304,7 +304,7 @@
       "depende": [
         "2.9"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "ga-funcionalidad-botones"
     },
@@ -510,7 +510,7 @@
         "4.2",
         "2.4"
       ],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Propuesta",
       "agente": "ga-funcionalidad-botones"
     },
@@ -561,10 +561,10 @@
         "4.1",
         "4.6"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "ga-funcionalidad-botones (antes Carlos Pardo)",
-      "nota": "29-sep: primera entrega (ZIP de un repo privado propio, sobre main anterior al rediseño C+) revisada por la sesión principal — NO fusionable. Se le pidió rehacer el paquete sobre rediseno-c-plus, con un PR por tarea; ver detalle completo en la nota de 5.10 y P-69."
+      "nota": "29-sep: primera entrega (ZIP de un repo privado propio, sobre main anterior al rediseño C+) revisada por la sesión principal — NO fusionable. Se le pidió rehacer el paquete sobre rediseno-c-plus, con un PR por tarea; ver detalle completo en la nota de 5.10 y P-69. 30-sep: retomado por los agentes (sin Carlos): lienzo 3r/3s, RPC admin_metricas_dashboard/asesor_metricas_dashboard (migración 20261001000000 sin aplicar), loaders y pantallas Resumen. Falta «por estado_proceso» y desembolsos del mes en las RPC, decidir «inscritos al sorteo» y aplicar la migración. 01-oct: cerrado. Migración 20261001100000 agrega por_estado_proceso y desembolsos_mes; pintados en ResumenAdmin (fila de 8 estados y KPI «Desembolsos del mes») y ResumenAsesor (chips). «Inscritos al sorteo» sigue en decisión (P-111). Aplicar en producción: 6.24/P-113."
     },
     {
       "id": "4.8",
@@ -574,10 +574,10 @@
       "depende": [
         "4.6"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "ga-funcionalidad-botones (antes Carlos Pardo)",
-      "nota": "29-sep: la misma entrega (ver 4.7) borra /asesor/demo, que ya existe y está en producción (4.6/4.9); NO fusionable. Se le pidió rehacer el paquete sobre rediseno-c-plus, con un PR por tarea."
+      "nota": "29-sep: la misma entrega (ver 4.7) borra /asesor/demo, que ya existe y está en producción (4.6/4.9); NO fusionable. Se le pidió rehacer el paquete sobre rediseno-c-plus, con un PR por tarea. 30-sep: retomado por los agentes (sin Carlos): lienzo 3r/3s, RPC admin_metricas_dashboard/asesor_metricas_dashboard (migración 20261001000000 sin aplicar), loaders y pantallas Resumen. Falta «por estado_proceso» y desembolsos del mes en las RPC, decidir «inscritos al sorteo» y aplicar la migración. 01-oct: cerrado. Migración 20261001100000 agrega por_estado_proceso y desembolsos_mes; pintados en ResumenAdmin (fila de 8 estados y KPI «Desembolsos del mes») y ResumenAsesor (chips). «Inscritos al sorteo» sigue en decisión (P-111). Aplicar en producción: 6.24/P-113."
     },
     {
       "id": "4.9",
@@ -695,7 +695,7 @@
       "depende": [
         "3.7"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "ga-diseno-a-codigo"
     },
@@ -969,10 +969,11 @@
       "depende": [
         "6.1"
       ],
-      "estado": "Pendiente",
+      "estado": "Bloqueado",
       "origen": "Agregado",
       "agente": "ga-verificador-qa (antes Carlos Pardo)",
-      "nota": "25-sep: la máscara ahora oculta también el dominio, formato «xx•••@•••» (ver P-85). 29-sep: entrega revisada sin pruebas propias (ver 5.10); NO fusionable, se pidió rehacer sobre rediseno-c-plus (además ga-verificador-qa ya reescribió b-ingreso y j-produccion el 27-sep como parte de 4.11/6.17, así que el alcance real que falta se reduce a lo que quede desactualizado tras fusionar develop)."
+      "nota": "25-sep: la máscara ahora oculta también el dominio, formato «xx•••@•••» (ver P-85). 29-sep: entrega revisada sin pruebas propias (ver 5.10); NO fusionable, se pidió rehacer sobre rediseno-c-plus (además ga-verificador-qa ya reescribió b-ingreso y j-produccion el 27-sep como parte de 4.11/6.17, así que el alcance real que falta se reduce a lo que quede desactualizado tras fusionar develop).",
+      "bloqueo": "Docker Desktop se cayó y Supabase local no responde: Sebas reinicia Docker, supabase db reset y corre Playwright (-c tests/e2e/playwright.config.ts)."
     },
     {
       "id": "6.16",
@@ -1084,6 +1085,19 @@
       "agente": "ga-disenador-lienzo + ga-auditor-supabase + ga-funcionalidad-botones + ga-diseno-a-codigo"
     },
     {
+      "id": "4.15",
+      "fase": 4,
+      "actividad": "Pedidos de Sebas (spec §13): correos con respaldo en texto plano, acción admin «Habilitar nuevo crédito» y tarjeta vacía en /cuenta, demo con selector Policía/Ejército y cupo por grado, WhatsApp en el pie",
+      "peso": 3,
+      "depende": [
+        "4.14"
+      ],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "ga-auditor-supabase + ga-funcionalidad-botones + ga-diseno-a-codigo",
+      "nota": "01-oct: migración 20261001100000 (admin_habilitar_credito, mi_habilitacion_credito) y pgTAP 21. tsc, lint, vitest (552) y build en verde; pgTAP y e2e sin correr por Docker."
+    },
+    {
       "id": "6.21",
       "fase": 6,
       "actividad": "E2E nuevas de la tanda 2 (§12) y ajuste de las que buscan «Mis datos» en /cuenta",
@@ -1091,9 +1105,10 @@
       "depende": [
         "4.14"
       ],
-      "estado": "Pendiente",
+      "estado": "Bloqueado",
       "origen": "Agregado",
-      "agente": "ga-verificador-qa"
+      "agente": "ga-verificador-qa",
+      "bloqueo": "Docker Desktop se cayó y Supabase local no responde: Sebas reinicia Docker, supabase db reset y corre Playwright (-c tests/e2e/playwright.config.ts)."
     },
     {
       "id": "6.22",
@@ -1143,6 +1158,33 @@
       "estado": "Hecho",
       "origen": "Agregado",
       "agente": "ga-diseno-a-codigo"
+    },
+    {
+      "id": "6.23",
+      "fase": 6,
+      "actividad": "Aplicar la migración 20261001000000 (versión de política aceptada, secuencia revocada, RPC de métricas) ANTES de desplegar",
+      "peso": 1,
+      "simultanea": false,
+      "depende": [
+        "4.14"
+      ],
+      "estado": "Pendiente",
+      "origen": "Agregado",
+      "agente": "Sebas"
+    },
+    {
+      "id": "6.24",
+      "fase": 6,
+      "actividad": "Aplicar la migración 20261001100000 (habilitar crédito y métricas por estado/desembolsos) tras db reset y test db en local",
+      "peso": 1,
+      "depende": [
+        "4.15",
+        "4.7",
+        "4.8"
+      ],
+      "estado": "Pendiente",
+      "origen": "Agregado",
+      "agente": "Sebas"
     }
   ],
   "pendientes": [
@@ -1747,9 +1789,9 @@
       "tarea": "Opcional: revocar la secuencia limites_intentos_id_seq a anon y authenticated",
       "responsable": "Yo + ga-auditor-supabase",
       "prioridad": "Baja",
-      "estado": "Pendiente",
+      "estado": "En curso",
       "gantt": "6.8",
-      "nota": "Sugerido por ga-auditor-supabase en la auditoría de P-43."
+      "nota": "Sugerido por ga-auditor-supabase en la auditoría de P-43. 30-sep: revoke incluido en la migración 20261001000000 (pgTAP 20 en verde); falta aplicarla (6.23)."
     },
     {
       "id": "P-56",
@@ -2344,6 +2386,50 @@
       "estado": "Pendiente",
       "gantt": "5.12",
       "nota": "Spec §12.12"
+    },
+    {
+      "id": "P-110",
+      "categoria": "Configuración",
+      "area": "Base de datos",
+      "tarea": "Aplicar la migración 20261001000000 antes de desplegar (sin ella falla el insert de afiliación por la columna version_politica_datos)",
+      "responsable": "Sebas",
+      "prioridad": "Alta",
+      "estado": "Pendiente",
+      "gantt": "6.23",
+      "nota": "30-sep: reportado por ga-auditor-supabase y ga-funcionalidad-botones."
+    },
+    {
+      "id": "P-111",
+      "categoria": "Decisión",
+      "area": "/admin",
+      "tarea": "¿«Inscritos al sorteo» entra al dashboard del admin?",
+      "responsable": "Cooperativa",
+      "prioridad": "Media",
+      "estado": "Pendiente",
+      "gantt": "4.7",
+      "nota": "30-sep: reportado por ga-disenador-lienzo y ga-diseno-a-codigo."
+    },
+    {
+      "id": "P-112",
+      "categoria": "Funcionalidad",
+      "area": "Pruebas",
+      "tarea": "Agregar admin_metricas_dashboard y asesor_metricas_dashboard a las listas blancas de security definer (pgTAP 00 #14 y 15 #24)",
+      "responsable": "ga-escritor-tests",
+      "prioridad": "Media",
+      "estado": "Hecho",
+      "gantt": "6.21",
+      "nota": "30-sep: reportado por ga-auditor-supabase. 01-oct: listas blancas de 00 y 15 actualizadas por ga-auditor-supabase (falta correrlas: Docker)."
+    },
+    {
+      "id": "P-113",
+      "categoria": "Configuración",
+      "area": "Base de datos",
+      "tarea": "Docker: db reset + test db local y aplicar la migración 20261001100000 en producción",
+      "responsable": "Sebas",
+      "prioridad": "Alta",
+      "estado": "Pendiente",
+      "gantt": "6.24",
+      "nota": "01-oct: Docker Desktop no arranca («unable to start»)."
     }
   ],
   "bitacora": [
@@ -2857,6 +2943,69 @@
       "tareas": "6.22; P-20, P-21, P-43, P-45, P-105",
       "cambio": "Tanda 2 en producción y pendientes de configuración cerrados",
       "detalle": "Sebas aplicó las 7 migraciones 20260930200* y fusionó develop→main. Hechos: P-20 (plantilla del código), P-43 (límite de intentos), P-45 (ajustes OTP), P-105 (CRON_SECRET y plantilla del aviso institucional). P-21 cancelado: el límite de Resend no preocupa por ahora. P-54 y P-73 siguen pendientes."
+    },
+    {
+      "fecha": "2026-09-30",
+      "agente": "ga-funcionalidad-botones",
+      "tareas": "P-81 (política v1.0)",
+      "cambio": "Política de datos v1.0 publicada en código",
+      "detalle": "/politica-de-datos con 28 secciones, anexo, índice, aviso de revisión jurídica en 7.3, 8 y 18 y botón PDF. Por definir: horario, órgano y acta de aprobación."
+    },
+    {
+      "fecha": "2026-09-30",
+      "agente": "ga-disenador-lienzo",
+      "tareas": "4.7, 4.8, 5.6",
+      "cambio": "Lienzo 3r, 3s, 3t",
+      "detalle": "Dashboards admin y asesor y /cuenta/solicitar maquetados en el lienzo (D-22 a D-24). 5.6 Hecho."
+    },
+    {
+      "fecha": "2026-09-30",
+      "agente": "ga-auditor-supabase",
+      "tareas": "P-55, 4.7, 4.8, 6.23",
+      "cambio": "Migración 20261001000000 y pgTAP 20",
+      "detalle": "version_politica_datos sellada, revoke de limites_intentos_id_seq, RPC de métricas solo con conteos; 16 pruebas en verde. Sin aplicar: nueva 6.23/P-110. Listas blancas pgTAP: P-112."
+    },
+    {
+      "fecha": "2026-09-30",
+      "agente": "ga-funcionalidad-botones",
+      "tareas": "2.11, 4.3, 4.7, 4.8",
+      "cambio": "F-01 corregido, revalidación de /cuenta y loaders de métricas",
+      "detalle": "2.11 y 4.3 Hecho. Afiliación guarda version_politica_datos; loaders cargarMetricasAdmin/Asesor con 8 pruebas (523 vitest en verde)."
+    },
+    {
+      "fecha": "2026-09-30",
+      "agente": "ga-diseno-a-codigo",
+      "tareas": "4.7, 4.8, 5.6",
+      "cambio": "Pantallas Resumen y /cuenta/solicitar en código",
+      "detalle": "4.7 y 4.8 En curso: falta estado_proceso y desembolsos del mes en las RPC y decisión P-111. tsc, lint, vitest y build en verde."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "ga-verificador-qa",
+      "tareas": "6.15, 6.21",
+      "cambio": "E2E al día pero sin ejecutar: Bloqueado",
+      "detalle": "y-tanda2.spec.ts y ajustes de e2e (370 pruebas listadas, tsc y eslint en verde). Docker se cayó: Sebas reinicia Docker, db reset y corre Playwright."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "ga-auditor-supabase",
+      "tareas": "4.15, 4.7, 4.8, P-112, 6.24, P-113",
+      "cambio": "Migración 20261001100000 y pgTAP 21",
+      "detalle": "admin_habilitar_credito, mi_habilitacion_credito, por_estado_proceso y desembolsos_mes; listas blancas 00/15 (P-112 Hecho). Diagnóstico: el bloqueo tras rechazo es de pantalla, no de base. Sin db reset por Docker: nueva 6.24/P-113 (Sebas)."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "ga-funcionalidad-botones",
+      "tareas": "4.15, 4.7, 4.8",
+      "cambio": "Pedidos §13 en servidor y front",
+      "detalle": "Correos con respaldo en texto plano y log correo_plantilla_faltante; acción Habilitar crédito; /cuenta con tarjeta vacía; loaders con por_estado_proceso y desembolsos_mes; demo Policía/Ejército; wa.me en el pie. 552 vitest y build en verde."
+    },
+    {
+      "fecha": "2026-10-01",
+      "agente": "ga-diseno-a-codigo",
+      "tareas": "4.15, 4.7, 4.8",
+      "cambio": "4.7, 4.8 y 4.15 Hecho",
+      "detalle": "Ícono WhatsApp en el pie, botón «Habilitar nuevo crédito», selector segmentado en la demo, 8 estados y KPI Desembolsos del mes en admin, chips en asesor. e2e sin ejecutar."
     }
   ]
 }

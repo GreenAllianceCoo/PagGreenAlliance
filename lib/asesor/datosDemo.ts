@@ -6,6 +6,8 @@
 // las filas de grados_credito, no los 17 grados del catálogo `grados`.
 import { GRUPOS_CREDITO, type GrupoCredito as CodigoGrado } from "@/lib/gradosCatalogo";
 import { MONTO_MINIMO, formatTasa } from "@/lib/credito";
+import { gradosDeInstitucion, type GradoCatalogo } from "@/lib/gradosCatalogo";
+import type { CodigoInstitucion } from "@/lib/validaciones/instituciones";
 
 /** §12.1: el grupo OF solo queda por datos antiguos; ningún grado seleccionable lo usa, así que el simulador no lo ofrece. */
 export const GRADOS: readonly CodigoGrado[] = GRUPOS_CREDITO.filter((g) => g !== "OF");
@@ -56,3 +58,28 @@ export function topeMaximoDemo(paquetes: PaqueteDemo[]): number {
 }
 
 export { formatTasa, MONTO_MINIMO };
+
+/** §13.3: instituciones del selector de la demo. */
+export const INSTITUCIONES_DEMO: readonly { codigo: CodigoInstitucion; nombre: string }[] = [
+  { codigo: "policia", nombre: "Policía" },
+  { codigo: "ejercito", nombre: "Ejército" },
+];
+
+/** Grados que se ofrecen para la institución elegida (catálogo `grados`, §1/§12.1), en orden del catálogo. */
+export function gradosDemoDeInstitucion(catalogo: GradoCatalogo[], institucion: CodigoInstitucion): GradoCatalogo[] {
+  return gradosDeInstitucion(catalogo, institucion);
+}
+
+/**
+ * Cupo del grado elegido: los paquetes de su GRUPO de crédito. `[]` si el
+ * grado no tiene grupo (sin cupo todavía, §12.1) o el grupo no trajo filas.
+ * Las tasas llegan solo del servidor (RPC tabla_credito_con_tasa): aquí no hay cifras.
+ */
+export function paquetesDeGradoDemo(
+  catalogo: GradoCatalogo[],
+  paquetesPorGrupo: Record<CodigoGrado, PaqueteDemo[]> | null,
+  codigoGrado: string,
+): PaqueteDemo[] {
+  const grupo = catalogo.find((g) => g.codigo === codigoGrado)?.grupoCredito;
+  return grupo ? (paquetesPorGrupo?.[grupo] ?? []) : [];
+}

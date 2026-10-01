@@ -4,6 +4,8 @@
  * encabezado propio de /admin/demo.
  */
 export const SECCIONES = [
+  // Pieza 3r (4.7): dashboard «Resumen de clientes» en /admin.
+  { href: "/admin", etiqueta: "Resumen", clave: "resumen" },
   { href: "/admin/afiliaciones", etiqueta: "Afiliaciones", clave: "afiliaciones" },
   { href: "/admin/creditos", etiqueta: "Créditos", clave: "creditos" },
   // Pieza 3m: «Asociados» (proceso ejecutivo) y «Alertas» (retiro/renovación).

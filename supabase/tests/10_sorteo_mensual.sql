@@ -27,17 +27,31 @@ update public.perfiles set rol = 'admin' where id = '00000000-0000-4000-a000-000
 reset role;
 set local role service_role;
 
-select throws_ok(
+-- Independiente de la fecha real: si hoy está entre el 1 y el 5 se prueba
+-- el camino abierto (participa; confirmar con número errado falla) y luego se
+-- borra la boleta del mes en curso para no afectar las pruebas siguientes.
+select case when public.sorteo_ventana_abierta() then
+  lives_ok(
+    $$ select * from public.participar_sorteo('00000000-0000-4000-a000-00000000000a') $$,
+    'participar_sorteo funciona dentro de la ventana del 1 al 5')
+else throws_ok(
   $$ select * from public.participar_sorteo('00000000-0000-4000-a000-00000000000a') $$,
   'P0001', 'La inscripción al sorteo solo está abierta del 1 al 5 de cada mes',
-  'participar_sorteo falla fuera de la ventana del 1 al 5'
-);
+  'participar_sorteo falla fuera de la ventana del 1 al 5')
+end;
 
-select throws_ok(
+select case when public.sorteo_ventana_abierta() then
+  is(public.confirmar_boleta_sorteo('00000000-0000-4000-a000-00000000000a', '000000'), false,
+    'confirmar_boleta_sorteo rechaza un número que no es el de su boleta')
+else throws_ok(
   $$ select public.confirmar_boleta_sorteo('00000000-0000-4000-a000-00000000000a', '123456') $$,
   'P0001', 'La ventana del sorteo (1 al 5) ya cerró',
-  'confirmar_boleta_sorteo falla fuera de la ventana del 1 al 5'
-);
+  'confirmar_boleta_sorteo falla fuera de la ventana del 1 al 5')
+end;
+
+reset role;
+delete from public.boletas_sorteo where asociado_id = '00000000-0000-4000-a000-00000000000a';
+set local role service_role;
 
 select is(
   public.sorteo_ventana_abierta(),

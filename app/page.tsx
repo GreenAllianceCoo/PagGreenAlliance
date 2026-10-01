@@ -1,5 +1,5 @@
 import { Landing } from "@/components/pantallas/Landing";
-import { CORREO_CONTACTO, TEXTO_VIGILANCIA, WHATSAPP_NUMERO } from "@/lib/config";
+import { CORREO_CONTACTO, TEXTO_VIGILANCIA, WHATSAPP_NUMERO, WHATSAPP_URL_PIE } from "@/lib/config";
 import { cargarConvenios } from "@/lib/conveniosServidor";
 import { ESTADISTICAS_EJEMPLO } from "@/lib/mock";
 
@@ -16,6 +16,7 @@ export default async function Home() {
       estadisticas={ESTADISTICAS_EJEMPLO}
       convenios={convenios}
       whatsapp={WHATSAPP_NUMERO}
+      whatsappUrl={WHATSAPP_URL_PIE}
       correo={CORREO_CONTACTO}
       textoVigilancia={TEXTO_VIGILANCIA}
     />

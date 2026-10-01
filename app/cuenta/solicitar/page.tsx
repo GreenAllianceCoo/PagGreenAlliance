@@ -107,7 +107,7 @@ export default async function SolicitarPage() {
               </ButtonLink>
             </>
           ) : (
-            <SolicitudForm paquetes={paquetes} />
+            <SolicitudForm paquetes={paquetes} gradoNombre={cupo.estado === "con_cupo" ? cupo.nombre : ""} />
           )}
         </section>
       </main>

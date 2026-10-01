@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PanelAsesor } from "@/components/asesor/PanelAsesor";
 import { registrar } from "@/lib/servidor/registro";
 import { cargarComisionesAsesor, exigirAsesor } from "@/lib/asesor/servidor";
+import { cargarMetricasAsesor } from "@/lib/asesor/metricas";
 import { sanitizarFilaResumen, type FilaResumenAsesor } from "@/lib/asesor/resumen";
 import { buscarCliente, cerrarSesionAsesor, revelarAcumulado } from "./actions";
 
@@ -35,13 +36,14 @@ export default async function AsesorPage() {
   });
 
   // Comisiones del periodo (corte el 15): null si no se pudieron cargar (queda en el registro).
-  const comisiones = await cargarComisionesAsesor(supabase);
+  const [comisiones, metricas] = await Promise.all([cargarComisionesAsesor(supabase), cargarMetricasAsesor(supabase)]);
 
   return (
     <PanelAsesor
       nombre={perfil.nombre_completo ?? "Asesor"}
       filas={filas}
       comisiones={comisiones}
+      metricas={metricas}
       accionSalir={cerrarSesionAsesor}
       revelar={revelarAcumulado}
       buscar={buscarCliente}

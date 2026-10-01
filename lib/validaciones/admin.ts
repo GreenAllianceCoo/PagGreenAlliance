@@ -104,6 +104,19 @@ export const esquemaCambiarEstadoAsociado = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Habilitar crédito tras un rechazo (§13.2)
+// ---------------------------------------------------------------------------
+
+export const CAMPOS_HABILITAR_CREDITO = ["asociadoId", "motivo"] as const;
+export type CampoHabilitarCredito = (typeof CAMPOS_HABILITAR_CREDITO)[number];
+
+/** «Habilitar crédito»: motivo obligatorio (5 a 300 caracteres, igual que la base). */
+export const esquemaHabilitarCredito = z.object({
+  asociadoId: z.uuid({ error: "Falta el asociado." }),
+  motivo: esquemaCambiarEstadoAsociado.shape.motivo,
+});
+
+// ---------------------------------------------------------------------------
 // Sorteo mensual (§12.10)
 // ---------------------------------------------------------------------------
 

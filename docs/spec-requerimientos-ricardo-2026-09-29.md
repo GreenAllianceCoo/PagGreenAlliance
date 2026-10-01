@@ -373,3 +373,15 @@ No hace falta; la cooperativa lo maneja de forma interna. No se implementa.
 - **R-10 cerrado:** los grupos nuevos usan la tasa de OF. Por ahora no importa.
 - **R-11 cerrado:** el 50 % de MY y TC es la mitad (4,5 M y 6 M).
 - **Landing (30-sep, Sebas):** se quitó la tarjeta «Embargo solidario a 36 meses» y la mención en el paso 02; la grilla de servicios pasa a 3 columnas.
+
+## 13. Pedidos de Sebas (1-oct)
+
+1. **WhatsApp en el pie de página.** Volver a poner el enlace a WhatsApp de la cooperativa en el pie del sitio, con el logo. Usar el número de contacto que ya esté en `lib/config.ts`; si no hay, el de la cooperativa: 318 389 4034.
+2. **El admin cambia el estado de los asociados**, desde /admin/asociados/[id]:
+   - el proceso ejecutivo, que ya existe;
+   - dar de baja o reactivar, que ya existe;
+   - **volver a habilitar el crédito de un asociado después de que se le rechazó una solicitud.** Hoy el asociado queda bloqueado. Hay que revisar por qué: la regla, el trigger o la pantalla. La habilitación la hace el admin con una acción, con motivo y registro en el historial.
+3. **Modo demostración (/asesor/demo y /admin/demo)** con el diseño C+ nuevo, como /cuenta, y con un **selector Policía / Ejército** que cambie los grados y cupos que se muestran, según la §12.1.
+4. **Correos que no llegan.** El aviso de crédito rechazado (y el de aprobado) no se envía si falta `RESEND_TEMPLATE_CREDITO_RECHAZADO` (o `_APROBADO`): solo registra `credito_resultado_no_enviado`. Hay que hacer dos cosas:
+   - **Respaldo:** todos los correos con plantilla (crédito aprobado y rechazado, ingreso aceptado, sorteo, desembolso) deben caer a texto plano con el mismo contenido si la plantilla falta o falla, igual que `lib/correo/institucional.ts`.
+   - **Diagnóstico:** un registro claro de cuál variable o plantilla falta, sin datos personales.

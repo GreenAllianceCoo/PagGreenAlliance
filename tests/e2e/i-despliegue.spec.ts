@@ -1,6 +1,17 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Browser, type Page, type TestInfo } from "@playwright/test";
-import { createCipheriv, createHash, createHmac, randomBytes } from "node:crypto";
+import {
+  expect,
+  test,
+  type Browser,
+  type Page,
+  type TestInfo,
+} from "@playwright/test";
+import {
+  createCipheriv,
+  createHash,
+  createHmac,
+  randomBytes,
+} from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import {
@@ -53,23 +64,39 @@ const VERDE = "rgb(30, 102, 82)";
 /** Misma clave que lib/servidor/limite.ts#claveHmac (con el secreto LOCAL). */
 function claveLimite(tipo: string, valor: string) {
   const secreto = ENV_LOCAL.LIMITE_HMAC_SECRET ?? "";
-  const hmac = createHmac("sha256", secreto).update(`${tipo}:${valor}`).digest("hex").slice(0, 40);
+  const hmac = createHmac("sha256", secreto)
+    .update(`${tipo}:${valor}`)
+    .digest("hex")
+    .slice(0, 40);
   return `${tipo}:${hmac}`;
 }
 
 /** Llena un límite (service role, solo local) para simular que ya se gastaron los intentos. */
 async function gastarLimite(tipo: string, valor: string, veces: number) {
-  const filas = Array.from({ length: veces }, () => ({ clave: claveLimite(tipo, valor) }));
-  const r = await adminRest("limites_intentos", { method: "POST", body: JSON.stringify(filas) });
-  expect(r.status, `insertar límites ${tipo}: ${JSON.stringify(r.cuerpo)}`).toBeLessThan(300);
+  const filas = Array.from({ length: veces }, () => ({
+    clave: claveLimite(tipo, valor),
+  }));
+  const r = await adminRest("limites_intentos", {
+    method: "POST",
+    body: JSON.stringify(filas),
+  });
+  expect(
+    r.status,
+    `insertar límites ${tipo}: ${JSON.stringify(r.cuerpo)}`,
+  ).toBeLessThan(300);
 }
 
 /** Misma cookie cifrada que lib/ingreso/servidor.ts (con el secreto LOCAL). */
 function cookieIngreso(datos: { c: string; m: string; u: number }) {
-  const llave = createHash("sha256").update(ENV_LOCAL.INGRESO_COOKIE_SECRET ?? "").digest();
+  const llave = createHash("sha256")
+    .update(ENV_LOCAL.INGRESO_COOKIE_SECRET ?? "")
+    .digest();
   const iv = randomBytes(12);
   const c = createCipheriv("aes-256-gcm", llave, iv);
-  const cuerpo = Buffer.concat([c.update(JSON.stringify(datos), "utf8"), c.final()]);
+  const cuerpo = Buffer.concat([
+    c.update(JSON.stringify(datos), "utf8"),
+    c.final(),
+  ]);
   return Buffer.concat([iv, c.getAuthTag(), cuerpo]).toString("base64url");
 }
 
@@ -87,7 +114,9 @@ async function solicitudesDe(id: string) {
 }
 
 async function borrarSolicitudesSinSolicitudes() {
-  await adminRest(`solicitudes_credito?asociado_id=eq.${ID_SIN_SOLICITUDES}`, { method: "DELETE" });
+  await adminRest(`solicitudes_credito?asociado_id=eq.${ID_SIN_SOLICITUDES}`, {
+    method: "DELETE",
+  });
 }
 
 /**
@@ -145,11 +174,23 @@ async function axeGraves(page: Page, nombre: string, testInfo: TestInfo) {
   fs.mkdirSync(CARPETA_QA, { recursive: true });
   fs.writeFileSync(
     path.join(CARPETA_QA, `axe-${nombre}-${testInfo.project.name}.json`),
-    JSON.stringify(r.violations.map((v) => ({ id: v.id, impacto: v.impact, ayuda: v.help, nodos: v.nodes.map((n) => n.target.join(" ")) })), null, 2),
+    JSON.stringify(
+      r.violations.map((v) => ({
+        id: v.id,
+        impacto: v.impact,
+        ayuda: v.help,
+        nodos: v.nodes.map((n) => n.target.join(" ")),
+      })),
+      null,
+      2,
+    ),
   );
   return r.violations
     .filter((v) => v.impact === "serious" || v.impact === "critical")
-    .map((v) => `${v.id} (${v.impact}): ${v.help} → ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`);
+    .map(
+      (v) =>
+        `${v.id} (${v.impact}): ${v.help} → ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`,
+    );
 }
 
 async function sesionSinSolicitudes(browser: Browser, testInfo: TestInfo) {
@@ -170,26 +211,41 @@ test.describe("I1 · /login y /dashboard ya no existen", () => {
     });
   }
 
-  test("Ninguna página (pública o con sesión) enlaza a /login o /dashboard", async ({ browser }, testInfo) => {
+  test("Ninguna página (pública o con sesión) enlaza a /login o /dashboard", async ({
+    browser,
+  }, testInfo) => {
     const malos: string[] = [];
     const revisar = async (page: Page, ruta: string) => {
       await page.goto(ruta);
       const html = await page.content();
       const destinos = await page
         .locator("a[href], form[action], button[formaction]")
-        .evaluateAll((els) => els.map((e) => e.getAttribute("href") ?? e.getAttribute("action") ?? e.getAttribute("formaction") ?? ""));
-      for (const d of destinos) if (/^\/(login|dashboard)(\/|$|\?|#)/.test(d)) malos.push(`${ruta}: ${d}`);
-      if (/["'(]\/(login|dashboard)(\/|["'?#)])/.test(html)) malos.push(`${ruta}: aparece en el HTML`);
+        .evaluateAll((els) =>
+          els.map(
+            (e) =>
+              e.getAttribute("href") ??
+              e.getAttribute("action") ??
+              e.getAttribute("formaction") ??
+              "",
+          ),
+        );
+      for (const d of destinos)
+        if (/^\/(login|dashboard)(\/|$|\?|#)/.test(d))
+          malos.push(`${ruta}: ${d}`);
+      if (/["'(]\/(login|dashboard)(\/|["'?#)])/.test(html))
+        malos.push(`${ruta}: aparece en el HTML`);
     };
     const publica = await browser.newContext(opcionesContexto(testInfo));
     const p = await publica.newPage();
-    for (const ruta of ["/", "/ingresar", "/afiliacion", "/politica-de-datos"]) await revisar(p, ruta);
+    for (const ruta of ["/", "/ingresar", "/afiliacion", "/politica-de-datos"])
+      await revisar(p, ruta);
     await pedirCodigo(p, CEDULA_NO_REGISTRADA);
     await revisar(p, "/ingresar/codigo");
     await publica.close();
 
     const { ctx, page } = await sesionSinSolicitudes(browser, testInfo);
-    for (const ruta of ["/cuenta", "/cuenta/solicitar"]) await revisar(page, ruta);
+    for (const ruta of ["/cuenta", "/cuenta/solicitar"])
+      await revisar(page, ruta);
     await ctx.close();
     expect(malos).toEqual([]);
   });
@@ -201,14 +257,22 @@ test.describe("I1 · /login y /dashboard ya no existen", () => {
       for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
         const p = path.join(dir, e.name);
         if (e.isDirectory()) recorrer(p);
-        else if (/\.(ts|tsx|mjs|js)$/.test(e.name) && /["'`]\/(login|dashboard)\b/.test(fs.readFileSync(p, "utf8"))) {
+        else if (
+          /\.(ts|tsx|mjs|js)$/.test(e.name) &&
+          /["'`]\/(login|dashboard)\b/.test(fs.readFileSync(p, "utf8"))
+        ) {
           malos.push(path.relative(RAIZ, p));
         }
       }
     };
     for (const d of ["app", "components", "lib"]) recorrer(path.join(RAIZ, d));
     for (const f of ["proxy.ts", "next.config.mjs"]) {
-      if (/["'`]\/(login|dashboard)\b/.test(fs.readFileSync(path.join(RAIZ, f), "utf8"))) malos.push(f);
+      if (
+        /["'`]\/(login|dashboard)\b/.test(
+          fs.readFileSync(path.join(RAIZ, f), "utf8"),
+        )
+      )
+        malos.push(f);
     }
     expect(fs.existsSync(path.join(RAIZ, "app", "login"))).toBe(false);
     expect(fs.existsSync(path.join(RAIZ, "app", "dashboard"))).toBe(false);
@@ -235,8 +299,15 @@ test.describe("I2 · /cuenta/solicitar", () => {
   test("Pantalla: título, 50/100 %, deslizador (mínimo 100.000, tope y pasos), tasa y plazo del grado", async ({
     browser,
   }, testInfo) => {
-    const { cuerpo } = await adminRest("grados_credito?select=porcentaje,capacidad_maxima,tasa_interes_mensual,plazo_meses&grado=eq.SI");
-    const paquetes = cuerpo as { porcentaje: string; capacidad_maxima: number; tasa_interes_mensual: number; plazo_meses: number }[];
+    const { cuerpo } = await adminRest(
+      "grados_credito?select=porcentaje,capacidad_maxima,tasa_interes_mensual,plazo_meses&grado=eq.SI",
+    );
+    const paquetes = cuerpo as {
+      porcentaje: string;
+      capacidad_maxima: number;
+      tasa_interes_mensual: number;
+      plazo_meses: number;
+    }[];
     const pesos = (v: number) => `$${v.toLocaleString("es-CO")}`;
 
     const { ctx, page } = await sesionSinSolicitudes(browser, testInfo);
@@ -244,25 +315,43 @@ test.describe("I2 · /cuenta/solicitar", () => {
     page.on("pageerror", (e) => errores.push(e.message));
     const r = await page.goto("/cuenta/solicitar");
     expect(r?.status()).toBe(200);
-    await expect(page).toHaveTitle("Nueva solicitud · Cooperativa Green Alliance");
+    await expect(page).toHaveTitle(
+      "Nueva solicitud · Cooperativa Green Alliance",
+    );
     await expect(page.locator("h1")).toHaveText("Nueva solicitud");
-    await expect(page.getByRole("heading", { level: 2, name: "Solicita tu crédito" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Solicita tu crédito" }),
+    ).toBeVisible();
     if (esEscritorio(testInfo)) {
-      await expect(page.getByRole("navigation", { name: "Principal" }).getByRole("link", { name: "Nueva solicitud" })).toHaveAttribute("aria-current", "page");
-      await expect(page.getByRole("navigation", { name: "Principal" }).getByRole("link", { name: "Convenios" })).toHaveAttribute("href", "/cuenta#convenios");
+      await expect(
+        page
+          .getByRole("navigation", { name: "Principal" })
+          .getByRole("link", { name: "Nueva solicitud" }),
+      ).toHaveAttribute("aria-current", "page");
+      await expect(
+        page
+          .getByRole("navigation", { name: "Principal" })
+          .getByRole("link", { name: "Convenios" }),
+      ).toHaveAttribute("href", "/cuenta#convenios");
     }
 
     const monto = page.locator("#monto");
     for (const p of paquetes) {
-      await page.getByText(`${p.porcentaje}% de devolución`, { exact: true }).click();
-      await expect(page.getByRole("radio", { name: `${p.porcentaje}% de devolución` })).toBeChecked();
+      await page.getByText(`${p.porcentaje} %`, { exact: true }).click();
+      await expect(
+        page.getByRole("radio", { name: new RegExp(`^${p.porcentaje} %`) }),
+      ).toBeChecked();
       await expect(monto).toHaveAttribute("min", "100000");
       await expect(monto).toHaveAttribute("max", String(p.capacidad_maxima));
       await expect(monto).toHaveAttribute("step", "50000");
       // Al elegir el paquete, el monto queda en el tope.
       await expect(monto).toHaveValue(String(p.capacidad_maxima));
-      await expect(page.locator("output[for=monto]")).toHaveText(pesos(p.capacidad_maxima));
-      await expect(page.getByText(`Tope ${pesos(p.capacidad_maxima)}`)).toBeVisible();
+      await expect(page.locator("output[for=monto]")).toHaveText(
+        pesos(p.capacidad_maxima),
+      );
+      await expect(
+        page.getByText(`Tope ${pesos(p.capacidad_maxima)}`),
+      ).toBeVisible();
       await expect(page.getByText("Mínimo $100.000")).toBeVisible();
       const dl = page.locator("main dl");
       await expect(dl).not.toContainText("Interés");
@@ -283,8 +372,14 @@ test.describe("I2 · /cuenta/solicitar", () => {
     await page.mouse.move(1, 1);
     await page.waitForTimeout(400);
     const boton = page.getByRole("button", { name: "Enviar solicitud" });
-    expect(await boton.evaluate((n) => getComputedStyle(n).backgroundColor)).toBe(VERDE);
-    expect((await page.evaluate(() => getComputedStyle(document.body).fontFamily)).toLowerCase()).toContain("manrope");
+    expect(
+      await boton.evaluate((n) => getComputedStyle(n).backgroundColor),
+    ).toBe(VERDE);
+    expect(
+      (
+        await page.evaluate(() => getComputedStyle(document.body).fontFamily)
+      ).toLowerCase(),
+    ).toContain("manrope");
     await capturaCompleta(page, "i-cuenta-solicitar", testInfo);
 
     // Flecha volver → /cuenta.
@@ -294,10 +389,12 @@ test.describe("I2 · /cuenta/solicitar", () => {
     await ctx.close();
   });
 
-  test("Envío válido (100 %, $100.000) → /cuenta con la solicitud; luego ya no deja pedir otra", async ({ browser }, testInfo) => {
+  test("Envío válido (100 %, $100.000) → /cuenta con la solicitud; luego ya no deja pedir otra", async ({
+    browser,
+  }, testInfo) => {
     const { ctx, page } = await sesionSinSolicitudes(browser, testInfo);
     await page.goto("/cuenta/solicitar");
-    await page.getByText("100% de devolución", { exact: true }).click();
+    await page.getByRole("radio", { name: /^100 %/ }).check({ force: true });
     await page.locator("#monto").focus();
     await page.keyboard.press("Home");
     await expect(page.locator("output[for=monto]")).toHaveText("$100.000");
@@ -310,24 +407,42 @@ test.describe("I2 · /cuenta/solicitar", () => {
     expect(texto).toContain("100%");
     expect(texto).not.toContain("Interés");
     const filas = await solicitudesDe(ID_SIN_SOLICITUDES);
-    expect(filas.map((f) => [f.estado, Number(f.monto_solicitado), f.porcentaje_devolucion])).toEqual([["pendiente", 100000, "100"]]);
+    expect(
+      filas.map((f) => [
+        f.estado,
+        Number(f.monto_solicitado),
+        f.porcentaje_devolucion,
+      ]),
+    ).toEqual([["pendiente", 100000, "100"]]);
 
     await page.goto("/cuenta/solicitar");
-    await expect(page.getByText("Ya tienes una solicitud pendiente de revisión. Espera la respuesta antes de enviar una nueva.")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Enviar solicitud" })).toHaveCount(0);
+    await expect(
+      page.getByText(
+        "Ya tienes una solicitud pendiente de revisión. Espera la respuesta antes de enviar una nueva.",
+      ),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Enviar solicitud" }),
+    ).toHaveCount(0);
     await expect(page.locator("#monto")).toHaveCount(0);
     await page.getByRole("link", { name: "Volver a mi cuenta" }).click();
     await expect(page).toHaveURL(/\/cuenta$/);
     await ctx.close();
   });
 
-  test("Con solicitud pendiente (asociado 1234567890): aviso y «Volver a mi cuenta»; axe sin graves", async ({ browser }, testInfo) => {
+  test("Con solicitud pendiente (asociado 1234567890): aviso y «Volver a mi cuenta»; axe sin graves", async ({
+    browser,
+  }, testInfo) => {
     const ctx = await contextoConSesion(browser, "conSolicitud", testInfo);
     const page = await ctx.newPage();
     await page.goto("/cuenta/solicitar");
-    await expect(page.getByText(/Ya tienes una solicitud pendiente de revisión/)).toBeVisible();
+    await expect(
+      page.getByText(/Ya tienes una solicitud pendiente de revisión/),
+    ).toBeVisible();
     await expect(page.locator("form #monto")).toHaveCount(0);
-    expect(await axeGraves(page, "cuenta-solicitar-pendiente", testInfo)).toEqual([]);
+    expect(
+      await axeGraves(page, "cuenta-solicitar-pendiente", testInfo),
+    ).toEqual([]);
     await capturaCompleta(page, "i-cuenta-solicitar-pendiente", testInfo);
     await ctx.close();
   });
@@ -335,40 +450,80 @@ test.describe("I2 · /cuenta/solicitar", () => {
   test("Servidor: rechaza monto bajo el mínimo, sobre el tope y porcentaje inválido (cliente manipulado)", async ({
     browser,
   }, testInfo) => {
-    test.skip(!esEscritorio(testInfo), "Validación del servidor: una vez basta");
+    test.skip(
+      !esEscritorio(testInfo),
+      "Validación del servidor: una vez basta",
+    );
     const { ctx, page } = await sesionSinSolicitudes(browser, testInfo);
     const casos = [
-      { campo: "monto", valor: "50000", error: "El monto mínimo de un crédito es $100.000.", foco: "#monto" },
-      { campo: "monto", valor: "1550000", error: "El monto supera el tope permitido para tu grado.", foco: "#monto" },
-      { campo: "monto", valor: "abc", error: "Elige un monto válido.", foco: "#monto" },
-      { campo: "porcentaje", valor: "75", error: "Elige el porcentaje de devolución.", foco: 'input[name="porcentaje"]' },
+      {
+        campo: "monto",
+        valor: "50000",
+        error: "El monto mínimo de un crédito es $100.000.",
+        foco: "#monto",
+      },
+      {
+        campo: "monto",
+        valor: "1550000",
+        error: "El monto supera el tope permitido para tu grado.",
+        foco: "#monto",
+      },
+      {
+        campo: "monto",
+        valor: "abc",
+        error: "Elige un monto válido.",
+        foco: "#monto",
+      },
+      {
+        campo: "porcentaje",
+        valor: "75",
+        error: "Elige el porcentaje de devolución.",
+        foco: 'input[name="porcentaje"]',
+      },
     ];
     for (const c of casos) {
       await page.goto("/cuenta/solicitar");
       await page.waitForLoadState("networkidle");
-      await page.getByText("50% de devolución", { exact: true }).click();
+      await page.getByRole("radio", { name: /^50 %/ }).check({ force: true });
       // Deja que termine el re-render del clic anterior (elegir el paquete)
       // antes de manipular y enviar en un solo turno: ver forzarCampoYEnviar.
       await page.waitForTimeout(150);
       await forzarCampoYEnviar(page, c.campo, c.valor);
-      await expect(page.getByText(c.error), `${c.campo}=${c.valor}`).toBeVisible();
+      await expect(
+        page.getByText(c.error),
+        `${c.campo}=${c.valor}`,
+      ).toBeVisible();
       await expect(page).toHaveURL(/\/cuenta\/solicitar$/);
       if (c.campo === "monto") {
         await expect(page.locator("#monto")).toBeFocused();
-        await expect(page.locator("#monto")).toHaveAttribute("aria-invalid", "true");
-        await expect(page.locator("#monto")).toHaveAttribute("aria-describedby", /monto-error/);
+        await expect(page.locator("#monto")).toHaveAttribute(
+          "aria-invalid",
+          "true",
+        );
+        await expect(page.locator("#monto")).toHaveAttribute(
+          "aria-describedby",
+          /monto-error/,
+        );
       }
-      expect(await solicitudesDe(ID_SIN_SOLICITUDES), `sin fila tras ${c.campo}=${c.valor}`).toEqual([]);
+      expect(
+        await solicitudesDe(ID_SIN_SOLICITUDES),
+        `sin fila tras ${c.campo}=${c.valor}`,
+      ).toEqual([]);
     }
     await ctx.close();
   });
 
-  test("Servidor: monto que no es múltiplo de 50.000 (registro del comportamiento)", async ({ browser }, testInfo) => {
-    test.skip(!esEscritorio(testInfo), "Validación del servidor: una vez basta");
+  test("Servidor: monto que no es múltiplo de 50.000 (registro del comportamiento)", async ({
+    browser,
+  }, testInfo) => {
+    test.skip(
+      !esEscritorio(testInfo),
+      "Validación del servidor: una vez basta",
+    );
     const { ctx, page } = await sesionSinSolicitudes(browser, testInfo);
     await page.goto("/cuenta/solicitar");
     await page.waitForLoadState("networkidle");
-    await page.getByText("50% de devolución", { exact: true }).click();
+    await page.getByRole("radio", { name: /^50 %/ }).check({ force: true });
     await page.waitForTimeout(150);
     await forzarCampoYEnviar(page, "monto", "123457");
     await page.waitForTimeout(3000);
@@ -381,7 +536,10 @@ test.describe("I2 · /cuenta/solicitar", () => {
     // Hallazgo informativo (Baja): el mapa pide pasos de $50.000 en el deslizador; el servidor no lo exige.
     test.info().annotations.push({
       type: "hallazgo",
-      description: filas.length > 0 ? `El servidor guardó ${filas[0].monto_solicitado} (no múltiplo de 50.000)` : "Rechazado",
+      description:
+        filas.length > 0
+          ? `El servidor guardó ${filas[0].monto_solicitado} (no múltiplo de 50.000)`
+          : "Rechazado",
     });
     await ctx.close();
   });
@@ -393,22 +551,41 @@ test.describe("I2 · /cuenta/solicitar", () => {
     // A nombre de otro asociado → rechazado.
     const ajena = await usuarioRest("solicitudes_credito", token, {
       method: "POST",
-      body: JSON.stringify({ asociado_id: ID_CON_SOLICITUD, porcentaje_devolucion: "50", monto_solicitado: 200000 }),
+      // La columna de tasa no es legible para el asociado (20260930100300): sin representación.
+      headers: { Prefer: "return=minimal" },
+      body: JSON.stringify({
+        asociado_id: ID_CON_SOLICITUD,
+        porcentaje_devolucion: "50",
+        monto_solicitado: 200000,
+      }),
     });
-    expect(ajena.status, JSON.stringify(ajena.cuerpo)).toBeGreaterThanOrEqual(400);
+    expect(ajena.status, JSON.stringify(ajena.cuerpo)).toBeGreaterThanOrEqual(
+      400,
+    );
 
     // Sobre el tope (SI 50 % = 1.500.000) y bajo el mínimo → rechazado por la base.
     for (const monto of [1550000, 50000]) {
       const r = await usuarioRest("solicitudes_credito", token, {
         method: "POST",
-        body: JSON.stringify({ asociado_id: ID_SIN_SOLICITUDES, porcentaje_devolucion: "50", monto_solicitado: monto }),
+        // La columna de tasa no es legible para el asociado (20260930100300): sin representación.
+        headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({
+          asociado_id: ID_SIN_SOLICITUDES,
+          porcentaje_devolucion: "50",
+          monto_solicitado: monto,
+        }),
       });
-      expect(r.status, `monto ${monto}: ${JSON.stringify(r.cuerpo)}`).toBeGreaterThanOrEqual(400);
+      expect(
+        r.status,
+        `monto ${monto}: ${JSON.stringify(r.cuerpo)}`,
+      ).toBeGreaterThanOrEqual(400);
     }
 
     // Intentar crearla ya aprobada y con otra tasa → nace pendiente con la tasa del grado.
     const primera = await usuarioRest("solicitudes_credito", token, {
       method: "POST",
+      // La columna de tasa no es legible para el asociado (20260930100300): sin representación.
+      headers: { Prefer: "return=minimal" },
       body: JSON.stringify({
         asociado_id: ID_SIN_SOLICITUDES,
         porcentaje_devolucion: "50",
@@ -426,38 +603,70 @@ test.describe("I2 · /cuenta/solicitar", () => {
     // Segunda pendiente → rechazada (índice único).
     const segunda = await usuarioRest("solicitudes_credito", token, {
       method: "POST",
-      body: JSON.stringify({ asociado_id: ID_SIN_SOLICITUDES, porcentaje_devolucion: "100", monto_solicitado: 300000 }),
+      // La columna de tasa no es legible para el asociado (20260930100300): sin representación.
+      headers: { Prefer: "return=minimal" },
+      body: JSON.stringify({
+        asociado_id: ID_SIN_SOLICITUDES,
+        porcentaje_devolucion: "100",
+        monto_solicitado: 300000,
+      }),
     });
-    expect(segunda.status, JSON.stringify(segunda.cuerpo)).toBeGreaterThanOrEqual(400);
+    expect(
+      segunda.status,
+      JSON.stringify(segunda.cuerpo),
+    ).toBeGreaterThanOrEqual(400);
 
     // El asociado no puede aprobar su propia solicitud ni subir el monto sobre el tope.
-    const aprobar = await usuarioRest(`solicitudes_credito?asociado_id=eq.${ID_SIN_SOLICITUDES}`, token, {
-      method: "PATCH",
-      body: JSON.stringify({ estado: "aprobado" }),
-    });
-    const subir = await usuarioRest(`solicitudes_credito?asociado_id=eq.${ID_SIN_SOLICITUDES}`, token, {
-      method: "PATCH",
-      body: JSON.stringify({ monto_solicitado: 9000000 }),
-    });
+    const aprobar = await usuarioRest(
+      `solicitudes_credito?asociado_id=eq.${ID_SIN_SOLICITUDES}`,
+      token,
+      {
+        method: "PATCH",
+        // La columna de tasa no es legible para el asociado (20260930100300): sin representación.
+        headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({ estado: "aprobado" }),
+      },
+    );
+    const subir = await usuarioRest(
+      `solicitudes_credito?asociado_id=eq.${ID_SIN_SOLICITUDES}`,
+      token,
+      {
+        method: "PATCH",
+        // La columna de tasa no es legible para el asociado (20260930100300): sin representación.
+        headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({ monto_solicitado: 9000000 }),
+      },
+    );
     filas = await solicitudesDe(ID_SIN_SOLICITUDES);
-    expect(filas, `PATCH estado → ${aprobar.status}; PATCH monto → ${subir.status}`).toHaveLength(1);
+    expect(
+      filas,
+      `PATCH estado → ${aprobar.status}; PATCH monto → ${subir.status}`,
+    ).toHaveLength(1);
     expect(filas[0].estado).toBe("pendiente");
     expect(Number(filas[0].monto_solicitado)).toBe(200000);
 
     // No ve la solicitud del otro asociado.
-    const ajenas = await usuarioRest(`solicitudes_credito?select=id&asociado_id=eq.${ID_CON_SOLICITUD}`, token);
+    const ajenas = await usuarioRest(
+      `solicitudes_credito?select=id&asociado_id=eq.${ID_CON_SOLICITUD}`,
+      token,
+    );
     expect(ajenas.cuerpo).toEqual([]);
   });
 
-  test("Teclado y axe en el formulario: radios con flechas, Enter envía; sin violaciones graves", async ({ browser }, testInfo) => {
+  test("Teclado y axe en el formulario: radios con flechas, Enter envía; sin violaciones graves", async ({
+    browser,
+  }, testInfo) => {
     const { ctx, page } = await sesionSinSolicitudes(browser, testInfo);
     await page.goto("/cuenta/solicitar");
     await page.waitForLoadState("networkidle");
     expect(await axeGraves(page, "cuenta-solicitar", testInfo)).toEqual([]);
     // Todos los campos con nombre accesible.
-    await expect(page.getByRole("radio", { name: "50% de devolución" })).toHaveCount(1);
-    await expect(page.getByRole("radio", { name: "100% de devolución" })).toHaveCount(1);
-    await expect(page.getByRole("slider", { name: "Monto a desembolsar" })).toHaveCount(1);
+    await expect(
+      page.getByRole("radio", { name: /^50 %/ }),
+    ).toHaveCount(1);
+    await expect(
+      page.getByRole("radio", { name: /^100 %/ }),
+    ).toHaveCount(1);
 
     // Tab hasta el primer radio; foco visible en su tarjeta. En celular
     // (pieza 2b) el encabezado agrega el ícono «Cerrar sesión» entre
@@ -468,19 +677,28 @@ test.describe("I2 · /cuenta/solicitar", () => {
     let enfocado: string | null | undefined;
     for (let i = 0; i < 3; i++) {
       await page.keyboard.press("Tab");
-      enfocado = await page.evaluate(() => (document.activeElement as HTMLInputElement | null)?.name);
+      enfocado = await page.evaluate(
+        () => (document.activeElement as HTMLInputElement | null)?.name,
+      );
       if (enfocado === "porcentaje") break;
     }
     expect(enfocado).toBe("porcentaje");
     const outline = await page.evaluate(() => {
-      const span = (document.activeElement as HTMLElement).nextElementSibling as HTMLElement;
+      const span = (document.activeElement as HTMLElement)
+        .nextElementSibling as HTMLElement;
       const s = getComputedStyle(span);
       return s.outlineStyle !== "none" && parseFloat(s.outlineWidth) > 0;
     });
     expect(outline, "foco visible en la tarjeta del porcentaje").toBe(true);
     await page.keyboard.press("ArrowRight");
-    const marcado = await page.locator('input[name="porcentaje"]:checked').getAttribute("value");
+    const marcado = await page
+      .locator('input[name="porcentaje"]:checked')
+      .getAttribute("value");
     expect(["50", "100"]).toContain(marcado);
+    // El deslizador del monto aparece al elegir el porcentaje y tiene nombre accesible.
+    const slider = page.getByRole("slider");
+    await expect(slider).toHaveCount(1);
+    expect(await slider.evaluate((el) => (el as HTMLInputElement).labels?.length ?? 0)).toBeGreaterThan(0);
     await ctx.close();
   });
 });
@@ -496,7 +714,9 @@ test.describe("I3 · Límites de intentos", () => {
   });
   test.afterEach(limpiarLimites);
 
-  test("Código: 1 cada 45 s por cédula (desde otro navegador tampoco), misma pantalla y sin correo", async ({ browser }, testInfo) => {
+  test("Código: 1 cada 45 s por cédula (desde otro navegador tampoco), misma pantalla y sin correo", async ({
+    browser,
+  }, testInfo) => {
     const u = USUARIOS.sinSolicitudes;
     await esperarVentanaReenvio(u.correo);
     const a = await browser.newContext(opcionesContexto(testInfo));
@@ -513,22 +733,33 @@ test.describe("I3 · Límites de intentos", () => {
     const textoB = (await pb.locator("main").innerText()).replace(/\s+/g, " ");
     expect(textoB).toBe(textoA);
     await pb.waitForTimeout(4000);
-    expect((await mensajesPara(u.correo)).length, "no debe llegar un segundo correo antes de 45 s").toBe(antes);
+    expect(
+      (await mensajesPara(u.correo)).length,
+      "no debe llegar un segundo correo antes de 45 s",
+    ).toBe(antes);
 
     // Forzar «Reenviar código» antes de tiempo (botón habilitado a mano): el servidor lo frena.
     await pa.evaluate(() => {
-      const btn = Array.from(document.querySelectorAll("button")).find((x) => x.textContent?.includes("Reenviar código"));
+      const btn = Array.from(document.querySelectorAll("button")).find((x) =>
+        x.textContent?.includes("Reenviar código"),
+      );
       btn?.removeAttribute("disabled");
     });
-    await pa.getByRole("button", { name: "Reenviar código" }).click({ force: true });
-    await expect(pa.getByRole("status")).toContainText(/Espera \d+ segundos para pedir otro código|Enviando/);
+    await pa
+      .getByRole("button", { name: "Reenviar código" })
+      .click({ force: true });
+    await expect(pa.getByRole("status")).toContainText(
+      /Espera \d+ segundos para pedir otro código|Enviando/,
+    );
     await pa.waitForTimeout(3000);
     expect((await mensajesPara(u.correo)).length).toBe(antes);
     await a.close();
     await b.close();
   });
 
-  test("Código: tope de 5 por cédula en 15 min → misma pantalla, sin correo", async ({ page }) => {
+  test("Código: tope de 5 por cédula en 15 min → misma pantalla, sin correo", async ({
+    page,
+  }) => {
     const u = USUARIOS.sinSolicitudes;
     await esperarVentanaReenvio(u.correo);
     await gastarLimite("otp-cedula", u.cedula, 5);
@@ -541,43 +772,66 @@ test.describe("I3 · Límites de intentos", () => {
     expect((await mensajesPara(u.correo)).length).toBe(antes);
   });
 
-  test("Código: tope de 20 por IP en 15 min → misma pantalla, sin correo", async ({ browser }, testInfo) => {
+  test("Código: tope de 20 por IP en 15 min → misma pantalla, sin correo", async ({
+    browser,
+  }, testInfo) => {
     const u = USUARIOS.sinSolicitudes;
     const ip = "203.0.113.77";
     await esperarVentanaReenvio(u.correo);
     await gastarLimite("otp-ip", ip, 20);
-    const ctx = await browser.newContext({ ...opcionesContexto(testInfo), extraHTTPHeaders: { "x-forwarded-for": ip } });
+    const ctx = await browser.newContext({
+      ...opcionesContexto(testInfo),
+      extraHTTPHeaders: { "x-forwarded-for": ip },
+    });
     const page = await ctx.newPage();
     const antes = (await mensajesPara(u.correo)).length;
     await pedirCodigo(page, u.cedula);
     await expect(page.locator("body")).toContainText(u.mascara);
     await page.waitForTimeout(5000);
-    expect((await mensajesPara(u.correo)).length, "con la IP en el tope no debe salir correo").toBe(antes);
+    expect(
+      (await mensajesPara(u.correo)).length,
+      "con la IP en el tope no debe salir correo",
+    ).toBe(antes);
     await ctx.close();
   });
 
-  test("Afiliación: 5 por hora por IP → mensaje general, sin fila", async ({ browser }, testInfo) => {
+  test("Afiliación: 5 por hora por IP → mensaje general, sin fila", async ({
+    browser,
+  }, testInfo) => {
     const ip = "203.0.113.78";
     await gastarLimite("afiliacion-ip", ip, 5);
-    const ctx = await browser.newContext({ ...opcionesContexto(testInfo), extraHTTPHeaders: { "x-forwarded-for": ip } });
+    const ctx = await browser.newContext({
+      ...opcionesContexto(testInfo),
+      extraHTTPHeaders: { "x-forwarded-for": ip },
+    });
     const page = await ctx.newPage();
     const d = datosValidos();
     await page.goto("/afiliacion");
     await llenarAfiliacion(page, d);
     await page.getByRole("button", { name: "Enviar solicitud" }).click();
-    await expect(page.getByText("Recibimos varias solicitudes desde esta conexión. Intenta de nuevo en una hora.")).toBeVisible();
+    await expect(
+      page.getByText(
+        "Recibimos varias solicitudes desde esta conexión. Intenta de nuevo en una hora.",
+      ),
+    ).toBeVisible();
     await expect(page).toHaveURL(/\/afiliacion$/);
     expect(await afiliacionesPorCedula(d.cedula)).toHaveLength(0);
     await ctx.close();
   });
 
-  test("Afiliación: 3 por día por cédula → error en la cédula, sin fila", async ({ page }) => {
+  test("Afiliación: 3 por día por cédula → error en la cédula, sin fila", async ({
+    page,
+  }) => {
     const d = datosValidos();
     await gastarLimite("afiliacion-cedula", d.cedula, 3);
     await page.goto("/afiliacion");
     await llenarAfiliacion(page, d);
     await page.getByRole("button", { name: "Enviar solicitud" }).click();
-    await expect(page.getByText("Ya recibimos varias solicitudes con esta cédula hoy. Intenta de nuevo mañana.")).toBeVisible();
+    await expect(
+      page.getByText(
+        "Ya recibimos varias solicitudes con esta cédula hoy. Intenta de nuevo mañana.",
+      ),
+    ).toBeVisible();
     expect(await afiliacionesPorCedula(d.cedula)).toHaveLength(0);
   });
 });
@@ -592,7 +846,9 @@ test.describe("I4 · Código viejo, cookie vencida y tiempos del paso 2", () => 
     await limpiarLimites();
   });
 
-  test("Tras «Reenviar código», el código anterior ya no sirve; el nuevo sí", async ({ page }) => {
+  test("Tras «Reenviar código», el código anterior ya no sirve; el nuevo sí", async ({
+    page,
+  }) => {
     test.setTimeout(180_000);
     const u = USUARIOS.sinSolicitudes;
     await esperarVentanaReenvio(u.correo);
@@ -605,7 +861,9 @@ test.describe("I4 · Código viejo, cookie vencida y tiempos del paso 2", () => 
     await reenviar.click();
     // Esperar la respuesta final: «Enviando un código nuevo…» también contiene «código nuevo»,
     // y si se pega antes de que termine el reenvío, la app vacía las casillas al terminar.
-    await expect(page.getByRole("status")).toHaveText("Si tu cédula está registrada, te enviamos un código nuevo.");
+    await expect(page.getByRole("status")).toHaveText(
+      "Si tu cédula está registrada, te enviamos un código nuevo.",
+    );
     let nuevo = viejo;
     const limite = Date.now() + 20_000;
     while (nuevo === viejo && Date.now() < limite) {
@@ -621,25 +879,60 @@ test.describe("I4 · Código viejo, cookie vencida y tiempos del paso 2", () => 
     await page.waitForURL("**/cuenta");
   });
 
-  test("Cookie del paso 1 con más de 10 min → /ingresar", async ({ context, page }) => {
-    const valor = cookieIngreso({ c: USUARIOS.sinSolicitudes.cedula, m: USUARIOS.sinSolicitudes.mascara, u: Date.now() - 11 * 60_000 });
-    await context.addCookies([{ name: "ga_ingreso", value: valor, url: "http://localhost:3000", httpOnly: true }]);
+  test("Cookie del paso 1 con más de 10 min → /ingresar", async ({
+    context,
+    page,
+  }) => {
+    const valor = cookieIngreso({
+      c: USUARIOS.sinSolicitudes.cedula,
+      m: USUARIOS.sinSolicitudes.mascara,
+      u: Date.now() - 11 * 60_000,
+    });
+    await context.addCookies([
+      {
+        name: "ga_ingreso",
+        value: valor,
+        url: "http://localhost:3000",
+        httpOnly: true,
+      },
+    ]);
     await page.goto("/ingresar/codigo");
     await expect(page).toHaveURL(/\/ingresar$/);
     // Control: la misma cookie con hora actual sí abre el paso 2 (la cookie de prueba es válida).
     await context.clearCookies();
     await context.addCookies([
-      { name: "ga_ingreso", value: cookieIngreso({ c: CEDULA_NO_REGISTRADA, m: "zz•••@gmail.com", u: Date.now() }), url: "http://localhost:3000", httpOnly: true },
+      {
+        name: "ga_ingreso",
+        value: cookieIngreso({
+          c: CEDULA_NO_REGISTRADA,
+          m: "zz•••@•••",
+          u: Date.now(),
+        }),
+        url: "http://localhost:3000",
+        httpOnly: true,
+      },
     ]);
     await page.goto("/ingresar/codigo");
     await expect(page).toHaveURL(/\/ingresar\/codigo$/);
   });
 
-  test("Paso 2: el error con cédula registrada y no registrada tarda parecido (≤ 1 s)", async ({ context, page }) => {
+  test("Paso 2: el error con cédula registrada y no registrada tarda parecido (≤ 1 s)", async ({
+    context,
+    page,
+  }) => {
     const medir = async (cedula: string, mascara: string) => {
       await context.clearCookies();
       await context.addCookies([
-        { name: "ga_ingreso", value: cookieIngreso({ c: cedula, m: mascara, u: Date.now() - 50_000 }), url: "http://localhost:3000", httpOnly: true },
+        {
+          name: "ga_ingreso",
+          value: cookieIngreso({
+            c: cedula,
+            m: mascara,
+            u: Date.now() - 50_000,
+          }),
+          url: "http://localhost:3000",
+          httpOnly: true,
+        },
       ]);
       await page.goto("/ingresar/codigo");
       const tiempos: number[] = [];
@@ -653,10 +946,19 @@ test.describe("I4 · Código viejo, cookie vencida y tiempos del paso 2", () => 
       }
       return Math.min(...tiempos);
     };
-    const reg = await medir(USUARIOS.sinSolicitudes.cedula, USUARIOS.sinSolicitudes.mascara);
-    const noReg = await medir(CEDULA_NO_REGISTRADA, "zz•••@gmail.com");
-    fs.writeFileSync(path.join(CARPETA_QA, "i-tiempos-paso2.json"), JSON.stringify({ registradaMs: reg, noRegistradaMs: noReg }, null, 2));
-    expect(Math.abs(reg - noReg), `registrada ${reg} ms vs no registrada ${noReg} ms`).toBeLessThanOrEqual(1000);
+    const reg = await medir(
+      USUARIOS.sinSolicitudes.cedula,
+      USUARIOS.sinSolicitudes.mascara,
+    );
+    const noReg = await medir(CEDULA_NO_REGISTRADA, "zz•••@•••");
+    fs.writeFileSync(
+      path.join(CARPETA_QA, "i-tiempos-paso2.json"),
+      JSON.stringify({ registradaMs: reg, noRegistradaMs: noReg }, null, 2),
+    );
+    expect(
+      Math.abs(reg - noReg),
+      `registrada ${reg} ms vs no registrada ${noReg} ms`,
+    ).toBeLessThanOrEqual(1000);
   });
 });
 
@@ -665,30 +967,50 @@ test.describe("I4 · Código viejo, cookie vencida y tiempos del paso 2", () => 
 // ---------------------------------------------------------------------------
 
 test.describe("I5 · Política de datos y privacidad", () => {
-  test("/politica-de-datos: título, logo → /, se abre desde la afiliación en otra pestaña", async ({ page, context }, testInfo) => {
+  test("/politica-de-datos: título, logo → /, se abre desde la afiliación en otra pestaña", async ({
+    page,
+    context,
+  }, testInfo) => {
     const r = await page.goto("/politica-de-datos");
     expect(r?.status()).toBe(200);
-    await expect(page).toHaveTitle("Política de tratamiento de datos · Cooperativa Green Alliance");
-    await expect(page.locator("h1")).toHaveText("Política de tratamiento de datos");
+    await expect(page).toHaveTitle(
+      "Política de tratamiento de datos · Cooperativa Green Alliance",
+    );
+    await expect(page.locator("h1")).toHaveText(
+      "Política de tratamiento de datos",
+    );
     const cuerpo = await page.locator("main").innerText();
-    test.info().annotations.push({ type: "pendiente", description: `Texto actual: ${cuerpo.replace(/\s+/g, " ").slice(0, 160)}` });
+    test
+      .info()
+      .annotations.push({
+        type: "pendiente",
+        description: `Texto actual: ${cuerpo.replace(/\s+/g, " ").slice(0, 160)}`,
+      });
     await capturaCompleta(page, "i-politica-de-datos", testInfo);
     await page.getByRole("link", { name: "Ir al inicio" }).click();
     await expect(page).toHaveURL(/\/$/);
 
     await page.goto("/afiliacion");
-    const [nueva] = await Promise.all([context.waitForEvent("page"), page.getByRole("link", { name: /política de datos/i }).click()]);
+    const [nueva] = await Promise.all([
+      context.waitForEvent("page"),
+      page.getByRole("link", { name: /política de datos/i }).click(),
+    ]);
     await nueva.waitForLoadState();
     await expect(nueva).toHaveURL(/\/politica-de-datos$/);
-    await expect(nueva.locator("h1")).toHaveText("Política de tratamiento de datos");
+    await expect(nueva.locator("h1")).toHaveText(
+      "Política de tratamiento de datos",
+    );
   });
 
-  test("/cuenta y /cuenta/solicitar no traen el correo completo ni datos del otro asociado", async ({ browser }, testInfo) => {
+  test("/cuenta y /cuenta/solicitar no traen el correo completo ni datos del otro asociado", async ({
+    browser,
+  }, testInfo) => {
     const { ctx, page } = await sesionSinSolicitudes(browser, testInfo);
     const cuerpos: string[] = [];
     page.on("response", async (r) => {
       try {
-        if (r.url().startsWith("http://localhost:3000")) cuerpos.push(await r.text());
+        if (r.url().startsWith("http://localhost:3000"))
+          cuerpos.push(await r.text());
       } catch {
         /* sin cuerpo */
       }
@@ -714,16 +1036,25 @@ test.describe("I5 · Política de datos y privacidad", () => {
 // ---------------------------------------------------------------------------
 
 test.describe("I6 · Marcadores pendientes visibles", () => {
-  test("Inventario de textos entre corchetes en cada pantalla (informativo)", async ({ browser }, testInfo) => {
+  test("Inventario de textos entre corchetes en cada pantalla (informativo)", async ({
+    browser,
+  }, testInfo) => {
     const inventario: Record<string, string[]> = {};
     const tomar = async (page: Page, ruta: string) => {
       const texto = await page.locator("body").innerText();
-      const hallados = Array.from(new Set(texto.match(/\[[^\]\n]{1,80}\]/g) ?? []));
+      const hallados = Array.from(
+        new Set(texto.match(/\[[^\]\n]{1,80}\]/g) ?? []),
+      );
       if (hallados.length) inventario[ruta] = hallados;
     };
     const publica = await browser.newContext(opcionesContexto(testInfo));
     const p = await publica.newPage();
-    for (const ruta of ["/", "/ingresar", "/afiliacion", "/politica-de-datos"]) {
+    for (const ruta of [
+      "/",
+      "/ingresar",
+      "/afiliacion",
+      "/politica-de-datos",
+    ]) {
       await p.goto(ruta);
       await tomar(p, ruta);
     }
@@ -731,7 +1062,9 @@ test.describe("I6 · Marcadores pendientes visibles", () => {
     await tomar(p, "/ingresar/codigo");
     await p.goto("/afiliacion");
     await llenarAfiliacion(p, datosValidos());
-    await p.locator("#af-sitio").evaluate((el: HTMLInputElement) => (el.value = "spam"));
+    await p
+      .locator("#af-sitio")
+      .evaluate((el: HTMLInputElement) => (el.value = "spam"));
     await p.getByRole("button", { name: "Enviar solicitud" }).click();
     await p.waitForURL("**/afiliacion/enviada");
     await tomar(p, "/afiliacion/enviada");
@@ -743,10 +1076,21 @@ test.describe("I6 · Marcadores pendientes visibles", () => {
     }
     await ctx.close();
     fs.mkdirSync(CARPETA_QA, { recursive: true });
-    fs.writeFileSync(path.join(CARPETA_QA, `i-marcadores-${testInfo.project.name}.json`), JSON.stringify(inventario, null, 2));
-    test.info().annotations.push({ type: "marcadores", description: JSON.stringify(inventario) });
+    fs.writeFileSync(
+      path.join(CARPETA_QA, `i-marcadores-${testInfo.project.name}.json`),
+      JSON.stringify(inventario, null, 2),
+    );
+    test
+      .info()
+      .annotations.push({
+        type: "marcadores",
+        description: JSON.stringify(inventario),
+      });
     // Nunca deben verse los marcadores de datos DEL USUARIO en sus páginas.
-    const privadas = [...(inventario["/cuenta"] ?? []), ...(inventario["/cuenta/solicitar"] ?? [])].join(" ");
+    const privadas = [
+      ...(inventario["/cuenta"] ?? []),
+      ...(inventario["/cuenta/solicitar"] ?? []),
+    ].join(" ");
     expect(privadas).not.toContain("[Nombre]");
     expect(privadas).not.toContain("[TOPE]");
   });
