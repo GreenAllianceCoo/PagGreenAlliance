@@ -6,7 +6,9 @@ import { FormularioPagoComision, ListaPagosComision } from "@/components/admin/P
 import { exigirAdmin } from "@/lib/admin/servidor";
 import { listarBitacoraPagos, listarEquipo, listarPagosComision } from "@/lib/admin/equipo";
 import { opcionesPeriodoCorte } from "@/lib/asesor/comisiones";
-import { hoyBogota } from "@/lib/fechas";
+import { listarPremiosAsesores } from "@/lib/admin/premiosAsesores";
+import { ganadoresPorMeta } from "@/lib/asesor/premios";
+import { fechaBogotaDeInstante, formatearFechaLarga, hoyBogota } from "@/lib/fechas";
 
 export const metadata: Metadata = { title: "Asesores · Admin · Green Alliance" };
 
@@ -14,10 +16,11 @@ export const metadata: Metadata = { title: "Asesores · Admin · Green Alliance"
 export default async function AsesoresPage() {
   const { supabase, nombre, userId } = await exigirAdmin();
 
-  const [{ personas }, pagosTodos, bitacoraTodas] = await Promise.all([
+  const [{ personas }, pagosTodos, bitacoraTodas, premios] = await Promise.all([
     listarEquipo(supabase),
     listarPagosComision(supabase),
     listarBitacoraPagos(supabase),
+    listarPremiosAsesores(supabase),
   ]);
 
   // RS-16: los pagos propios del admin que atiende (y su bitácora) NO se listan:
@@ -38,6 +41,8 @@ export default async function AsesoresPage() {
       return { ...a, clientes: clientes.count ?? 0, afiliaciones: afiliaciones.count ?? 0 };
     }),
   );
+  const ganadores = ganadoresPorMeta(new Map(personas.map((p) => [p.id, p.nombre])), premios);
+  const fechaCorta = (instante: string | null) => (instante ? formatearFechaLarga(fechaBogotaDeInstante(instante)) : "nunca");
   const quienesCobran = personas.filter((p) => p.atiende && p.id !== userId).map((p) => ({ valor: p.id, etiqueta: p.nombre }));
 
   return (
@@ -48,6 +53,10 @@ export default async function AsesoresPage() {
 
       <section className="flex flex-col gap-2 rounded-20 bg-admin-superficie p-5.5">
         <h2 className="m-0 font-display text-20 font-extrabold">Asesores registrados</h2>
+        <p className="m-0 text-14 text-admin-texto-2">
+          Bono de 50 asociados ($1.000.000): {ganadores[50] ? `ganó ${ganadores[50]}` : "sin ganador todavía"} · Viaje por 100:{" "}
+          {ganadores[100] ? `ganó ${ganadores[100]}` : "sin ganador todavía"}
+        </p>
         {conConteos.length === 0 ? (
           <p className="m-0 text-15 text-admin-texto-3">Todavía no hay asesores.</p>
         ) : (
@@ -67,6 +76,19 @@ export default async function AsesoresPage() {
                     {a.clientes} {a.clientes === 1 ? "cliente" : "clientes"} · {a.afiliaciones}{" "}
                     {a.afiliaciones === 1 ? "afiliación referida" : "afiliaciones referidas"}
                   </span>
+                  {(() => {
+                    const p = premios.get(a.id);
+                    const toques = (p?.toques50 ?? 0) + (p?.toques100 ?? 0);
+                    return (
+                      <span className="text-13 text-admin-texto-3">
+                        Premios: {p?.asociados ?? 0} asociados operando · {toques}{" "}
+                        {toques === 1 ? "toque" : "toques"} en la sección · último: {fechaCorta(p?.ultimoClic ?? null)} · toques en 50:{" "}
+                        {p?.toques50 ?? 0}, en 100: {p?.toques100 ?? 0} · aperturas: {p?.aperturas ?? 0}
+                        {p?.gano50 ? " · Ganó el bono de 50" : ""}
+                        {p?.gano100 ? " · Ganó el viaje de 100" : ""}
+                      </span>
+                    );
+                  })()}
                 </div>
                 {a.rol === "admin" ? (
                   <InterruptorAtiende perfilId={a.id} nombre={a.nombre} atiende={a.atiendeAsociados} />

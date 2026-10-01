@@ -94,7 +94,7 @@ export function IngresoCodigo({
     whatsapp
   );
   const textoWhatsapp = (
-    // TODO(pendiente-spec): falta el número real (NEXT_PUBLIC_WHATSAPP); sin él, texto sin enlace.
+    // Número en lib/config.ts (NEXT_PUBLIC_WHATSAPP); sin él, texto sin enlace.
     <>¿Cambiaste de correo? Escríbenos por WhatsApp {numero} para actualizarlo.</>
   );
 

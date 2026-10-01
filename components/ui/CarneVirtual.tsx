@@ -10,6 +10,10 @@ export type CarneVirtualProps = {
   cedula: string;
   /** `undefined` = sin el dato: no se dibuja el chip de estado. */
   activo?: boolean;
+  /** Destino de «Ver carné con QR» (el QR vive en su propia pantalla). `null` = sin enlace (ya estás ahí). */
+  hrefQr?: string | null;
+  /** Destino de «Ver empresas en convenio». */
+  hrefConvenios?: string;
 };
 
 /**
@@ -19,7 +23,15 @@ export type CarneVirtualProps = {
  * Pieza 3u: en escritorio va en grilla 1.3fr/1fr con una columna lateral («Para usarlo en un
  * convenio»); en celular, el carné y debajo el enlace «Ver empresas en convenio».
  */
-export function CarneVirtual({ nombre, grado, institucion, cedula, activo }: CarneVirtualProps) {
+export function CarneVirtual({
+  nombre,
+  grado,
+  institucion,
+  cedula,
+  activo,
+  hrefQr = "/cuenta/carne",
+  hrefConvenios = "#convenios",
+}: CarneVirtualProps) {
   return (
     <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-6">
     <section
@@ -81,11 +93,19 @@ export function CarneVirtual({ nombre, grado, institucion, cedula, activo }: Car
         Abre esta pantalla y muéstrasela a la empresa en convenio junto con tu documento. El carné no es un documento de identidad.
       </p>
       <Link
-        href="#convenios"
+        href={hrefConvenios}
         className="flex h-12 items-center justify-center rounded-full border-1.5 border-ga-navy text-15 font-extrabold text-ga-navy no-underline transition-colors duration-200 hover:bg-ga-fondo-suave focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
       >
         Ver empresas en convenio
       </Link>
+      {hrefQr ? (
+        <Link
+          href={hrefQr}
+          className="flex h-12 items-center justify-center rounded-full bg-ga-verde text-15 font-extrabold text-white no-underline transition-colors duration-200 hover:bg-ga-verde-oscuro hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
+        >
+          Ver carné con QR
+        </Link>
+      ) : null}
     </aside>
     </div>
   );

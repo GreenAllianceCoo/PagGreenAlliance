@@ -17,10 +17,6 @@ import type { Convenio } from "@/lib/mock";
  */
 
 export type LandingProps = {
-  estadisticas: {
-    creditosAprobados: string;
-    tiempoRespuesta: string;
-  };
   convenios: Convenio[];
   whatsapp: string;
   /** §13.1: enlace wa.me con mensaje corto (lib/config.ts WHATSAPP_URL_PIE). Sin valor, el número va como texto. */
@@ -93,7 +89,7 @@ const PASOS_ALIVIO: Array<{ numero: string; fondo: string; numeroFg: string; tit
 // Sedes (pieza 2a): Bogotá + 4 sucursales.
 const SEDES = ["Bogotá · sede principal", "Valledupar, Cesar", "Bosconia, Cesar", "La Jagua de Ibirico, Cesar", "Hatonuevo, La Guajira"];
 
-export function Landing({ estadisticas, convenios, whatsapp, whatsappUrl, correo, textoVigilancia }: LandingProps) {
+export function Landing({ convenios, whatsapp, whatsappUrl, correo, textoVigilancia }: LandingProps) {
   return (
     <div className="flex min-h-dvh flex-col overflow-x-clip bg-ga-fondo-suave">
       {/* Encabezado: píldora blanca flotante (pieza 2a). */}
@@ -366,7 +362,6 @@ export function Landing({ estadisticas, convenios, whatsapp, whatsappUrl, correo
         <div className="mx-auto flex max-w-[1280px] flex-col items-center gap-3 rounded-24 bg-white px-5 py-6 text-center text-14 leading-150 text-ga-texto-2 lg:flex-row lg:justify-between lg:rounded-full lg:px-8 lg:py-4.5 lg:text-left lg:text-15 lg:leading-normal">
           <Logo variant="apilado" className="w-[150px] lg:w-[130px]" />
           <span className="flex flex-col gap-2.5 lg:block">
-            {/* TODO(pendiente-spec): número de WhatsApp y correo confirmados en lib/config.ts. */}
             <span>
               {whatsappUrl ? (
                 <a

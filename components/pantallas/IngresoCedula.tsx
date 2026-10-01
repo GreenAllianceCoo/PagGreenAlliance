@@ -64,7 +64,7 @@ export function IngresoCedula({
           ))}
         </ul>
       }
-      // TODO(pendiente-spec): falta el número real (NEXT_PUBLIC_WHATSAPP); sin él, texto sin enlace.
+      // Número en lib/config.ts (NEXT_PUBLIC_WHATSAPP); sin él, texto sin enlace.
       pie={<>Ayuda por WhatsApp {numero}</>}
       pieInterlineado={false}
       // En el navegador no hay barra de estado del teléfono: panel sin el relleno extra.

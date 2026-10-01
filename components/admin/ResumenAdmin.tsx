@@ -61,10 +61,13 @@ export function ResumenAdmin({ metricas, alertasPendientes }: Props) {
     <>
       {encabezado}
 
-      <section aria-label="Cifras principales" className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+      <section aria-label="Cifras principales" className="grid grid-cols-2 gap-3 lg:grid-cols-5 lg:gap-4">
         <TarjetaKpi etiqueta="Asociados activos" valor={metricas.asociadosActivos} />
         <TarjetaKpi etiqueta="Afiliaciones pendientes" valor={metricas.afiliacionesPendientes} tono="ambar" />
         <TarjetaKpi etiqueta="Créditos pendientes" valor={metricas.creditosPendientes} tono="ambar" />
+        <Link href="/admin/sorteo" className="flex flex-col no-underline [&>div]:flex-1">
+          <TarjetaKpi etiqueta="Inscritos al sorteo del mes" valor={metricas.inscritosSorteoMes} />
+        </Link>
         <TarjetaKpi
           etiqueta="Desembolsos del mes"
           valor={metricas.desembolsosMes.conteo}
