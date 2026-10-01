@@ -68,8 +68,10 @@ export function Logo({ tone = "dark", variant = "horizontal", className }: LogoP
         alt="Cooperativa Green Alliance"
         width={LETRAS_ANCHO}
         height={LETRAS_ALTO}
-        className="block h-auto min-w-0 flex-1"
+        className="block h-auto min-w-0 flex-1 max-[359px]:hidden"
       />
+      {/* P-53: bajo 360 px las letras miden ~5 px de alto; se ocultan y queda el nombre para lectores. */}
+      <span className="sr-only min-[360px]:hidden">Cooperativa Green Alliance</span>
     </span>
   );
 }

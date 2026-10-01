@@ -291,6 +291,8 @@ test("asesor entra a /asesor, no ve celular/correo/Nequi/fotos, y la demo no gua
     "asesor.prueba@greenalliance.test",
     "/asesor",
   );
+  // /asesor abre en «Resumen» (3s): la cartera está en «Mis clientes».
+  await page.getByRole("button", { name: "Mis clientes" }).click();
   // Cédula enmascarada en /asesor (enmascarar_cedula, migración 20260930100400): nunca completa.
   await expect(page.getByText("1.2••.•••.890").first()).toBeVisible();
   expect(await page.locator("body").innerText()).not.toContain("1234567890");

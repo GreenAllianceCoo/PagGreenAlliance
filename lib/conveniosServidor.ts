@@ -1,16 +1,20 @@
 import "server-only";
-import {
-  completarConvenio,
-  CONVENIOS,
-  NOMBRE_CORTO_POR_NIT,
-  ORDEN_POR_NIT,
-  type Convenio,
-} from "@/lib/convenios";
+import { completarConvenio, CONVENIOS, NOMBRE_CORTO_POR_NIT, type Convenio, type MedioConvenio } from "@/lib/convenios";
 import { registrar } from "@/lib/servidor/registro";
-import { crearClienteAdmin } from "@/lib/supabase/admin";
+import { crearClienteAnonimoSinSesion } from "@/lib/supabase/admin";
 
-/** Fila pública de `convenios` (solo columnas de información comercial). */
-type FilaConvenio = {
+export const BUCKET_LOGOS = "convenios-logos";
+
+/**
+ * Columnas comerciales de `convenios`: las mismas que el rol anon puede pedir
+ * (migración 20261002000000). Nunca `select *`: la tabla tiene notas internas.
+ */
+export const COLUMNAS_CONVENIO_PUBLICAS =
+  "id, nombre_empresa, nit, especialidad, emoji, descripcion, servicios, sedes, telefono_contacto, orden, visible, logo_path, video_url, pdf_url, pdf_tamano";
+
+/** Fila pública de `convenios`. */
+export type FilaConvenio = {
+  id: string;
   nombre_empresa: string;
   nit: string | null;
   telefono_contacto: string | null;
@@ -19,46 +23,63 @@ type FilaConvenio = {
   descripcion: string | null;
   servicios: string[] | null;
   sedes: string[] | null;
+  orden: number;
+  visible: boolean;
+  logo_path: string | null;
+  video_url: string | null;
+  pdf_url: string | null;
+  pdf_tamano: string | null;
 };
 
-export function filaAConvenio(fila: FilaConvenio): Convenio {
-  return completarConvenio({
-    emoji: fila.emoji ?? "🤝",
-    nombre: fila.nombre_empresa,
-    nombreCorto: (fila.nit && NOMBRE_CORTO_POR_NIT[fila.nit]) || fila.nombre_empresa,
-    especialidad: fila.especialidad ?? "",
-    nit: fila.nit,
-    descripcion: fila.descripcion,
-    servicios: fila.servicios ?? [],
-    sedes: fila.sedes ?? [],
-    whatsapp: fila.telefono_contacto,
-  });
+/** Video si hay `video_url`; si no, PDF si hay `pdf_url` (con su tamaño). */
+export function medioDeFila(fila: Pick<FilaConvenio, "video_url" | "pdf_url" | "pdf_tamano">): MedioConvenio | null {
+  if (fila.video_url) return { tipo: "video", src: fila.video_url };
+  if (fila.pdf_url) return { tipo: "pdf", src: fila.pdf_url, tamano: fila.pdf_tamano ?? "" };
+  return null;
 }
 
-function posicion(nit: string | null) {
-  const i = ORDEN_POR_NIT.indexOf(nit ?? "");
-  return i === -1 ? Number.MAX_SAFE_INTEGER : i;
+/** URL pública del logo (getPublicUrl no hace red: arma la URL del bucket público). */
+export function urlLogo(logoPath: string | null | undefined): string | null {
+  if (!logoPath) return null;
+  return crearClienteAnonimoSinSesion().storage.from(BUCKET_LOGOS).getPublicUrl(logoPath).data.publicUrl;
+}
+
+export function filaAConvenio(fila: FilaConvenio): Convenio {
+  return {
+    ...completarConvenio({
+      emoji: fila.emoji ?? "🤝",
+      nombre: fila.nombre_empresa,
+      nombreCorto: (fila.nit && NOMBRE_CORTO_POR_NIT[fila.nit]) || fila.nombre_empresa,
+      especialidad: fila.especialidad ?? "",
+      nit: fila.nit,
+      descripcion: fila.descripcion,
+      servicios: fila.servicios ?? [],
+      sedes: fila.sedes ?? [],
+      whatsapp: fila.telefono_contacto,
+      medio: medioDeFila(fila),
+      logoUrl: urlLogo(fila.logo_path),
+    }),
+    id: fila.id,
+  };
 }
 
 /**
- * Convenios ACTIVOS para la landing (pública) y /cuenta. La política de
- * `convenios` solo deja leer a usuarios con sesión; la landing no tiene
- * sesión, así que se lee en el servidor con service role y SOLO columnas
- * comerciales (nada de notas internas). Si falla o está vacía, se usa el
- * respaldo `CONVENIOS` (mismos textos de la migración).
+ * Convenios VISIBLES para la landing (pública) y /cuenta, por `orden`. La
+ * landing no tiene sesión: se lee en el servidor con el rol anon (sin service role) y
+ * SOLO columnas comerciales. Si la consulta falla (o no hay ninguno visible
+ * porque la tabla no responde), se usa el respaldo `CONVENIOS`. Si la tabla
+ * responde y el admin ocultó todos, la lista queda vacía a propósito.
  */
 export async function cargarConvenios(): Promise<Convenio[]> {
   try {
-    const { data, error } = await crearClienteAdmin()
+    const { data, error } = await crearClienteAnonimoSinSesion()
       .from("convenios")
-      .select("nombre_empresa, nit, telefono_contacto, emoji, especialidad, descripcion, servicios, sedes")
-      .eq("activo", true);
+      .select(COLUMNAS_CONVENIO_PUBLICAS)
+      .eq("visible", true)
+      .order("orden", { ascending: true })
+      .order("nombre_empresa", { ascending: true });
     if (error) throw error;
-    const filas = (data ?? []) as FilaConvenio[];
-    if (filas.length === 0) return CONVENIOS;
-    return filas
-      .map(filaAConvenio)
-      .sort((a, b) => posicion(a.nit) - posicion(b.nit) || a.nombre.localeCompare(b.nombre, "es"));
+    return ((data ?? []) as unknown as FilaConvenio[]).map(filaAConvenio);
   } catch (e) {
     registrar("error", {
       evento: "convenios_carga_fallo",
