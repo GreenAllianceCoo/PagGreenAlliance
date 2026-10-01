@@ -17,8 +17,8 @@ type EncabezadoAsesorProps = {
    * Pestañas «Mis clientes» / «Comisiones» (pieza 3l). Sin `onPestana` (p. ej. /asesor/demo)
    * queda la única etiqueta «Mis clientes», como antes.
    */
-  pestana?: "clientes" | "comisiones";
-  onPestana?: (pestana: "clientes" | "comisiones") => void;
+  pestana?: "resumen" | "clientes" | "comisiones";
+  onPestana?: (pestana: "resumen" | "clientes" | "comisiones") => void;
 };
 
 /**
@@ -51,6 +51,14 @@ export function EncabezadoAsesor({
         <nav aria-label="Principal" className="hidden items-center gap-1 lg:flex">
           {onPestana ? (
             <>
+              <button
+                type="button"
+                aria-current={pestana === "resumen" ? "page" : undefined}
+                onClick={() => onPestana("resumen")}
+                className={pestana === "resumen" ? claseActiva : claseInactiva}
+              >
+                Resumen
+              </button>
               <button
                 type="button"
                 aria-current={pestana === "clientes" ? "page" : undefined}

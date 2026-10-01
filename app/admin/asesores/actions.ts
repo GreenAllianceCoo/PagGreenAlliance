@@ -115,7 +115,7 @@ export type EstadoPagoComision = {
  * admin (RLS: solo admin inserta; el trigger sella quién y cuándo y exige
  * que el asesor pueda atender). Libro contable: no hay editar ni borrar; una
  * corrección se registra como «Ajuste» (puede ser negativo).
- * TODO(confirmar: R-09) la cifra que ve el asesor es la suma de estos pagos.
+ * R-09 decidido: solo el admin (Sebas o Ricardo) registra pagos; el asesor ve la suma de estos pagos.
  */
 export async function registrarPagoComision(
   _previo: EstadoPagoComision,

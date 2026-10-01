@@ -3,6 +3,7 @@ import { CuentaDemo } from "@/components/asesor/CuentaDemo";
 import { EncabezadoAdmin } from "@/components/admin/EncabezadoAdmin";
 import { exigirAdmin } from "@/lib/admin/servidor";
 import { cargarPaquetesDemo } from "@/lib/asesor/cargarPaquetesDemo";
+import { cargarCatalogoGrados } from "@/lib/grados";
 
 export const metadata: Metadata = {
   title: "Demostración · Panel de administración · Cooperativa Green Alliance",
@@ -16,12 +17,16 @@ export const metadata: Metadata = {
  */
 export default async function AdminDemoPage() {
   const { supabase, nombre } = await exigirAdmin();
-  const paquetesPorGrado = await cargarPaquetesDemo(supabase, "admin_demo_grados_fallo");
+  const [paquetesPorGrado, catalogoGrados] = await Promise.all([
+    cargarPaquetesDemo(supabase, "admin_demo_grados_fallo"),
+    cargarCatalogoGrados(supabase),
+  ]);
 
   return (
     <CuentaDemo
       nombreAsesor={nombre}
       paquetesPorGrado={paquetesPorGrado}
+      catalogoGrados={catalogoGrados}
       encabezado={<EncabezadoAdmin nombre={nombre} seccion="demo" />}
       volver={{ href: "/admin", texto: "Volver al panel" }}
     />

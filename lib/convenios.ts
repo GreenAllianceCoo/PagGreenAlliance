@@ -8,7 +8,14 @@ import { normalizarCelularColombiano } from "@/lib/admin/whatsapp";
  * puede leer: mismos textos literales de esa migración (no se inventa nada).
  */
 
+/** Medio multimedia del detalle (columnas video_url / pdf_url de `convenios`). */
+export type MedioConvenio =
+  | { tipo: "video"; src: string }
+  | { tipo: "pdf"; src: string; tamano: string };
+
 export type Convenio = {
+  /** Id de la fila (solo cuando viene de la tabla). */
+  id?: string;
   emoji: string;
   nombre: string;
   /** Nombre corto que usa el diseño de /cuenta. */
@@ -26,6 +33,10 @@ export type Convenio = {
   whatsappTexto: string | null;
   /** https://wa.me/57…?text=… con el mensaje prellenado, o null si no hay número válido. */
   whatsappUrl: string | null;
+  /** Video o PDF del detalle, o null. */
+  medio: MedioConvenio | null;
+  /** URL pública del logo en el bucket `convenios-logos`, o null. */
+  logoUrl: string | null;
 };
 
 /** Mensaje prellenado (pieza 3n): «…quiero conocer el beneficio con [marca]». */
@@ -46,12 +57,13 @@ export function formatearCelular(telefono: string | null | undefined): string | 
   return /^3[0-9]{9}$/.test(digitos) ? digitos.replace(/^(\d{3})(\d{3})(\d{4})$/, "$1 $2 $3") : null;
 }
 
-type DatosBase = Omit<Convenio, "whatsappTexto" | "whatsappUrl">;
+type DatosBase = Omit<Convenio, "whatsappTexto" | "whatsappUrl" | "logoUrl"> & { logoUrl?: string | null };
 
 /** Completa los campos derivados (texto y enlace de WhatsApp). */
 export function completarConvenio(base: DatosBase): Convenio {
   return {
     ...base,
+    logoUrl: base.logoUrl ?? null,
     whatsappTexto: formatearCelular(base.whatsapp),
     whatsappUrl: enlaceWhatsappConvenio(base.whatsapp, base.nombre),
   };
@@ -73,6 +85,7 @@ const BASE: DatosBase[] = [
     nombreCorto: "AMB Móvil",
     especialidad: "Tecnología",
     nit: "902.038.118-7",
+    medio: { tipo: "video", src: "/convenios/amb-movil.mp4" },
     whatsapp: "3214612714",
     descripcion:
       "Como aliado estratégico, pondrá al alcance de nuestros asociados una amplia oferta de tecnología de punta, que incluye:",
@@ -91,6 +104,7 @@ const BASE: DatosBase[] = [
     nombreCorto: "Locos por los Viajes",
     especialidad: "Viajes y turismo",
     nit: "901.865.816-3",
+    medio: { tipo: "video", src: "/convenios/locos-por-los-viajes.mp4" },
     whatsapp: "3103397949",
     descripcion:
       "Con el respaldo de nuestra agencia de viajes de confianza, los asociados contarán con asesoría experta para planificar sus próximas vacaciones en familia, a través de:",
@@ -110,6 +124,7 @@ const BASE: DatosBase[] = [
     nombreCorto: "Dr. Ribero Dental",
     especialidad: "Odontología estética",
     nit: "1.090.464.475-4",
+    medio: { tipo: "video", src: "/convenios/dr-ribero.mp4" },
     whatsapp: "3144612829",
     descripcion:
       "Red de servicios de salud odontológica que da prioridad a la atención de nuestros asociados: un equipo humano altamente capacitado y materiales de primera calidad garantizan a cada paciente una experiencia cómoda y agradable.",
@@ -132,6 +147,7 @@ const BASE: DatosBase[] = [
     nombreCorto: "Racing Tours",
     especialidad: "Tours en Villa de Leyva",
     nit: "1.054.095.149-3",
+    medio: { tipo: "pdf", src: "/convenios/racing-tours-presentacion.pdf", tamano: "3 MB" },
     whatsapp: "3138008830",
     descripcion:
       "Empresa en convenio ubicada en el municipio de Villa de Leyva (Boyacá), donde los asociados encontrarán una amplia oferta de aventuras, atendida directamente por su propietario, con excelentes recorridos y vehículos de última generación.",
@@ -144,6 +160,7 @@ const BASE: DatosBase[] = [
     nombreCorto: "Dream & Go Visas",
     especialidad: "Trámite de visas",
     nit: "52.953.735-3",
+    medio: { tipo: "video", src: "/convenios/dream-go-visas.mp4" },
     whatsapp: "3192544799",
     descripcion:
       "Mediante este convenio estratégico, ofreceremos acompañamiento integral durante la solicitud de visa, desde el inicio hasta su finalización. Profesionales especializados orientarán el diligenciamiento de formularios y evaluarán cada perfil para reducir el riesgo de rechazo en trámites individuales o grupales.",
@@ -153,20 +170,3 @@ const BASE: DatosBase[] = [
 ];
 
 export const CONVENIOS: Convenio[] = BASE.map(completarConvenio);
-
-/** Orden de la presentación (por NIT); los convenios nuevos van al final. */
-export const ORDEN_POR_NIT: string[] = BASE.map((c) => c.nit ?? "");
-
-/** Medio multimedia del detalle (archivos en public/convenios/, sin columna en la base). */
-export type MedioConvenio =
-  | { tipo: "video"; src: string }
-  | { tipo: "pdf"; src: string; tamano: string };
-
-/** Medios por NIT. Locos por los Viajes (901.865.816-3) no tiene. */
-export const MEDIO_POR_NIT: Record<string, MedioConvenio> = {
-  "902.038.118-7": { tipo: "video", src: "/convenios/amb-movil.mp4" },
-  "901.865.816-3": { tipo: "video", src: "/convenios/locos-por-los-viajes.mp4" },
-  "1.090.464.475-4": { tipo: "video", src: "/convenios/dr-ribero.mp4" },
-  "52.953.735-3": { tipo: "video", src: "/convenios/dream-go-visas.mp4" },
-  "1.054.095.149-3": { tipo: "pdf", src: "/convenios/racing-tours-presentacion.pdf", tamano: "3 MB" },
-};

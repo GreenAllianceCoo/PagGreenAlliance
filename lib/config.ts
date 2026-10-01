@@ -20,6 +20,21 @@ export function enlaceWhatsapp(numero: string | undefined) {
 
 export const WHATSAPP_URL = enlaceWhatsapp(WHATSAPP_DIGITOS);
 
+/** Número de la cooperativa (318 389 4034) que se usa SOLO si no hay ninguno configurado arriba. */
+const WHATSAPP_RESPALDO = "3183894034";
+
+/** §13.1: mensaje corto prellenado del pie de página. */
+export const MENSAJE_WHATSAPP_PIE = "Hola, quiero información sobre Green Alliance";
+
+/** Enlace wa.me con el mensaje prellenado (null si el número no es válido). */
+export function enlaceWhatsappConMensaje(numero: string | undefined, mensaje: string) {
+  const base = enlaceWhatsapp(numero);
+  return base ? `${base}?text=${encodeURIComponent(mensaje)}` : null;
+}
+
+/** Enlace del pie: el número configurado o, si falta, el de la cooperativa (573183894034). */
+export const WHATSAPP_URL_PIE = enlaceWhatsappConMensaje(WHATSAPP_DIGITOS || WHATSAPP_RESPALDO, MENSAJE_WHATSAPP_PIE);
+
 // Tiempo de respuesta a una solicitud de afiliación (confirmado por la cooperativa).
 export const TIEMPO_RESPUESTA = "poco tiempo";
 

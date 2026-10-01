@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { vistaClienteBuscado, type ClienteBuscado, type FilaClienteAsesor } from "@/lib/asesor/busqueda";
+import { metaDeClic } from "@/lib/asesor/premios";
 import { exigirAsesor } from "@/lib/asesor/servidor";
 import { formatearPesos } from "@/lib/cuenta";
 import { dentroDelLimite } from "@/lib/servidor/limite";
@@ -93,4 +94,17 @@ export async function buscarCliente(
     cliente: data ? vistaClienteBuscado(data as FilaClienteAsesor) : null,
     cedula: entrada.cedula,
   };
+}
+
+/**
+ * Registra que el asesor abrió o tocó «Premios» (para que la cooperativa sepa si lo ven).
+ * La base aplica el tope de 1 registro por minuto por asesor (registrar_clic_premios).
+ * No devuelve nada y nunca falla hacia la UI: es una métrica, no bloquea nada.
+ */
+export async function registrarClicPremios(meta?: number): Promise<void> {
+  const { supabase } = await exigirAsesor();
+  const { error } = await supabase.rpc("registrar_clic_premios", { p_meta: metaDeClic(meta) });
+  if (error) {
+    registrar("error", { evento: "registrar_clic_premios_fallo", codigo: error.code, mensaje: error.message });
+  }
 }

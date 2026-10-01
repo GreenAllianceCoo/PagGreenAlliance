@@ -40,7 +40,7 @@ export default async function CuentaPage({
   const { anio, mes } = fechaBogota(ahora);
 
   // Todo con la sesión del usuario (RLS): solo ve lo suyo. Nunca la tasa.
-  const [{ data: solicitudes }, { data: boletaCruda }, convenios, ganadorSorteo] = await Promise.all([
+  const [{ data: solicitudes }, { data: boletaCruda }, convenios, ganadorSorteo, { data: fechaHabilitacion }] = await Promise.all([
     supabase
       .from("solicitudes_credito")
       .select(
@@ -54,9 +54,13 @@ export default async function CuentaPage({
     supabase.rpc("mi_boleta_sorteo", { p_anio: anio, p_mes: mes }).maybeSingle(),
     cargarConvenios(),
     cargarGanadorSorteo(supabase),
+    // §13.2: fecha en que el admin habilitó un nuevo crédito tras el rechazo (null = no). Nunca el motivo.
+    supabase.rpc("mi_habilitacion_credito"),
   ]);
   const boleta = boletaCruda as FilaBoletaSorteo | null;
-  const ultima = (solicitudes?.[0] as FilaSolicitud | undefined) ?? null;
+  const ultimaReal = (solicitudes?.[0] as FilaSolicitud | undefined) ?? null;
+  // §13.2: rechazada y habilitada = tarjeta vacía con «Nueva solicitud» (la solicitud sigue en la base).
+  const ultima = ultimaReal?.estado === "rechazado" && fechaHabilitacion ? null : ultimaReal;
 
   // Perfil (spec-requerimientos-ricardo §3): grado con nombre, institución,
   // asesor, proceso ejecutivo, conteo de 36 meses, cupo por grupo de crédito

@@ -56,8 +56,6 @@ const SERVICIOS_APOYOS = [
   "Una conversación estratégica para ordenar tus cuentas y decidir mejor antes de endeudarte.",
   "Apoyo legal",
   "Acompañamiento jurídico integral en trámites para ti y tu familia.",
-  "Embargo solidario a 36 meses",
-  "Un alivio financiero pensado para que, con el tiempo, recuperes tu vida comercial ante los bancos.",
 ];
 
 async function revisarEstilos(
@@ -74,7 +72,10 @@ async function revisarEstilos(
   await page.mouse.move(1, 1);
   await page.waitForTimeout(500); // fin de la transición de color
   for (const texto of primarios) {
-    const el = page.getByRole("button", { name: texto, exact: true }).or(page.getByRole("link", { name: texto, exact: true })).first();
+    const el = page
+      .getByRole("button", { name: texto, exact: true })
+      .or(page.getByRole("link", { name: texto, exact: true }))
+      .first();
     await expect(el, `primario «${texto}»`).toBeVisible();
     const fondo = await el.evaluate((n) => getComputedStyle(n).backgroundColor);
     expect(fondo, `fondo de «${texto}»`).toBe(VERDE);
@@ -89,7 +90,12 @@ async function revisarEstilos(
       for (const hoja of Array.from(document.styleSheets)) {
         try {
           for (const r of Array.from(hoja.cssRules) as CSSStyleRule[]) {
-            if (r.selectorText && n.matches(r.selectorText) && r.style?.borderWidth) declarado = r.style.borderWidth;
+            if (
+              r.selectorText &&
+              n.matches(r.selectorText) &&
+              r.style?.borderWidth
+            )
+              declarado = r.style.borderWidth;
           }
         } catch {
           /* hojas de otro origen */
@@ -103,8 +109,13 @@ async function revisarEstilos(
       return { color: s.borderTopColor, declarado, sombra };
     });
     const tieneBorde = estilo.color === NAVY && estilo.declarado === "1.5px";
-    const tieneSombraNavy = /rgb\(26,\s*60,\s*87\)/.test(estilo.sombra) && estilo.sombra.includes("1.5px");
-    expect(tieneBorde || tieneSombraNavy, `borde/sombra navy de «${texto}» (${JSON.stringify(estilo)})`).toBe(true);
+    const tieneSombraNavy =
+      /rgb\(26,\s*60,\s*87\)/.test(estilo.sombra) &&
+      estilo.sombra.includes("1.5px");
+    expect(
+      tieneBorde || tieneSombraNavy,
+      `borde/sombra navy de «${texto}» (${JSON.stringify(estilo)})`,
+    ).toBe(true);
   }
   // Fuente: Manrope en el cuerpo, Bricolage Grotesque en los títulos (h1),
   // ambas cargadas (pieza 3a del rediseño C+: docs/Green Alliance C+.dc.html).
@@ -116,10 +127,14 @@ async function revisarEstilos(
       h1: getComputedStyle(h1).fontFamily,
       manropeCargada:
         document.fonts.check("16px Manrope") ||
-        Array.from(document.fonts).some((f) => /manrope/i.test(f.family) && f.status === "loaded"),
+        Array.from(document.fonts).some(
+          (f) => /manrope/i.test(f.family) && f.status === "loaded",
+        ),
       bricolageCargada:
         document.fonts.check("16px 'Bricolage Grotesque'") ||
-        Array.from(document.fonts).some((f) => /bricolage/i.test(f.family) && f.status === "loaded"),
+        Array.from(document.fonts).some(
+          (f) => /bricolage/i.test(f.family) && f.status === "loaded",
+        ),
     };
   }, selectorTitulo);
   expect(fuente.body.toLowerCase()).toContain("manrope");
@@ -128,11 +143,19 @@ async function revisarEstilos(
   expect(fuente.bricolageCargada).toBe(true);
 }
 
-async function revisarTextos(page: Page, esperados: string[], nombre: string, testInfo: TestInfo) {
+async function revisarTextos(
+  page: Page,
+  esperados: string[],
+  nombre: string,
+  testInfo: TestInfo,
+) {
   const texto = await textoVisible(page);
   const problemas = revisarOrden(texto, esperados);
   await capturaCompleta(page, nombre, testInfo);
-  expect(problemas, `Textos del diseño en ${nombre} (${testInfo.project.name})`).toEqual([]);
+  expect(
+    problemas,
+    `Textos del diseño en ${nombre} (${testInfo.project.name})`,
+  ).toEqual([]);
 }
 
 test.describe("E · Landing /", () => {
@@ -232,13 +255,19 @@ test.describe("E · Landing /", () => {
     await revisarEstilos(
       page,
       ["Solicitar crédito"],
-      esEscritorio(testInfo) ? ["Conocer la cooperativa"] : ["Quiero afiliarme"],
+      esEscritorio(testInfo)
+        ? ["Conocer la cooperativa"]
+        : ["Quiero afiliarme"],
     );
   });
 
-  test("La landing no tiene sección de testimonios (decisión de Sebas, 27-sep)", async ({ page }) => {
+  test("La landing no tiene sección de testimonios (decisión de Sebas, 27-sep)", async ({
+    page,
+  }) => {
     await page.goto("/");
-    await expect(page.getByText("Lo que hicieron con su crédito")).toHaveCount(0);
+    await expect(page.getByText("Lo que hicieron con su crédito")).toHaveCount(
+      0,
+    );
     await expect(page.locator("#c-historias")).toHaveCount(0);
   });
 });
@@ -274,7 +303,10 @@ test.describe("E · Ingreso paso 1 /ingresar", () => {
           "Ayuda por WhatsApp 311 724 1942",
         ];
     await revisarTextos(page, esperados, "ingresar", testInfo);
-    await expect(page.getByLabel("Número de cédula")).toHaveAttribute("placeholder", "Sin puntos ni espacios");
+    await expect(page.getByLabel("Número de cédula")).toHaveAttribute(
+      "placeholder",
+      "Sin puntos ni espacios",
+    );
     await revisarEstilos(page, ["Enviarme el código"], ["Deseo afiliarme"]);
   });
 });
@@ -287,7 +319,8 @@ test.describe("E · Ingreso paso 2 /ingresar/codigo", () => {
     // lib/mascara.ts oculta el dominio COMPLETO desde la revisión de
     // privacidad del 25-sep (antes se veían las primeras letras del
     // dominio): «ju•••@•••», nunca «ju•••@correo.com».
-    const mascara = /[a-z]{2}•••@•••/.exec(texto)?.[0] ?? "<sin correo enmascarado>";
+    const mascara =
+      /[a-z]{2}•••@•••/.exec(texto)?.[0] ?? "<sin correo enmascarado>";
     const esperados = esEscritorio(testInfo)
       ? [
           "Revisa tu correo",
@@ -325,7 +358,9 @@ test.describe("E · Inicio del asociado /cuenta", () => {
   // misma sesión de base de datos (ver restaurarCreditoDeEjemplo en utils.ts).
   test.beforeAll(restaurarCreditoDeEjemplo);
 
-  test("Textos, orden, colores y fuente (asociado con solicitud)", async ({ browser }, testInfo) => {
+  test("Textos, orden, colores y fuente (asociado con solicitud)", async ({
+    browser,
+  }, testInfo) => {
     const u = USUARIOS.conSolicitud;
     const ctx = await contextoConSesion(browser, "conSolicitud", testInfo);
     const page = await ctx.newPage();
@@ -344,8 +379,11 @@ test.describe("E · Inicio del asociado /cuenta", () => {
     const fechaEnviada = /Enviada \d{1,2} de \w+\.?/.exec(texto)?.[0];
     const proximoSorteo = /Próximo sorteo: \d{1,2} de \w+/.exec(texto)?.[0];
     const sorteoNav = /Sorteo de \w+: abre el \d{1,2} de \w+/.exec(texto)?.[0];
-    expect(fechaEnviada, "no se encontró «Enviada <fecha>»: revisar seed/ventana del sorteo").toBeTruthy();
-    expect(proximoSorteo, "no se encontró «Próximo sorteo: …»: ¿está la ventana 1-5 abierta hoy?").toBeTruthy();
+    expect(
+      fechaEnviada,
+      "no se encontró «Enviada <fecha>»: revisar seed/ventana del sorteo",
+    ).toBeTruthy();
+    // «Próximo sorteo: …» solo sale con la ventana 1-5 cerrada: la prueba no depende de la fecha.
 
     const esperados = esEscritorio(testInfo)
       ? [
@@ -374,9 +412,9 @@ test.describe("E · Inicio del asociado /cuenta", () => {
           "Tu solicitud usa",
           "$ 500.000",
           "Nueva solicitud",
-          proximoSorteo!,
+          ...(proximoSorteo ? [proximoSorteo] : []),
           "Hablar con la cooperativa",
-          "CARNÉ DE ASOCIADO",
+          "AFILIADO TITULAR",
           u.nombre,
           "Muéstralo en cada empresa en convenio.",
           "Tus convenios",
@@ -385,16 +423,6 @@ test.describe("E · Inicio del asociado /cuenta", () => {
           "Dr. Ribero Dental",
           "Racing Tours",
           "Dream & Go Visas",
-          "Mis datos",
-          "Si tu nombre, cédula o grado no están bien, habla con la cooperativa.",
-          "Nombre",
-          u.nombre,
-          "Cédula",
-          "1234567890",
-          "Grado",
-          "PP",
-          "Celular",
-          "Guardar",
         ]
       : [
           `Hola, ${u.nombre}`,
@@ -413,42 +441,43 @@ test.describe("E · Inicio del asociado /cuenta", () => {
           "$ 500.000",
           "Nueva solicitud",
           "Convenios",
-          proximoSorteo!,
+          ...(proximoSorteo ? [proximoSorteo] : []),
           "Hablar con la cooperativa",
-          "CARNÉ DE ASOCIADO",
+          "AFILIADO TITULAR",
           u.nombre,
           "Muéstralo en cada empresa en convenio.",
           "Tus convenios",
-          "Mis datos",
-          "Si tu nombre, cédula o grado no están bien, habla con la cooperativa.",
-          "Nombre",
-          u.nombre,
-          "Cédula",
-          "1234567890",
-          "Grado",
-          "PP",
-          "Celular",
-          "Guardar",
           "Inicio",
           "Solicitar",
           "Sorteo",
-          "Mis datos",
+          "Perfil",
         ];
     await revisarTextos(page, esperados, "cuenta", testInfo);
     // «Hablar con la cooperativa»: variante «terciario» (components/ui/Button.tsx),
     // borde verde real (no navy).
-    const hablar = page.getByRole("link", { name: "Hablar con la cooperativa" });
-    const bordeHablar = await hablar.evaluate((n) => getComputedStyle(n).borderTopColor);
-    expect(bordeHablar, "«Hablar con la cooperativa» debe llevar el borde verde (terciario)").toBe(VERDE);
-    await revisarEstilos(page, ["Guardar"], [], "h1 .font-display");
+    const hablar = page.getByRole("link", {
+      name: "Hablar con la cooperativa",
+    });
+    const bordeHablar = await hablar.evaluate(
+      (n) => getComputedStyle(n).borderTopColor,
+    );
+    expect(
+      bordeHablar,
+      "«Hablar con la cooperativa» debe llevar el borde verde (terciario)",
+    ).toBe(VERDE);
+    await revisarEstilos(page, [] /* «Guardar» está en /cuenta/perfil (v3) */, [], "h1 .font-display");
     await ctx.close();
   });
 
-  test("Estado vacío (asociada sin solicitudes): captura", async ({ browser }, testInfo) => {
+  test("Estado vacío (asociada sin solicitudes): captura", async ({
+    browser,
+  }, testInfo) => {
     const ctx = await contextoConSesion(browser, "sinSolicitudes", testInfo);
     const page = await ctx.newPage();
     await page.goto("/cuenta");
-    await expect(page.getByText("Todavía no tienes solicitudes de crédito")).toBeVisible();
+    await expect(
+      page.getByText("Todavía no tienes solicitudes de crédito"),
+    ).toBeVisible();
     await capturaCompleta(page, "cuenta-vacia", testInfo);
     await ctx.close();
   });
@@ -466,23 +495,27 @@ test.describe("E · Afiliación /afiliacion", () => {
     const autoriza =
       "Autorizo a la Cooperativa Green Alliance a tratar mis datos personales, incluida la foto de mi cédula (frente y reverso) y mi selfie como dato sensible, para gestionar mi afiliación, según su política de datos (Ley 1581 de 2012).";
     const camposComunes = [
+      // v3 (spec-requerimientos-ricardo §2): institución → grado, cuenta de nómina y dos correos.
       "Nombres",
       "Apellidos",
       "Número de cédula",
-      "Grado",
-      "Selecciona tu grado",
-      "Número Nequi",
       "Institución",
       "Selecciona tu institución",
       "Policía Nacional",
       "Ejército Nacional",
+      "Grado",
+      "Selecciona tu grado",
+      "Cuenta de nómina",
+      "Entidad bancaria",
+      "Número Nequi",
       "Celular",
-      "Correo electrónico",
+      "Correo institucional",
+      "Correo personal",
+      "Tu código de ingreso llega aquí.",
       "Asesor",
       "No tengo asesor",
       "Fotos de tu documento",
       "Cédula (frente)",
-      "Toca para tomar o subir la foto",
       "Cédula (reverso)",
       "Selfie",
       "¿Algo que debamos saber?",
@@ -497,9 +530,14 @@ test.describe("E · Afiliación /afiliacion", () => {
           "Ya activo, ingresas con tu cédula.",
           ...camposComunes,
           "Enviar solicitud",
-          "El equipo te contactará por WhatsApp o a tu correo.",
+          "El equipo te contactará por WhatsApp o a tu correo personal.",
         ]
-      : [...comun, ...camposComunes, "Enviar solicitud", "El equipo te contactará por WhatsApp o a tu correo."];
+      : [
+          ...comun,
+          ...camposComunes,
+          "Enviar solicitud",
+          "El equipo te contactará por WhatsApp o a tu correo personal.",
+        ];
     await revisarTextos(page, esperados, "afiliacion", testInfo);
     await revisarEstilos(page, ["Enviar solicitud"], []);
   });
@@ -510,7 +548,9 @@ test.describe("E · Afiliación enviada /afiliacion/enviada", () => {
     // Se llega con el campo trampa para no crear filas.
     await page.goto("/afiliacion");
     await llenarAfiliacion(page, datosValidos());
-    await page.locator("#af-sitio").evaluate((el: HTMLInputElement) => (el.value = "x"));
+    await page
+      .locator("#af-sitio")
+      .evaluate((el: HTMLInputElement) => (el.value = "x"));
     await page.getByRole("button", { name: "Enviar solicitud" }).click();
     await expect(page).toHaveURL(/\/afiliacion\/enviada$/);
     const esperados = esEscritorio(testInfo)

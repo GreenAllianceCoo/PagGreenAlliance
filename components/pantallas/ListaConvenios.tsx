@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import { IconoWhatsapp } from "@/components/ui/Iconos";
 import { Modal } from "@/components/ui/Modal";
-import { MEDIO_POR_NIT, type Convenio } from "@/lib/convenios";
+import type { Convenio } from "@/lib/convenios";
 
 type ListaConveniosProps = {
   convenios: Convenio[];
@@ -17,23 +17,54 @@ function Vineta() {
 }
 
 /**
+ * Logo de marca (pieza 3w): cuadro blanco con filete y `object-contain`; sin logo, el emoji
+ * ocupa el mismo cuadro. Decorativo: el nombre de la empresa ya está al lado.
+ */
+function LogoMarca({ convenio, tamano }: { convenio: Convenio; tamano: 32 | 56 | 64 }) {
+  const caja = { 32: "h-8 w-8", 56: "h-14 w-14", 64: "h-16 w-16" }[tamano];
+  if (!convenio.logoUrl) {
+    return (
+      <span
+        aria-hidden="true"
+        className={`flex shrink-0 items-center justify-center leading-none ${caja} ${tamano === 32 ? "text-22" : "text-36"}`}
+      >
+        {convenio.emoji}
+      </span>
+    );
+  }
+  return (
+    <span
+      aria-hidden="true"
+      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-12 bg-white p-1 shadow-[inset_0_0_0_1px_var(--ga-linea)] ${caja}`}
+    >
+      {/* Logo subido desde /admin/convenios (bucket público). */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={convenio.logoUrl} alt="" className="h-full w-full object-contain" />
+    </span>
+  );
+}
+
+/**
  * Detalle de un convenio (pieza 3n): modal centrado en escritorio y hoja inferior en
  * celular, con descripción, servicios en viñetas, sedes (solo si tiene), NIT y
  * «Escribir por WhatsApp» (enlace wa.me directo, sin backend).
  */
 function DetalleConvenio({ convenio, onCerrar }: { convenio: Convenio; onCerrar: () => void }) {
   const idTitulo = useId();
-  const medio = convenio.nit ? MEDIO_POR_NIT[convenio.nit] : undefined;
+  const medio = convenio.medio ?? undefined;
   return (
     <Modal abierto onCerrar={onCerrar} tituloId={idTitulo}>
       <div className="flex flex-col gap-3.5 lg:gap-4.5">
-        <div className="flex flex-col gap-1 pr-10 lg:gap-1.5">
-          <span className="text-12 font-bold uppercase tracking-[0.04em] text-ga-verde lg:text-13">
-            {convenio.especialidad}
-          </span>
-          <h2 id={idTitulo} className="m-0 font-display text-22 font-extrabold text-ga-navy lg:text-30">
-            {convenio.nombre}
-          </h2>
+        <div className="flex items-center gap-3.5 pr-10">
+          <LogoMarca convenio={convenio} tamano={64} />
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <span className="text-12 font-bold uppercase tracking-[0.04em] text-ga-verde lg:text-13">
+              {convenio.especialidad}
+            </span>
+            <h2 id={idTitulo} className="m-0 font-display text-22 font-extrabold text-ga-navy lg:text-30">
+              {convenio.nombre}
+            </h2>
+          </div>
         </div>
         {medio?.tipo === "video" ? (
           // Sin autoplay; el arrastre de la hoja vive solo en el «grip», no captura los gestos del video.
@@ -133,18 +164,17 @@ export function ListaConvenios({ convenios, variante }: ListaConveniosProps) {
               onClick={() => setAbierto(convenio)}
               className="flex flex-col gap-2.5 rounded-24 bg-white p-5 text-left transition-colors duration-200 hover:bg-ga-verde-tint focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
             >
+              <LogoMarca convenio={convenio} tamano={56} />
               <span className="text-13 font-bold uppercase tracking-[0.04em] text-ga-verde">
                 {convenio.especialidad}
               </span>
               <strong className="font-display text-20 font-extrabold leading-115 text-ga-navy">
                 {convenio.nombre}
               </strong>
-              <span className="flex items-center gap-2 text-15 text-ga-texto-2">
-                <span aria-hidden="true" className="text-22">
-                  {convenio.emoji}
-                </span>
-                {convenio.nombreCorto}
-              </span>
+              {/* Se omite si repite el nombre (evita leer dos veces lo mismo). */}
+              {convenio.nombreCorto !== convenio.nombre ? (
+                <span className="text-15 text-ga-texto-2">{convenio.nombreCorto}</span>
+              ) : null}
               <span className="text-14 font-extrabold text-ga-verde underline">Ver detalle</span>
             </button>
           ) : (
@@ -155,9 +185,7 @@ export function ListaConvenios({ convenios, variante }: ListaConveniosProps) {
               onClick={() => setAbierto(convenio)}
               className="flex items-center gap-2.5 rounded-12 border border-ga-borde-tarjeta bg-white p-3 text-left text-14 font-bold text-ga-texto transition-colors duration-200 hover:bg-ga-fondo-suave focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
             >
-              <span aria-hidden="true" className="text-22">
-                {convenio.emoji}
-              </span>
+              <LogoMarca convenio={convenio} tamano={32} />
               {convenio.nombreCorto}
             </button>
           ),

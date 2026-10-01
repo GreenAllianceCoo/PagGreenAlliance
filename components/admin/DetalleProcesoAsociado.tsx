@@ -6,6 +6,7 @@ import type { DetalleProcesoAsociado as Detalle } from "@/lib/admin/asociados";
 import { ESTADOS_PROCESO, ETIQUETA_ESTADO_PROCESO } from "@/lib/procesoEjecutivo";
 import { BotonAdmin, CampoAdmin, EntradaAdmin, SelectAdmin } from "./CamposAdmin";
 import { BajaAsociado } from "./BajaAsociado";
+import { HabilitarCredito } from "./HabilitarCredito";
 import { ToastAdmin } from "./ToastAdmin";
 
 const INICIAL: EstadoActualizarProceso = {};
@@ -95,6 +96,14 @@ export function DetalleProcesoAsociado({ detalle, bloqueado = false }: { detalle
           onResuelto={setToast}
         />
       </div>
+
+      {/* §13.2: solo si la última solicitud está rechazada y sin habilitar. */}
+      {detalle.puedeHabilitarCredito ? (
+        <div className="flex flex-col gap-2.5 border-t border-admin-borde-sutil pt-4">
+          <h2 className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Crédito</h2>
+          <HabilitarCredito asociadoId={asociado.id} nombre={asociado.nombre} bloqueado={bloqueado} onResuelto={setToast} />
+        </div>
+      ) : null}
 
       <div className="flex flex-col gap-2.5">
         <h2 className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Historial del proceso</h2>

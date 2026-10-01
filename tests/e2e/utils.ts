@@ -1,4 +1,9 @@
-import { expect, type Browser, type Page, type TestInfo } from "@playwright/test";
+import {
+  expect,
+  type Browser,
+  type Page,
+  type TestInfo,
+} from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -56,13 +61,19 @@ export type ClaveUsuario = keyof typeof USUARIOS;
 
 export const CEDULA_NO_REGISTRADA = "9999999999";
 export const MENSAJE_CODIGO_INVALIDO = "El código no es válido o ya venció";
-export const TEXTO_PRIVACIDAD = "Si tu cédula está registrada, te enviamos un código";
+export const TEXTO_PRIVACIDAD =
+  "Si tu cédula está registrada, te enviamos un código";
 
 // ---------------------------------------------------------------------------
 // Supabase local (service role solo en la prueba, nunca en la app cliente)
 // ---------------------------------------------------------------------------
 
-async function rest(ruta: string, init: RequestInit = {}, llave = SERVICE_KEY, token?: string) {
+async function rest(
+  ruta: string,
+  init: RequestInit = {},
+  llave = SERVICE_KEY,
+  token?: string,
+) {
   const respuesta = await fetch(`${SUPABASE_URL}/rest/v1/${ruta}`, {
     ...init,
     headers: {
@@ -83,10 +94,15 @@ async function rest(ruta: string, init: RequestInit = {}, llave = SERVICE_KEY, t
   return { status: respuesta.status, cuerpo };
 }
 
-export const adminRest = (ruta: string, init: RequestInit = {}) => rest(ruta, init);
-export const anonRest = (ruta: string, init: RequestInit = {}) => rest(ruta, init, ANON_KEY);
-export const usuarioRest = (ruta: string, token: string, init: RequestInit = {}) =>
-  rest(ruta, init, ANON_KEY, token);
+export const adminRest = (ruta: string, init: RequestInit = {}) =>
+  rest(ruta, init);
+export const anonRest = (ruta: string, init: RequestInit = {}) =>
+  rest(ruta, init, ANON_KEY);
+export const usuarioRest = (
+  ruta: string,
+  token: string,
+  init: RequestInit = {},
+) => rest(ruta, init, ANON_KEY, token);
 
 /** Borra los límites de frecuencia (solo en local) para que las pruebas sean repetibles. */
 export async function limpiarLimites() {
@@ -114,9 +130,12 @@ export async function afiliacionesPorCedula(cedula: string) {
 }
 
 export async function borrarAfiliaciones(cedula: string) {
-  await adminRest(`solicitudes_afiliacion?cedula=eq.${encodeURIComponent(cedula)}`, {
-    method: "DELETE",
-  });
+  await adminRest(
+    `solicitudes_afiliacion?cedula=eq.${encodeURIComponent(cedula)}`,
+    {
+      method: "DELETE",
+    },
+  );
 }
 
 /**
@@ -134,15 +153,23 @@ export async function restaurarCreditoDeEjemplo() {
   const { cuerpo: perfiles } = await adminRest(
     `perfiles?select=id&cedula=eq.${encodeURIComponent(USUARIOS.conSolicitud.cedula)}`,
   );
-  const id = (Array.isArray(perfiles) ? perfiles : [])[0] as { id: string } | undefined;
+  const id = (Array.isArray(perfiles) ? perfiles : [])[0] as
+    { id: string } | undefined;
   if (!id) return;
-  const { cuerpo: filas } = await adminRest(`solicitudes_credito?select=id,estado&asociado_id=eq.${id.id}`);
-  const fila = (Array.isArray(filas) ? filas : [])[0] as { id: string; estado: string } | undefined;
+  const { cuerpo: filas } = await adminRest(
+    `solicitudes_credito?select=id,estado&asociado_id=eq.${id.id}`,
+  );
+  const fila = (Array.isArray(filas) ? filas : [])[0] as
+    { id: string; estado: string } | undefined;
   if (!fila || fila.estado === "pendiente") return;
   await adminRest(`solicitudes_credito?id=eq.${fila.id}`, { method: "DELETE" });
   await adminRest("solicitudes_credito", {
     method: "POST",
-    body: JSON.stringify({ asociado_id: id.id, porcentaje_devolucion: "50", monto_solicitado: 500000 }),
+    body: JSON.stringify({
+      asociado_id: id.id,
+      porcentaje_devolucion: "50",
+      monto_solicitado: 500000,
+    }),
   });
 }
 
@@ -154,7 +181,8 @@ export async function tokenDeUsuario(correo: string) {
     body: JSON.stringify({ email: correo, password: "Prueba123!" }),
   });
   const cuerpo = (await r.json()) as { access_token?: string };
-  if (!cuerpo.access_token) throw new Error(`No se obtuvo token para ${correo}`);
+  if (!cuerpo.access_token)
+    throw new Error(`No se obtuvo token para ${correo}`);
   return cuerpo.access_token;
 }
 
@@ -177,13 +205,21 @@ type MensajeMailpit = {
 };
 
 export async function mensajesPara(correo: string): Promise<MensajeMailpit[]> {
-  const r = await fetch(`${MAILPIT}/api/v1/search?query=${encodeURIComponent(`to:"${correo}"`)}&limit=20`);
+  const r = await fetch(
+    `${MAILPIT}/api/v1/search?query=${encodeURIComponent(`to:"${correo}"`)}&limit=20`,
+  );
   const cuerpo = (await r.json()) as { messages?: MensajeMailpit[] };
-  return (cuerpo.messages ?? []).sort((a, b) => Date.parse(b.Created) - Date.parse(a.Created));
+  return (cuerpo.messages ?? []).sort(
+    (a, b) => Date.parse(b.Created) - Date.parse(a.Created),
+  );
 }
 
 /** Espera un correo con código nuevo (posterior a `desde`) y devuelve los 6 dígitos. */
-export async function esperarCodigo(correo: string, desde: number, maxMs = 20_000) {
+export async function esperarCodigo(
+  correo: string,
+  desde: number,
+  maxMs = 20_000,
+) {
   const limite = Date.now() + maxMs;
   while (Date.now() < limite) {
     const [ultimo] = await mensajesPara(correo);
@@ -216,7 +252,13 @@ export async function llenarOtp(page: Page, codigo: string) {
   await primera.evaluate((el, texto) => {
     const dt = new DataTransfer();
     dt.setData("text", texto);
-    el.dispatchEvent(new ClipboardEvent("paste", { clipboardData: dt, bubbles: true, cancelable: true }));
+    el.dispatchEvent(
+      new ClipboardEvent("paste", {
+        clipboardData: dt,
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
   }, codigo);
 }
 
@@ -260,10 +302,19 @@ export function opcionesContexto(testInfo: TestInfo) {
   };
 }
 
-export async function contextoConSesion(browser: Browser, clave: ClaveUsuario, testInfo: TestInfo) {
+export async function contextoConSesion(
+  browser: Browser,
+  clave: ClaveUsuario,
+  testInfo: TestInfo,
+) {
   const crearContexto = (o: { storageState?: string } = {}) =>
     browser.newContext({ ...opcionesContexto(testInfo), ...o });
-  const archivo = path.join(RAIZ, "test-results", ".auth", `${testInfo.project.name}-${clave}.json`);
+  const archivo = path.join(
+    RAIZ,
+    "test-results",
+    ".auth",
+    `${testInfo.project.name}-${clave}.json`,
+  );
   if (fs.existsSync(archivo)) {
     const ctx = await crearContexto({ storageState: archivo });
     const p = await ctx.newPage();
@@ -291,9 +342,16 @@ export function esEscritorio(testInfo: TestInfo) {
   return testInfo.project.name === "escritorio";
 }
 
-export async function capturaCompleta(page: Page, nombre: string, testInfo: TestInfo) {
+export async function capturaCompleta(
+  page: Page,
+  nombre: string,
+  testInfo: TestInfo,
+) {
   fs.mkdirSync(CARPETA_QA, { recursive: true });
-  const archivo = path.join(CARPETA_QA, `${nombre}-${testInfo.project.name}.png`);
+  const archivo = path.join(
+    CARPETA_QA,
+    `${nombre}-${testInfo.project.name}.png`,
+  );
   await page.screenshot({ path: archivo, fullPage: true });
   return archivo;
 }
@@ -312,7 +370,9 @@ export function revisarOrden(texto: string, esperados: string[]) {
     const i = texto.indexOf(e, desde);
     if (i === -1) {
       const enOtroLado = texto.indexOf(e);
-      problemas.push(enOtroLado === -1 ? `FALTA: «${e}»` : `FUERA DE ORDEN: «${e}»`);
+      problemas.push(
+        enOtroLado === -1 ? `FALTA: «${e}»` : `FUERA DE ORDEN: «${e}»`,
+      );
     } else {
       desde = i + e.length;
     }
@@ -331,10 +391,17 @@ export type DatosFormulario = {
   nombres: string;
   apellidos: string;
   cedula: string;
+  institucion: "policia" | "ejercito" | "";
   grado: string;
-  institucion: "policia" | "ejercito";
+  /** Cuenta de nómina v3 (spec §2.6): entidad (texto visible), tipo y número. */
+  nominaEntidad: string;
+  nominaTipo: "Ahorros" | "Corriente" | "";
+  nominaNumero: string;
   nequi: string;
   celular: string;
+  /** Correo institucional: dominio obligatorio según la institución (spec §12.3). */
+  correoInstitucional: string;
+  /** Correo personal: ancla el ingreso con código (spec §2.8). */
   email: string;
   /** Texto visible del `<option>`, o "" para «No tengo asesor». */
   asesor: string;
@@ -347,11 +414,15 @@ export function datosValidos(cedula = cedulaUnica()): DatosFormulario {
     nombres: "Laura",
     apellidos: "Gómez Prueba",
     cedula,
-    grado: "PT",
     institucion: "policia",
+    grado: "PT",
+    nominaEntidad: "Bancolombia",
+    nominaTipo: "Ahorros",
+    nominaNumero: "12345678901",
     nequi: "3009998877",
     celular: "3104567890",
-    email: `laura.qa.${cedula}@policia.gov.co`,
+    correoInstitucional: `laura.qa.${cedula}@policia.gov.co`,
+    email: `laura.qa.${cedula}@gmail.com`,
     asesor: "",
     mensaje: "Prueba automática de QA.",
     acepto: true,
@@ -368,23 +439,71 @@ export function fotoDePrueba(nombre: string) {
   return { name: nombre, mimeType: "image/png" as const, buffer: PNG_1PX };
 }
 
-/** Llena el formulario v2 (espera a que hidrate: el orden de campos cambia en escritorio/celular). */
-export async function llenarAfiliacion(page: Page, d: Partial<DatosFormulario>) {
+/**
+ * Llena el formulario v3 (institución→grado, cuenta de nómina en cascada, dos
+ * correos y selfie con input sr-only). Espera a que hidrate. `fotos=false` no sube fotos.
+ */
+export async function llenarAfiliacion(
+  page: Page,
+  d: Partial<DatosFormulario>,
+  fotos = true,
+) {
   await page.waitForLoadState("networkidle");
   if (d.nombres !== undefined) await page.getByLabel("Nombres").fill(d.nombres);
-  if (d.apellidos !== undefined) await page.getByLabel("Apellidos").fill(d.apellidos);
-  if (d.cedula !== undefined) await page.getByLabel("Número de cédula").fill(d.cedula);
-  if (d.grado !== undefined) await page.getByLabel("Grado").selectOption(d.grado);
-  if (d.institucion !== undefined) await page.getByLabel("Institución").selectOption(d.institucion);
-  if (d.nequi !== undefined) await page.getByLabel("Número Nequi").fill(d.nequi);
-  if (d.celular !== undefined) await page.getByLabel("Celular").fill(d.celular);
-  if (d.email !== undefined) await page.getByLabel("Correo electrónico").fill(d.email);
-  if (d.asesor !== undefined) {
-    await page.getByLabel("Asesor").selectOption(d.asesor ? { label: d.asesor } : { index: 0 });
+  if (d.apellidos !== undefined)
+    await page.getByLabel("Apellidos").fill(d.apellidos);
+  if (d.cedula !== undefined)
+    await page.getByLabel("Número de cédula").fill(d.cedula);
+  if (d.institucion !== undefined) {
+    await page
+      .locator("#af-institucion")
+      .selectOption(d.institucion || { index: 0 });
   }
-  await page.locator('input[name="foto_cedula_frente"]').setInputFiles(fotoDePrueba("frente.png"));
-  await page.locator('input[name="foto_cedula_reverso"]').setInputFiles(fotoDePrueba("reverso.png"));
-  await page.locator('input[name="foto_selfie"]').setInputFiles(fotoDePrueba("selfie.png"));
-  if (d.mensaje !== undefined) await page.getByLabel("¿Algo que debamos saber?").fill(d.mensaje);
-  if (d.acepto !== undefined) await page.locator("#af-datos").setChecked(d.acepto);
+  if (d.grado && d.institucion !== "") {
+    await expect(page.locator("#af-grado")).toBeEnabled();
+    await page.locator("#af-grado").selectOption(d.grado);
+  }
+  if (d.nominaEntidad) {
+    const combo = page.locator("#af-nomina-entidad");
+    await combo.click();
+    await combo.fill(d.nominaEntidad);
+    await page
+      .getByRole("option", { name: d.nominaEntidad, exact: true })
+      .first()
+      .dispatchEvent("mousedown");
+  }
+  if (d.nominaTipo) {
+    await page
+      .locator('label:has(input[name="nomina_tipo"])', {
+        hasText: d.nominaTipo,
+      })
+      .click();
+  }
+  if (d.nominaNumero !== undefined && d.nominaEntidad)
+    await page.locator("#af-nomina-numero").fill(d.nominaNumero);
+  if (d.nequi !== undefined) await page.locator("#af-nequi").fill(d.nequi);
+  if (d.celular !== undefined) await page.locator("#af-cel").fill(d.celular);
+  if (d.correoInstitucional !== undefined)
+    await page.locator("#af-correo-inst").fill(d.correoInstitucional);
+  if (d.email !== undefined) await page.locator("#af-email").fill(d.email);
+  if (d.asesor !== undefined) {
+    await page
+      .locator("#af-asesor")
+      .selectOption(d.asesor ? { label: d.asesor } : { index: 0 });
+  }
+  if (fotos) {
+    await page
+      .locator('input[name="foto_cedula_frente"]')
+      .setInputFiles(fotoDePrueba("frente.png"));
+    await page
+      .locator('input[name="foto_cedula_reverso"]')
+      .setInputFiles(fotoDePrueba("reverso.png"));
+    await page
+      .locator('input[name="foto_selfie"]')
+      .setInputFiles(fotoDePrueba("selfie.png"));
+  }
+  if (d.mensaje !== undefined)
+    await page.getByLabel("¿Algo que debamos saber?").fill(d.mensaje);
+  if (d.acepto !== undefined)
+    await page.locator("#af-datos").setChecked(d.acepto);
 }

@@ -1,7 +1,6 @@
 import { Landing } from "@/components/pantallas/Landing";
-import { CORREO_CONTACTO, TEXTO_VIGILANCIA, WHATSAPP_NUMERO } from "@/lib/config";
+import { CORREO_CONTACTO, TEXTO_VIGILANCIA, WHATSAPP_NUMERO, WHATSAPP_URL_PIE } from "@/lib/config";
 import { cargarConvenios } from "@/lib/conveniosServidor";
-import { ESTADISTICAS_EJEMPLO } from "@/lib/mock";
 
 // Los convenios salen de la tabla `convenios` (spec-requerimientos-ricardo §4);
 // la landing se regenera como máximo cada hora (si la tabla no responde, se
@@ -13,9 +12,9 @@ export default async function Home() {
   const convenios = await cargarConvenios();
   return (
     <Landing
-      estadisticas={ESTADISTICAS_EJEMPLO}
       convenios={convenios}
       whatsapp={WHATSAPP_NUMERO}
+      whatsappUrl={WHATSAPP_URL_PIE}
       correo={CORREO_CONTACTO}
       textoVigilancia={TEXTO_VIGILANCIA}
     />

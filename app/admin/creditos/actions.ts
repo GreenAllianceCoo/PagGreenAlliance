@@ -103,6 +103,7 @@ export async function resolverCredito(
   }
 
   revalidatePath("/admin/creditos");
+  revalidatePath("/cuenta"); // el asociado ve el estado nuevo en su pantalla
   return { mensaje: datos.decision === "aprobado" ? "Crédito aprobado." : "Crédito rechazado." };
 }
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CuentaDemo } from "@/components/asesor/CuentaDemo";
 import { cargarPaquetesDemo } from "@/lib/asesor/cargarPaquetesDemo";
+import { cargarCatalogoGrados } from "@/lib/grados";
 import { exigirAsesor } from "@/lib/asesor/servidor";
 import { cerrarSesionAsesor } from "../actions";
 
@@ -18,9 +19,18 @@ export const metadata: Metadata = {
 export default async function AsesorDemoPage() {
   const { supabase, nombre } = await exigirAsesor();
 
-  const paquetesPorGrado = await cargarPaquetesDemo(supabase, "asesor_demo_grados_fallo");
+  // §13.3: grados por institución (catálogo público) + cupos/tasa por grupo (RPC solo asesor/admin).
+  const [paquetesPorGrado, catalogoGrados] = await Promise.all([
+    cargarPaquetesDemo(supabase, "asesor_demo_grados_fallo"),
+    cargarCatalogoGrados(supabase),
+  ]);
 
   return (
-    <CuentaDemo nombreAsesor={nombre} paquetesPorGrado={paquetesPorGrado} accionSalir={cerrarSesionAsesor} />
+    <CuentaDemo
+      nombreAsesor={nombre}
+      paquetesPorGrado={paquetesPorGrado}
+      catalogoGrados={catalogoGrados}
+      accionSalir={cerrarSesionAsesor}
+    />
   );
 }

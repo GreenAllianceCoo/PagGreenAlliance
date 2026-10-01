@@ -41,7 +41,7 @@ function TarjetaKpi({
   );
 }
 
-function BarraBono({ titulo, avance }: { titulo: string; avance: AvanceMeta }) {
+export function BarraBono({ titulo, avance }: { titulo: string; avance: AvanceMeta }) {
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex justify-between gap-3 text-14 font-bold">
@@ -59,7 +59,7 @@ function BarraBono({ titulo, avance }: { titulo: string; avance: AvanceMeta }) {
         className="h-2.5 overflow-hidden rounded-full bg-ga-verde-claro"
       >
         <div
-          className="h-full w-full origin-left rounded-full bg-ga-verde transition-transform duration-500 ease-spring"
+          className="h-full w-full origin-left rounded-full bg-ga-verde transition-transform duration-500 ease-spring motion-safe:animate-ga-barra"
           style={{ transform: `scaleX(${avance.porcentaje / 100})` }}
         />
       </div>
@@ -158,7 +158,6 @@ export function PanelComisiones({ comisiones, revelar, hrefSimulador }: PanelCom
             </p>
           ) : null}
 
-          {/* TODO(confirmar: Q-01) los bonos cuentan hoy los embargos operando ahora, no los históricos. */}
           <section aria-labelledby="bonos-titulo" className="flex flex-col gap-3.5 rounded-20 bg-white p-5 lg:rounded-26 lg:px-6 lg:py-6">
             <h2 id="bonos-titulo" className="m-0 text-14 font-extrabold uppercase tracking-[0.04em] text-ga-texto-3">
               Avance hacia los bonos <span className="font-medium normal-case text-ga-deshabilitado-texto">(opcional)</span>

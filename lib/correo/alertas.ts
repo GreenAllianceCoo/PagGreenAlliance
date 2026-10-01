@@ -29,7 +29,7 @@ export async function avisarAdminsDeAlerta(datos: { tipo: TipoAlertaAsociado; no
     const etiqueta = ETIQUETA_ALERTA[datos.tipo];
     await enviarCorreoTexto({
       para: [...new Set(correos)],
-      asunto: `Nueva alerta: ${etiqueta.toLowerCase()} · ${datos.nombreAsociado}`,
+      asunto: `Nueva alerta: ${etiqueta.toLowerCase()} · ${datos.nombreAsociado.replace(/[\r\n]+/g, " ")}`,
       texto: [
         `${datos.nombreAsociado} pidió «${etiqueta}» desde su cuenta.`,
         "",

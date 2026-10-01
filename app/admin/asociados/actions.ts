@@ -2,11 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { exigirAdmin } from "@/lib/admin/servidor";
+import { correoDeCedula } from "@/lib/ingreso/servidor";
+import { enviarCreditoHabilitado } from "@/lib/correo/credito";
+import { destinatariosAviso } from "@/lib/correo/destinatarios";
+import { avisarCorreoInstitucional } from "@/lib/correo/institucional";
 import { registrar } from "@/lib/servidor/registro";
 import { erroresPorCampo, textoDe } from "@/lib/validaciones/comunes";
 import {
   esquemaActualizarProceso,
   esquemaCambiarEstadoAsociado,
+  esquemaHabilitarCredito,
+  type CampoHabilitarCredito,
   type CampoActualizarProceso,
   type CampoEstadoAsociado,
 } from "@/lib/validaciones/admin";
@@ -126,4 +132,92 @@ export async function cambiarEstadoAsociado(
   revalidatePath("/admin/asociados");
   revalidatePath(`/admin/asociados/${asociadoId}`);
   return { mensaje: activo ? "Asociado reactivado." : "Asociado dado de baja." };
+}
+
+export type EstadoHabilitarCredito = {
+  errores?: Partial<Record<CampoHabilitarCredito, string>>;
+  error?: string;
+  mensaje?: string;
+  /** Lo que aún impediría pedir (inactivo, sin_grado, sin_cupo, no_operando), ya traducido. */
+  pendientes?: string[];
+};
+
+/** Textos de admin_habilitar_credito() listos para mostrar. */
+const MENSAJES_HABILITAR = [
+  "Solo un administrador puede habilitar el crédito de un asociado",
+  "El motivo debe tener entre 5 y 300 caracteres",
+  "No puedes habilitar tu propio crédito; debe hacerlo otro administrador",
+  "El asociado no existe",
+  "El asociado no tiene un crédito rechazado por habilitar",
+  "Este rechazo ya fue habilitado",
+];
+
+const TEXTO_BLOQUEO: Record<string, string> = {
+  inactivo: "la cuenta está dada de baja",
+  sin_grado: "no tiene grado asignado",
+  sin_cupo: "su grado no tiene cupo",
+  no_operando: "su proceso ejecutivo aún no está en «Operando»",
+};
+
+/**
+ * «Habilitar crédito» del detalle del asociado (spec §13.2). Solo el admin,
+ * por la RPC `admin_habilitar_credito` (motivo 5–300, no sobre sí mismo, la
+ * última solicitud debe estar rechazada y sin habilitar; deja una fila
+ * inmutable en historial_solicitudes). El motivo NUNCA llega al asociado.
+ * Después: correo al personal y aviso sin datos al institucional (no bloquean).
+ * Campos: `asociadoId` y `motivo`.
+ */
+export async function habilitarCredito(
+  _previo: EstadoHabilitarCredito,
+  formData: FormData,
+): Promise<EstadoHabilitarCredito> {
+  const { supabase } = await exigirAdmin();
+
+  const resultado = esquemaHabilitarCredito.safeParse({
+    asociadoId: textoDe(formData, "asociadoId"),
+    motivo: textoDe(formData, "motivo"),
+  });
+  if (!resultado.success) {
+    return { errores: erroresPorCampo<CampoHabilitarCredito>(resultado.error) };
+  }
+  const { asociadoId, motivo } = resultado.data;
+
+  const { data, error } = await supabase.rpc("admin_habilitar_credito", {
+    p_asociado_id: asociadoId,
+    p_motivo: motivo,
+  });
+  if (error) {
+    const conocido = MENSAJES_HABILITAR.find((m) => error.message?.includes(m));
+    if (!conocido) {
+      registrar("error", { evento: "admin_habilitar_credito_fallo", codigo: error.code, mensaje: error.message });
+    }
+    return { error: conocido ? `${conocido}.` : "No pudimos guardar el cambio. Intenta de nuevo." };
+  }
+  const fila = Array.isArray(data) ? data[0] : data;
+  const bloqueos = Array.isArray(fila?.bloqueos) ? (fila.bloqueos as string[]) : [];
+  const pendientes = bloqueos.map((b) => TEXTO_BLOQUEO[b]).filter((t): t is string => Boolean(t));
+
+  // Avisos: no bloquean. Nombre y cédula salen de la ficha (RLS del admin).
+  const { data: perfil } = await supabase
+    .from("perfiles")
+    .select("nombre_completo, cedula, correo_institucional")
+    .eq("id", asociadoId)
+    .maybeSingle();
+  if (perfil) {
+    const correoPersonal = await correoDeCedula(perfil.cedula);
+    const correo = destinatariosAviso(correoPersonal);
+    await avisarCorreoInstitucional(correoPersonal, perfil.correo_institucional);
+    if (correo.length > 0) await enviarCreditoHabilitado({ id: asociadoId, nombre: perfil.nombre_completo, correo });
+  }
+
+  revalidatePath("/admin/asociados");
+  revalidatePath(`/admin/asociados/${asociadoId}`);
+  revalidatePath("/cuenta");
+  revalidatePath("/cuenta/solicitar");
+  return {
+    mensaje: pendientes.length
+      ? `Crédito habilitado. Aún no podrá pedir porque ${pendientes.join(" y ")}.`
+      : "Crédito habilitado. Ya puede hacer una nueva solicitud.",
+    pendientes,
+  };
 }

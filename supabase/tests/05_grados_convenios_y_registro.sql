@@ -66,7 +66,7 @@ set local role anon;
 set local request.jwt.claims = '{"role":"anon"}';
 
 select is_empty($$ select 1 from public.grados_credito $$, 'anon no ve los topes de crédito');
-select is_empty($$ select 1 from public.convenios $$, 'anon no ve los convenios (NIT y teléfono incluidos)');
+select results_eq($$ select nombre_empresa from public.convenios where id in ('40000000-0000-4000-a000-000000000001', '40000000-0000-4000-a000-000000000002') $$, array['AMB Móvil S.A.S.'], 'anon solo ve los convenios visibles (20261002000000)');
 
 -- ------------------------------------------------------------
 -- Sesión: admin

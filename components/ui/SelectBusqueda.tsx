@@ -130,6 +130,8 @@ export function SelectBusqueda({
           id={idLista}
           role="listbox"
           aria-label={etiquetaLista}
+          // Chrome vuelve «tabulable» a una lista con scroll; al cerrarse con el blur el foco caía en body.
+          tabIndex={-1}
           className="absolute left-0 right-0 top-full z-20 mt-1.5 max-h-64 overflow-auto rounded-12 bg-white py-1 shadow-modal-toast ring-1 ring-ga-linea"
         >
           {visibles.map((o, i) => (

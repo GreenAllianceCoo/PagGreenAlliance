@@ -10,13 +10,16 @@ import { EncabezadoAsesor } from "@/components/asesor/EncabezadoAsesor";
 import { CONVENIOS } from "@/lib/convenios";
 import {
   CLIENTE_DEMO,
-  GRADOS,
+  INSTITUCIONES_DEMO,
   MONTO_MINIMO,
-  NOMBRE_GRADO,
+  gradosDemoDeInstitucion,
+  paquetesDeGradoDemo,
   topeMaximoDemo,
   type CodigoGrado,
   type PaqueteDemo,
 } from "@/lib/asesor/datosDemo";
+import { TEXTO_SIN_CUPO_CORTO, type GradoCatalogo } from "@/lib/gradosCatalogo";
+import type { CodigoInstitucion } from "@/lib/validaciones/instituciones";
 
 const PASO_MONTO = 50000;
 
@@ -28,6 +31,8 @@ type CuentaDemoProps = {
   nombreAsesor: string;
   /** `grados_credito` agrupado por grado, leído en el servidor. `null` si no se pudo leer (RS-08: no hay cifras de respaldo). */
   paquetesPorGrado: Record<CodigoGrado, PaqueteDemo[]> | null;
+  /** §13.3: catálogo `grados` (con institución y grupo de crédito) para el selector Policía / Ejército. [] = no se pudo leer. */
+  catalogoGrados: GradoCatalogo[];
   /** Server Action de «Salir» (misma del resto de /asesor). */
   accionSalir?: (formData: FormData) => void;
   /** Encabezado propio (p. ej. el de /admin); si falta, el del asesor. */
@@ -54,16 +59,27 @@ const VOLVER_ASESOR = { href: "/asesor", texto: "Volver a Mis clientes" };
 export function CuentaDemo({
   nombreAsesor,
   paquetesPorGrado,
+  catalogoGrados,
   accionSalir,
   encabezado,
   volver = VOLVER_ASESOR,
   tituloDemo = "Modo demostración",
   subtituloDemo = "Nada de lo que hagas aquí se guarda",
 }: CuentaDemoProps) {
-  const sinDatos = paquetesPorGrado === null;
-  const gradosDisponibles = GRADOS.filter((g) => (paquetesPorGrado?.[g]?.length ?? 0) > 0);
-  const [grado, setGrado] = useState<CodigoGrado>(gradosDisponibles[0] ?? "PP");
-  const paquetes = useMemo(() => paquetesPorGrado?.[grado] ?? [], [paquetesPorGrado, grado]);
+  const sinDatos = paquetesPorGrado === null || catalogoGrados.length === 0;
+  // §13.3: la institución define los grados; el grado define el cupo (por su grupo de crédito).
+  const [institucion, setInstitucion] = useState<CodigoInstitucion>("policia");
+  const gradosDisponibles = useMemo(
+    () => gradosDemoDeInstitucion(catalogoGrados, institucion),
+    [catalogoGrados, institucion],
+  );
+  const [grado, setGrado] = useState<string>(() => gradosDemoDeInstitucion(catalogoGrados, "policia")[0]?.codigo ?? "");
+  const nombreGrado = gradosDisponibles.find((g) => g.codigo === grado)?.nombre ?? grado;
+  const paquetes = useMemo(
+    () => paquetesDeGradoDemo(catalogoGrados, paquetesPorGrado, grado),
+    [catalogoGrados, paquetesPorGrado, grado],
+  );
+  const sinCupo = !sinDatos && paquetes.length === 0;
   const tope = topeMaximoDemo(paquetes);
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
@@ -76,9 +92,16 @@ export function CuentaDemo({
   const [enviando, setEnviando] = useState(false);
   const [confirmada, setConfirmada] = useState(false);
 
-  function cambiarGrado(nuevo: CodigoGrado) {
+  function cambiarInstitucion(nueva: CodigoInstitucion) {
+    setInstitucion(nueva);
+    // El grado elegido ya no aplica a la otra institución: se pasa al primero de la lista.
+    cambiarGrado(gradosDemoDeInstitucion(catalogoGrados, nueva)[0]?.codigo ?? "");
+    setMostrarFormulario(false);
+  }
+
+  function cambiarGrado(nuevo: string) {
     setGrado(nuevo);
-    const nuevosPaquetes = paquetesPorGrado?.[nuevo] ?? [];
+    const nuevosPaquetes = paquetesDeGradoDemo(catalogoGrados, paquetesPorGrado, nuevo);
     const nuevoPorcentaje = nuevosPaquetes[0]?.porcentaje ?? "50";
     setPorcentaje(nuevoPorcentaje);
     setMonto(nuevosPaquetes[0]?.capacidad_maxima ?? MONTO_MINIMO);
@@ -139,21 +162,44 @@ export function CuentaDemo({
           </h1>
         </div>
 
-        <label className="flex flex-col gap-1.5 rounded-18 bg-white p-5 lg:p-6">
-          <span className="text-15 font-bold">Grado del cliente</span>
-          <Select
-            value={grado}
-            onChange={(e) => cambiarGrado(e.target.value as CodigoGrado)}
-            aria-label="Grado del cliente"
-            className="lg:max-w-xs"
-          >
-            {gradosDisponibles.map((g) => (
-              <option key={g} value={g}>
-                {NOMBRE_GRADO[g]}
-              </option>
-            ))}
-          </Select>
-        </label>
+        <div className="flex flex-col gap-4 rounded-18 bg-white p-5 lg:flex-row lg:gap-6 lg:p-6">
+          {/* Selector segmentado Policía / Ejército: radios nativos (flechas del teclado y lector de pantalla). */}
+          <fieldset className="m-0 flex flex-1 flex-col gap-1.5 border-0 p-0">
+            <legend className="mb-1.5 p-0 text-15 font-bold">Institución del cliente</legend>
+            <div role="radiogroup" aria-label="Institución del cliente" className="grid grid-cols-2 gap-1 rounded-full bg-ga-fondo-suave p-1 lg:max-w-xs">
+              {INSTITUCIONES_DEMO.map((i) => (
+                <label key={i.codigo} className="cursor-pointer">
+                  <input
+                    type="radio"
+                    name="institucion-demo"
+                    value={i.codigo}
+                    checked={institucion === i.codigo}
+                    onChange={() => cambiarInstitucion(i.codigo)}
+                    className="peer sr-only"
+                  />
+                  <span className="flex min-h-11 items-center justify-center rounded-full px-4 text-15 font-bold text-ga-texto-2 transition-colors peer-checked:bg-ga-verde peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ga-verde">
+                    {i.nombre}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <label className="flex flex-1 flex-col gap-1.5">
+            <span className="text-15 font-bold">Grado del cliente</span>
+            <Select
+              value={grado}
+              onChange={(e) => cambiarGrado(e.target.value)}
+              aria-label="Grado del cliente"
+              className="lg:max-w-xs"
+            >
+              {gradosDisponibles.map((g) => (
+                <option key={g.codigo} value={g.codigo}>
+                  {g.nombre}
+                </option>
+              ))}
+            </Select>
+          </label>
+        </div>
 
         <div className="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:gap-6">
           <section className="flex flex-col gap-4 rounded-18 bg-white p-5 lg:col-span-2 lg:gap-5.5 lg:p-7">
@@ -164,6 +210,10 @@ export function CuentaDemo({
                   <p role="alert" className="m-0 text-14 font-semibold text-ga-error">
                     No pudimos cargar los topes de crédito. Recarga la página; si sigue igual, avisa al equipo técnico.
                   </p>
+                ) : sinCupo ? (
+                  <p role="status" className="m-0 text-15 leading-150 text-ga-texto-2">
+                    {TEXTO_SIN_CUPO_CORTO}: este grado todavía no tiene cupo de crédito.
+                  </p>
                 ) : (
                   <p className="m-0 text-15 leading-150 text-ga-texto-2">
                     Así ve el cliente su cuenta antes de pedir un crédito. Prueba «Nueva solicitud».
@@ -171,7 +221,7 @@ export function CuentaDemo({
                 )}
                 <Button
                   onClick={() => setMostrarFormulario(true)}
-                  disabled={sinDatos}
+                  disabled={sinDatos || sinCupo}
                   className="gap-2 lg:self-start lg:px-9"
                 >
                   Nueva solicitud
@@ -287,8 +337,8 @@ export function CuentaDemo({
 
           <div className="flex flex-col gap-4">
             <section className="flex flex-col gap-1.5 rounded-18 bg-ga-navy p-5 text-white lg:p-6">
-              <span className="text-14 text-ga-navy-texto-suave">Tope disponible para el grado {NOMBRE_GRADO[grado]}</span>
-              <span className="text-26 font-extrabold lg:text-30">{formatCOP(tope)}</span>
+              <span className="text-14 text-ga-navy-texto-suave">Tope disponible para el grado {nombreGrado}</span>
+              <span className="text-26 font-extrabold lg:text-30">{sinCupo ? TEXTO_SIN_CUPO_CORTO : formatCOP(tope)}</span>
             </section>
             <ButtonLink href={volver.href} variante="terciario" className="gap-2">
               {volver.texto}
@@ -299,11 +349,11 @@ export function CuentaDemo({
           </div>
         </div>
 
-        <section className="flex flex-col gap-4 rounded-18 bg-white p-5 lg:px-7 lg:py-6">
+        <section id="convenios-ejemplo" className="flex flex-col gap-4 rounded-18 bg-white p-5 lg:px-7 lg:py-6">
           <h2 className="m-0 text-18 font-extrabold">Convenios de ejemplo</h2>
           <div className="flex flex-col gap-3 lg:grid lg:grid-cols-5">
             {CONVENIOS.map((convenio) => (
-              <ConvenioCard key={convenio.nombre} convenio={convenio} variante="enlace" href="#" />
+              <ConvenioCard key={convenio.nombre} convenio={convenio} variante="enlace" href="#convenios-ejemplo" />
             ))}
           </div>
         </section>
@@ -320,8 +370,10 @@ export function CuentaDemo({
               <dd className="m-0 text-16 font-bold text-ga-texto">{CLIENTE_DEMO.cedula}</dd>
             </div>
             <div className="flex flex-col gap-0.5 rounded-12 bg-ga-fondo-suave p-3.5">
-              <dt className="text-14 text-ga-texto-3">Grado</dt>
-              <dd className="m-0 text-16 font-bold text-ga-texto">{NOMBRE_GRADO[grado]}</dd>
+              <dt className="text-14 text-ga-texto-3">Institución · Grado</dt>
+              <dd className="m-0 text-16 font-bold text-ga-texto">
+                {INSTITUCIONES_DEMO.find((i) => i.codigo === institucion)?.nombre} · {nombreGrado}
+              </dd>
             </div>
           </dl>
         </section>

@@ -34,7 +34,7 @@ test("SUPABASE_SERVICE_ROLE_KEY no aparece en archivos 'use client'", () => {
 
 test("Los 'use client' no importan el cliente admin ni módulos server-only", () => {
   const malos = CODIGO.filter(
-    (f) => /^\s*["']use client["']/.test(leer(f)) && /@\/lib\/(supabase\/admin|servidor\/|ingreso\/servidor|afiliacion\/flash|grados)/.test(leer(f)),
+    (f) => /^\s*["']use client["']/.test(leer(f)) && /@\/lib\/(supabase\/admin|servidor\/|ingreso\/servidor|afiliacion\/flash|grados(?![A-Za-z]))/.test(leer(f)),
   );
   expect(malos.map(rel)).toEqual([]);
 });
@@ -66,7 +66,12 @@ test("Sin textos de ejemplo del diseño fijos en pantallas de producción", () =
   expect(usosMock.map(rel)).toEqual([]);
 });
 
-test("Ninguna pantalla dice «Correo institucional» (spec-fase-2 §2: el correo acepta cualquier dominio)", () => {
-  const malos = CODIGO.filter((f) => sinComentarios(leer(f)).includes("Correo institucional"));
-  expect(malos.map(rel)).toEqual([]);
+test("El formulario pide «Correo institucional» (v3 §12.3) y el aviso institucional no lleva datos personales", () => {
+  const conCampo = CODIGO.filter((f) => sinComentarios(leer(f)).includes("Correo institucional"));
+  expect(conCampo.map(rel)).toContain("components/pantallas/Afiliacion.tsx");
+  // El aviso al correo institucional solo lleva el enlace de ingreso: sin nombre, cédula, montos ni correo personal.
+  const aviso = sinComentarios(leer(path.join(RAIZ, "lib/correo/institucional.ts")));
+  const llamadas = Array.from(aviso.matchAll(/enviar(?:PlantillaResend|CorreoTexto)\(\{[\s\S]*?\}\)/g)).map((m) => m[0]);
+  expect(llamadas.length).toBeGreaterThan(0);
+  for (const l of llamadas) expect(l).not.toMatch(/nombre|cedula|monto|celular|personal\b/i);
 });
