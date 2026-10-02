@@ -14,6 +14,7 @@
 --  * Tope de cambios: 5 por hora por asociado (lo exige la base, no solo el navegador).
 --  * Eliminar definitivamente (anonimizar) también borra la foto de carné y su log:
 --    se reemplaza admin_confirmar_eliminacion (copia de 20261003000000 + estas líneas).
+--    Los comprobantes de desembolso se conservan 30 días (comprobante_borrar_at), no se borran aquí.
 -- Idempotente.
 -- ============================================================
 
@@ -234,18 +235,14 @@ begin
   perform public.validar_eliminacion_asociado(p_admin_id, v_sol.asociado_id);
   select * into v_perfil from public.perfiles p where p.id = v_sol.asociado_id for update;
 
-  -- Archivos de Storage a borrar (afiliación y comprobantes), antes de limpiar las filas.
+  -- Archivos de Storage a borrar ya (afiliación y foto del carné), antes de limpiar las filas.
+  -- Los comprobantes de desembolso NO van aquí: se guardan 30 días (más abajo).
   v_archivos :=
     coalesce((
       select array_agg('afiliacion-documentos/' || regexp_replace(f.ruta, '^afiliacion-documentos/', ''))
         from public.solicitudes_afiliacion sa
         cross join lateral unnest(array[sa.foto_cedula_frente, sa.foto_cedula_reverso, sa.foto_selfie]) as f(ruta)
        where sa.cedula = v_perfil.cedula and f.ruta is not null
-    ), '{}'::text[])
-    || coalesce((
-      select array_agg('comprobantes-desembolso/' || sc.comprobante_path)
-        from public.solicitudes_credito sc
-       where sc.asociado_id = v_perfil.id and sc.comprobante_path is not null
     ), '{}'::text[])
     || coalesce((
       select array_agg('fotos-carne/' || fc.ruta)
@@ -262,8 +259,9 @@ begin
   update public.historial_cambio_correo_ingreso h
      set motivo = 'Registro anonimizado'
    where h.perfil_id = v_perfil.id;
+  -- Comprobantes de desembolso: se conservan 30 días, solo visibles al admin; luego los borra la tarea programada.
   update public.solicitudes_credito sc
-     set comprobante_path = null, comprobante_subido_at = null
+     set comprobante_borrar_at = now() + interval '30 days'
    where sc.asociado_id = v_perfil.id and sc.comprobante_path is not null;
 
   update public.perfiles p

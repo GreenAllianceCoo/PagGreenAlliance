@@ -294,6 +294,16 @@ Cuando la cooperativa ya entregó el dinero:
 
 Desde esa fecha corre el **conteo de 3 meses** del crédito que ve el asociado, y le llega un correo de aviso. Una vez marcado, no se puede deshacer desde el panel.
 
+### 7.5 Comprobante del desembolso y «Eliminar definitivamente»
+
+El comprobante de la transferencia se sube al marcar el desembolso (o después, desde el mismo crédito) y se abre con **«Ver comprobante»**. Solo lo ven los administradores; el asociado solo ve si existe.
+
+Si usted **elimina definitivamente a un asociado** (ficha del asociado, solo si ya está dado de baja; pide un código que llega a su correo), sus datos personales, fotos, carné y acceso se borran de inmediato, pero **sus comprobantes de desembolso se guardan 30 días**:
+
+- En la ficha del asociado eliminado aparece **«Comprobantes que se borrarán el DD/MM/AAAA»** con un botón **«Ver»** por cada comprobante. Solo usted (administrador) puede abrirlos en ese plazo; ya no se pueden reemplazar.
+- Pasados los 30 días, la plataforma los borra sola (la tarea programada corre cada hora). No hay que hacer nada y no se puede deshacer. Si necesita conservar un comprobante, descárguelo antes de esa fecha.
+- La plataforma también borra sola los comprobantes subidos que nunca quedaron ligados a un crédito (a las 24 horas).
+
 ---
 
 ## 8. Asesores: registro, comisiones, pagos y premios

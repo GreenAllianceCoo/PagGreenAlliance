@@ -24,7 +24,7 @@ import {
  * «Eliminar definitivamente» (pedido de Sebas, 1-oct) = ANONIMIZAR: la fila del
  * asociado y sus cifras (créditos, pagos, comisiones, historial) se conservan sin
  * datos personales; se borran su afiliación, fotos, token del carné y su usuario
- * de Auth. Solo admin; el asociado debe estar dado de baja; motivo obligatorio;
+ * de Auth (sus comprobantes de desembolso se guardan 30 días y los borra la tarea programada). Solo admin; el asociado debe estar dado de baja; motivo obligatorio;
  * confirmación con un código de 6 dígitos que llega al correo del admin que lo pide
  * (10 minutos, 3 intentos). Las funciones de la base son SOLO service_role: este
  * archivo es el único camino, y siempre después de `exigirAdmin()`.

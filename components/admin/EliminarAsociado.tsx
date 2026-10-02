@@ -53,7 +53,8 @@ export function EliminarAsociado({ asociadoId, nombre, activo, esPropio }: Props
       ) : (
         <p className="m-0 text-14 leading-145 text-admin-texto-2">
           Borra sus datos personales (nombre, cédula, celular, correos, cuenta de nómina, Nequi, fotos, carné y acceso). Sus
-          créditos, pagos y comisiones se conservan como «Asociado eliminado». No se puede deshacer.
+          créditos, pagos y comisiones se conservan como «Asociado eliminado». Sus comprobantes de desembolso se guardan 30 días
+          (solo los ve el administrador) y luego se borran solos. No se puede deshacer.
         </p>
       )}
       <button
@@ -218,7 +219,8 @@ function Pasos({
       <div role="note" className="rounded-14 bg-ga-error-fondo p-3.5 text-14 leading-150 text-ga-error-texto">
         <strong>Esto no se puede deshacer.</strong> Se borrarán su nombre, cédula, celular, correos, cuenta de nómina y Nequi, las
         fotos de su afiliación, su carné y su acceso a la cuenta. Sus créditos, pagos y comisiones se conservan, ligados a un
-        registro anónimo «Asociado eliminado».
+        registro anónimo «Asociado eliminado». Sus comprobantes de desembolso se guardan 30 días, solo visibles para el
+        administrador, y luego se borran automáticamente.
       </div>
       <div className="flex flex-col gap-1.5">
         <label htmlFor={`${tituloId}-motivo`} className="text-14 font-bold">
