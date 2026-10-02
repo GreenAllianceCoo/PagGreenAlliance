@@ -48,6 +48,8 @@ export type CuentaProps = {
    * carné no dibuja esa línea / chip.
    */
   institucion?: string;
+  /** URL firmada de la foto del carné (la arma el servidor). */
+  fotoCarneUrl?: string | null;
   activo?: boolean;
   /** Server Action de «Salir» / cerrar sesión (signOut → /ingresar). */
   accionSalir?: (formData: FormData) => void;
@@ -229,6 +231,7 @@ export function Cuenta({
   cedula,
   grado,
   institucion,
+  fotoCarneUrl,
   activo,
   accionSalir,
   whatsappUrl,
@@ -363,7 +366,14 @@ export function Cuenta({
         {/* Carné (pieza 2b): con los datos que ya existen hoy (nombre, cédula
             enmascarada, grado); institución y «activo» quedan para cuando
             exista esa columna. */}
-        <CarneVirtual nombre={nombre} cedula={cedula} grado={grado} institucion={institucion} activo={activo} />
+        <CarneVirtual
+          nombre={nombre}
+          cedula={cedula}
+          grado={grado}
+          institucion={institucion}
+          activo={activo}
+          fotoUrl={fotoCarneUrl}
+        />
 
         <section
           id="convenios"

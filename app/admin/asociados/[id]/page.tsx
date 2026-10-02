@@ -7,6 +7,7 @@ import { DetalleProcesoAsociado } from "@/components/admin/DetalleProcesoAsociad
 import { EliminarAsociado } from "@/components/admin/EliminarAsociado";
 import { IconoVolver } from "@/components/ui/Iconos";
 import { exigirAdmin } from "@/lib/admin/servidor";
+import { urlFotoCarneDeAsociado } from "@/lib/carneFoto";
 import { cargarDetalleProceso } from "@/lib/admin/asociados";
 import { cargarCorreoIngresoAsociado } from "@/lib/admin/recuperaciones";
 
@@ -22,6 +23,8 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
   const correoIngreso = asociado.eliminado
     ? { pendiente: null, historial: [] }
     : await cargarCorreoIngresoAsociado(supabase, id, userId);
+  // Foto del carné (propia o la selfie de la afiliación): URL firmada corta, solo para el admin.
+  const fotoCarne = asociado.eliminado || asociado.rol !== "asociado" ? null : await urlFotoCarneDeAsociado(asociado.id);
   // El admin mueve el proceso de sus propios clientes (pedido de Sebas, 1-oct); solo el suyo no.
   const procesoBloqueado = asociado.id === userId;
   // El cambio de correo de ingreso sigue exigiendo otro admin para sus clientes (toma de cuentas).
@@ -51,6 +54,34 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
       ) : (
         <div className="flex max-w-[640px] flex-col gap-4">
           <DetalleProcesoAsociado detalle={detalle} bloqueado={procesoBloqueado} />
+          {asociado.rol === "asociado" ? (
+            <section aria-labelledby="titulo-foto-carne" className="flex items-center gap-4 rounded-20 bg-admin-superficie p-5.5">
+              {fotoCarne ? (
+                // URL firmada de Storage (caduca en minutos): no pasa por next/image.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={fotoCarne.url}
+                  alt={`Foto del carné de ${asociado.nombre}`}
+                  width={96}
+                  height={96}
+                  data-testid="foto-carne-admin"
+                  className="h-24 w-24 shrink-0 rounded-14 object-cover"
+                />
+              ) : null}
+              <div className="flex flex-col gap-1">
+                <h2 id="titulo-foto-carne" className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+                  Foto del carné
+                </h2>
+                <p className="m-0 text-14 text-admin-texto-2">
+                  {fotoCarne
+                    ? fotoCarne.origen === "propia"
+                      ? "Foto que subió el asociado."
+                      : "Selfie de su afiliación."
+                    : "Sin foto en el carné."}
+                </p>
+              </div>
+            </section>
+          ) : null}
           <CorreoIngresoAsociado
             asociadoId={asociado.id}
             nombre={asociado.nombre}

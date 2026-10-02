@@ -14,6 +14,8 @@ export type CarneVirtualProps = {
   hrefQr?: string | null;
   /** Destino de «Ver empresas en convenio». */
   hrefConvenios?: string;
+  /** URL firmada y corta de la foto del asociado (la arma el servidor). Sin ella no se dibuja foto. */
+  fotoUrl?: string | null;
 };
 
 /**
@@ -31,6 +33,7 @@ export function CarneVirtual({
   activo,
   hrefQr = "/cuenta/carne",
   hrefConvenios = "#convenios",
+  fotoUrl = null,
 }: CarneVirtualProps) {
   return (
     <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-6">
@@ -63,10 +66,24 @@ export function CarneVirtual({
           </span>
         ) : null}
       </div>
-      <span className="relative text-13 font-bold uppercase tracking-etiqueta text-ga-menta-suave">
-        Afiliado Titular
-      </span>
-      <strong className="relative break-words font-display text-22 font-extrabold lg:text-34">{nombre}</strong>
+      <div className="relative flex items-center gap-4">
+        {fotoUrl ? (
+          // URL firmada de Storage (caduca en minutos): no pasa por next/image.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={fotoUrl}
+            alt={`Foto de ${nombre}`}
+            width={96}
+            height={96}
+            data-testid="foto-carne"
+            className="h-20 w-20 shrink-0 rounded-14 bg-ga-verde object-cover lg:h-24 lg:w-24"
+          />
+        ) : null}
+        <div className="flex min-w-0 flex-col gap-1">
+          <span className="text-13 font-bold uppercase tracking-etiqueta text-ga-menta-suave">Afiliado Titular</span>
+          <strong className="break-words font-display text-22 font-extrabold lg:text-34">{nombre}</strong>
+        </div>
+      </div>
       <dl className="relative m-0 grid grid-cols-2 gap-x-4 gap-y-3 text-14">
         <div className="min-w-0">
           <dt className="text-12 text-ga-menta-suave">Grado</dt>

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { RUTA_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 import { cargarPerfilAsociado } from "@/lib/asociado/servidor";
 import { WHATSAPP_URL } from "@/lib/config";
+import { urlFotoCarneDeAsociado } from "@/lib/carneFoto";
 import { cargarConvenios } from "@/lib/conveniosServidor";
 import { textoTope, vistaSolicitud, type FilaSolicitud } from "@/lib/cuenta";
 import { hoyBogota } from "@/lib/fechas";
@@ -82,6 +83,8 @@ export default async function CuentaPage({
   // S-13: solo los asociados participan en el sorteo.
   const esAsociado = perfil?.rol === "asociado";
 
+  const fotoCarne = esAsociado ? await urlFotoCarneDeAsociado(user.id) : null;
+
   const topes = perfil?.cupo.estado === "con_cupo" ? perfil.cupo.paquetes : null;
 
   return (
@@ -105,6 +108,7 @@ export default async function CuentaPage({
       grado={perfil?.gradoCodigo ?? "Sin asignar"}
       institucion={perfil?.institucion ?? undefined}
       activo={perfil ? perfil.activo : undefined}
+      fotoCarneUrl={fotoCarne?.url ?? null}
       whatsappUrl={WHATSAPP_URL}
       accionSalir={cerrarSesion}
       perfilAsociado={perfil}
