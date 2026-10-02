@@ -1,6 +1,6 @@
 {
   "parametros": {
-    "actualizado": "2026-10-01",
+    "actualizado": "2026-10-02",
     "bloques_por_semana": 10,
     "nota_bloque": "1 bloque = 1 punto de peso ≈ media jornada de trabajo. Se puede cambiar en la hoja Resumen."
   },
@@ -1196,9 +1196,180 @@
       "depende": [
         "5.9"
       ],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "Sebas",
+      "nota": "02-oct: la sesión principal ya no la lista entre las migraciones pendientes; la fusión develop→main pasa a 6.27."
+    },
+    {
+      "id": "4.16",
+      "fase": 4,
+      "actividad": "Premios de asesores (clics y tope por meta), inscritos al sorteo en /admin/sorteo y ajustes de entrega S-01/S-02 (migraciones 20261002100000–20261002400000)",
+      "peso": 3,
+      "depende": [
+        "4.14"
+      ],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "ga-funcionalidad-botones + ga-revisor-seguridad + ga-verificador-qa",
+      "nota": "01-oct: revisión de seguridad sin críticos ni altos; e2e 188/148 en verde; grado con nombre en inscritos."
+    },
+    {
+      "id": "5.14",
+      "fase": 5,
+      "actividad": "Carné con QR, /verificar/[token] (solo activos, regenerar 1/min) y botón «Descargar PDF» del carné",
+      "peso": 2,
+      "depende": [
+        "5.12"
+      ],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "ga-funcionalidad-botones",
+      "nota": "01-oct: pdf-lib + qrcode; e2e M2 escritorio y celular."
+    },
+    {
+      "id": "4.17",
+      "fase": 4,
+      "actividad": "Recuperación de acceso (Anexo Técnico fase 2, O-1): /ingresar/recuperar, cambio de correo asistido en /admin y propio en /cuenta/perfil, correcciones SEC-REC-01 a 05 (migración 20261002500000)",
+      "peso": 4,
+      "depende": [
+        "4.14"
+      ],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "ga-funcionalidad-botones + ga-revisor-seguridad",
+      "nota": "02-oct: SEC-REC-02 compensado con trigger en auth.users y aviso nativo. Migración sin aplicar (6.27)."
+    },
+    {
+      "id": "4.18",
+      "fase": 4,
+      "actividad": "Reglas de Sebas: admin sin restricción sobre sus clientes y PP retirado (migración 20261002600000) con pgTAP, vitest y e2e ajustados",
+      "peso": 2,
+      "depende": [
+        "4.14"
+      ],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "ga-escritor-tests + ga-funcionalidad-botones"
+    },
+    {
+      "id": "4.19",
+      "fase": 4,
+      "actividad": "Comprobante de desembolso (bucket privado, visible para el asociado) y «Eliminar definitivamente» = anonimizar con código al correo del admin (migración 20261003000000)",
+      "peso": 4,
+      "depende": [
+        "4.14"
+      ],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "ga-funcionalidad-botones",
+      "nota": "02-oct: pgTAP 28 (68), e2e o-desembolso-eliminacion. D-28 para diseño."
+    },
+    {
+      "id": "4.20",
+      "fase": 4,
+      "actividad": "Rol secretario (Resumen y afiliaciones, con historial) y búsqueda general de asociados para asesores con cédula enmascarada (migración 20261003100000)",
+      "peso": 4,
+      "depende": [
+        "4.14"
+      ],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "ga-funcionalidad-botones",
+      "nota": "02-oct: pgTAP 29 (44), e2e p-secretario-busqueda; arreglado el formulario «Registrar asesor»."
+    },
+    {
+      "id": "5.15",
+      "fase": 5,
+      "actividad": "Foto del asociado en el carné: selfie por defecto, cambiable por el asociado; en carné, PDF, /verificar y ficha del admin (migración 20261003200000)",
+      "peso": 3,
+      "depende": [
+        "5.14"
+      ],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "ga-funcionalidad-botones",
+      "nota": "02-oct: pgTAP 30 (33), e2e q-foto-carne. D-29 para diseño."
+    },
+    {
+      "id": "5.16",
+      "fase": 5,
+      "actividad": "Vistas de /cuenta y demo del admin/asesor unificadas (CamposSolicitud, TarjetaTope) y comprobante conectado en /cuenta",
+      "peso": 2,
+      "depende": [
+        "4.19"
+      ],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "ga-diseno-a-codigo + sesión principal"
+    },
+    {
+      "id": "5.17",
+      "fase": 5,
+      "actividad": "Correos: diagnóstico del correo del sorteo, plan de correos Resend y mensajes de WhatsApp Business",
+      "peso": 1,
+      "depende": [
+        "3.9"
+      ],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "ga-correos"
+    },
+    {
+      "id": "6.26",
+      "fase": 6,
+      "actividad": "Documentos de entrega en PDF (documentación técnica, respaldo y restauración, manual, actas, constancia), contrato 001-2026 diligenciado con anexos 2 y 3, propuesta de garantía (7–21 oct) y soporte mensual ($500.000 desde el 22-oct)",
+      "peso": 3,
+      "depende": [],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "agente de documentos de entrega + sesión principal"
+    },
+    {
+      "id": "6.27",
+      "fase": 6,
+      "actividad": "Aplicar con respaldo previo las migraciones 20261002500000, 20261002600000, 20261003000000, 20261003100000 y 20261003200000 y fusionar develop→main",
+      "peso": 1,
+      "depende": [
+        "4.17",
+        "4.18",
+        "4.19",
+        "4.20",
+        "5.15",
+        "6.25"
+      ],
+      "estado": "Pendiente",
+      "origen": "Agregado",
+      "agente": "Sebas",
+      "simultanea": false
+    },
+    {
+      "id": "6.28",
+      "fase": 6,
+      "actividad": "Configurar la plantilla del sorteo en Vercel/Resend (RESEND_TEMPLATE_SORTEO_BOLETA, alias ga-sorteo-boleta publicado) y agregar {{{COMPROBANTE}}} a la plantilla de desembolso",
+      "peso": 1,
+      "depende": [
+        "5.17",
+        "4.19"
+      ],
       "estado": "Pendiente",
       "origen": "Agregado",
       "agente": "Sebas"
+    },
+    {
+      "id": "6.29",
+      "fase": 6,
+      "actividad": "Entrega final y último pago (miércoles 7-oct)",
+      "peso": 1,
+      "depende": [
+        "6.26",
+        "6.27",
+        "6.28"
+      ],
+      "estado": "Pendiente",
+      "origen": "Agregado",
+      "agente": "Sebas",
+      "simultanea": false
     }
   ],
   "pendientes": [
@@ -2452,9 +2623,9 @@
       "tarea": "Aplicar la migración 20261002000000 en producción y fusionar develop→main (commit e2523de)",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.25",
-      "nota": "01-oct: sin ella /admin/convenios y la lectura de convenios por visible/orden fallan en producción (el loader tiene respaldo en CONVENIOS). Probar subida de logo con un admin real."
+      "nota": "01-oct: sin ella /admin/convenios y la lectura de convenios por visible/orden fallan en producción (el loader tiene respaldo en CONVENIOS). Probar subida de logo con un admin real. 02-oct: cerrada; la fusión develop→main sigue en P-116 (6.27)."
     },
     {
       "id": "P-115",
@@ -2463,9 +2634,119 @@
       "tarea": "¿El carné virtual lleva un código QR?",
       "responsable": "Cooperativa",
       "prioridad": "Baja",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "5.12",
-      "nota": "01-oct: planteado por ga-disenador-lienzo al maquetar 3u."
+      "nota": "01-oct: planteado por ga-disenador-lienzo al maquetar 3u. 01-oct: el carné lleva QR con /verificar/[token] (5.14)."
+    },
+    {
+      "id": "P-116",
+      "categoria": "Configuración",
+      "area": "Base de datos",
+      "tarea": "Aplicar con respaldo previo 20261002500000, 20261002600000, 20261003000000, 20261003100000 y 20261003200000 y fusionar develop→main",
+      "responsable": "Sebas",
+      "prioridad": "Alta",
+      "estado": "Pendiente",
+      "gantt": "6.27",
+      "nota": "02-oct: 20261003000000 quita la FK perfiles.id → auth.users (cascada por trigger)."
+    },
+    {
+      "id": "P-117",
+      "categoria": "Configuración",
+      "area": "Correos",
+      "tarea": "Plantilla del sorteo en Vercel/Resend (variables NOMBRE, NUMERO_BOLETA, MES) y {{{COMPROBANTE}}} en la plantilla de desembolso",
+      "responsable": "Sebas",
+      "prioridad": "Alta",
+      "estado": "Pendiente",
+      "gantt": "6.28",
+      "nota": "02-oct: sin la plantilla, el correo del sorteo cae a texto plano (docs/resend-plantillas.md)."
+    },
+    {
+      "id": "P-118",
+      "categoria": "Verificación y cierre",
+      "area": "Entrega",
+      "tarea": "Entrega final y último pago el miércoles 7-oct",
+      "responsable": "Sebas",
+      "prioridad": "Alta",
+      "estado": "Pendiente",
+      "gantt": "6.29",
+      "nota": ""
+    },
+    {
+      "id": "P-119",
+      "categoria": "Decisión",
+      "area": "Admin",
+      "tarea": "Preguntas sobre el rol secretario (¿ve Asociados/Créditos en solo lectura?)",
+      "responsable": "Cooperativa",
+      "prioridad": "Media",
+      "estado": "Pendiente",
+      "gantt": "4.20",
+      "nota": ""
+    },
+    {
+      "id": "P-120",
+      "categoria": "Decisión",
+      "area": "Admin",
+      "tarea": "¿Se borran los comprobantes de desembolso al eliminar definitivamente a un asociado?",
+      "responsable": "Cooperativa",
+      "prioridad": "Media",
+      "estado": "Pendiente",
+      "gantt": "4.19",
+      "nota": ""
+    },
+    {
+      "id": "P-121",
+      "categoria": "Decisión",
+      "area": "/cuenta",
+      "tarea": "¿El carné sin foto lleva una silueta?",
+      "responsable": "Cooperativa",
+      "prioridad": "Baja",
+      "estado": "Pendiente",
+      "gantt": "5.15",
+      "nota": ""
+    },
+    {
+      "id": "P-122",
+      "categoria": "Decisión",
+      "area": "/cuenta",
+      "tarea": "Moderación de las fotos que sube el asociado al carné",
+      "responsable": "Cooperativa",
+      "prioridad": "Media",
+      "estado": "Pendiente",
+      "gantt": "5.15",
+      "nota": ""
+    },
+    {
+      "id": "P-123",
+      "categoria": "Decisión",
+      "area": "Correos",
+      "tarea": "Plan Pro de Resend (verificar precio)",
+      "responsable": "Cooperativa",
+      "prioridad": "Media",
+      "estado": "Pendiente",
+      "gantt": "6.28",
+      "nota": "Ver docs/entrega/plan-correos-resend.md."
+    },
+    {
+      "id": "P-124",
+      "categoria": "Dato de la cooperativa",
+      "area": "Landing",
+      "tarea": "Fotos de las sedes",
+      "responsable": "Cooperativa",
+      "prioridad": "Baja",
+      "estado": "Pendiente",
+      "gantt": "5.3",
+      "nota": ""
+    },
+    {
+      "id": "P-125",
+      "categoria": "Decisión",
+      "area": "/verificar",
+      "tarea": "¿El nombre completo del asociado puede verse públicamente en /verificar?",
+      "responsable": "Cooperativa",
+      "prioridad": "Baja",
+      "estado": "Pendiente",
+      "gantt": "5.14",
+      "nota": "01-oct: planteado por ga-revisor-seguridad."
     }
   ],
   "bitacora": [
@@ -3133,6 +3414,111 @@
       "tareas": "6.23, 6.24, P-73, P-51, P-57, P-66, P-67, 6.25",
       "cambio": "Migraciones aplicadas, pago a Carlos y cierres verificados",
       "detalle": "20261001000000 y 20261001100000 aplicadas en producción; pago de 150.000 COP a Carlos hecho. P-51, P-57, P-66 y P-67 verificados contra el código y cerrados. Nuevo 6.25/P-114: Sebas aplica 20261002000000 y fusiona develop→main (e2523de)."
+    },
+    {
+      "fecha": "2026-10-02",
+      "agente": "ga-revisor-seguridad",
+      "tareas": "4.16, 5.14",
+      "cambio": "Revisión de premios, QR y sorteo",
+      "detalle": "Sin críticos ni altos; medios/bajos atendidos en 20261002400000. Nombre público en /verificar: P-125."
+    },
+    {
+      "fecha": "2026-10-02",
+      "agente": "ga-verificador-qa",
+      "tareas": "4.16, 5.14",
+      "cambio": "e2e de premios, carné con QR e inscritos",
+      "detalle": "Escritorio 188 / celular 148 pasan, 0 fallan; m-premios-qr-sorteo.spec.ts."
+    },
+    {
+      "fecha": "2026-10-02",
+      "agente": "ga-funcionalidad-botones",
+      "tareas": "4.16",
+      "cambio": "Ajustes de entrega (20261002400000)",
+      "detalle": "Tope de toques por meta, verificar_carne solo activos, regenerar 1/min, grado con nombre; pgTAP 26."
+    },
+    {
+      "fecha": "2026-10-02",
+      "agente": "ga-funcionalidad-botones",
+      "tareas": "5.14",
+      "cambio": "PDF del carné",
+      "detalle": "/cuenta/carne/pdf con pdf-lib + qrcode; vitest y e2e M2."
+    },
+    {
+      "fecha": "2026-10-02",
+      "agente": "agente de documentos de entrega",
+      "tareas": "6.26",
+      "cambio": "Documentos de entrega",
+      "detalle": "docs/entrega/ (documentación técnica, respaldo, anexos 2 y 3, actas) y scripts/respaldo.sh."
+    },
+    {
+      "fecha": "2026-10-02",
+      "agente": "ga-funcionalidad-botones",
+      "tareas": "4.17",
+      "cambio": "Recuperación de acceso (20261002500000)",
+      "detalle": "/ingresar/recuperar, cambio de correo asistido y propio; pgTAP 27."
+    },
+    {
+      "fecha": "2026-10-02",
+      "agente": "ga-revisor-seguridad",
+      "tareas": "4.17",
+      "cambio": "Revisión de la recuperación de acceso",
+      "detalle": "2 altos (SEC-REC-01 y 02) de toma de cuenta."
+    },
+    {
+      "fecha": "2026-10-02",
+      "agente": "ga-funcionalidad-botones",
+      "tareas": "4.17",
+      "cambio": "Correcciones SEC-REC-01 a 05",
+      "detalle": "WhatsApp al celular del perfil, cierre de sesiones, trigger en auth.users como compensación de SEC-REC-02."
+    },
+    {
+      "fecha": "2026-10-02",
+      "agente": "ga-escritor-tests",
+      "tareas": "4.18",
+      "cambio": "Pruebas por reglas nuevas",
+      "detalle": "Admin sin restricción sobre sus clientes, PP no seleccionable; pgTAP, vitest 628 y e2e en verde."
+    },
+    {
+      "fecha": "2026-10-02",
+      "agente": "ga-correos",
+      "tareas": "5.17, 6.28",
+      "cambio": "Correo del sorteo y plan de correos",
+      "detalle": "Diagnóstico del texto plano, plan Resend y mensajes WhatsApp. Pendientes P-117 y P-123."
+    },
+    {
+      "fecha": "2026-10-02",
+      "agente": "ga-diseno-a-codigo",
+      "tareas": "5.16",
+      "cambio": "/cuenta igual a la demo",
+      "detalle": "CamposSolicitud y TarjetaTope compartidos; slot accionDesembolso."
+    },
+    {
+      "fecha": "2026-10-02",
+      "agente": "ga-funcionalidad-botones",
+      "tareas": "4.19",
+      "cambio": "Comprobante y eliminar definitivamente (20261003000000)",
+      "detalle": "Bucket privado, anonimizar con código; pgTAP 28. Decisión P-120."
+    },
+    {
+      "fecha": "2026-10-02",
+      "agente": "ga-funcionalidad-botones",
+      "tareas": "4.20",
+      "cambio": "Secretario y búsqueda general (20261003100000)",
+      "detalle": "pgTAP 29, e2e p-secretario-busqueda. Decisión P-119."
+    },
+    {
+      "fecha": "2026-10-02",
+      "agente": "ga-funcionalidad-botones",
+      "tareas": "5.15",
+      "cambio": "Foto del carné (20261003200000)",
+      "detalle": "Bucket fotos-carne, pgTAP 30, e2e q-foto-carne. Decisiones P-121 y P-122."
+    },
+    {
+      "fecha": "2026-10-02",
+      "agente": "sesión principal",
+      "tareas": "6.25, 6.26, 6.27, 6.28, 6.29, P-114, P-115, P-116–P-125",
+      "cambio": "Todo en develop; contrato y garantía",
+      "detalle": "Todo fusionado en develop. Contrato diligenciado con anexos 2 y 3, garantía 7–21 oct y soporte $500.000/mes desde el 22. Pendiente de Sebas: 5 migraciones + develop→main, plantillas Resend, entrega y último pago el 7-oct."
     }
   ]
 }
