@@ -1,4 +1,5 @@
-import { PanelIngreso, CLASES_FORM_INGRESO, PieIngresoMovil } from "@/components/ingreso/PanelIngreso";
+import Link from "next/link";
+import { PanelIngreso,CLASES_FORM_INGRESO, PieIngresoMovil } from "@/components/ingreso/PanelIngreso";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { IconoCheck } from "@/components/ui/Iconos";
@@ -95,6 +96,10 @@ export function IngresoCedula({
         <Button cargando={cargando} textoCargando="Enviando…">
           Enviarme el código
         </Button>
+        {/* Recuperación de acceso: quien perdió o cambió su correo pide ayuda a la cooperativa. */}
+        <Link href="/ingresar/recuperar" className="enlace self-center text-15 font-bold">
+          ¿Ya no tienes acceso a tu correo?
+        </Link>
         <div className="flex items-center gap-3 text-14 text-ga-texto-3">
           <span className="h-px grow bg-ga-linea" />
           ¿Aún no eres asociado?

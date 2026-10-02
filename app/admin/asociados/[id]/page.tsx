@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { CorreoIngresoAsociado } from "@/components/admin/CorreoIngresoAsociado";
 import { DetalleProcesoAsociado } from "@/components/admin/DetalleProcesoAsociado";
 import { IconoVolver } from "@/components/ui/Iconos";
 import { exigirAdmin } from "@/lib/admin/servidor";
 import { cargarDetalleProceso } from "@/lib/admin/asociados";
+import { cargarCorreoIngresoAsociado } from "@/lib/admin/recuperaciones";
 
 export const metadata: Metadata = { title: "Asociado · Admin · Green Alliance" };
 
@@ -15,6 +17,8 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
   const { id } = await params;
   const detalle = await cargarDetalleProceso(supabase, id);
   if (!detalle) notFound();
+  const correoIngreso = await cargarCorreoIngresoAsociado(supabase, id, userId);
+  const bloqueado = detalle.asociado.id === userId || detalle.asociado.asesorId === userId;
 
   return (
     <AdminShell nombre={nombre} seccion="asociados">
@@ -32,10 +36,14 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
           <span className="hidden lg:inline">Asociados</span>
         </h1>
       </div>
-      <div className="max-w-[640px]">
-        <DetalleProcesoAsociado
-          detalle={detalle}
-          bloqueado={detalle.asociado.id === userId || detalle.asociado.asesorId === userId}
+      <div className="flex max-w-[640px] flex-col gap-4">
+        <DetalleProcesoAsociado detalle={detalle} bloqueado={bloqueado} />
+        <CorreoIngresoAsociado
+          asociadoId={detalle.asociado.id}
+          nombre={detalle.asociado.nombre}
+          pendiente={correoIngreso.pendiente}
+          historial={correoIngreso.historial}
+          bloqueado={bloqueado}
         />
       </div>
     </AdminShell>

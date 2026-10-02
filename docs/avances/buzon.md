@@ -38,3 +38,27 @@ Formato (copiar debajo de la línea, uno por tarea):
 - Estado: Hecho
 - Qué se hizo: «Descargar PDF» en /cuenta/carne; route handler /cuenta/carne/pdf (sesión, solo el propio asociado, inactivo 403, attachment, no-store) con pdf-lib + qrcode (mismo token); vitest (4) y e2e M2 en escritorio y celular. tsc, lint, vitest (599) y build OK.
 - Bloqueos o trabajo nuevo: ninguno. Dependencia nueva: pdf-lib. Diseño del PDF sin revisión visual de ga-diseno-a-codigo.
+
+## 2026-10-01 · agente de documentos de entrega
+- Actividades: P-xx (documentos de entrega final, cláusulas 9, 10, 16, 19 y 31 del contrato 001-2026); P-xx (recuperación de acceso, fase 2 del Anexo Técnico)
+- Estado: En curso
+- Qué se hizo: docs/entrega/ con documentacion-tecnica.md (arquitectura, roles, modelo de datos, seguridad, recuperación de acceso, variables, cron, despliegue, reversibilidad), respaldo-y-restauracion.md, anexo-2-cuentas-y-accesos.md (prellenado + lista de transferencia), acta-entrega-final.md, actas-etapas.md y anexo-3-trabajo-adicional.md; script scripts/respaldo.sh (dump con fecha, opción --con-storage, se niega a guardar dentro del repo).
+- Bloqueos o trabajo nuevo: Sebas: datos personales del contrato, registrador y titulares de dominio/Vercel/Supabase/Resend, plan de Supabase, administrador principal, ubicaciones de respaldo, cifrar y entregar el respaldo del 30-sep. Falta redactar el manual de administración. La recuperación de acceso cuando el asociado pierde su correo no tiene pantalla (observación O-1 del acta): decidir si se construye un cambio de correo asistido en /admin.
+
+## 2026-10-02 · ga-funcionalidad-botones
+- Actividades: P-xx (recuperación de acceso, fase 2 del Anexo Técnico; observación O-1 del acta de entrega)
+- Estado: En curso
+- Qué se hizo: /ingresar/recuperar (público, respuesta única anti-enumeración, honeypot, límites por IP y cédula con HMAC), tabla de solicitudes con RLS e historial de cambios de correo (migración 20261002500000, sin aplicar), sección «Recuperación de acceso» en /admin/alertas y «Correo de ingreso» en la ficha del asociado con «Cambiar correo de ingreso» y «Rechazar» (motivo obligatorio, auth.admin.updateUserById, avisos al correo anterior y al nuevo), y «Cambiar correo de ingreso» en /cuenta/perfil con código al correo nuevo (updateUser + verifyOtp email_change). pgTAP 27 (23 pruebas; todas las pruebas de base OK), vitest 631 OK, tsc, lint y build OK. e2e n-recuperacion.spec.ts escrita pero NO corrida: Docker Desktop quedó en pausa manual.
+- Bloqueos o trabajo nuevo: Sebas debe reanudar Docker Desktop para correr la e2e (escritorio y celular) y verificar el flujo de updateUser/verifyOtp contra GoTrue local. Antes de aplicar en producción: desactivar «Secure email change» y pegar la plantilla supabase/templates/cambio-correo.html en «Change Email Address». Pedido de diseño D-27.
+
+## 2026-10-01 · ga-revisor-seguridad
+- Actividades: P-xx (revisión de seguridad de la recuperación de acceso, migración 20261002500000)
+- Estado: Hecho
+- Qué se hizo: Revisión de /ingresar/recuperar, la acción admin «Cambiar correo de ingreso», el cambio de correo propio y la migración. La anti-enumeración, los límites, RLS y server-only están bien. Hay 2 hallazgos altos de toma de cuenta: el botón de WhatsApp apunta al celular que escribió el solicitante, y con «Secure email change» apagado se puede cambiar el correo por la API de GoTrue sin historial ni aviso.
+- Bloqueos o trabajo nuevo: ga-funcionalidad-botones corrige SEC-REC-01, 03, 04 y 05. Sebas decide sobre SEC-REC-02 (no apagar «Secure email change» o compensarlo) antes de aplicar en producción.
+
+## 2026-10-01 · ga-funcionalidad-botones
+- Actividades: P-xx (correcciones de seguridad SEC-REC-01 a 05 de la recuperación de acceso)
+- Estado: En curso
+- Qué se hizo: WhatsApp al celular del perfil con confirmación aparte si no coincide; validación (solicitud pendiente, asesor 24 h) antes de tocar Auth; cierre de sesiones tras el cambio; cambio propio solo para asociados con ingreso reciente; trigger en auth.users y aviso nativo como compensación de SEC-REC-02. Todo en la migración 20261002500000 (sin aplicar). tsc, lint, vitest (636) y build en verde.
+- Bloqueos o trabajo nuevo: Docker Desktop está en pausa manual: faltan db reset, test db y las e2e n-recuperacion y b-ingreso. Sebas decide sobre «Secure email change» antes de producción.

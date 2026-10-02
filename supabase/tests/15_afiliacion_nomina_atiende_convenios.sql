@@ -174,7 +174,8 @@ select set_eq(
         'admin_marcar_desembolsado', 'admin_cambiar_estado_asociado', 'bonos_acumulados_asesor',
         'admin_realizar_sorteo', 'ganador_sorteo_vigente',
         'admin_metricas_dashboard', 'asesor_metricas_dashboard', 'admin_habilitar_credito', 'mi_habilitacion_credito',
-        'mis_premios_asesor', 'registrar_clic_premios', 'admin_premios_asesores', 'mi_carne_token', 'regenerar_carne_token', 'verificar_carne', 'admin_inscritos_sorteo'],
+        'mis_premios_asesor', 'registrar_clic_premios', 'admin_premios_asesores', 'mi_carne_token', 'regenerar_carne_token', 'verificar_carne', 'admin_inscritos_sorteo',
+                              'admin_registrar_cambio_correo', 'admin_rechazar_recuperacion', 'admin_validar_cambio_correo'],
   'solo estas funciones security definer (que se validan solas) las ejecuta authenticated'
 );
 select is_empty(
