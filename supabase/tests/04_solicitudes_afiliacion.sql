@@ -17,7 +17,7 @@ select plan(24);
 -- Datos de prueba
 -- ------------------------------------------------------------
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
-  ('00000000-0000-4000-a000-00000000000a', 'asociado.a@prueba.test', '{"cedula":"1000000001","grado":"PP"}', '{"nombre_completo":"Asociado A"}'),
+  ('00000000-0000-4000-a000-00000000000a', 'asociado.a@prueba.test', '{"cedula":"1000000001","grado":"PT"}', '{"nombre_completo":"Asociado A"}'),
   ('00000000-0000-4000-a000-0000000000ad', 'admin@prueba.test',      '{"cedula":"1000000003"}',             '{"nombre_completo":"Admin Prueba"}');
 update public.perfiles set rol = 'admin' where id = '00000000-0000-4000-a000-0000000000ad';
 
@@ -26,7 +26,7 @@ insert into public.solicitudes_afiliacion (
   nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
   foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
 ) values (
-  'Pedro', 'Pérez', '1234567890', 'PP', 'policia', '3001234567', '3001234567',
+  'Pedro', 'Pérez', '1234567890', 'PT', 'policia', '3001234567', '3001234567',
   'pedro.perez@policia.gov.co', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()
 );
 
@@ -148,7 +148,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Cédula', 'Corta', '12345', 'PP', 'policia', '3000000005', '3000000005',
+       'Cédula', 'Corta', '12345', 'PT', 'policia', '3000000005', '3000000005',
        'c5@policia.gov.co', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()
      ) $$,
   '23514', null,
@@ -159,7 +159,7 @@ select lives_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Cédula', 'Seis', '123456', 'PP', 'policia', '3000000006', '3000000006',
+       'Cédula', 'Seis', '123456', 'PT', 'policia', '3000000006', '3000000006',
        'c6@policia.gov.co', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()
      ) $$,
   'acepta cédula de 6 dígitos'
@@ -169,7 +169,7 @@ select lives_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Cédula', 'Diez', '2222222222', 'PP', 'policia', '3000000007', '3000000007',
+       'Cédula', 'Diez', '2222222222', 'PT', 'policia', '3000000007', '3000000007',
        'c10@policia.gov.co', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()
      ) $$,
   'acepta cédula de 10 dígitos'
@@ -179,7 +179,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Cédula', 'Larga', '12345678901', 'PP', 'policia', '3000000008', '3000000008',
+       'Cédula', 'Larga', '12345678901', 'PT', 'policia', '3000000008', '3000000008',
        'c11@policia.gov.co', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()
      ) $$,
   '23514', null,
@@ -190,7 +190,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Cédula', 'Puntos', '1.234.567', 'PP', 'policia', '3000000009', '3000000009',
+       'Cédula', 'Puntos', '1.234.567', 'PT', 'policia', '3000000009', '3000000009',
        'cp@policia.gov.co', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()
      ) $$,
   '23514', null,
@@ -203,7 +203,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Celular', 'Fijo', '2000000010', 'PP', 'policia', '2001234567', '3000000010',
+       'Celular', 'Fijo', '2000000010', 'PT', 'policia', '2001234567', '3000000010',
        'cf@policia.gov.co', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()
      ) $$,
   '23514', null,
@@ -214,7 +214,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Celular', 'Corto', '2000000011', 'PP', 'policia', '300123456', '3000000011',
+       'Celular', 'Corto', '2000000011', 'PT', 'policia', '300123456', '3000000011',
        'cc@policia.gov.co', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()
      ) $$,
   '23514', null,
@@ -227,7 +227,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Correo', 'Mayus', '2000000012', 'PP', 'policia', '3000000012', '3000000012',
+       'Correo', 'Mayus', '2000000012', 'PT', 'policia', '3000000012', '3000000012',
        'Pedro@Policia.gov.co', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()
      ) $$,
   '23514', null,
@@ -238,7 +238,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Correo', 'Malo', '2000000013', 'PP', 'policia', '3000000013', '3000000013',
+       'Correo', 'Malo', '2000000013', 'PT', 'policia', '3000000013', '3000000013',
        'pedro@policia', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()
      ) $$,
   '23514', null,
@@ -251,7 +251,7 @@ select lives_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email, mensaje,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Mensaje', 'Quinientos', '2000000014', 'PP', 'policia', '3000000014', '3000000014',
+       'Mensaje', 'Quinientos', '2000000014', 'PT', 'policia', '3000000014', '3000000014',
        'm500@policia.gov.co', repeat('x', 500), 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()
      ) $$,
   'acepta mensaje de 500 caracteres'
@@ -261,7 +261,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email, mensaje,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Mensaje', 'QuinientosUno', '2000000015', 'PP', 'policia', '3000000015', '3000000015',
+       'Mensaje', 'QuinientosUno', '2000000015', 'PT', 'policia', '3000000015', '3000000015',
        'm501@policia.gov.co', repeat('x', 501), 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()
      ) $$,
   '23514', null,
@@ -274,7 +274,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Sin', 'Autorizar', '2000000016', 'PP', 'policia', '3000000016', '3000000016',
+       'Sin', 'Autorizar', '2000000016', 'PT', 'policia', '3000000016', '3000000016',
        'sa@policia.gov.co', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', null
      ) $$,
   '23502', null,

@@ -185,6 +185,15 @@ describe("asignarAsesor · carrera con otro admin (update condicional)", () => {
   });
 });
 
+describe("asignarAsesor · el admin puede asignarse clientes (regla cambiada 2026-10-01)", () => {
+  it("un admin que se elige a sí mismo como asesor sí guarda la asignación", async () => {
+    const { actualizaciones } = crearSupabaseFalso();
+    const { resultado } = await enviar({ id: ID_SOLICITUD, asesorId: ID_ADMIN });
+    expect(resultado?.error).toBeUndefined();
+    expect(actualizaciones).toEqual([{ asesor_id: ID_ADMIN }]);
+  });
+});
+
 describe("asignarAsesor · el asesor elegido debe tener rol asesor", () => {
   it("si el trigger de la base rechaza el id (no es asesor), da un mensaje claro", async () => {
     crearSupabaseFalso({ errorUpdateMensaje: "asesor_id debe ser un perfil con rol asesor" });

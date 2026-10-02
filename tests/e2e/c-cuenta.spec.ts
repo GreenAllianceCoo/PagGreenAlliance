@@ -43,9 +43,9 @@ test.describe("C2 · Con sesión: datos del propio usuario", () => {
     // Decisión 25-sep: la tasa de interés es de uso interno, no se muestra; la cuota NO se calcula.
     expect(texto).not.toContain("Interés");
     expect(texto.toLowerCase()).not.toContain("cuota");
-    // Tope PP = 2.100.000 (máximo entre 50 % y 100 %).
+    // Tope PT = 2.700.000 (máximo entre 50 % y 100 %).
     expect(texto).toContain("Tope disponible para tu grado");
-    expect(texto).toContain("$ 2.100.000");
+    expect(texto).toContain("$ 2.700.000");
     // «Mis datos» se movió a /cuenta/perfil (pieza 3k); Inicio ya no lo muestra.
     expect(texto).not.toContain("Mis datos");
     // No hay datos de la otra asociada.

@@ -6,8 +6,8 @@ select plan(17);
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('21000000-0000-4000-a000-0000000000ad', 'h.adm@prueba.test', '{"cedula":"2100000009"}', '{"nombre_completo":"Admin H"}'),
   ('21000000-0000-4000-a000-0000000000e1', 'h.as@prueba.test',  '{"cedula":"2100000010"}', '{"nombre_completo":"Asesor H"}'),
-  ('21000000-0000-4000-a000-00000000000a', 'h.a@prueba.test',   '{"cedula":"2100000001","grado":"PP"}', '{"nombre_completo":"Cliente H"}'),
-  ('21000000-0000-4000-a000-00000000000b', 'h.b@prueba.test',   '{"cedula":"2100000002","grado":"PP"}', '{"nombre_completo":"Otro H"}');
+  ('21000000-0000-4000-a000-00000000000a', 'h.a@prueba.test',   '{"cedula":"2100000001","grado":"PT"}', '{"nombre_completo":"Cliente H"}'),
+  ('21000000-0000-4000-a000-00000000000b', 'h.b@prueba.test',   '{"cedula":"2100000002","grado":"PT"}', '{"nombre_completo":"Otro H"}');
 update public.perfiles set rol = 'admin'  where id = '21000000-0000-4000-a000-0000000000ad';
 update public.perfiles set rol = 'asesor' where id = '21000000-0000-4000-a000-0000000000e1';
 update public.perfiles set asesor_id = '21000000-0000-4000-a000-0000000000e1' where id = '21000000-0000-4000-a000-00000000000a';
@@ -17,9 +17,9 @@ alter table public.solicitudes_credito disable trigger user;
 insert into public.solicitudes_credito (id, asociado_id, porcentaje_devolucion, monto_solicitado, cuota_mensual,
   grado, grado_asociado, estado, motivo_rechazo, fecha_respuesta, fecha_desembolso, fecha_solicitud, tasa_interes_mensual) values
   ('21100000-0000-4000-a000-00000000000a', '21000000-0000-4000-a000-00000000000a', '50', 300000, 0,
-   'PP', 'PP', 'rechazado', 'Capacidad insuficiente', now(), null, now(), 0.02),
+   'PT', 'PT', 'rechazado', 'Capacidad insuficiente', now(), null, now(), 0.02),
   ('21100000-0000-4000-a000-00000000000b', '21000000-0000-4000-a000-00000000000b', '50', 400000, 0,
-   'PP', 'PP', 'aprobado', null, now(), (now() at time zone 'America/Bogota')::date, now(), 0.02);
+   'PT', 'PT', 'aprobado', null, now(), (now() at time zone 'America/Bogota')::date, now(), 0.02);
 alter table public.solicitudes_credito enable trigger user;
 
 select has_function('public', 'admin_habilitar_credito', array['uuid', 'text'], 'existe admin_habilitar_credito');

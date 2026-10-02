@@ -11,7 +11,7 @@ select plan(24);
 -- Datos de prueba
 -- ------------------------------------------------------------
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
-  ('00000000-0000-4000-a000-00000000000a', 'asociado.a@prueba.test', '{"cedula":"1000000001","grado":"PP"}', '{"nombre_completo":"Asociado A"}'),
+  ('00000000-0000-4000-a000-00000000000a', 'asociado.a@prueba.test', '{"cedula":"1000000001","grado":"PT"}', '{"nombre_completo":"Asociado A"}'),
   ('00000000-0000-4000-a000-0000000000ad', 'admin@prueba.test',      '{"cedula":"1000000003"}',             '{"nombre_completo":"Admin Prueba"}');
 update public.perfiles set rol = 'admin' where id = '00000000-0000-4000-a000-0000000000ad';
 
@@ -37,7 +37,7 @@ with u as (
 
 select throws_ok(
   $$ insert into public.grados_credito (grado, porcentaje, capacidad_maxima, cuota_mensual, total_credito, tasa_interes_mensual)
-     values ('PP', '50', 99999999, 1, 1, 0.01) $$,
+     values ('PT', '50', 99999999, 1, 1, 0.01) $$,
   '42501', null,
   'un asociado no puede insertar topes'
 );
@@ -83,7 +83,7 @@ select is(
 
 with u as (
   update public.grados_credito set capacidad_maxima = capacidad_maxima
-   where grado = 'PP' and porcentaje = '50' returning 1
+   where grado = 'PT' and porcentaje = '50' returning 1
 ) select is(count(*)::int, 1, 'admin puede editar los topes') from u;
 
 -- ------------------------------------------------------------

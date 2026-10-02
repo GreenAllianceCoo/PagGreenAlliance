@@ -10,7 +10,7 @@ select plan(15);
 -- Datos de prueba
 -- ------------------------------------------------------------
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
-  ('00000000-0000-4000-a000-00000000000a', 'asociado.a@prueba.test', '{"cedula":"1000000001","grado":"PP"}', '{"nombre_completo":"Asociado A"}'),
+  ('00000000-0000-4000-a000-00000000000a', 'asociado.a@prueba.test', '{"cedula":"1000000001","grado":"PT"}', '{"nombre_completo":"Asociado A"}'),
   ('00000000-0000-4000-a000-00000000000b', 'asociado.b@prueba.test', '{"cedula":"1000000002","grado":"OF"}', '{"nombre_completo":"Asociado B"}'),
   ('00000000-0000-4000-a000-0000000000ad', 'admin@prueba.test',      '{"cedula":"1000000003"}',             '{"nombre_completo":"Admin Prueba"}');
 update public.perfiles set rol = 'admin' where id = '00000000-0000-4000-a000-0000000000ad';
@@ -86,8 +86,8 @@ with d as (
 
 select is(
   (select rol::text || '|' || grado::text from public.perfiles where id = '00000000-0000-4000-a000-00000000000a'),
-  'asociado|PP',
-  'A sigue siendo asociado PP tras los intentos'
+  'asociado|PT',
+  'A sigue siendo asociado PT tras los intentos'
 );
 
 -- ------------------------------------------------------------

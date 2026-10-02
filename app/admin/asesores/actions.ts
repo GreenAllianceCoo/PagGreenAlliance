@@ -121,7 +121,7 @@ export async function registrarPagoComision(
   _previo: EstadoPagoComision,
   formData: FormData,
 ): Promise<EstadoPagoComision> {
-  const { supabase, userId } = await exigirAdmin();
+  const { supabase } = await exigirAdmin();
 
   const entrada = leerFormularioPagoComision(formData);
   const resultado = esquemaPagoComision.safeParse(entrada);
@@ -129,10 +129,6 @@ export async function registrarPagoComision(
     return { errores: erroresPorCampo<CampoPagoComision>(resultado.error), valores: entrada };
   }
   const datos = resultado.data;
-  // RS-01: nadie se registra pagos a sí mismo (la base también lo impide).
-  if (datos.asesorId === userId) {
-    return { errores: { asesorId: MENSAJE_PAGO_PROPIO }, valores: entrada };
-  }
 
   const { error } = await supabase.from("pagos_comision").insert({
     asesor_id: datos.asesorId,

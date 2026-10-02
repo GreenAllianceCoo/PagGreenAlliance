@@ -6,10 +6,10 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(22);
+select plan(24);
 
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
-  ('12000000-0000-4000-a000-00000000000a', 'g.pp@prueba.test',  '{"cedula":"1200000001","grado":"PP"}', '{"nombre_completo":"Asociado PP"}'),
+  ('12000000-0000-4000-a000-00000000000a', 'g.pt@prueba.test',  '{"cedula":"1200000001","grado":"PT"}', '{"nombre_completo":"Asociado PT"}'),
   ('12000000-0000-4000-a000-00000000000b', 'g.te@prueba.test',  '{"cedula":"1200000002","grado":"TE"}', '{"nombre_completo":"Asociado TE"}'),
   ('12000000-0000-4000-a000-00000000000c', 'g.ij@prueba.test',  '{"cedula":"1200000003","grado":"SP"}', '{"nombre_completo":"Asociado SP"}'),
   ('12000000-0000-4000-a000-00000000000d', 'g.of@prueba.test',  '{"cedula":"1200000004","grado":"OF"}', '{"nombre_completo":"Asociado OF heredado"}'),
@@ -23,12 +23,13 @@ select id, 'operando' from public.perfiles where id::text like '12000000-0000-40
 -- ------------------------------------------------------------
 -- Catálogo
 -- ------------------------------------------------------------
-select is((select count(*)::int from public.grados where seleccionable), 17, 'hay 17 grados seleccionables');
+select is((select count(*)::int from public.grados where seleccionable), 16, 'hay 16 grados seleccionables (PP ya no se ofrece)');
+select is(  (select seleccionable::text || '|' || nombre from public.grados where codigo = 'PP'),  'false|Patrullero de Policía',  'PP (Patrullero de Policía) ya no es seleccionable; queda solo Patrullero (PT)');
 
 select is(
   (select array_agg(codigo order by orden) from public.grados where policia and seleccionable),
-  array['PP','PT','SI','IT','IJ','ST','TE','CT','MY','TC'],
-  'Policía ve PP, PT, SI, IT, IJ y ST–TC'
+  array['PT','SI','IT','IJ','ST','TE','CT','MY','TC'],
+  'Policía ve PT, SI, IT, IJ y ST–TC'
 );
 
 select is(
@@ -165,6 +166,7 @@ select throws_ok(
   'P0001', 'El grado OF ya no se puede elegir; escoge tu grado exacto',
   'una afiliación nueva no puede usar el grado heredado OF'
 );
+select throws_ok(  $$ insert into public.solicitudes_afiliacion (       nombres, apellidos, cedula, grado, institucion, celular, nequi, email,       foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at     ) values ('Pedro', 'Patrullero', '1200000013', 'PP', 'policia', '3001000013', '3001000013',       'pedro@correo.test', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()) $$,  'P0001', 'El grado PP ya no se puede elegir; escoge tu grado exacto',  'una afiliación nueva no puede usar PP; debe elegir Patrullero (PT)');
 
 select lives_ok(
   $$ insert into public.solicitudes_afiliacion (

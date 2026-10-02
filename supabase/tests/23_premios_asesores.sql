@@ -13,7 +13,7 @@ insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('23000000-0000-4000-a000-0000000000b1', 'p.b@prueba.test',   '{"cedula":"2300000010"}', '{"nombre_completo":"Asesor B"}'),
   ('23000000-0000-4000-a000-0000000000a1', 'p.a@prueba.test',   '{"cedula":"2300000011"}', '{"nombre_completo":"Asesor A"}'),
   ('23000000-0000-4000-a000-0000000000ad', 'p.adm@prueba.test', '{"cedula":"2300000099"}', '{"nombre_completo":"Admin P"}'),
-  ('23000000-0000-4000-a000-0000000000f1', 'p.soc@prueba.test', '{"cedula":"2300000098","grado":"PP"}', '{"nombre_completo":"Asociado P"}');
+  ('23000000-0000-4000-a000-0000000000f1', 'p.soc@prueba.test', '{"cedula":"2300000098","grado":"PT"}', '{"nombre_completo":"Asociado P"}');
 update public.perfiles set rol = 'asesor' where id in ('23000000-0000-4000-a000-0000000000b1', '23000000-0000-4000-a000-0000000000a1');
 update public.perfiles set rol = 'admin'  where id = '23000000-0000-4000-a000-0000000000ad';
 
@@ -21,7 +21,7 @@ update public.perfiles set rol = 'admin'  where id = '23000000-0000-4000-a000-00
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data)
 select ('23100000-0000-4000-a000-' || lpad(n::text, 12, '0'))::uuid,
        'p.c' || n || '@prueba.test',
-       jsonb_build_object('cedula', '24' || lpad(n::text, 8, '0'), 'grado', 'PP'),
+       jsonb_build_object('cedula', '24' || lpad(n::text, 8, '0'), 'grado', 'PT'),
        jsonb_build_object('nombre_completo', 'Cliente P ' || n)
 from generate_series(1, 150) n;
 update public.perfiles set asesor_id = '23000000-0000-4000-a000-0000000000b1'

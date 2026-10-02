@@ -48,7 +48,7 @@ select is(
 -- ------------------------------------------------------------
 -- 2) No pisa una cédula ni un grado que ya dejaron de ser "pendientes".
 -- ------------------------------------------------------------
-update auth.users set raw_app_meta_data = '{"cedula":"9000000099","grado":"PP"}'::jsonb
+update auth.users set raw_app_meta_data = '{"cedula":"9000000099","grado":"PT"}'::jsonb
   where id = '11111111-0000-4000-a000-000000000001';
 
 select is(
@@ -86,7 +86,7 @@ select is(
 --    un usuario de Auth huérfano: ni auth.users ni perfiles cambian).
 -- ------------------------------------------------------------
 select throws_ok(
-  $$ update auth.users set raw_app_meta_data = '{"cedula":"9000000002","grado":"PP"}'::jsonb
+  $$ update auth.users set raw_app_meta_data = '{"cedula":"9000000002","grado":"PT"}'::jsonb
       where id = '33333333-0000-4000-a000-000000000003' $$,
   '23505', null,
   'una cédula duplicada hace fallar todo el update de app_metadata (sin huérfanos)'

@@ -729,13 +729,13 @@ test.describe("D7 · El servidor detecta el tipo real del archivo (magic bytes, 
 });
 
 test.describe("D8 · Opciones de los desplegables", () => {
-  test("Grado (Policía): grados de la institución desde el catálogo, sin el heredado OF", async ({ page }) => {
+  test("Grado (Policía): grados de la institución desde el catálogo, sin el heredado OF ni PP", async ({ page }) => {
     await page.goto("/afiliacion");
     await page.locator("#af-institucion").selectOption("policia");
     const opciones = await page
       .locator("#af-grado option")
       .evaluateAll((os) => os.map((o) => (o as HTMLOptionElement).value));
-    expect(opciones).toEqual(["", "PP", "PT", "SI", "IT", "IJ", "ST", "TE", "CT", "MY", "TC"]);
+    expect(opciones).toEqual(["", "PT", "SI", "IT", "IJ", "ST", "TE", "CT", "MY", "TC"]);
     await expect(page.locator("#af-grado option").first()).toHaveText(
       "Selecciona tu grado",
     );
@@ -966,7 +966,7 @@ test.describe("D15 · RLS de solicitudes_afiliacion", () => {
     nombres: "Intruso",
     apellidos: "Directo",
     cedula,
-    grado: "PP",
+    grado: "PT",
     institucion: "policia",
     celular: "3001112233",
     nequi: "3001112233",

@@ -57,7 +57,7 @@ vi.mock("@/lib/afiliacion/fotos", () => ({
 vi.mock("@/lib/servidor/limite", () => ({ dentroDelLimite: m.dentroDelLimite, ipDelCliente: m.ip }));
 vi.mock("@/lib/grados", () => ({
   cargarCatalogoGrados: async () => [
-    { codigo: "PP", nombre: "Patrullero de Policía", policia: true, ejercito: false, grupoCredito: "PP", orden: 1, seleccionable: true },
+    { codigo: "PT", nombre: "Patrullero", policia: true, ejercito: false, grupoCredito: "PT", orden: 1, seleccionable: true },
   ],
 }));
 vi.mock("@/lib/afiliacion/asesores", () => ({ asesoresParaAfiliacion: async () => [] }));
@@ -83,7 +83,7 @@ function formulario(cambios: Record<string, string> = {}) {
     apellidos: "Gómez",
     cedula: CEDULA,
     institucion: "policia",
-    grado_id: "PP",
+    grado_id: "PT",
     nequi: "3001234567",
     nomina_entidad: "Nequi",
     nomina_entidad_otra: "",
@@ -131,7 +131,7 @@ describe("enviarAfiliacion · envío exitoso", () => {
     expect(m.insertados[0]).toMatchObject({
       id: SOLICITUD,
       cedula: CEDULA,
-      grado: "PP",
+      grado: "PT",
       email: PERSONAL,
       correo_institucional: "laura.gomez@policia.gov.co",
       nomina_entidad: "Nequi",

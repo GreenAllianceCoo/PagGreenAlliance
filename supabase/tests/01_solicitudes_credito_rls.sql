@@ -1,6 +1,6 @@
 -- ============================================================
 -- Green Alliance · pgTAP · RLS de solicitudes_credito
--- Asociado A (PP), asociado B (OF) y un admin, creados dentro de la
+-- Asociado A (PT), asociado B (OF) y un admin, creados dentro de la
 -- transacción. Las sesiones se simulan con:
 --   set local role authenticated;
 --   set local request.jwt.claims = '{"sub":"<uuid>","role":"authenticated"}';
@@ -14,13 +14,13 @@ select plan(27);
 -- Datos de prueba (como postgres; el trigger handle_new_user crea los perfiles)
 -- ------------------------------------------------------------
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
-  ('00000000-0000-4000-a000-00000000000a', 'asociado.a@prueba.test', '{"cedula":"1000000001","grado":"PP"}', '{"nombre_completo":"Asociado A"}'),
+  ('00000000-0000-4000-a000-00000000000a', 'asociado.a@prueba.test', '{"cedula":"1000000001","grado":"PT"}', '{"nombre_completo":"Asociado A"}'),
   ('00000000-0000-4000-a000-00000000000b', 'asociado.b@prueba.test', '{"cedula":"1000000002","grado":"OF"}', '{"nombre_completo":"Asociado B"}'),
   ('00000000-0000-4000-a000-0000000000ad', 'admin@prueba.test',      '{"cedula":"1000000003"}',             '{"nombre_completo":"Admin Prueba"}'),
   -- C y D no tienen solicitudes: sirven para probar qué pasa con los campos de revisión en un insert
-  ('00000000-0000-4000-a000-00000000000c', 'asociado.c@prueba.test', '{"cedula":"1000000004","grado":"PP"}', '{"nombre_completo":"Asociado C"}'),
-  ('00000000-0000-4000-a000-00000000000d', 'asociado.d@prueba.test', '{"cedula":"1000000005","grado":"PP"}', '{"nombre_completo":"Asociado D"}');
-update public.perfiles set rol = 'admin', grado = 'PP' where id = '00000000-0000-4000-a000-0000000000ad';
+  ('00000000-0000-4000-a000-00000000000c', 'asociado.c@prueba.test', '{"cedula":"1000000004","grado":"PT"}', '{"nombre_completo":"Asociado C"}'),
+  ('00000000-0000-4000-a000-00000000000d', 'asociado.d@prueba.test', '{"cedula":"1000000005","grado":"PT"}', '{"nombre_completo":"Asociado D"}');
+update public.perfiles set rol = 'admin', grado = 'PT' where id = '00000000-0000-4000-a000-0000000000ad';
 
 -- 20260930100200: el crédito exige proceso ejecutivo en «operando» (spec §8).
 insert into public.procesos_ejecutivos (asociado_id, estado)

@@ -5,16 +5,16 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(20);
+select plan(21);
 
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('18000000-0000-4000-a000-0000000000a1', 's.ric@prueba.test',  '{"cedula":"1800000001"}',              '{"nombre_completo":"Admin Que Atiende"}'),
   ('18000000-0000-4000-a000-0000000000a2', 's.adm@prueba.test',  '{"cedula":"1800000002"}',              '{"nombre_completo":"Otro Admin"}'),
   ('18000000-0000-4000-a000-0000000000e1', 's.as1@prueba.test',  '{"cedula":"1800000010"}',              '{"nombre_completo":"Asesor Uno"}'),
   ('18000000-0000-4000-a000-0000000000e2', 's.as2@prueba.test',  '{"cedula":"1800000011"}',              '{"nombre_completo":"Asesor Dos"}'),
-  ('18000000-0000-4000-a000-00000000000c', 's.c@prueba.test',    '{"cedula":"1800000020","grado":"PP"}', '{"nombre_completo":"Cliente C"}'),
-  ('18000000-0000-4000-a000-00000000000d', 's.d@prueba.test',    '{"cedula":"1800000021","grado":"PP"}', '{"nombre_completo":"Cliente D"}'),
-  ('18000000-0000-4000-a000-00000000000f', 's.f@prueba.test',    '{"cedula":"1800000022","grado":"PP"}', '{"nombre_completo":"Cliente F"}');
+  ('18000000-0000-4000-a000-00000000000c', 's.c@prueba.test',    '{"cedula":"1800000020","grado":"PT"}', '{"nombre_completo":"Cliente C"}'),
+  ('18000000-0000-4000-a000-00000000000d', 's.d@prueba.test',    '{"cedula":"1800000021","grado":"PT"}', '{"nombre_completo":"Cliente D"}'),
+  ('18000000-0000-4000-a000-00000000000f', 's.f@prueba.test',    '{"cedula":"1800000022","grado":"PT"}', '{"nombre_completo":"Cliente F"}');
 update public.perfiles set rol = 'admin', atiende_asociados = true where id = '18000000-0000-4000-a000-0000000000a1';
 update public.perfiles set rol = 'admin' where id = '18000000-0000-4000-a000-0000000000a2';
 update public.perfiles set rol = 'asesor' where id in ('18000000-0000-4000-a000-0000000000e1', '18000000-0000-4000-a000-0000000000e2');
@@ -23,21 +23,13 @@ update public.perfiles set asesor_id = '18000000-0000-4000-a000-0000000000e1'
 update public.perfiles set asesor_id = '18000000-0000-4000-a000-0000000000a1' where id = '18000000-0000-4000-a000-00000000000d';
 
 -- ------------------------------------------------------------
--- RS-17 (a): el admin no se asigna ni se quita clientes
+-- RS-17 (a) (regla cambiada 2026-10-01): el admin sí se asigna y se quita clientes; el asesor no
 -- ------------------------------------------------------------
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"18000000-0000-4000-a000-0000000000a1","role":"authenticated"}';
 
-select throws_ok(
-  $$ update public.perfiles set asesor_id = null where id = '18000000-0000-4000-a000-00000000000d' $$,
-  'P0001', 'Otro administrador debe asignar tus clientes',
-  'el admin que atiende no se quita un cliente propio'
-);
-select throws_ok(
-  $$ update public.perfiles set asesor_id = '18000000-0000-4000-a000-0000000000a1' where id = '18000000-0000-4000-a000-00000000000c' $$,
-  'P0001', 'Otro administrador debe asignar tus clientes',
-  'el admin que atiende no se asigna un cliente'
-);
+select lives_ok(  $$ update public.perfiles set asesor_id = null where id = '18000000-0000-4000-a000-00000000000d' $$,  'el admin que atiende sí se quita un cliente propio (aprobado por Sebas 2026-10-01)');
+select lives_ok(  $$ update public.perfiles set asesor_id = '18000000-0000-4000-a000-0000000000a1' where id = '18000000-0000-4000-a000-00000000000c' $$,  'el admin que atiende sí se asigna un cliente (aprobado por Sebas 2026-10-01)');
 select lives_ok(
   $$ update public.perfiles set asesor_id = '18000000-0000-4000-a000-0000000000e2' where id = '18000000-0000-4000-a000-00000000000c' $$,
   'sí mueve clientes entre otros asesores'
@@ -48,6 +40,13 @@ select lives_ok(
   $$ update public.perfiles set asesor_id = '18000000-0000-4000-a000-0000000000e1' where id = '18000000-0000-4000-a000-00000000000d' $$,
   'otro admin sí reasigna los clientes del admin que atiende'
 );
+
+-- El asesor no mueve clientes (ni los suyos) ni se asigna otros
+set local request.jwt.claims = '{"sub":"18000000-0000-4000-a000-0000000000e1","role":"authenticated"}';
+with u as (
+  update public.perfiles set asesor_id = '18000000-0000-4000-a000-0000000000e1'
+   where id = '18000000-0000-4000-a000-00000000000c' returning 1
+) select is(count(*)::int, 0, 'el asesor no se asigna clientes ajenos') from u;
 
 -- ------------------------------------------------------------
 -- RS-17 (b): el ingreso nuevo es del asesor de cuando pasó a operando
@@ -83,7 +82,7 @@ insert into public.solicitudes_afiliacion (
   id, nombres, apellidos, cedula, grado, institucion, celular, nequi, email, correo_institucional,
   nomina_entidad, nomina_tipo, nomina_numero,
   foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
-) values ('18000000-0000-4000-c000-000000000001', 'Con', 'Solicitud', '1800000099', 'PP', 'policia',
+) values ('18000000-0000-4000-c000-000000000001', 'Con', 'Solicitud', '1800000099', 'PT', 'policia',
           '3001800000', '3001800000', 'con.sol@prueba.test', 'con.sol@policia.gov.co',
           'Bancolombia', 'ahorros', '123456', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now());
 

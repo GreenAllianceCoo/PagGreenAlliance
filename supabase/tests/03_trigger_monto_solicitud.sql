@@ -15,7 +15,7 @@ select plan(23);
 -- Datos de prueba
 -- ------------------------------------------------------------
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
-  ('00000000-0000-4000-a000-00000000000a', 'asociado.a@prueba.test', '{"cedula":"1000000001","grado":"PP"}', '{"nombre_completo":"Asociado A (PP)"}'),
+  ('00000000-0000-4000-a000-00000000000a', 'asociado.a@prueba.test', '{"cedula":"1000000001","grado":"PT"}', '{"nombre_completo":"Asociado A (PT)"}'),
   ('00000000-0000-4000-a000-00000000000b', 'asociado.b@prueba.test', '{"cedula":"1000000002","grado":"OF"}', '{"nombre_completo":"Asociado B (OF)"}'),
   ('00000000-0000-4000-a000-00000000000c', 'asociado.c@prueba.test', '{"cedula":"1000000004"}',             '{"nombre_completo":"Asociado C (sin grado)"}'),
   ('00000000-0000-4000-a000-00000000000d', 'asociado.d@prueba.test', '{"cedula":"1000000005","grado":"PT"}', '{"nombre_completo":"Asociado D (PT)"}'),
@@ -32,16 +32,16 @@ select id, 'operando' from public.perfiles where id::text like '00000000-0000-40
 -- ------------------------------------------------------------
 select throws_like(
   $$ insert into public.solicitudes_credito (asociado_id, porcentaje_devolucion, monto_solicitado, cuota_mensual)
-     values ('00000000-0000-4000-a000-00000000000a', '50', 1000001, 0) $$,
+     values ('00000000-0000-4000-a000-00000000000a', '50', 1300001, 0) $$,
   '%supera el tope%',
-  'rechaza monto mayor al tope del grado (PP 50% = 1.000.000; pide 1.000.001)'
+  'rechaza monto mayor al tope del grado (PT 50% = 1.300.000; pide 1.300.001)'
 );
 
 select throws_like(
   $$ insert into public.solicitudes_credito (asociado_id, porcentaje_devolucion, monto_solicitado, cuota_mensual)
      values ('00000000-0000-4000-a000-00000000000a', '100', 4200000, 0) $$,
   '%supera el tope%',
-  'el tope sale del grado del perfil: un PP no puede pedir el tope de un OF'
+  'el tope sale del grado del perfil: un PT no puede pedir el tope de un OF'
 );
 
 select throws_ok(
@@ -79,8 +79,9 @@ select throws_ok(
   'rechaza la solicitud de un asociado sin grado'
 );
 
--- Grado sin tope configurado: se borra la fila PP/100% (se revierte al final)
-delete from public.grados_credito where grado = 'PP' and porcentaje = '100';
+-- Grado sin tope configurado: se borra la fila PT/100% y se restaura después
+create temp table respaldo_pt100 as select * from public.grados_credito where grado = 'PT' and porcentaje = '100';
+delete from public.grados_credito where grado = 'PT' and porcentaje = '100';
 
 select throws_like(
   $$ insert into public.solicitudes_credito (asociado_id, porcentaje_devolucion, monto_solicitado, cuota_mensual)
@@ -88,6 +89,7 @@ select throws_like(
   'No hay un tope configurado%',
   'rechaza la solicitud si el grado no tiene tope configurado para ese porcentaje'
 );
+insert into public.grados_credito select * from respaldo_pt100;
 
 
 select throws_ok(
@@ -105,12 +107,12 @@ select throws_ok(
 );
 
 -- ------------------------------------------------------------
--- Tasa de interés mensual por grado y porcentaje (PP 100% se borró arriba)
+-- Tasa de interés mensual por grado y porcentaje (PT 100% se borró y se restauró arriba)
 -- ------------------------------------------------------------
 select is(
   (select string_agg(grado::text || porcentaje::text || '=' || tasa_interes_mensual::text, ' ' order by grado, porcentaje)
      from public.grados_credito),
-  'PP50=0.07900000 PT50=0.05076923 PT100=0.03740741 SI50=0.08200000 SI100=0.08200000 IT50=0.05050000 IT100=0.05050000 IJ50=0.05395349 IJ100=0.06333333 CT50=0.05395349 CT100=0.06333333 MY50=0.05395349 MY100=0.06333333 TC50=0.05395349 TC100=0.06333333 OF50=0.05395349 OF100=0.06333333',
+  'PP50=0.07900000 PP100=0.06000000 PT50=0.05076923 PT100=0.03740741 SI50=0.08200000 SI100=0.08200000 IT50=0.05050000 IT100=0.05050000 IJ50=0.05395349 IJ100=0.06333333 CT50=0.05395349 CT100=0.06333333 MY50=0.05395349 MY100=0.06333333 TC50=0.05395349 TC100=0.06333333 OF50=0.05395349 OF100=0.06333333',
   'cada grado y porcentaje tiene su tasa de interés mensual (interés de la tabla / tope)'
 );
 
@@ -119,14 +121,14 @@ select is(
 -- ------------------------------------------------------------
 select lives_ok(
   $$ insert into public.solicitudes_credito (id, asociado_id, porcentaje_devolucion, monto_solicitado, cuota_mensual, plazo_meses, grado, tasa_interes_mensual)
-     values ('20000000-0000-4000-a000-000000000001', '00000000-0000-4000-a000-00000000000a', '50', 1000000, 1, 99, 'OF', 0.00000001) $$,
-  'acepta monto igual al tope del grado (PP 50% = 1.000.000)'
+     values ('20000000-0000-4000-a000-000000000001', '00000000-0000-4000-a000-00000000000a', '50', 1300000, 1, 99, 'OF', 0.00000001) $$,
+  'acepta monto igual al tope del grado (PT 50% = 1.300.000)'
 );
 
 select is(
   (select grado::text || '|' || tasa_interes_mensual::text || '|' || plazo_meses::text || '|' || coalesce(cuota_mensual::text, 'null')
      from public.solicitudes_credito where id = '20000000-0000-4000-a000-000000000001'),
-  'PP|0.07900000|3|null',
+  'PT|0.05076923|3|null',
   'grado, tasa y plazo los pone el servidor aunque el insert mande otros; la cuota queda en null'
 );
 
@@ -144,7 +146,7 @@ select is(
 
 -- ------------------------------------------------------------
 -- Solicitud pendiente: condiciones fijas (primero en llegar, primero en salir)
--- Quedan pendientes: A (PP 50%) y D (PT 100%).
+-- Quedan pendientes: A (PT 50%) y D (PT 100%).
 -- ------------------------------------------------------------
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"00000000-0000-4000-a000-0000000000ad","role":"authenticated"}';
@@ -171,20 +173,20 @@ select throws_ok(
 );
 
 select throws_like(
-  $$ update public.grados_credito set capacidad_maxima = 900000 where grado = 'PP' and porcentaje = '50' $$,
-  'No se puede bajar ni eliminar el tope de PP%',
+  $$ update public.grados_credito set capacidad_maxima = 900000 where grado = 'PT' and porcentaje = '50' $$,
+  'No se puede bajar ni eliminar el tope de PT%',
   'no se puede bajar un tope con solicitudes pendientes de ese grado y porcentaje'
 );
 
 select throws_like(
-  $$ delete from public.grados_credito where grado = 'PP' and porcentaje = '50' $$,
-  'No se puede bajar ni eliminar el tope de PP%',
+  $$ delete from public.grados_credito where grado = 'PT' and porcentaje = '50' $$,
+  'No se puede bajar ni eliminar el tope de PT%',
   'no se puede borrar un tope con solicitudes pendientes de ese grado y porcentaje'
 );
 
 select lives_ok(
-  $$ update public.grados_credito set capacidad_maxima = 1100000, tasa_interes_mensual = 0.05
-      where grado = 'PP' and porcentaje = '50' $$,
+  $$ update public.grados_credito set capacidad_maxima = 1400000, tasa_interes_mensual = 0.05
+      where grado = 'PT' and porcentaje = '50' $$,
   'sí se puede subir el tope y cambiar la tasa con pendientes'
 );
 
@@ -193,7 +195,7 @@ select is(
   (select t.tasa_interes_mensual::text
      from public.admin_tasas_solicitudes(array(select s.id from public.solicitudes_credito s
                                                 where s.asociado_id = '00000000-0000-4000-a000-00000000000a')) t),
-  '0.07900000',
+  '0.05076923',
   'la pendiente conserva la tasa con que se pidió'
 );
 
@@ -206,7 +208,7 @@ update public.solicitudes_credito set estado = 'rechazado', motivo_rechazo = 'Pr
  where asociado_id = '00000000-0000-4000-a000-00000000000a';
 
 select lives_ok(
-  $$ update public.grados_credito set capacidad_maxima = 900000 where grado = 'PP' and porcentaje = '50' $$,
+  $$ update public.grados_credito set capacidad_maxima = 900000 where grado = 'PT' and porcentaje = '50' $$,
   'resuelta la pendiente, ya se puede bajar el tope'
 );
 

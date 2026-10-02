@@ -18,7 +18,10 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
   const detalle = await cargarDetalleProceso(supabase, id);
   if (!detalle) notFound();
   const correoIngreso = await cargarCorreoIngresoAsociado(supabase, id, userId);
-  const bloqueado = detalle.asociado.id === userId || detalle.asociado.asesorId === userId;
+  // El admin mueve el proceso de sus propios clientes (pedido de Sebas, 1-oct); solo el suyo no.
+  const procesoBloqueado = detalle.asociado.id === userId;
+  // El cambio de correo de ingreso sigue exigiendo otro admin para sus clientes (toma de cuentas).
+  const correoBloqueado = procesoBloqueado || detalle.asociado.asesorId === userId;
 
   return (
     <AdminShell nombre={nombre} seccion="asociados">
@@ -37,13 +40,13 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
         </h1>
       </div>
       <div className="flex max-w-[640px] flex-col gap-4">
-        <DetalleProcesoAsociado detalle={detalle} bloqueado={bloqueado} />
+        <DetalleProcesoAsociado detalle={detalle} bloqueado={procesoBloqueado} />
         <CorreoIngresoAsociado
           asociadoId={detalle.asociado.id}
           nombre={detalle.asociado.nombre}
           pendiente={correoIngreso.pendiente}
           historial={correoIngreso.historial}
-          bloqueado={bloqueado}
+          bloqueado={correoBloqueado}
         />
       </div>
     </AdminShell>
