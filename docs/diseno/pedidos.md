@@ -164,3 +164,10 @@ Formato de cada pedido:
 - Qué falta: pieza para /admin/convenios (lista ordenable con crear, editar, ocultar, subir/bajar, eliminar con confirmación y subida de logo) y la ubicación del logo de la marca en tarjetas, chips y detalle de convenio.
 - Datos y reglas: ver `components/admin/GestorConvenios.tsx` y `components/pantallas/ListaConvenios.tsx`. Logo PNG/JPG/WebP/SVG, máximo 1 MB; sin logo se muestra el emoji.
 - Estado: Resuelto → 3v y 3w (2026-10-01, ga-disenador-lienzo)
+
+### D-27 · Recuperación de acceso: formulario público, bandeja admin y cambio de correo propio
+- Pedido por: ga-funcionalidad-botones · 2026-10-02
+- Prioridad: media
+- Qué falta: el lienzo no tiene (a) la pantalla /ingresar/recuperar (cédula, correo nuevo, celular, motivo, y confirmación «Solicitud recibida»), (b) el enlace «¿Ya no tienes acceso a tu correo?» en /ingresar, (c) la sección «Recuperación de acceso» de /admin/alertas con la acción «Cambiar correo de ingreso» y «Rechazar» (modales con motivo obligatorio) y la sección «Correo de ingreso» en la ficha del asociado, y (d) el bloque «Correo de ingreso» en /cuenta/perfil (correo nuevo → código de 6 números → listo). Se implementaron provisionales con los componentes existentes (PanelIngreso, Field, Input, Textarea, Modal, Button).
+- Datos y reglas: el formulario responde SIEMPRE «Si los datos coinciden, la cooperativa te contactará para verificar tu identidad» (exista o no la cédula). Admin: ve nombre, cédula, correo nuevo, celular (con «coincide / NO coincide» con el del perfil), motivo; motivo obligatorio de 5 a 300 al cambiar o rechazar; el admin no cambia el correo de sus propios clientes. Asociado: el cambio solo se aplica al confirmar el código que llega al correo nuevo.
+- Estado: Pendiente

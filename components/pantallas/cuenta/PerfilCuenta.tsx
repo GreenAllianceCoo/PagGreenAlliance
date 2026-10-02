@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useId, useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { cx } from "@/components/ui/cx";
 import { Field } from "@/components/ui/Field";
@@ -8,6 +9,7 @@ import { IconoCheck } from "@/components/ui/Iconos";
 import { Input } from "@/components/ui/Input";
 import { LineaProceso } from "@/components/ui/LineaProceso";
 import { Modal } from "@/components/ui/Modal";
+import { WHATSAPP_URL } from "@/lib/config";
 import type { EstadoAlertaAsociado } from "@/app/cuenta/actions-proceso";
 import type { ConteoCredito } from "@/lib/cuenta";
 import {
@@ -502,6 +504,22 @@ export function PerfilCuenta({
             {mensajeTelefono}
           </p>
         </form>
+        <p className="m-0 text-14 leading-150 text-ga-texto-3">
+          ¿Necesitas cambiar tu correo de ingreso? Solicítalo en «
+          <Link href="/ingresar/recuperar" className="font-bold text-ga-navy underline">
+            ¿Ya no tienes acceso a tu correo?
+          </Link>
+          » al ingresar
+          {WHATSAPP_URL ? (
+            <>
+              , o{" "}
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="font-bold text-ga-navy underline">
+            escríbenos por WhatsApp
+          </a>
+            </>
+          ) : null}
+          .
+        </p>
       </section>
 
       {accionRetiro ? (

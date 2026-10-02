@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { normalizarCelularColombiano } from "@/lib/admin/whatsapp";
 import { formatearFecha } from "@/lib/cuenta";
 import { ETIQUETA_ALERTA, type TipoAlertaAsociado } from "@/lib/alertasAsociado";
+import { contarRecuperacionesPendientes } from "@/lib/admin/recuperaciones";
 import { registrar } from "@/lib/servidor/registro";
 
 /**
@@ -95,5 +96,6 @@ export async function contarAlertasPendientes(supabase: SupabaseClient): Promise
     registrar("error", { evento: "admin_alertas_conteo_fallo", codigo: error.code, mensaje: error.message });
     return 0;
   }
-  return count ?? 0;
+  // Las solicitudes de recuperación de acceso viven en la misma bandeja.
+  return (count ?? 0) + (await contarRecuperacionesPendientes(supabase));
 }

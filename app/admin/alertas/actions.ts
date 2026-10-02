@@ -5,6 +5,8 @@ import { exigirAdmin } from "@/lib/admin/servidor";
 import { registrar } from "@/lib/servidor/registro";
 import { textoDe } from "@/lib/validaciones/comunes";
 import { esquemaMarcarAlerta } from "@/lib/validaciones/admin";
+import { esquemaRechazarRecuperacion, type CampoRechazarRecuperacion } from "@/lib/validaciones/recuperacion";
+import { erroresPorCampo } from "@/lib/validaciones/comunes";
 
 export type EstadoMarcarAlerta = { error?: string; mensaje?: string };
 
@@ -33,4 +35,49 @@ export async function marcarAlertaAtendida(
 
   revalidatePath("/admin/alertas");
   return { mensaje: "Alerta atendida." };
+}
+
+export type EstadoRechazarRecuperacion = {
+  errores?: Partial<Record<CampoRechazarRecuperacion, string>>;
+  error?: string;
+  mensaje?: string;
+};
+
+const MENSAJES_RECHAZO_RECUPERACION = [
+  "La solicitud no existe o ya fue resuelta",
+  "El motivo debe tener entre 5 y 300 caracteres",
+];
+
+/**
+ * «Rechazar» una solicitud de recuperación de acceso (no cambia ningún correo).
+ * Solo admin (exigirAdmin + la RPC lo vuelve a comprobar); motivo obligatorio.
+ */
+export async function rechazarRecuperacion(
+  _previo: EstadoRechazarRecuperacion,
+  formData: FormData,
+): Promise<EstadoRechazarRecuperacion> {
+  const { supabase } = await exigirAdmin();
+
+  const resultado = esquemaRechazarRecuperacion.safeParse({
+    solicitudId: textoDe(formData, "solicitudId"),
+    motivo: textoDe(formData, "motivo"),
+  });
+  if (!resultado.success) {
+    return { errores: erroresPorCampo<CampoRechazarRecuperacion>(resultado.error) };
+  }
+
+  const { error } = await supabase.rpc("admin_rechazar_recuperacion", {
+    p_solicitud_id: resultado.data.solicitudId,
+    p_motivo: resultado.data.motivo,
+  });
+  if (error) {
+    const conocido = MENSAJES_RECHAZO_RECUPERACION.find((m) => error.message?.includes(m));
+    if (!conocido) {
+      registrar("error", { evento: "admin_rechazar_recuperacion_fallo", codigo: error.code, mensaje: error.message });
+    }
+    return { error: conocido ? `${conocido}.` : "No pudimos rechazar la solicitud. Intenta de nuevo." };
+  }
+
+  revalidatePath("/admin/alertas");
+  return { mensaje: "Solicitud rechazada." };
 }
