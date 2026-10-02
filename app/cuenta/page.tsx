@@ -13,6 +13,7 @@ import { fechaBogota } from "@/lib/sorteo/fecha";
 import { vistaSorteo, type FilaBoletaSorteo } from "@/lib/sorteo/vista";
 import { createClient } from "@/lib/supabase/server";
 import { Cuenta } from "@/components/pantallas/Cuenta";
+import { ComprobanteDesembolso } from "@/components/cuenta/ComprobanteDesembolso";
 import { cerrarSesion } from "./actions";
 
 export const metadata: Metadata = {
@@ -44,7 +45,7 @@ export default async function CuentaPage({
     supabase
       .from("solicitudes_credito")
       .select(
-        "estado, monto_solicitado, porcentaje_devolucion, plazo_meses, fecha_solicitud, fecha_respuesta, fecha_desembolso",
+        "id, estado, monto_solicitado, porcentaje_devolucion, plazo_meses, fecha_solicitud, fecha_respuesta, fecha_desembolso, comprobante_subido_at",
       )
       .eq("asociado_id", user.id)
       .order("fecha_solicitud", { ascending: false })
@@ -58,7 +59,8 @@ export default async function CuentaPage({
     supabase.rpc("mi_habilitacion_credito"),
   ]);
   const boleta = boletaCruda as FilaBoletaSorteo | null;
-  const ultimaReal = (solicitudes?.[0] as FilaSolicitud | undefined) ?? null;
+  const ultimaReal =
+    (solicitudes?.[0] as (FilaSolicitud & { id: string; comprobante_subido_at: string | null }) | undefined) ?? null;
   // §13.2: rechazada y habilitada = tarjeta vacía con «Nueva solicitud» (la solicitud sigue en la base).
   const ultima = ultimaReal?.estado === "rechazado" && fechaHabilitacion ? null : ultimaReal;
 
@@ -107,6 +109,11 @@ export default async function CuentaPage({
       accionSalir={cerrarSesion}
       perfilAsociado={perfil}
       ganadorSorteo={ganadorSorteo}
+      accionDesembolso={
+        ultima ? (
+          <ComprobanteDesembolso solicitudId={ultima.id} disponible={Boolean(ultima.comprobante_subido_at)} />
+        ) : undefined
+      }
     />
   );
 }

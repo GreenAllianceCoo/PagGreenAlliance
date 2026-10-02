@@ -68,3 +68,21 @@ Formato (copiar debajo de la línea, uno por tarea):
 - Estado: Hecho
 - Qué se hizo: pgTAP 01–27 y seed pasan de PP a PT; 03 usa cupos de PT (1,3 M/2,7 M); 12 queda en 16 seleccionables sin PP y con pruebas de PP no seleccionable y afiliación con PP rechazada; 17 y 18 ahora comprueban que el admin SÍ registra/corrige/anula sus pagos, mueve el proceso de sus clientes y se asigna clientes (siguen prohibidos su propio proceso y el asesor). vitest y e2e actualizados (PT, cupos 2,7 M). Resultados: supabase test db PASS, vitest 628/628, tsc limpio, e2e afectadas 151 pasan (1 omitida) en escritorio y celular.
 - Bloqueos o trabajo nuevo: ninguno
+
+## 2026-10-02 · ga-correos
+- Actividades: trabajo nuevo sin ID (correo de la boleta sin diseño; plan de correos Resend; mensajes de WhatsApp Business)
+- Estado: Hecho
+- Qué se hizo: Diagnóstico del correo del sorteo (la app cae al texto plano si falta RESEND_TEMPLATE_SORTEO_BOLETA, si la plantilla no está publicada o si el alias/variables no coinciden), respaldo de texto mejorado y asunto con el mes, diagnóstico en docs/resend-plantillas.md; nuevos docs/entrega/plan-correos-resend.md y docs/entrega/whatsapp-business-mensajes.md.
+- Bloqueos o trabajo nuevo: Sebas debe revisar Vercel y el panel de Resend (alias ga-sorteo-boleta publicado; variables NOMBRE, NUMERO_BOLETA, MES) y verificar el precio del plan Pro.
+
+## 2026-10-02 · ga-diseno-a-codigo
+- Actividades: P-xx (pedido de Sebas: /cuenta igual a la demo del admin/asesor)
+- Estado: Hecho
+- Qué se hizo: se extrajeron `components/cuenta/CamposSolicitud.tsx` y `TarjetaTope.tsx`, ahora usados por /cuenta, /cuenta/solicitar y `CuentaDemo` (misma tarjeta de tope, mismos campos de solicitud, carné, radios 28 y tipografía display); `Cuenta` recibe el slot `accionDesembolso` para «Ver comprobante». tsc, lint, build y e2e (c, e, h, l, m) en verde.
+- Bloqueos o trabajo nuevo: ninguno; falta que el otro agente pase `<ComprobanteDesembolso/>` en `accionDesembolso`.
+
+## 2026-10-02 · ga-funcionalidad-botones
+- Actividades: P-xx (pedidos de Sebas, reunión 1-oct: comprobante de desembolso y «Eliminar definitivamente» = anonimizar a un asociado)
+- Estado: Hecho
+- Qué se hizo: bucket privado `comprobantes-desembolso` con subida directa por URL firmada (al marcar desembolsado y después, subir/reemplazar con historial), componente `components/cuenta/ComprobanteDesembolso.tsx` para el asociado (aún sin conectar a /cuenta) y «Eliminar definitivamente» en la ficha del asociado (anonimiza, código de 6 dígitos al correo del admin, 10 min y 3 intentos, log inmutable, borra Storage y Auth). Migración 20261003000000 (SIN aplicar en producción), pgTAP 28 (68 pruebas), vitest +70, e2e o-desembolso-eliminacion (escritorio y celular).
+- Bloqueos o trabajo nuevo: la sesión principal debe pasar `<ComprobanteDesembolso/>` al slot `accionDesembolso` de /cuenta (con `id` y `comprobante_subido_at` en el select); Sebas debe aplicar la migración (quita la FK perfiles.id → auth.users, conserva la cascada con un trigger) y decidir si los comprobantes se borran al eliminar; pedido de diseño D-28.

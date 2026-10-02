@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { CorreoIngresoAsociado } from "@/components/admin/CorreoIngresoAsociado";
 import { DetalleProcesoAsociado } from "@/components/admin/DetalleProcesoAsociado";
+import { EliminarAsociado } from "@/components/admin/EliminarAsociado";
 import { IconoVolver } from "@/components/ui/Iconos";
 import { exigirAdmin } from "@/lib/admin/servidor";
 import { cargarDetalleProceso } from "@/lib/admin/asociados";
@@ -17,11 +18,14 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
   const { id } = await params;
   const detalle = await cargarDetalleProceso(supabase, id);
   if (!detalle) notFound();
-  const correoIngreso = await cargarCorreoIngresoAsociado(supabase, id, userId);
+  const { asociado } = detalle;
+  const correoIngreso = asociado.eliminado
+    ? { pendiente: null, historial: [] }
+    : await cargarCorreoIngresoAsociado(supabase, id, userId);
   // El admin mueve el proceso de sus propios clientes (pedido de Sebas, 1-oct); solo el suyo no.
-  const procesoBloqueado = detalle.asociado.id === userId;
+  const procesoBloqueado = asociado.id === userId;
   // El cambio de correo de ingreso sigue exigiendo otro admin para sus clientes (toma de cuentas).
-  const correoBloqueado = procesoBloqueado || detalle.asociado.asesorId === userId;
+  const correoBloqueado = procesoBloqueado || asociado.asesorId === userId;
 
   return (
     <AdminShell nombre={nombre} seccion="asociados">
@@ -35,20 +39,39 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
         </Link>
         {/* Pieza 3m: en celular el h1 es el nombre de la persona; en escritorio sigue siendo «Asociados». */}
         <h1 className="m-0 font-display text-24 font-extrabold tracking-titular lg:text-34">
-          <span className="lg:hidden">{detalle.asociado.nombre}</span>
+          <span className="lg:hidden">{asociado.nombre}</span>
           <span className="hidden lg:inline">Asociados</span>
         </h1>
       </div>
-      <div className="flex max-w-[640px] flex-col gap-4">
-        <DetalleProcesoAsociado detalle={detalle} bloqueado={procesoBloqueado} />
-        <CorreoIngresoAsociado
-          asociadoId={detalle.asociado.id}
-          nombre={detalle.asociado.nombre}
-          pendiente={correoIngreso.pendiente}
-          historial={correoIngreso.historial}
-          bloqueado={correoBloqueado}
-        />
-      </div>
+      {asociado.eliminado ? (
+        <p role="status" className="m-0 max-w-[640px] rounded-20 bg-admin-superficie p-5.5 text-15 leading-150 text-admin-texto-2">
+          <strong className="text-admin-texto">Asociado eliminado.</strong> Sus datos personales se borraron; solo se conservan
+          sus cifras (créditos, pagos y comisiones) y el registro de quién lo eliminó y por qué.
+        </p>
+      ) : (
+        <div className="flex max-w-[640px] flex-col gap-4">
+          <DetalleProcesoAsociado detalle={detalle} bloqueado={procesoBloqueado} />
+          <CorreoIngresoAsociado
+            asociadoId={asociado.id}
+            nombre={asociado.nombre}
+            pendiente={correoIngreso.pendiente}
+            historial={correoIngreso.historial}
+            bloqueado={correoBloqueado}
+          />
+          {/* Pedido de Sebas (1-oct): anonimizar al asociado dado de baja. Asesores y admins no se eliminan por aquí. */}
+          {asociado.rol === "asociado" ? (
+            <section className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5.5">
+              <h2 className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Eliminar definitivamente</h2>
+              <EliminarAsociado
+                asociadoId={asociado.id}
+                nombre={asociado.nombre}
+                activo={asociado.activo}
+                esPropio={asociado.id === userId}
+              />
+            </section>
+          ) : null}
+        </div>
+      )}
     </AdminShell>
   );
 }

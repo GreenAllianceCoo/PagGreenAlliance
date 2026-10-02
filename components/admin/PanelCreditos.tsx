@@ -29,6 +29,8 @@ export type FilaCreditoPanel = {
   fecha_respuesta: string | null;
   /** §12.2: AAAA-MM-DD del desembolso; null = pendiente. */
   fecha_desembolso: string | null;
+  /** Pedido de Sebas (1-oct): cuándo se subió el comprobante de la transferencia; null = sin comprobante. */
+  comprobante_subido_at: string | null;
   motivo_rechazo: string | null;
   nombre: string;
   cedula: string;
@@ -312,7 +314,12 @@ function DetalleCredito({
           </p>
           {/* §12.2 (pieza 3q): la única acción que queda en un crédito aprobado. */}
           {fila.estado === "aprobado" ? (
-            <MarcarDesembolsado solicitudId={fila.id} fechaDesembolso={fila.fecha_desembolso} onResuelto={onResuelto} />
+            <MarcarDesembolsado
+              solicitudId={fila.id}
+              fechaDesembolso={fila.fecha_desembolso}
+              tieneComprobante={Boolean(fila.comprobante_subido_at)}
+              onResuelto={onResuelto}
+            />
           ) : null}
         </>
       ) : paso === "idle" ? (

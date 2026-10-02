@@ -65,6 +65,7 @@ export function BotonAdmin({
   variante = "verde",
   className,
   deshabilitado = false,
+  cargando = false,
 }: {
   children: ReactNode;
   textoCargando: string;
@@ -72,8 +73,11 @@ export function BotonAdmin({
   className?: string;
   /** Prop mínima (RS-01): botón inactivo sin cambiar su aspecto (usa el mismo estilo de «enviando»). */
   deshabilitado?: boolean;
+  /** Prop mínima (comprobante): carga manual cuando el envío no es un `action` (hay una subida a Storage antes). */
+  cargando?: boolean;
 }) {
-  const { pending } = useFormStatus();
+  const { pending: enviando } = useFormStatus();
+  const pending = enviando || cargando;
   return (
     <button
       type="submit"

@@ -140,3 +140,19 @@ Al correo institucional (que nunca se verifica y puede controlarlo el empleador)
 5. **Publish**. Copia el alias (`ga-aviso-institucional`) o el ID a `RESEND_TEMPLATE_AVISO_INSTITUCIONAL` en `.env.local` y en Vercel (Production y Preview) y vuelve a desplegar.
 
 **Respaldo:** si `RESEND_TEMPLATE_AVISO_INSTITUCIONAL` no está configurada, o la plantilla falla, se manda el mismo texto en texto plano (asunto, frase y enlace) y se registra `aviso_institucional_sin_plantilla` o `aviso_institucional_plantilla_fallo` sin datos personales. Si también falla el respaldo, se registra `aviso_institucional_fallo` y la acción principal sigue.
+
+---
+
+## Diagnóstico: «llega el correo sin el diseño de la plantilla»
+
+Si el correo llega como texto plano (sin logo ni colores), la app usó el **respaldo**. Pasa en uno de estos casos; el log del servidor dice cuál (`correo_plantilla_faltante`):
+
+| Registro | Causa | Qué revisar |
+|---|---|---|
+| `motivo: variable_vacia` | `RESEND_TEMPLATE_SORTEO_BOLETA` no existe o está vacía en el servidor | Vercel → Settings → Environment Variables: que exista en **Production** (y Preview), sin comillas ni espacios. Después, **redeploy** (las variables nuevas no aplican a despliegues anteriores). |
+| `motivo: plantilla_fallo`, 404 | ID o alias equivocado | Debe ser el alias `ga-sorteo-boleta` o el ID de la plantilla, tal cual aparece en Resend → Templates. |
+| `motivo: plantilla_fallo`, 404/422 «not published» | La plantilla está en borrador | Pulsar **Publish** en Resend. Cada cambio posterior también debe publicarse. |
+| `motivo: plantilla_fallo`, 422 de variables | La plantilla declara variables con otro nombre o sin valor por defecto | Deben ser exactamente `NOMBRE`, `NUMERO_BOLETA` y `MES` (mayúsculas, sin espacios). |
+| `motivo: plantilla_fallo`, 401/403 | Llave de otro entorno o sin permiso de envío | `RESEND_API_KEY` con permiso «Sending access» y dominio de `EMAIL_FROM` verificado. |
+
+El mismo diagnóstico aplica a las demás plantillas (cambia el nombre de la variable de entorno).
