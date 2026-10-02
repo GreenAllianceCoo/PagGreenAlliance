@@ -72,7 +72,7 @@ test.beforeAll(async ({}, testInfo) => {
     body: JSON.stringify({
       email: asociado.correoViejo,
       email_confirm: true,
-      app_metadata: { cedula, grado: "PP" },
+      app_metadata: { cedula, grado: "PT" },
       user_metadata: { nombre_completo: asociado.nombre },
     }),
   });

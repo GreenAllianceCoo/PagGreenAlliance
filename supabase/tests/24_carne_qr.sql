@@ -7,7 +7,7 @@ create extension if not exists pgtap with schema extensions;
 select plan(10);
 
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
-  ('24000000-0000-4000-a000-000000000001', 'q.uno@prueba.test', '{"cedula":"2400000001","grado":"PP"}', '{"nombre_completo":"Asociado Uno"}'),
+  ('24000000-0000-4000-a000-000000000001', 'q.uno@prueba.test', '{"cedula":"2400000001","grado":"PT"}', '{"nombre_completo":"Asociado Uno"}'),
   ('24000000-0000-4000-a000-000000000002', 'q.dos@prueba.test', '{"cedula":"2400000002","grado":"PT"}', '{"nombre_completo":"Asociado Dos"}');
 update public.perfiles set institucion = 'policia' where id = '24000000-0000-4000-a000-000000000001';
 
@@ -34,7 +34,7 @@ select is(
 );
 select results_eq(
   $$select nombre, grado, institucion, activo from public.verificar_carne((select token from tk where n = 2))$$,
-  $$values ('Asociado Uno'::text, 'Patrullero de Policía'::text, 'Policía Nacional'::text, true)$$,
+  $$values ('Asociado Uno'::text, 'Patrullero'::text, 'Policía Nacional'::text, true)$$,
   'anon ve solo nombre, grado, institución y activo'
 );
 select is(

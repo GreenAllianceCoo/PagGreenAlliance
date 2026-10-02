@@ -197,14 +197,14 @@ describe("/asesor · acumulado y búsqueda (§5.4–§5.5)", () => {
           perfil_id: UUID,
           nombre: "Laura Gómez",
           cedula: "1012345321",
-          grado: "PP",
-          grado_nombre: "Patrullero de Policía",
+          grado: "PT",
+          grado_nombre: "Patrullero",
           institucion: "policia",
           estado_proceso: "operando",
           fecha_inicio_embargo: "2026-06-15",
-          grupo_credito: "PP",
-          cupo_50: 1000000,
-          cupo_100: 2100000,
+          grupo_credito: "PT",
+          cupo_50: 1300000,
+          cupo_100: 2700000,
         },
       }),
     });
@@ -212,7 +212,7 @@ describe("/asesor · acumulado y búsqueda (§5.4–§5.5)", () => {
     expect(rpc).toHaveBeenCalledWith("buscar_cliente_asesor", { p_cedula: "1012345321" });
     expect(r.cliente?.cedulaEnmascarada).toBe("1.0••.•••.321");
     expect(JSON.stringify(r.cliente)).not.toContain("1012345321");
-    expect(r.cliente?.capacidad).toEqual({ configurada: true, cupo50: "$ 1.000.000", cupo100: "$ 2.100.000" });
+    expect(r.cliente?.capacidad).toEqual({ configurada: true, cupo50: "$ 1.300.000", cupo100: "$ 2.700.000" });
   });
 
   it("buscarCliente: sin resultado (no es su cliente) → cliente null", async () => {
@@ -326,12 +326,14 @@ describe("/admin · pagos de comisión (§5.4, R-09 y correcciones §8)", () => 
     expect(rpc).not.toHaveBeenCalled();
   });
 
-  it("RS-01: un admin no se registra pagos a sí mismo (ni llega a la base)", async () => {
+  it("RS-01 (regla cambiada 2026-10-01): un admin sí se registra pagos a sí mismo", async () => {
     m.adminId = UUID;
     const { inserts } = clienteFalso();
     const r = await registrarPagoComision({}, fd(pago));
-    expect(r.errores?.asesorId).toBe("Otro administrador debe registrar tus comisiones.");
-    expect(inserts).toHaveLength(0);
+    expect(r.errores).toBeUndefined();
+    expect(r.mensaje).toBe("Pago registrado.");
+    expect(inserts).toHaveLength(1);
+    expect(inserts[0].fila).toMatchObject({ asesor_id: UUID });
   });
 
   it("RS-01: muestra el mensaje de la base si igual llega (registrar, corregir y anular)", async () => {

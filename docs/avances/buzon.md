@@ -62,3 +62,9 @@ Formato (copiar debajo de la línea, uno por tarea):
 - Estado: En curso
 - Qué se hizo: WhatsApp al celular del perfil con confirmación aparte si no coincide; validación (solicitud pendiente, asesor 24 h) antes de tocar Auth; cierre de sesiones tras el cambio; cambio propio solo para asociados con ingreso reciente; trigger en auth.users y aviso nativo como compensación de SEC-REC-02. Todo en la migración 20261002500000 (sin aplicar). tsc, lint, vitest (636) y build en verde.
 - Bloqueos o trabajo nuevo: Docker Desktop está en pausa manual: faltan db reset, test db y las e2e n-recuperacion y b-ingreso. Sebas decide sobre «Secure email change» antes de producción.
+
+## 2026-10-01 · ga-escritor-tests
+- Actividades: P-xx (ajuste de pruebas por reglas aprobadas por Sebas: admin sin restricción sobre sus clientes y PP no seleccionable)
+- Estado: Hecho
+- Qué se hizo: pgTAP 01–27 y seed pasan de PP a PT; 03 usa cupos de PT (1,3 M/2,7 M); 12 queda en 16 seleccionables sin PP y con pruebas de PP no seleccionable y afiliación con PP rechazada; 17 y 18 ahora comprueban que el admin SÍ registra/corrige/anula sus pagos, mueve el proceso de sus clientes y se asigna clientes (siguen prohibidos su propio proceso y el asesor). vitest y e2e actualizados (PT, cupos 2,7 M). Resultados: supabase test db PASS, vitest 628/628, tsc limpio, e2e afectadas 151 pasan (1 omitida) en escritorio y celular.
+- Bloqueos o trabajo nuevo: ninguno

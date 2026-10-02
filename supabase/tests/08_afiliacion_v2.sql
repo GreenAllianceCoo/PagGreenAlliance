@@ -11,7 +11,7 @@ select plan(20);
 
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('00000000-0000-4000-a000-0000000000e1', 'asesor.1@prueba.test', '{"cedula":"1000000010"}', '{"nombre_completo":"Asesor Uno"}'),
-  ('00000000-0000-4000-a000-00000000000a', 'asociado.a@prueba.test', '{"cedula":"1000000001","grado":"PP"}', '{"nombre_completo":"Asociado A"}');
+  ('00000000-0000-4000-a000-00000000000a', 'asociado.a@prueba.test', '{"cedula":"1000000001","grado":"PT"}', '{"nombre_completo":"Asociado A"}');
 update public.perfiles set rol = 'asesor' where id = '00000000-0000-4000-a000-0000000000e1';
 
 reset role;
@@ -25,7 +25,7 @@ select lives_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Pedro', 'Pérez Ruiz', '3000000001', 'PP', 'policia', '3001234567', '3001234567',
+       'Pedro', 'Pérez Ruiz', '3000000001', 'PT', 'policia', '3001234567', '3001234567',
        'pedro.perez@policia.gov.co', 'a/f.jpg', 'a/r.jpg', 'a/s.jpg', now()
      ) $$,
   'acepta una solicitud completa de policía con correo institucional'
@@ -106,7 +106,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'A', 'Pérez', '3000000007', 'PP', 'policia', '3001234573', '3001234573',
+       'A', 'Pérez', '3000000007', 'PT', 'policia', '3001234573', '3001234573',
        'a1@policia.gov.co', 'a/f.jpg', 'a/r.jpg', 'a/s.jpg', now()
      ) $$,
   '23514', null,
@@ -118,7 +118,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Pedro3', 'Pérez', '3000000008', 'PP', 'policia', '3001234574', '3001234574',
+       'Pedro3', 'Pérez', '3000000008', 'PT', 'policia', '3001234574', '3001234574',
        'a2@policia.gov.co', 'a/f.jpg', 'a/r.jpg', 'a/s.jpg', now()
      ) $$,
   '23514', null,
@@ -130,7 +130,7 @@ select lives_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'José Ñoño', 'Muñóz Peña', '3000000009', 'PP', 'policia', '3001234575', '3001234575',
+       'José Ñoño', 'Muñóz Peña', '3000000009', 'PT', 'policia', '3001234575', '3001234575',
        'a3@policia.gov.co', 'a/f.jpg', 'a/r.jpg', 'a/s.jpg', now()
      ) $$,
   'acepta tildes, ñ y espacios en nombres y apellidos'
@@ -144,7 +144,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Nequi', 'Malo', '3000000010', 'PP', 'policia', '3001234576', '2001234576',
+       'Nequi', 'Malo', '3000000010', 'PT', 'policia', '3001234576', '2001234576',
        'a4@policia.gov.co', 'a/f.jpg', 'a/r.jpg', 'a/s.jpg', now()
      ) $$,
   '23514', null,
@@ -156,7 +156,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Nequi', 'Corto', '3000000011', 'PP', 'policia', '3001234577', '300123457',
+       'Nequi', 'Corto', '3000000011', 'PT', 'policia', '3001234577', '300123457',
        'a5@policia.gov.co', 'a/f.jpg', 'a/r.jpg', 'a/s.jpg', now()
      ) $$,
   '23514', null,
@@ -171,7 +171,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Sin', 'Fotos', '3000000012', 'PP', 'policia', '3001234578', '3001234578',
+       'Sin', 'Fotos', '3000000012', 'PT', 'policia', '3001234578', '3001234578',
        'a6@policia.gov.co', null, 'a/r.jpg', 'a/s.jpg', now()
      ) $$,
   '23514', null,
@@ -183,7 +183,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Sin', 'Selfie', '3000000013', 'PP', 'policia', '3001234579', '3001234579',
+       'Sin', 'Selfie', '3000000013', 'PT', 'policia', '3001234579', '3001234579',
        'a7@policia.gov.co', 'a/f.jpg', 'a/r.jpg', null, now()
      ) $$,
   '23514', null,
@@ -198,7 +198,7 @@ select lives_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        asesor_id, foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Con', 'Asesor', '3000000014', 'PP', 'policia', '3001234580', '3001234580',
+       'Con', 'Asesor', '3000000014', 'PT', 'policia', '3001234580', '3001234580',
        'a8@policia.gov.co', '00000000-0000-4000-a000-0000000000e1', 'a/f.jpg', 'a/r.jpg', 'a/s.jpg', now()
      ) $$,
   'acepta un asesor_id que sí es rol asesor'
@@ -209,7 +209,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        asesor_id, foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Con', 'AsesorFalso', '3000000015', 'PP', 'policia', '3001234581', '3001234581',
+       'Con', 'AsesorFalso', '3000000015', 'PT', 'policia', '3001234581', '3001234581',
        'a9@policia.gov.co', '00000000-0000-4000-a000-00000000000a', 'a/f.jpg', 'a/r.jpg', 'a/s.jpg', now()
      ) $$,
   'P0001', 'asesor_id debe ser un perfil con rol asesor',
@@ -254,7 +254,7 @@ select lives_ok(
        nombres, apellidos, cedula, grado, institucion, unidad, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Con', 'Unidad', '3000000016', 'PP', 'policia', 'DEPRO', '3001234582', '3001234582',
+       'Con', 'Unidad', '3000000016', 'PT', 'policia', 'DEPRO', '3001234582', '3001234582',
        'a10@policia.gov.co', 'a/f.jpg', 'a/r.jpg', 'a/s.jpg', now()
      ) $$,
   'unidad se puede seguir mandando (en desuso, pero no se borró la columna)'

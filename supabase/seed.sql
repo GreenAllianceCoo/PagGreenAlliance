@@ -5,7 +5,7 @@
 -- Ingreso con código (/ingresar): el correo con el código de 6 dígitos llega
 -- a Mailpit (http://127.0.0.1:54324), no a un buzón real.
 --
---   Asociado 1 · cédula 1234567890 · grado PP · correo asociado.prueba@greenalliance.test
+--   Asociado 1 · cédula 1234567890 · grado PT · correo asociado.prueba@greenalliance.test
 --                con una solicitud de crédito pendiente (500.000 al 50 %).
 --   Asociado 2 · cédula 1234567891 · grado SI · correo sin.solicitudes@greenalliance.test
 --                sin solicitudes (estado vacío de /cuenta).
@@ -31,7 +31,7 @@ insert into auth.users (
   'asociado.prueba@greenalliance.test',
   extensions.crypt('Prueba123!', extensions.gen_salt('bf')),
   now(),
-  '{"provider":"email","providers":["email"],"cedula":"1234567890","grado":"PP"}',
+  '{"provider":"email","providers":["email"],"cedula":"1234567890","grado":"PT"}',
   '{"nombre_completo":"Asociado de Prueba","telefono":"3001234567"}',
   now(), now(), '', '', '', ''
 ),
@@ -70,7 +70,7 @@ insert into auth.identities (
 -- handle_new_user ya toma cédula y grado de raw_app_meta_data; se fijan otra vez
 -- por si el trigger cambia en el futuro.
 update public.perfiles
-   set cedula = '1234567890', grado = 'PP', telefono = '3001234567'
+   set cedula = '1234567890', grado = 'PT', telefono = '3001234567'
  where id = '4c7808d8-085f-42ed-9e5d-f53c117b4cd1';
 
 update public.perfiles

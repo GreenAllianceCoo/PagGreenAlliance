@@ -47,7 +47,7 @@ export const USUARIOS = {
     correo: "asociado.prueba@greenalliance.test",
     mascara: "as•••@•••",
     nombre: "Asociado de Prueba",
-    grado: "PP",
+    grado: "PT",
   },
   sinSolicitudes: {
     cedula: "1234567891",

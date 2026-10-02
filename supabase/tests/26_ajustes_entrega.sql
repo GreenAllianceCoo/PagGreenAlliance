@@ -7,7 +7,7 @@ create extension if not exists pgtap with schema extensions;
 select plan(9);
 
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
-  ('26000000-0000-4000-a000-000000000001', 'j.uno@prueba.test', '{"cedula":"2600000001","grado":"PP"}', '{"nombre_completo":"Asociado J"}'),
+  ('26000000-0000-4000-a000-000000000001', 'j.uno@prueba.test', '{"cedula":"2600000001","grado":"PT"}', '{"nombre_completo":"Asociado J"}'),
   ('26000000-0000-4000-a000-0000000000a1', 'j.as@prueba.test', '{"cedula":"2600000002","grado":"PT"}', '{"nombre_completo":"Asesor J"}'),
   ('26000000-0000-4000-a000-0000000000ad', 'j.ad@prueba.test', '{"cedula":"2600000003","grado":"PT"}', '{"nombre_completo":"Admin J"}');
 update public.perfiles set rol = 'asesor' where id = '26000000-0000-4000-a000-0000000000a1';

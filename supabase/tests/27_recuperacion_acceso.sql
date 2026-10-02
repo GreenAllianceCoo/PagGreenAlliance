@@ -7,7 +7,7 @@ create extension if not exists pgtap with schema extensions;
 select plan(28);
 
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
-  ('27000000-0000-4000-a000-000000000001', 'r.uno@prueba.test', '{"cedula":"2700000001","grado":"PP"}', '{"nombre_completo":"Asociado R1"}'),
+  ('27000000-0000-4000-a000-000000000001', 'r.uno@prueba.test', '{"cedula":"2700000001","grado":"PT"}', '{"nombre_completo":"Asociado R1"}'),
   ('27000000-0000-4000-a000-000000000002', 'r.dos@prueba.test', '{"cedula":"2700000002","grado":"PT"}', '{"nombre_completo":"Asociado R2"}'),
   ('27000000-0000-4000-a000-0000000000a1', 'r.as@prueba.test', '{"cedula":"2700000003","grado":"PT"}', '{"nombre_completo":"Asesor R"}'),
   ('27000000-0000-4000-a000-0000000000ad', 'r.ad@prueba.test', '{"cedula":"2700000004","grado":"PT"}', '{"nombre_completo":"Admin R"}'),

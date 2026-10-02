@@ -11,10 +11,10 @@ select plan(42);
 
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('16000000-0000-4000-a000-0000000000e1', 's.as@prueba.test',   '{"cedula":"1600000010"}',              '{"nombre_completo":"Asesor S"}'),
-  ('16000000-0000-4000-a000-00000000000a', 's.a@prueba.test',    '{"cedula":"1600000001","grado":"PP"}', '{"nombre_completo":"Asociado Operando"}'),
-  ('16000000-0000-4000-a000-00000000000b', 's.b@prueba.test',    '{"cedula":"1600000002","grado":"PP"}', '{"nombre_completo":"Asociado Notificación"}'),
-  ('16000000-0000-4000-a000-00000000000c', 's.c@prueba.test',    '{"cedula":"1600000003","grado":"PP"}', '{"nombre_completo":"Asociado Inactivo"}'),
-  ('16000000-0000-4000-a000-00000000000d', 's.d@prueba.test',    '{"cedula":"1600000004","grado":"PP"}', '{"nombre_completo":"Asociado Sin Proceso"}'),
+  ('16000000-0000-4000-a000-00000000000a', 's.a@prueba.test',    '{"cedula":"1600000001","grado":"PT"}', '{"nombre_completo":"Asociado Operando"}'),
+  ('16000000-0000-4000-a000-00000000000b', 's.b@prueba.test',    '{"cedula":"1600000002","grado":"PT"}', '{"nombre_completo":"Asociado Notificación"}'),
+  ('16000000-0000-4000-a000-00000000000c', 's.c@prueba.test',    '{"cedula":"1600000003","grado":"PT"}', '{"nombre_completo":"Asociado Inactivo"}'),
+  ('16000000-0000-4000-a000-00000000000d', 's.d@prueba.test',    '{"cedula":"1600000004","grado":"PT"}', '{"nombre_completo":"Asociado Sin Proceso"}'),
   ('16000000-0000-4000-a000-0000000000ad', 's.adm@prueba.test',  '{"cedula":"1600000009"}',              '{"nombre_completo":"Admin S"}');
 update public.perfiles set rol = 'asesor' where id = '16000000-0000-4000-a000-0000000000e1';
 update public.perfiles set rol = 'admin'  where id = '16000000-0000-4000-a000-0000000000ad';
@@ -104,7 +104,7 @@ select is(
   'el admin obtiene los topes con tasa (demo del admin)'
 );
 select lives_ok(
-  $$ update public.grados_credito set capacidad_maxima = capacidad_maxima where grado = 'PP' and porcentaje = '50' $$,
+  $$ update public.grados_credito set capacidad_maxima = capacidad_maxima where grado = 'PT' and porcentaje = '50' $$,
   'el admin sigue pudiendo editar topes'
 );
 
@@ -263,7 +263,7 @@ select throws_ok($$ select * from public.solicitudes_credito $$, '42501', null,
 select is(
   (select estado::text || '|' || monto_solicitado::text || '|' || grado::text
      from public.solicitudes_credito where asociado_id = '16000000-0000-4000-a000-00000000000a'),
-  'pendiente|500000|PP',
+  'pendiente|500000|PT',
   'el asociado sigue leyendo el resto de su solicitud'
 );
 select is_empty(
@@ -277,7 +277,7 @@ select throws_ok($$ select tasa_interes_mensual from public.solicitudes_credito 
 select is(
   (select t.tasa_interes_mensual from public.admin_tasas_solicitudes(
      array(select id from public.solicitudes_credito where asociado_id = '16000000-0000-4000-a000-00000000000a')) t),
-  0.07900000::numeric,
+  0.05076923::numeric,
   'el admin obtiene la tasa con admin_tasas_solicitudes'
 );
 select ok(not has_function_privilege('anon', 'public.admin_tasas_solicitudes(uuid[])', 'execute'),

@@ -211,7 +211,7 @@ export async function asignarAsesor(
   _previo: EstadoAccionAfiliacion,
   formData: FormData,
 ): Promise<EstadoAccionAfiliacion> {
-  const { supabase, userId } = await exigirAdmin();
+  const { supabase } = await exigirAdmin();
 
   const resultado = esquemaAsignarAsesor.safeParse({
     id: formData.get("id"),
@@ -219,8 +219,6 @@ export async function asignarAsesor(
   });
   if (!resultado.success) return { error: "Datos inválidos." };
   const { id, asesorId } = resultado.data;
-  // RS-17: un admin no se asigna clientes a sí mismo (la base también lo exige).
-  if (asesorId === userId) return { error: "Otro administrador debe asignar tus clientes." };
 
   const { data: solicitud, error: errorConsulta } = await supabase
     .from("solicitudes_afiliacion")
