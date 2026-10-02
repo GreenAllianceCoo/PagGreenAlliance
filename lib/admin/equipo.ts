@@ -14,7 +14,7 @@ export type PersonaEquipo = {
   id: string;
   nombre: string;
   cedula: string;
-  rol: "asesor" | "admin";
+  rol: "asesor" | "admin" | "secretario";
   /** Solo significa algo para admins (un asesor siempre atiende). */
   atiendeAsociados: boolean;
   /** true = aparece en el desplegable de /afiliacion y puede tener clientes. */
@@ -30,7 +30,7 @@ export async function listarEquipo(supabase: SupabaseClient): Promise<{ personas
   const { data, error } = await supabase
     .from("perfiles")
     .select("id, nombre_completo, cedula, rol, atiende_asociados, activo")
-    .in("rol", ["asesor", "admin"])
+    .in("rol", ["asesor", "admin", "secretario"])
     .order("nombre_completo");
   if (error) {
     registrar("error", { evento: "admin_equipo_fallo", codigo: error.code, mensaje: error.message });
@@ -39,7 +39,7 @@ export async function listarEquipo(supabase: SupabaseClient): Promise<{ personas
   return {
     error: false,
     personas: (data ?? []).map((p) => {
-      const rol = p.rol as "asesor" | "admin";
+      const rol = p.rol as "asesor" | "admin" | "secretario";
       const activo = p.activo !== false;
       const atiendeAsociados = p.atiende_asociados === true;
       return {

@@ -95,7 +95,8 @@ select is_empty(
                               'admin_habilitar_credito', 'mi_habilitacion_credito',
                               'mis_premios_asesor', 'registrar_clic_premios', 'admin_premios_asesores', 'mi_carne_token', 'regenerar_carne_token', 'verificar_carne', 'admin_inscritos_sorteo',
                               'admin_registrar_cambio_correo', 'admin_rechazar_recuperacion', 'admin_validar_cambio_correo',
-                              'admin_registrar_comprobante')
+                              'admin_registrar_comprobante',
+                              'es_secretario', 'es_admin_o_secretario', 'secretario_asignar_asesor', 'buscar_asociados_general')
         and (has_function_privilege('authenticated', p.oid, 'execute')
              or has_function_privilege('anon', p.oid, 'execute')) $$,
   'ninguna función security definer fuera de la lista blanca (las que se validan solas) es ejecutable por anon o authenticated'

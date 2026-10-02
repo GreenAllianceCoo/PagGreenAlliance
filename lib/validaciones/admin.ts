@@ -146,12 +146,16 @@ const esquemaNombrePropio = (mensajeVacio: string) =>
         .regex(/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$/, { error: "Solo letras y espacios." }),
     );
 
-/** «Registrar asesor» de /admin/asesores. */
+/** Roles que el admin puede crear desde /admin/asesores (el equipo: asesores y secretarios). */
+export const ROLES_EQUIPO = ["asesor", "secretario"] as const;
+
+/** «Registrar asesor» / «Registrar secretario» de /admin/asesores. */
 export const esquemaCrearAsesor = z.object({
   cedula: esquemaCedula,
   nombres: esquemaNombrePropio("Escribe los nombres."),
   apellidos: esquemaNombrePropio("Escribe los apellidos."),
   correo: esquemaCorreo,
+  rol: z.enum(ROLES_EQUIPO, { error: "Elige un rol válido." }).default("asesor"),
 });
 export type CampoCrearAsesor = keyof z.input<typeof esquemaCrearAsesor>;
 
@@ -161,6 +165,7 @@ export function leerFormularioAsesor(formData: FormData) {
     nombres: textoDe(formData, "nombres"),
     apellidos: textoDe(formData, "apellidos"),
     correo: textoDe(formData, "correo"),
+    rol: textoDe(formData, "rol") || "asesor",
   };
 }
 

@@ -97,7 +97,7 @@ export async function verificarCodigoIngreso(
 
   await borrarCookieIngreso();
 
-  // Redirección por rol (admin → /admin, asesor → /asesor, asociado → /cuenta).
+  // Redirección por rol (admin y secretario → /admin, asesor → /asesor, asociado → /cuenta).
   // Si por lo que sea no se puede leer el perfil, se manda a /cuenta (el destino
   // de siempre); /admin y /asesor exigen su propio rol con exigirAdmin() y su
   // equivalente, así que un asociado nunca llega ahí por error.
@@ -112,7 +112,7 @@ export async function verificarCodigoIngreso(
       await supabase.auth.signOut();
       redirect(`/ingresar?cuenta=${PARAMETRO_CUENTA_INACTIVA}`);
     }
-    if (perfil?.rol === "admin") destino = "/admin";
+    if (perfil?.rol === "admin" || perfil?.rol === "secretario") destino = "/admin";
     else if (perfil?.rol === "asesor") destino = "/asesor";
   }
   redirect(destino);

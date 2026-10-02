@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PanelAfiliacionDetalle } from "@/components/admin/PanelAfiliacionDetalle";
 import { IconoVolver } from "@/components/ui/Iconos";
-import { exigirAdmin } from "@/lib/admin/servidor";
+import { exigirAdminOSecretario } from "@/lib/admin/servidor";
 import { urlsFirmadasAfiliacion } from "@/lib/admin/fotos";
 import { FILTRO_ATIENDEN, nombreGradoEmbebido, textoCuentaNomina } from "@/lib/admin/afiliacion";
 import { enmascararCedula } from "@/lib/mascara";
@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Solicitud de afiliación · Admin ·
 
 /** Detalle de una solicitud de afiliación: lista de hermanas + ficha con las 3 fotos (pieza 3e). */
 export default async function DetalleAfiliacionPage({ params }: { params: Promise<{ id: string }> }) {
-  const { supabase, userId: userIdAdmin, nombre: nombreAdmin } = await exigirAdmin();
+  const { supabase, userId: userIdAdmin, nombre: nombreAdmin, rol } = await exigirAdminOSecretario();
   const { id } = await params;
 
   const { data: solicitud } = await supabase
@@ -73,7 +73,7 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
   }
 
   return (
-    <AdminShell nombre={nombreAdmin} seccion="afiliaciones">
+    <AdminShell nombre={nombreAdmin} rol={rol} seccion="afiliaciones">
       <div className="flex items-center gap-3">
         <Link
           href="/admin/afiliaciones"

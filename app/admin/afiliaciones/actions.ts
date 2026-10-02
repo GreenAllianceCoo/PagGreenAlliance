@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { registrar } from "@/lib/servidor/registro";
-import { exigirAdmin } from "@/lib/admin/servidor";
+import { exigirAdminOSecretario } from "@/lib/admin/servidor";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { enviarIngresoAceptado } from "@/lib/correo/ingreso";
 import { destinatariosAviso } from "@/lib/correo/destinatarios";
@@ -27,7 +27,7 @@ export async function cambiarEstadoAfiliacion(
   _previo: EstadoAccionAfiliacion,
   formData: FormData,
 ): Promise<EstadoAccionAfiliacion> {
-  const { supabase } = await exigirAdmin();
+  const { supabase } = await exigirAdminOSecretario();
 
   const resultado = esquemaCambiarEstadoAfiliacion.safeParse({
     id: formData.get("id"),
@@ -80,7 +80,7 @@ export async function aprobarAfiliacion(
   _previo: EstadoAccionAfiliacion,
   formData: FormData,
 ): Promise<EstadoAccionAfiliacion> {
-  const { supabase } = await exigirAdmin();
+  const { supabase } = await exigirAdminOSecretario();
 
   const resultado = esquemaAprobarAfiliacion.safeParse({ id: formData.get("id") });
   if (!resultado.success) return { error: "Datos inválidos." };
@@ -211,7 +211,7 @@ export async function asignarAsesor(
   _previo: EstadoAccionAfiliacion,
   formData: FormData,
 ): Promise<EstadoAccionAfiliacion> {
-  const { supabase } = await exigirAdmin();
+  const { supabase, rol } = await exigirAdminOSecretario();
 
   const resultado = esquemaAsignarAsesor.safeParse({
     id: formData.get("id"),
@@ -242,6 +242,23 @@ export async function asignarAsesor(
   }
   if (perfil.asesor_id) {
     return { error: "Este asociado ya tiene un asesor asignado." };
+  }
+
+  // Secretario: no tiene update sobre perfiles; asigna por secretario_asignar_asesor()
+  // (solo toca asesor_id, solo si aún no tiene, y queda en historial_cambio_asesor).
+  if (rol === "secretario") {
+    const { error: errorRpc } = await supabase.rpc("secretario_asignar_asesor", {
+      p_perfil_id: perfil.id,
+      p_asesor_id: asesorId,
+    });
+    if (errorRpc) {
+      if (errorRpc.message?.includes("ya tiene un asesor")) return { error: "Este asociado ya tiene un asesor asignado." };
+      if (errorRpc.message?.includes("rol asesor")) return { error: "El perfil elegido no tiene rol de asesor." };
+      registrar("error", { evento: "secretario_asignar_asesor_fallo", codigo: errorRpc.code, mensaje: errorRpc.message, solicitud_id: id });
+      return { error: "No pudimos asignar el asesor. Intenta de nuevo." };
+    }
+    revalidatePath(`/admin/afiliaciones/${id}`);
+    return { mensaje: "Asesor asignado." };
   }
 
   const { data: actualizado, error: errorUpdate } = await supabase

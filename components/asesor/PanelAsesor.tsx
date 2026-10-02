@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import type { EstadoAcumulado, EstadoBuscarCliente } from "@/app/asesor/actions";
+import type { EstadoAcumulado, EstadoBuscarCliente, EstadoBuscarGeneral } from "@/app/asesor/actions";
 import { PremiosAsesor } from "@/components/asesor/PremiosAsesor";
+import { BuscarAsociadoGeneral } from "@/components/asesor/BuscarAsociadoGeneral";
 import { BuscarClientePorCedula } from "@/components/asesor/BuscarClientePorCedula";
 import { EncabezadoAsesor } from "@/components/asesor/EncabezadoAsesor";
 import { ResumenAsesor } from "@/components/asesor/ResumenAsesor";
@@ -33,6 +34,8 @@ type PanelAsesorProps = {
   revelar: () => Promise<EstadoAcumulado>;
   /** `buscarCliente` (app/asesor/actions.ts). */
   buscar: (previo: EstadoBuscarCliente, formData: FormData) => Promise<EstadoBuscarCliente>;
+  /** `buscarAsociadoGeneral` (app/asesor/actions.ts): búsqueda en toda la cooperativa (nombre, cédula enmascarada y asesor). */
+  buscarGeneral?: (previo: EstadoBuscarGeneral, formData: FormData) => Promise<EstadoBuscarGeneral>;
 };
 
 const RUTA_SIMULADOR = "/asesor/demo";
@@ -41,7 +44,7 @@ const RUTA_SIMULADOR = "/asesor/demo";
  * Panel del asesor (piezas 2c y 3l): pestañas «Mis clientes» (lista + búsqueda por cédula)
  * y «Comisiones». Es una sola pantalla: un solo <h1> visible a la vez.
  */
-export function PanelAsesor({ nombre, filas, comisiones, metricas, premios = null, registrarClic, accionSalir, revelar, buscar }: PanelAsesorProps) {
+export function PanelAsesor({ nombre, filas, comisiones, metricas, premios = null, registrarClic, accionSalir, revelar, buscar, buscarGeneral }: PanelAsesorProps) {
   const [pestana, setPestana] = useState<Pestana>("resumen");
 
   return (
@@ -86,6 +89,7 @@ export function PanelAsesor({ nombre, filas, comisiones, metricas, premios = nul
             </div>
 
             <BuscarClientePorCedula accion={buscar} />
+            {buscarGeneral ? <BuscarAsociadoGeneral accion={buscarGeneral} /> : null}
             <ListaClientesCliente filas={filas} />
 
             <p className="m-0 flex items-center gap-2.5 text-14 text-ga-texto-2 lg:text-15">

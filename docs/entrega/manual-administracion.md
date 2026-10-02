@@ -23,8 +23,9 @@ Este manual explica, paso a paso, cómo usar el panel de administración. No hac
 11. Convenios
 12. Modo demostración
 13. Qué hace el asesor
-14. Qué ve el asociado
-15. Preguntas frecuentes
+14. Rol de secretario
+15. Qué ve el asociado
+16. Preguntas frecuentes
 
 ---
 
@@ -305,6 +306,8 @@ Desde esa fecha corre el **conteo de 3 meses** del crédito que ve el asociado, 
 
 El asesor entra igual que todos: con su cédula y el código que le llega a ese correo. La plataforma lo lleva a su propia pantalla.
 
+Debajo hay un formulario igual, **«Registrar secretario»**, para crear a una persona con el rol de secretario (sección 14).
+
 ### 8.2 La lista de asesores
 
 En **«Asesores registrados»** ve, por cada uno:
@@ -469,13 +472,46 @@ El asesor (también llamado «embajador») entra con su cédula y su código, y 
 
 - **Resumen:** sus cifras y el avance hacia los **premios** de 50 y 100 asociados. Si otro asesor ya ganó un premio, solo ve «Ya fue ganado», sin saber quién.
 - **Clientes:** la lista de **sus** asociados y afiliaciones referidas, con buscador y filtro por estado. Puede **buscar a un cliente por cédula** y ver su grado, su institución, el estado de su proceso ejecutivo y su **capacidad de endeudamiento** (cupo al 50 % y al 100 %). Nunca ve el celular, el correo, la cuenta ni las fotos del cliente, ni a los clientes de otros asesores.
+  - **Buscar en toda la cooperativa:** debajo del buscador anterior hay otro, para saber si una persona **ya es asociada y de quién es** (por ejemplo, antes de afiliar a alguien que otro asesor ya trajo). Se escribe un **nombre o una cédula** (mínimo **4 letras o 4 números**) y salen como máximo **10 personas**, cada una con solo tres datos: su **nombre**, su **cédula parcialmente oculta** y su **asesor** («Cooperativa» si la atiende la administración, o «Sin asesor»). **No** muestra estados, créditos, celular ni correo. Solo busca entre asociados activos, y tiene un límite de búsquedas por minuto (si lo supera, pide esperar un momento).
 - **Comisiones:** el periodo actual (del 16 al 15), los **ingresos nuevos** y los **clientes operativos** con su valor, y el botón **«Acumulado ganado a la fecha»**, que muestra la suma de los pagos registrados por la cooperativa (oculta hasta que la toca). También tiene el enlace al **simulador de crédito**.
 
 El asesor **no puede** aprobar nada, cambiar estados ni registrar pagos.
 
 ---
 
-## 14. Qué ve el asociado
+## 14. Rol de secretario
+
+El **secretario** es una persona de apoyo que revisa las afiliaciones y consulta el Resumen, **sin** poder tocar nada más. Entra como todos, con su **cédula y el código** que le llega a su correo, y la plataforma lo lleva al panel de administración con un menú reducido.
+
+### 14.1 Qué puede hacer
+
+- Ver el **Resumen** (las mismas cifras que el administrador).
+- Ver y **editar las afiliaciones**: revisar la ficha y las fotos, **marcar como contactado**, **aprobar** (crea la cuenta y envía el correo «Ingreso aceptado», igual que el administrador), **rechazar** y **asignar el asesor** a un asociado que todavía no tiene (no puede cambiar un asesor ya asignado). No puede corregir los datos que escribió el solicitante: la plataforma solo permite cambiar el estado.
+
+### 14.2 Qué NO puede hacer
+
+- Eliminar a nadie, dar de baja o reactivar.
+- Entrar a **Créditos, Asociados, Asesores, Alertas, Convenios, Sorteo ni Demostración**: esas secciones **no aparecen** en su menú y, si escribe la dirección a mano, la plataforma lo devuelve al Resumen. Tampoco puede registrar pagos de comisión, hacer el sorteo, habilitar créditos ni cambiar el correo de ingreso de un asociado.
+- Cambiar su propio rol ni el de nadie.
+
+> Decisión de esta versión: el secretario **no** ve las listas de Asociados ni de Créditos, ni siquiera de solo lectura. Esas pantallas mezclan consulta con botones de acción (baja, eliminar, desembolso, correo) y datos delicados (tasa de interés); abrirlas en solo lectura exige rehacer las pantallas. Si la cooperativa lo pide, se puede agregar después.
+
+### 14.3 Crear un secretario
+
+Solo un **administrador**:
+1. Entre a **Asesores**.
+2. En **«Registrar secretario»**, llene cédula, correo, nombres y apellidos.
+3. Toque **«Registrar secretario»**.
+
+La persona entra con su cédula y el código que le llega a ese correo. Hoy el rol se asigna al crear la persona; **no** hay botón para dar de baja a un secretario desde la plataforma (si hace falta, avise al equipo técnico).
+
+### 14.4 Qué queda registrado
+
+Todo cambio de estado de una afiliación guarda **quién lo hizo, con qué rol y cuándo**; la asignación de asesor guarda quién y cuándo, y la creación de cada secretario guarda qué administrador lo creó y cuándo. Este registro está en la base de datos y lo consulta el equipo técnico a pedido de la cooperativa.
+
+---
+
+## 15. Qué ve el asociado
 
 Al entrar con su cédula y su código, el asociado ve:
 
@@ -486,7 +522,7 @@ Al entrar con su cédula y su código, el asociado ve:
 
 ---
 
-## 15. Preguntas frecuentes
+## 16. Preguntas frecuentes
 
 **Un asociado dice que no le llega el código para entrar.**
 1. Que revise «Spam», «Promociones» y «Correo no deseado».
