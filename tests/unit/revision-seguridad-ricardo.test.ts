@@ -131,7 +131,7 @@ describe("RS-03 · ruta /api/cron/limpiar-fotos", () => {
     m.clienteAdmin.mockReturnValue(almacenFalso({ nombres: [] }).admin);
     const r = await GET(new Request("http://x", { headers: { authorization: `Bearer ${SECRETO}` } }));
     expect(r.status).toBe(200);
-    expect(await r.json()).toEqual({ ok: true, revisados: 0, borrados: 0 });
+    expect(await r.json()).toEqual({ ok: true, revisados: 0, borrados: 0, comprobantes: { vencidos: 0, huerfanos: 0 } });
   });
 });
 

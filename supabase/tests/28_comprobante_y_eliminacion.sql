@@ -5,7 +5,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(68);
+select plan(76);
 
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('28000000-0000-4000-a000-0000000000ad', 'e.ad1@prueba.test', '{"cedula":"2800000009","grado":"PT"}', '{"nombre_completo":"Admin E1"}'),
@@ -334,9 +334,8 @@ select is((select resultado from res), 'ok', 'con el código correcto se ejecuta
 select set_eq(
   $$ select unnest(archivos) from res $$,
   $$ values ('afiliacion-documentos/solicitudes/28a/f.jpg'), ('afiliacion-documentos/solicitudes/28a/r.jpg'),
-            ('afiliacion-documentos/solicitudes/28a/s.jpg'),
-            ('comprobantes-desembolso/28100000-0000-4000-a000-00000000000a/cccccccc-cccc-4ccc-8ccc-cccccccccccc.jpg') $$,
-  'devuelve las rutas de Storage a borrar (afiliación con bucket y comprobantes)'
+            ('afiliacion-documentos/solicitudes/28a/s.jpg') $$,
+  'devuelve solo las rutas a borrar ya (afiliación); los comprobantes se guardan 30 días'
 );
 select is(
   (select nombre_completo from public.perfiles where id = '28000000-0000-4000-a000-00000000000a'),
@@ -369,9 +368,53 @@ select is(
   'Registro anonimizado', 'el motivo libre del historial de correo se anonimizó'
 );
 select ok(
-  (select monto_solicitado = 300000 and estado = 'aprobado' and fecha_desembolso is not null and comprobante_path is null
+  (select monto_solicitado = 300000 and estado = 'aprobado' and fecha_desembolso is not null
      from public.solicitudes_credito where id = '28100000-0000-4000-a000-00000000000a'),
-  'las cifras del crédito se conservan (sin comprobante)'
+  'las cifras del crédito se conservan'
+);
+
+-- Comprobantes: se conservan 30 días (borrado programado) y la tarea programada los limpia
+select ok(
+  (select comprobante_path is not null and comprobante_subido_at is not null
+          and comprobante_borrar_at between now() + interval '29 days 23 hours' and now() + interval '30 days 1 minute'
+     from public.solicitudes_credito where id = '28100000-0000-4000-a000-00000000000a'),
+  'el comprobante del eliminado se conserva y queda programado para borrarse en 30 días'
+);
+select is_empty(
+  $$ select * from public.comprobantes_vencidos() where solicitud_id = '28100000-0000-4000-a000-00000000000a' $$,
+  'dentro de los 30 días no hay comprobantes vencidos que borrar'
+);
+update public.solicitudes_credito set comprobante_borrar_at = now() - interval '1 hour'
+ where id = '28100000-0000-4000-a000-00000000000a';
+select is(
+  (select ruta from public.comprobantes_vencidos() where solicitud_id = '28100000-0000-4000-a000-00000000000a'),
+  '28100000-0000-4000-a000-00000000000a/cccccccc-cccc-4ccc-8ccc-cccccccccccc.jpg',
+  'vencido el plazo, la tarea programada lo ve con su ruta'
+);
+select is(
+  public.liberar_comprobantes(array['28100000-0000-4000-a000-00000000000a'::uuid, '28100000-0000-4000-a000-00000000000b'::uuid]),
+  1, 'liberar solo limpia los vencidos (el comprobante de un asociado activo no se toca)'
+);
+select ok(
+  (select comprobante_path is null and comprobante_subido_at is null and comprobante_borrar_at is null
+     from public.solicitudes_credito where id = '28100000-0000-4000-a000-00000000000a')
+  and (select comprobante_path is not null from public.solicitudes_credito where id = '28100000-0000-4000-a000-00000000000b'),
+  'tras borrar el archivo se limpia la referencia'
+);
+insert into storage.objects (bucket_id, name, created_at) values
+  ('comprobantes-desembolso', 'huerfano-28/viejo.pdf', now() - interval '25 hours'),
+  ('comprobantes-desembolso', 'huerfano-28/reciente.pdf', now() - interval '2 hours');
+select is(
+  (select array_agg(name order by name) from public.comprobantes_huerfanos() where name like 'huerfano-28/%'),
+  array['huerfano-28/viejo.pdf'],
+  'huérfanos: solo los no ligados con más de 24 h; nunca los que pertenecen a un crédito'
+);
+select is_empty(
+  $$ select p.proname::text from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+      where n.nspname = 'public'
+        and p.proname in ('comprobantes_vencidos', 'liberar_comprobantes', 'comprobantes_huerfanos')
+        and (has_function_privilege('anon', p.oid, 'execute') or has_function_privilege('authenticated', p.oid, 'execute')) $$,
+  'las funciones de limpieza de comprobantes son solo de service_role'
 );
 select is(
   (select count(*)::int from public.eliminaciones_asociados
@@ -435,6 +478,12 @@ select is((select count(*)::int from public.eliminaciones_asociados), 1, 'el adm
 select throws_ok(
   $$ select * from public.admin_confirmar_eliminacion('28000000-0000-4000-a000-0000000000ad', gen_random_uuid(), repeat('a', 64)) $$,
   '42501', null, 'el admin no puede llamar a la confirmación desde el navegador (saltarse el código)'
+);
+select throws_ok(
+  $$ select public.admin_registrar_comprobante('28100000-0000-4000-a000-00000000000a',
+       '28100000-0000-4000-a000-00000000000a/cccccccc-cccc-4ccc-8ccc-cccccccccccc.jpg') $$,
+  'P0001', 'Este asociado ya fue eliminado; su comprobante ya no se puede cambiar',
+  'el comprobante de un asociado eliminado ya no se reemplaza'
 );
 reset role;
 

@@ -406,12 +406,20 @@ test.describe("O4 · eliminar definitivamente (anonimizar)", () => {
       expect.objectContaining({ admin_id: adminId, motivo: "Cumplió su ciclo y pidió borrar sus datos" }),
     ]);
     expect(JSON.stringify(log)).not.toContain(a.cedula);
-    // …se borraron las fotos y los comprobantes de Storage, y el usuario de Auth.
+    // …se borraron las fotos de la afiliación y el usuario de Auth…
     for (const ruta of a.fotos) expect(await existeEnStorage("afiliacion-documentos", ruta)).toBe(false);
     const auth = await authAdmin(`users/${a.id}`);
     expect(auth.status).toBe(404);
-    const { cuerpo: sinComprobantes } = await adminRest(`solicitudes_credito?select=comprobante_path&asociado_id=eq.${a.id}`);
-    expect((sinComprobantes as { comprobante_path: string | null }[])[0].comprobante_path).toBeNull();
+    // …y el comprobante de desembolso NO se borró: queda 30 días con borrado programado.
+    const { cuerpo: conComprobante } = await adminRest(
+      `solicitudes_credito?select=comprobante_path,comprobante_borrar_at&asociado_id=eq.${a.id}`,
+    );
+    const guardado = (conComprobante as { comprobante_path: string | null; comprobante_borrar_at: string | null }[])[0];
+    expect(guardado.comprobante_path).toBeTruthy();
+    const dias = (new Date(guardado.comprobante_borrar_at as string).getTime() - Date.now()) / 86_400_000;
+    expect(dias).toBeGreaterThan(29.9);
+    expect(dias).toBeLessThan(30.1);
+    expect(await existeEnStorage("comprobantes-desembolso", guardado.comprobante_path as string)).toBe(true);
     const intentoLogin = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
       method: "POST",
       headers: { apikey: ANON_KEY, "Content-Type": "application/json" },
@@ -425,6 +433,14 @@ test.describe("O4 · eliminar definitivamente (anonimizar)", () => {
     await expect(pagina.getByText(a.nombre)).toHaveCount(0);
     await pagina.goto(`/admin/asociados/${a.id}`);
     await expect(pagina.getByText("Asociado eliminado.")).toBeVisible();
+    // El admin ve «Comprobantes que se borrarán el DD/MM/AAAA» con «Ver» (URL firmada).
+    const vence = new Date(guardado.comprobante_borrar_at as string)
+      .toLocaleDateString("es-CO", { timeZone: "America/Bogota", day: "2-digit", month: "2-digit", year: "numeric" });
+    const caja = pagina.getByTestId("comprobantes-por-borrar");
+    await expect(caja.getByText(`Comprobantes que se borrarán el ${vence}`)).toBeVisible();
+    const [pestana] = await Promise.all([pagina.context().waitForEvent("page"), caja.getByRole("button", { name: "Ver" }).click()]);
+    await pestana.waitForURL(/\/storage\/v1\/object\/sign\/comprobantes-desembolso\//, { timeout: 20_000 });
+    await pestana.close();
     await expect(pagina.getByRole("button", { name: "Eliminar definitivamente" })).toHaveCount(0);
   });
 });
