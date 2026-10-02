@@ -69,7 +69,7 @@ En constancia, se firma en ____________________, a los ____ días del mes de ___
 | LA COOPERATIVA | EL CONTRATISTA |
 |---|---|
 | COOPERATIVA GREEN ALLIANCE | SEBASTIÁN SANDOVAL |
-| NIT. 902.103.335-7 | C.C. No. ____________________ |
+| NIT. 902.103.335-7 | C.C. No. 1.052.380.429 |
 | Representante Legal: RICARDO VARÓN PENAGOS | |
 | C.C. 1.124.998.852 de Cumaribo, Vichada | |
 | Firma: ______________________________ | Firma: ______________________________ |
