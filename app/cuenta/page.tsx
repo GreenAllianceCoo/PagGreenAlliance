@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { RUTA_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 import { cargarPerfilAsociado } from "@/lib/asociado/servidor";
 import { WHATSAPP_URL } from "@/lib/config";
+import { urlFotoCarneDeAsociado } from "@/lib/carneFoto";
 import { cargarConvenios } from "@/lib/conveniosServidor";
 import { textoTope, vistaSolicitud, type FilaSolicitud } from "@/lib/cuenta";
 import { hoyBogota } from "@/lib/fechas";
@@ -13,6 +14,7 @@ import { fechaBogota } from "@/lib/sorteo/fecha";
 import { vistaSorteo, type FilaBoletaSorteo } from "@/lib/sorteo/vista";
 import { createClient } from "@/lib/supabase/server";
 import { Cuenta } from "@/components/pantallas/Cuenta";
+import { ComprobanteDesembolso } from "@/components/cuenta/ComprobanteDesembolso";
 import { cerrarSesion } from "./actions";
 
 export const metadata: Metadata = {
@@ -44,7 +46,7 @@ export default async function CuentaPage({
     supabase
       .from("solicitudes_credito")
       .select(
-        "estado, monto_solicitado, porcentaje_devolucion, plazo_meses, fecha_solicitud, fecha_respuesta, fecha_desembolso",
+        "id, estado, monto_solicitado, porcentaje_devolucion, plazo_meses, fecha_solicitud, fecha_respuesta, fecha_desembolso, comprobante_subido_at",
       )
       .eq("asociado_id", user.id)
       .order("fecha_solicitud", { ascending: false })
@@ -58,7 +60,8 @@ export default async function CuentaPage({
     supabase.rpc("mi_habilitacion_credito"),
   ]);
   const boleta = boletaCruda as FilaBoletaSorteo | null;
-  const ultimaReal = (solicitudes?.[0] as FilaSolicitud | undefined) ?? null;
+  const ultimaReal =
+    (solicitudes?.[0] as (FilaSolicitud & { id: string; comprobante_subido_at: string | null }) | undefined) ?? null;
   // §13.2: rechazada y habilitada = tarjeta vacía con «Nueva solicitud» (la solicitud sigue en la base).
   const ultima = ultimaReal?.estado === "rechazado" && fechaHabilitacion ? null : ultimaReal;
 
@@ -79,6 +82,8 @@ export default async function CuentaPage({
 
   // S-13: solo los asociados participan en el sorteo.
   const esAsociado = perfil?.rol === "asociado";
+
+  const fotoCarne = esAsociado ? await urlFotoCarneDeAsociado(user.id) : null;
 
   const topes = perfil?.cupo.estado === "con_cupo" ? perfil.cupo.paquetes : null;
 
@@ -103,10 +108,16 @@ export default async function CuentaPage({
       grado={perfil?.gradoCodigo ?? "Sin asignar"}
       institucion={perfil?.institucion ?? undefined}
       activo={perfil ? perfil.activo : undefined}
+      fotoCarneUrl={fotoCarne?.url ?? null}
       whatsappUrl={WHATSAPP_URL}
       accionSalir={cerrarSesion}
       perfilAsociado={perfil}
       ganadorSorteo={ganadorSorteo}
+      accionDesembolso={
+        ultima ? (
+          <ComprobanteDesembolso solicitudId={ultima.id} disponible={Boolean(ultima.comprobante_subido_at)} />
+        ) : undefined
+      }
     />
   );
 }

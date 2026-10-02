@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cerrarSesion } from "@/app/cuenta/actions";
-import { SECCIONES, type Seccion } from "./secciones";
+import { seccionesDelRol, type Seccion } from "./secciones";
 import { EncabezadoAdmin } from "./EncabezadoAdmin";
 import { contarAlertasPendientes } from "@/lib/admin/alertas";
 import { createClient } from "@/lib/supabase/server";
@@ -21,6 +21,8 @@ type AdminShellProps = {
    * fila «KPIs del admin» — para ga-funcionalidad-botones).
    */
   contadorSeccionActual?: number;
+  /** Un secretario ve un menú reducido (Resumen y Afiliaciones). Por defecto, admin. */
+  rol?: "admin" | "secretario";
   children: ReactNode;
 };
 
@@ -42,14 +44,16 @@ const TONO_CHIP: Record<Seccion, string> = {
  * `EncabezadoAdmin` (barra + pestañas en píldora, pieza 3h «El admin en
  * celular»).
  */
-export async function AdminShell({ nombre, seccion, contadorSeccionActual, children }: AdminShellProps) {
+export async function AdminShell({ nombre, seccion, contadorSeccionActual, rol = "admin", children }: AdminShellProps) {
   // Contador del menú «Alertas» (pieza 3m): pendientes de retiro anticipado y renovación, en todas las secciones.
-  const alertasPendientes = await contarAlertasPendientes(await createClient());
+  // El secretario no ve «Alertas»: no se consulta.
+  const alertasPendientes = rol === "admin" ? await contarAlertasPendientes(await createClient()) : 0;
+  const secciones = seccionesDelRol(rol);
 
   return (
     <div className="min-h-dvh bg-admin-fondo text-admin-texto lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
       <div className="lg:hidden">
-        <EncabezadoAdmin nombre={nombre} seccion={seccion} alertasPendientes={alertasPendientes} />
+        <EncabezadoAdmin nombre={nombre} seccion={seccion} alertasPendientes={alertasPendientes} rol={rol} />
       </div>
 
       <aside className="hidden flex-col gap-7 bg-admin-menu p-4 lg:flex">
@@ -65,7 +69,7 @@ export async function AdminShell({ nombre, seccion, contadorSeccionActual, child
         </Link>
 
         <nav className="flex flex-col gap-1 text-15 font-bold">
-          {SECCIONES.map((s) => {
+          {secciones.map((s) => {
             const activa = s.clave === seccion;
             // «Alertas» muestra siempre cuántas hay pendientes; las demás, el contador de su lista si están activas.
             const chip = s.clave === "alertas" ? (alertasPendientes > 0 ? alertasPendientes : undefined) : activa ? contadorSeccionActual : undefined;
@@ -98,7 +102,7 @@ export async function AdminShell({ nombre, seccion, contadorSeccionActual, child
           <span className="truncate text-14 font-bold">{nombre}</span>
           {/* No hay dato de género en `perfiles`: se deja un rótulo neutro
               (el diseño usa «Administradora» como ejemplo de María Fernanda López). */}
-          <span className="text-13 text-admin-texto-3">Administrador</span>
+          <span className="text-13 text-admin-texto-3">{rol === "secretario" ? "Secretaría" : "Administrador"}</span>
           <form action={cerrarSesion}>
             <button
               type="submit"

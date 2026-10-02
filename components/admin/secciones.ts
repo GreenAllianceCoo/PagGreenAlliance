@@ -18,3 +18,11 @@ export const SECCIONES = [
 ] as const;
 
 export type Seccion = (typeof SECCIONES)[number]["clave"];
+
+/** Lo único que ve un secretario en el menú (el servidor además rechaza el resto). */
+export const SECCIONES_SECRETARIO: readonly Seccion[] = ["resumen", "afiliaciones"];
+
+/** Secciones que muestra el menú según el rol. */
+export function seccionesDelRol(rol: "admin" | "secretario") {
+  return rol === "secretario" ? SECCIONES.filter((s) => SECCIONES_SECRETARIO.includes(s.clave)) : SECCIONES;
+}

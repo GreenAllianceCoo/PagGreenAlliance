@@ -4,7 +4,7 @@ import { useEffect, useId, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cerrarSesion } from "@/app/cuenta/actions";
-import { SECCIONES, type Seccion } from "./secciones";
+import { seccionesDelRol, type Seccion } from "./secciones";
 
 type EncabezadoAdminProps = {
   nombre: string;
@@ -12,6 +12,8 @@ type EncabezadoAdminProps = {
   seccion: Seccion;
   /** Alertas pendientes (pieza 3m): se ve como contador junto a «Alertas» en las pestañas de celular. */
   alertasPendientes?: number;
+  /** Un secretario solo ve «Resumen» y «Afiliaciones» (el servidor rechaza el resto). */
+  rol?: "admin" | "secretario";
 };
 
 /**
@@ -25,7 +27,9 @@ type EncabezadoAdminProps = {
  * ocultan esta barra en `lg:` y usan en su lugar el menú lateral de
  * `AdminShell.tsx`.
  */
-export function EncabezadoAdmin({ nombre, seccion, alertasPendientes = 0 }: EncabezadoAdminProps) {
+export function EncabezadoAdmin({ nombre, seccion, alertasPendientes = 0, rol = "admin" }: EncabezadoAdminProps) {
+  const secciones = seccionesDelRol(rol);
+  const etiquetaRol = rol === "secretario" ? "Secretaría" : "Administrador";
   const [menuAbierto, setMenuAbierto] = useState(false);
   const idMenu = useId();
 
@@ -76,7 +80,7 @@ export function EncabezadoAdmin({ nombre, seccion, alertasPendientes = 0 }: Enca
         {/* Nav en línea: solo en escritorio (usado por /admin/demo; en las otras
             4 secciones AdminShell oculta esta barra completa en `lg:`). */}
         <nav aria-label="Secciones del panel" className="hidden items-center gap-6 text-15 font-bold text-admin-texto-3 lg:flex">
-          {SECCIONES.map((s) => (
+          {secciones.map((s) => (
             <Link
               key={s.href}
               href={s.href}
@@ -128,7 +132,7 @@ export function EncabezadoAdmin({ nombre, seccion, alertasPendientes = 0 }: Enca
 
       {/* Pestañas en píldora: solo en celular, en todas las secciones (incluida /admin/demo). */}
       <div className="flex gap-1.5 overflow-x-auto px-4 pb-3 text-13 font-bold whitespace-nowrap lg:hidden">
-        {SECCIONES.map((s) => (
+        {secciones.map((s) => (
           <Link
             key={s.href}
             href={s.href}
@@ -164,7 +168,7 @@ export function EncabezadoAdmin({ nombre, seccion, alertasPendientes = 0 }: Enca
             className="motion-safe:animate-ga-toast fixed right-3 top-16 z-30 flex w-56 flex-col gap-3 rounded-16 bg-admin-superficie p-4 shadow-modal-toast lg:hidden"
           >
             <span className="truncate text-15 font-bold">{nombre}</span>
-            <span className="text-13 text-admin-texto-3">Administrador</span>
+            <span className="text-13 text-admin-texto-3">{etiquetaRol}</span>
             <form action={cerrarSesion}>
               <button
                 type="submit"

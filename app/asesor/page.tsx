@@ -5,7 +5,7 @@ import { cargarComisionesAsesor, exigirAsesor } from "@/lib/asesor/servidor";
 import { cargarMetricasAsesor } from "@/lib/asesor/metricas";
 import { cargarPremiosAsesor } from "@/lib/asesor/premiosServidor";
 import { sanitizarFilaResumen, type FilaResumenAsesor } from "@/lib/asesor/resumen";
-import { buscarCliente, cerrarSesionAsesor, registrarClicPremios, revelarAcumulado } from "./actions";
+import { buscarAsociadoGeneral, buscarCliente, cerrarSesionAsesor, registrarClicPremios, revelarAcumulado } from "./actions";
 
 export const metadata: Metadata = {
   title: "Mis clientes · Cooperativa Green Alliance",
@@ -54,6 +54,7 @@ export default async function AsesorPage() {
       accionSalir={cerrarSesionAsesor}
       revelar={revelarAcumulado}
       buscar={buscarCliente}
+      buscarGeneral={buscarAsociadoGeneral}
     />
   );
 }

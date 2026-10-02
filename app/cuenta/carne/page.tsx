@@ -5,12 +5,14 @@ import { CarneVirtual } from "@/components/ui/CarneVirtual";
 import { RUTA_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 import { cargarPerfilAsociado } from "@/lib/asociado/servidor";
 import { esTokenCarne, rutaVerificacion } from "@/lib/carne";
+import { urlFotoCarneDeAsociado } from "@/lib/carneFoto";
 import { qrComoSvg } from "@/lib/carneQr";
 import { hoyBogota } from "@/lib/fechas";
 import { registrar } from "@/lib/servidor/registro";
 import { urlDelSitio } from "@/lib/servidor/sitio";
 import { createClient } from "@/lib/supabase/server";
 import { BotonRegenerar } from "./BotonRegenerar";
+import { FotoCarne } from "./FotoCarne";
 
 export const metadata: Metadata = {
   title: "Mi carné con QR · Cooperativa Green Alliance",
@@ -38,6 +40,8 @@ export default async function CarneQrPage() {
   const { data: token, error } = await supabase.rpc("mi_carne_token");
   if (error) registrar("error", { evento: "carne_token_fallo", codigo: error.code, mensaje: error.message });
 
+  const foto = await urlFotoCarneDeAsociado(user.id);
+
   let svg: string | null = null;
   if (esTokenCarne(token)) {
     svg = await qrComoSvg(await urlDelSitio(rutaVerificacion(token)));
@@ -61,7 +65,10 @@ export default async function CarneQrPage() {
         activo={perfil ? perfil.activo : undefined}
         hrefQr={null}
         hrefConvenios="/cuenta#convenios"
+        fotoUrl={foto?.url ?? null}
       />
+
+      <FotoCarne origen={foto?.origen ?? null} />
 
       <section aria-labelledby="titulo-qr" className="flex flex-col items-center gap-4 rounded-28 bg-white p-6 text-center">
         <h2 id="titulo-qr" className="m-0 font-display text-20 font-extrabold text-ga-navy">

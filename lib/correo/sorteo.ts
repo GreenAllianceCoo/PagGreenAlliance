@@ -16,13 +16,21 @@ export async function enviarBoletaSorteo(datos: { correo: string | string[]; nom
       para: datos.correo,
       variablePlantilla: "RESEND_TEMPLATE_SORTEO_BOLETA",
       variables: { NOMBRE: datos.nombre, NUMERO_BOLETA: datos.numero, MES: datos.mes },
-      asunto: "Tu boleta del sorteo de Green Alliance",
+      asunto: `Tu boleta para el sorteo de ${datos.mes} · Green Alliance`,
+      // Respaldo en texto plano: mismo contenido que la plantilla (docs/resend-plantillas.md §4).
       texto: [
-        `Hola ${datos.nombre},`,
+        `¡Hola, ${datos.nombre}!`,
         "",
-        `Tu número de boleta para el sorteo de ${datos.mes} es ${datos.numero}.`,
+        `Ya estás a un paso de participar en el sorteo de ${datos.mes} de la Cooperativa Green Alliance.`,
+        "",
+        `Tu número de boleta es: ${datos.numero}`,
+        "",
+        "Vuelve a la pestaña «Sorteo del mes» en tu cuenta y escribe este número para confirmar tu participación. El ganador se anunciará por los canales oficiales de Green Alliance.",
+        "",
+        "Si tú no pediste participar en el sorteo, ignora este correo.",
         "",
         "Cooperativa Green Alliance",
+        "www.greenallianceco.com",
       ].join("\n"),
     });
   } catch (error) {

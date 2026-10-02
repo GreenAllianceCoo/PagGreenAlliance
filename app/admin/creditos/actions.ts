@@ -8,7 +8,10 @@ import { enviarDesembolsoCredito, enviarResultadoCredito } from "@/lib/correo/cr
 import { formatearFechaLarga } from "@/lib/fechas";
 import { destinatariosAviso } from "@/lib/correo/destinatarios";
 import { avisarCorreoInstitucional } from "@/lib/correo/institucional";
+import { textoDe } from "@/lib/validaciones/comunes";
 import { esquemaMarcarDesembolso, esquemaResolverCredito } from "@/lib/validaciones/admin";
+import { crearSubidaComprobante, firmarComprobante, registrarComprobanteSubido, rutaDeComprobante } from "@/lib/admin/comprobantes";
+import { esquemaPrepararComprobante, esquemaRegistrarComprobante, esquemaVerComprobante } from "@/lib/validaciones/comprobante";
 
 export type EstadoAccionCredito = { error?: string; mensaje?: string };
 
@@ -138,6 +141,9 @@ export async function marcarDesembolsado(
     return { error: resultado.error.issues[0]?.message ?? "Datos inválidos." };
   }
   const datos = resultado.data;
+  // Comprobante opcional (se recomienda): el navegador ya lo subió a Storage con una
+  // URL firmada y solo manda la ruta; se verifica más abajo, DESPUÉS de marcar el desembolso.
+  const rutaComprobante = textoDe(formData, "comprobanteRuta");
 
   const { data, error } = await supabase
     .rpc("admin_marcar_desembolsado", { p_solicitud_id: datos.id, p_fecha: datos.fecha ?? null })
@@ -150,6 +156,16 @@ export async function marcarDesembolsado(
     return { error: conocido ? `${conocido}.` : "No pudimos marcar el desembolso. Intenta de nuevo." };
   }
   const fecha = String((data as { fecha_desembolso: string }).fecha_desembolso).slice(0, 10);
+
+  // Comprobante: si falla, el desembolso YA quedó marcado; se avisa para que lo suba de nuevo.
+  let conComprobante = false;
+  let avisoComprobante = "";
+  if (rutaComprobante) {
+    const guardado = esquemaRegistrarComprobante.safeParse({ solicitudId: datos.id, ruta: rutaComprobante });
+    const r = guardado.success ? await registrarComprobanteSubido(supabase, datos.id, guardado.data.ruta) : null;
+    if (r?.ok) conComprobante = true;
+    else avisoComprobante = " El comprobante no se guardó; súbelo de nuevo desde este crédito.";
+  }
 
   // Aviso al asociado (no bloquea la respuesta si algo falla).
   const { data: solicitud } = await supabase
@@ -175,6 +191,7 @@ export async function marcarDesembolsado(
           monto: Number(solicitud.monto_solicitado),
           fecha,
           fechaTexto: formatearFechaLarga(fecha),
+          conComprobante,
         });
       }
     }
@@ -182,5 +199,59 @@ export async function marcarDesembolsado(
 
   revalidatePath("/admin/creditos");
   revalidatePath("/cuenta");
-  return { mensaje: "Desembolso registrado." };
+  return { mensaje: conComprobante ? "Desembolso registrado con su comprobante." : `Desembolso registrado.${avisoComprobante}` };
+}
+
+// ---------------------------------------------------------------------------
+// Comprobante de desembolso (subir / reemplazar / ver)
+// ---------------------------------------------------------------------------
+
+export type RespuestaPrepararComprobante =
+  | { ok: true; ruta: string; token: string; bucket: string }
+  | { ok: false; error: string };
+
+/**
+ * Paso 1 de la subida: URL firmada para que el navegador suba el archivo directo
+ * a Storage. Solo admin; valida tipo y tamaño (el bucket los vuelve a exigir).
+ */
+export async function prepararSubidaComprobante(entrada: {
+  solicitudId: string;
+  tipo: string;
+  tamano: number;
+}): Promise<RespuestaPrepararComprobante> {
+  await exigirAdmin();
+  const r = esquemaPrepararComprobante.safeParse(entrada);
+  if (!r.success) return { ok: false, error: r.error.issues[0]?.message ?? "Datos inválidos." };
+  const subida = await crearSubidaComprobante(r.data.solicitudId, r.data.tipo);
+  if (!subida) return { ok: false, error: "No pudimos preparar la subida. Intenta de nuevo." };
+  return { ok: true, ...subida };
+}
+
+/**
+ * Paso 2 (crédito ya desembolsado): liga el archivo subido a la solicitud. Sirve para
+ * subir el comprobante por primera vez o reemplazarlo; la base deja el historial.
+ */
+export async function guardarComprobanteDesembolso(entrada: {
+  solicitudId: string;
+  ruta: string;
+}): Promise<EstadoAccionCredito> {
+  const { supabase } = await exigirAdmin();
+  const r = esquemaRegistrarComprobante.safeParse(entrada);
+  if (!r.success) return { error: r.error.issues[0]?.message ?? "Datos inválidos." };
+  const resultado = await registrarComprobanteSubido(supabase, r.data.solicitudId, r.data.ruta);
+  if (!resultado.ok) return { error: resultado.error };
+  revalidatePath("/admin/creditos");
+  revalidatePath("/cuenta");
+  return { mensaje: "Comprobante guardado." };
+}
+
+/** «Ver comprobante» del admin: URL firmada de 3 minutos. */
+export async function urlComprobanteAdmin(entrada: { solicitudId: string }): Promise<{ url?: string; error?: string }> {
+  await exigirAdmin();
+  const r = esquemaVerComprobante.safeParse(entrada);
+  if (!r.success) return { error: "No encontramos la solicitud." };
+  const ruta = await rutaDeComprobante(r.data.solicitudId);
+  if (!ruta) return { error: "Este crédito no tiene comprobante." };
+  const url = await firmarComprobante(ruta);
+  return url ? { url } : { error: "No pudimos abrir el comprobante. Intenta de nuevo." };
 }

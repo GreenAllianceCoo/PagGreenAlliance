@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { ChipEstado } from "@/components/admin/ChipEstado";
-import { exigirAdmin } from "@/lib/admin/servidor";
+import { exigirAdminOSecretario } from "@/lib/admin/servidor";
 import { enmascararCedula } from "@/lib/mascara";
 import { formatearFecha } from "@/lib/cuenta";
 import { ESTADOS_AFILIACION, esEstadoAfiliacionValido, listarSolicitudesAfiliacion, type EstadoAfiliacion } from "./_datos";
@@ -17,13 +17,13 @@ export default async function AfiliacionesPage({
 }: {
   searchParams: Promise<{ estado?: string }>;
 }) {
-  const { supabase, nombre } = await exigirAdmin();
+  const { supabase, nombre, rol } = await exigirAdminOSecretario();
   const { estado: estadoCrudo } = await searchParams;
   const estado: EstadoAfiliacion = esEstadoAfiliacionValido(estadoCrudo) ? estadoCrudo : "pendiente";
   const { filas: solicitudes, error } = await listarSolicitudesAfiliacion(supabase, estado);
 
   return (
-    <AdminShell nombre={nombre} seccion="afiliaciones" contadorSeccionActual={estado === "pendiente" ? solicitudes.length : undefined}>
+    <AdminShell nombre={nombre} rol={rol} seccion="afiliaciones" contadorSeccionActual={estado === "pendiente" ? solicitudes.length : undefined}>
       <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Afiliaciones</h1>
 
       <nav aria-label="Filtrar por estado" className="flex flex-wrap gap-2">

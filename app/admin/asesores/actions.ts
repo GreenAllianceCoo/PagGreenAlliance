@@ -83,17 +83,19 @@ export async function crearAsesor(
     };
   }
 
-  const { error: errorRol } = await supabase.from("perfiles").update({ rol: "asesor" }).eq("id", creado.user.id);
+  const { error: errorRol } = await supabase.from("perfiles").update({ rol: datos.rol }).eq("id", creado.user.id);
   if (errorRol) {
     registrar("error", { evento: "crear_asesor_rol_fallo", mensaje: errorRol.message });
     return {
-      errorGeneral: "Creamos la cuenta, pero no pudimos asignarle el rol de asesor. Avisa al equipo técnico.",
+      errorGeneral: `Creamos la cuenta, pero no pudimos asignarle el rol de ${datos.rol}. Avisa al equipo técnico.`,
       valores: entrada,
     };
   }
 
   revalidatePath("/admin/asesores");
-  return { mensaje: `Asesor «${nombreCompleto}» creado.` };
+  // Quién y cuándo: lo escribe el trigger registrar_cambio_rol (historial_cambio_rol); aquí queda además en el registro.
+  registrar("info", { evento: "equipo_creado", rol: datos.rol, perfil_id: creado.user.id });
+  return { mensaje: `${datos.rol === "secretario" ? "Secretario" : "Asesor"} «${nombreCompleto}» creado.` };
 }
 
 // ---------------------------------------------------------------------------

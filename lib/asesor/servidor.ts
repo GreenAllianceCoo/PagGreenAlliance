@@ -29,7 +29,7 @@ export async function exigirAsesor() {
     .single();
 
   if (!perfil) redirect("/ingresar");
-  if (!puedeAtender(perfil)) redirect(perfil.rol === "admin" ? "/admin" : "/cuenta");
+  if (!puedeAtender(perfil)) redirect(perfil.rol === "admin" || perfil.rol === "secretario" ? "/admin" : "/cuenta");
 
   return {
     supabase,

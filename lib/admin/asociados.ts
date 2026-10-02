@@ -35,6 +35,7 @@ export async function listarAsociadosConProceso(
     .from("perfiles")
     .select("id, nombre_completo, cedula, grado, institucion, activo")
     .eq("rol", "asociado")
+    .is("eliminado_at", null) // los eliminados (anonimizados) no salen en la lista
     .order("nombre_completo");
   if (error) {
     registrar("error", { evento: "admin_asociados_fallo", codigo: error.code, mensaje: error.message });
@@ -88,6 +89,10 @@ export type DetalleProcesoAsociado = {
     asesorId: string | null;
     /** §12.6: false = dado de baja. */
     activo: boolean;
+    /** Rol del perfil: solo los asociados se eliminan desde la ficha. */
+    rol: string;
+    /** true = ya se eliminó (anonimizó): queda solo el registro con sus cifras. */
+    eliminado: boolean;
   };
   estado: EstadoProceso | null;
   fechaInicioEmbargo: string | null;
@@ -102,7 +107,7 @@ export async function cargarDetalleProceso(
   asociadoId: string,
 ): Promise<DetalleProcesoAsociado | null> {
   const [{ data: perfil }, { data: proceso }, { data: historial }, { data: ultimas }] = await Promise.all([
-    supabase.from("perfiles").select("id, nombre_completo, cedula, grado, institucion, asesor_id, activo").eq("id", asociadoId).maybeSingle(),
+    supabase.from("perfiles").select("id, nombre_completo, cedula, grado, institucion, asesor_id, activo, rol, eliminado_at").eq("id", asociadoId).maybeSingle(),
     supabase.from("procesos_ejecutivos").select("estado, fecha_inicio_embargo").eq("asociado_id", asociadoId).maybeSingle(),
     supabase
       .from("historial_proceso_ejecutivo")
@@ -149,6 +154,8 @@ export async function cargarDetalleProceso(
       institucion: nombreInstitucion(perfil.institucion),
       asesorId: (perfil.asesor_id as string | null) ?? null,
       activo: perfil.activo !== false,
+      rol: String(perfil.rol),
+      eliminado: Boolean(perfil.eliminado_at),
     },
     estado: esEstadoProceso(proceso?.estado) ? proceso.estado : null,
     fechaInicioEmbargo: (proceso?.fecha_inicio_embargo as string | null) ?? null,
