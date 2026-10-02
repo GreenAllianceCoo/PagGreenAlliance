@@ -31,7 +31,7 @@ Este manual explica, paso a paso, cómo usar el panel de administración. No hac
 ## 1. Reglas que conviene saber antes de empezar
 
 - **No hay contraseñas.** Todos (administradores, asesores y asociados) entran con su cédula y un código de 6 dígitos que llega al correo.
-- **Nadie se aprueba a sí mismo.** Si un administrador también atiende asociados (por ejemplo, Ricardo, que además es asesor), **otro administrador** debe hacer los cambios sobre sus propios clientes y sobre él mismo: cambiar el proceso ejecutivo, dar de baja, habilitar crédito, aprobar su crédito, asignarle clientes o registrarle pagos de comisión. La plataforma lo impide y muestra un aviso como «Otro administrador debe actualizarlo».
+- **Nadie se cambia a sí mismo.** Un administrador puede manejar a todos los asociados, incluidos los suyos si también atiende asociados (por ejemplo, Ricardo): mover su proceso ejecutivo, asignárselos y aprobar o habilitar sus créditos. Lo único que debe hacer **otro administrador** es lo que toca a su **propia** cuenta (su proceso, su estado o su crédito) y el cambio del correo de ingreso de sus clientes, que es una protección contra el robo de cuentas. Los asesores no pueden cambiar estados ni registrar pagos.
 - **Los motivos quedan guardados.** Dar de baja, reactivar, habilitar crédito, corregir o anular un pago y cambiar el correo de ingreso piden un motivo (de 5 a 300 caracteres) que queda en el historial con la fecha y el nombre de quien lo hizo.
 - **El asociado nunca ve la tasa de interés.** Solo la ven los administradores, en la ficha del crédito.
 - **Correos:** los datos (cédula, montos, motivo de rechazo, número del sorteo) van **solo al correo personal** del asociado. Al correo institucional solo llega un aviso sin datos: «Tienes una novedad en tu cuenta de Green Alliance; ingresa para verla».
@@ -512,7 +512,7 @@ La persona puede llenar el formulario de afiliación otra vez, o el equipo técn
 Use **«Corregir»** si el pago existe pero tiene un dato mal, o **«Anular»** si no debía existir (8.5).
 
 **¿Por qué no puedo cambiar el proceso (o el crédito, o el pago) de cierto asociado?**
-Porque es usted mismo o uno de sus clientes. Debe hacerlo otro administrador.
+Porque es su propia cuenta (o, en el caso del correo de ingreso, uno de sus clientes). Debe hacerlo otro administrador.
 
 **Un asociado quiere pedir crédito y la pantalla dice «Podrás pedir tu crédito cuando tu proceso esté operando».**
 Su proceso ejecutivo aún no está en «Operando». Cuando lo esté, cambie el estado en su ficha (5.2).
