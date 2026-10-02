@@ -36,7 +36,7 @@ function CampoAdmin({
   );
 }
 
-function BotonRegistrar() {
+function BotonRegistrar({ rol }: { rol: "asesor" | "secretario" }) {
   const { pending } = useFormStatus();
   return (
     <button
@@ -45,29 +45,40 @@ function BotonRegistrar() {
       aria-busy={pending || undefined}
       className="flex h-12 items-center gap-2 self-start rounded-full bg-admin-verde px-7 text-15 font-extrabold text-admin-fondo disabled:opacity-85"
     >
-      {pending ? "Creando…" : "Registrar asesor"}
+      {pending ? "Creando…" : rol === "secretario" ? "Registrar secretario" : "Registrar asesor"}
     </button>
   );
 }
 
-/** «Registrar asesor»: cédula, correo, nombres y apellidos (pieza 3f). */
-export function FormularioAsesor() {
+/**
+ * «Registrar asesor» (pieza 3f) o «Registrar secretario»: cédula, correo,
+ * nombres y apellidos. Con `rol="secretario"` los ids llevan prefijo para no
+ * repetirse en la misma página. Cada campo lleva `name` (sin él el navegador
+ * no envía el valor y el servidor recibe todo vacío).
+ */
+export function FormularioAsesor({ rol = "asesor" }: { rol?: "asesor" | "secretario" }) {
   const [estado, accion] = useActionState(crearAsesor, VACIO);
+  const pre = rol === "secretario" ? "secretario-" : "";
+  const de = rol === "secretario" ? " del secretario" : "";
 
   useEffect(() => {
     if (estado.errores) {
       const primerCampo = Object.keys(estado.errores)[0];
-      if (primerCampo) document.getElementById(primerCampo)?.focus();
+      if (primerCampo) document.getElementById(pre + primerCampo)?.focus();
     }
-  }, [estado]);
+  }, [estado, pre]);
 
   return (
     <form action={accion} noValidate className="flex flex-col gap-4 rounded-20 bg-admin-superficie p-5.5">
-      <h2 className="m-0 font-display text-20 font-extrabold">Registrar asesor</h2>
+      <h2 className="m-0 font-display text-20 font-extrabold">
+        {rol === "secretario" ? "Registrar secretario" : "Registrar asesor"}
+      </h2>
+      <input type="hidden" name="rol" value={rol} />
       <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
         <CampoAdmin
-          id="cedula"
-          label="Cédula"
+          id={`${pre}cedula`}
+          name="cedula"
+          label={`Cédula${de}`}
           inputMode="numeric"
           defaultValue={estado.valores?.cedula}
           error={estado.errores?.cedula}
@@ -75,18 +86,27 @@ export function FormularioAsesor() {
           required
         />
         <CampoAdmin
-          id="correo"
-          label="Correo"
+          id={`${pre}correo`}
+          name="correo"
+          label={`Correo${de}`}
           type="email"
           defaultValue={estado.valores?.correo}
           error={estado.errores?.correo}
           placeholder="nombre@correo.com"
           required
         />
-        <CampoAdmin id="nombres" label="Nombres" defaultValue={estado.valores?.nombres} error={estado.errores?.nombres} required />
         <CampoAdmin
-          id="apellidos"
-          label="Apellidos"
+          id={`${pre}nombres`}
+          name="nombres"
+          label={`Nombres${de}`}
+          defaultValue={estado.valores?.nombres}
+          error={estado.errores?.nombres}
+          required
+        />
+        <CampoAdmin
+          id={`${pre}apellidos`}
+          name="apellidos"
+          label={`Apellidos${de}`}
           defaultValue={estado.valores?.apellidos}
           error={estado.errores?.apellidos}
           required
@@ -100,7 +120,7 @@ export function FormularioAsesor() {
       <p role="status" aria-live="polite" className="m-0 text-14 font-semibold text-admin-verde-2">
         {estado.mensaje}
       </p>
-      <BotonRegistrar />
+      <BotonRegistrar rol={rol} />
     </form>
   );
 }

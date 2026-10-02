@@ -9,7 +9,8 @@ export const revalidate = 3600;
 
 export default async function Home() {
   // TODO(pendiente-spec): cifras reales. Sin sección de testimonios (decisión de Sebas, 27-sep).
-  const convenios = await cargarConvenios();
+  // El WhatsApp de cada convenio es solo para asociados: no se manda al navegador en la página pública.
+  const convenios = (await cargarConvenios()).map((c) => ({ ...c, whatsappTexto: null, whatsappUrl: null }));
   return (
     <Landing
       convenios={convenios}

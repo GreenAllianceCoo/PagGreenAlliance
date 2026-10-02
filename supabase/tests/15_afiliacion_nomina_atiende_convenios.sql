@@ -9,7 +9,7 @@ create extension if not exists pgtap with schema extensions;
 select plan(25);
 
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
-  ('15000000-0000-4000-a000-00000000000a', 'n.a@prueba.test',    '{"cedula":"1500000001","grado":"PP"}', '{"nombre_completo":"Asociado Nómina"}'),
+  ('15000000-0000-4000-a000-00000000000a', 'n.a@prueba.test',    '{"cedula":"1500000001","grado":"PT"}', '{"nombre_completo":"Asociado Nómina"}'),
   ('15000000-0000-4000-a000-0000000000ad', 'n.adm@prueba.test',  '{"cedula":"1500000009"}',              '{"nombre_completo":"Admin Ricardo"}'),
   ('15000000-0000-4000-a000-0000000000ae', 'n.adm2@prueba.test', '{"cedula":"1500000008"}',              '{"nombre_completo":"Admin Que No Atiende"}'),
   ('15000000-0000-4000-a000-0000000000e1', 'n.as@prueba.test',   '{"cedula":"1500000010"}',              '{"nombre_completo":"Asesor Inactivo"}');
@@ -24,7 +24,7 @@ returns void language sql as $f$
     nombres, apellidos, cedula, grado, institucion, celular, nequi, email, correo_institucional,
     nomina_entidad, nomina_tipo, nomina_numero,
     foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
-  ) values ('Prueba', 'Nómina', p_cedula, 'PP', 'policia', '3002000000', '3002000000', p_email, p_inst,
+  ) values ('Prueba', 'Nómina', p_cedula, 'PT', 'policia', '3002000000', '3002000000', p_email, p_inst,
             p_entidad, p_tipo::public.tipo_cuenta_nomina, p_numero, 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now());
 $f$;
 
@@ -174,7 +174,10 @@ select set_eq(
         'admin_marcar_desembolsado', 'admin_cambiar_estado_asociado', 'bonos_acumulados_asesor',
         'admin_realizar_sorteo', 'ganador_sorteo_vigente',
         'admin_metricas_dashboard', 'asesor_metricas_dashboard', 'admin_habilitar_credito', 'mi_habilitacion_credito',
-        'mis_premios_asesor', 'registrar_clic_premios', 'admin_premios_asesores', 'mi_carne_token', 'regenerar_carne_token', 'verificar_carne', 'admin_inscritos_sorteo'],
+        'mis_premios_asesor', 'registrar_clic_premios', 'admin_premios_asesores', 'mi_carne_token', 'regenerar_carne_token', 'verificar_carne', 'admin_inscritos_sorteo',
+                              'admin_registrar_cambio_correo', 'admin_rechazar_recuperacion', 'admin_validar_cambio_correo',
+                              'admin_registrar_comprobante',
+                              'es_secretario', 'es_admin_o_secretario', 'secretario_asignar_asesor', 'buscar_asociados_general'],
   'solo estas funciones security definer (que se validan solas) las ejecuta authenticated'
 );
 select is_empty(

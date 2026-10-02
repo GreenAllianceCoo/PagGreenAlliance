@@ -50,6 +50,7 @@ export default async function AsesoresPage() {
       <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Asesores</h1>
 
       <FormularioAsesor />
+      <FormularioAsesor rol="secretario" />
 
       <section className="flex flex-col gap-2 rounded-20 bg-admin-superficie p-5.5">
         <h2 className="m-0 font-display text-20 font-extrabold">Asesores registrados</h2>
@@ -70,7 +71,7 @@ export default async function AsesoresPage() {
                 <div className="flex flex-col">
                   <span className="text-16 font-extrabold text-white">{a.nombre}</span>
                   <span className="text-13 text-admin-texto-3">
-                    Cédula {a.cedula} · {a.rol === "admin" ? "Administrador" : "Asesor"}
+                    Cédula {a.cedula} · {a.rol === "admin" ? "Administrador" : a.rol === "secretario" ? "Secretario" : "Asesor"}
                   </span>
                   <span className="text-14 text-admin-texto-2">
                     {a.clientes} {a.clientes === 1 ? "cliente" : "clientes"} · {a.afiliaciones}{" "}

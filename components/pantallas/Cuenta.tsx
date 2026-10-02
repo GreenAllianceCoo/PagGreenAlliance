@@ -9,6 +9,7 @@ import { ListaConvenios } from "@/components/pantallas/ListaConvenios";
 import { IconoConvenios, IconoDocumento, IconoMas, IconoSalir } from "@/components/ui/Iconos";
 import { BarraInferiorCuenta } from "@/components/pantallas/BarraInferiorCuenta";
 import { EncabezadoCuenta, RUTA_NUEVA_SOLICITUD } from "@/components/pantallas/EncabezadoCuenta";
+import { TarjetaTope } from "@/components/cuenta/TarjetaTope";
 import { PasosSolicitud } from "@/components/ui/PasosSolicitud";
 import { SorteoDelMes, type SorteoDelMesProps } from "@/components/sorteo/SorteoDelMes";
 import type { PerfilAsociado } from "@/lib/asociado/servidor";
@@ -47,6 +48,8 @@ export type CuentaProps = {
    * carné no dibuja esa línea / chip.
    */
   institucion?: string;
+  /** URL firmada de la foto del carné (la arma el servidor). */
+  fotoCarneUrl?: string | null;
   activo?: boolean;
   /** Server Action de «Salir» / cerrar sesión (signOut → /ingresar). */
   accionSalir?: (formData: FormData) => void;
@@ -57,6 +60,11 @@ export type CuentaProps = {
    * resto del perfil vive en /cuenta/perfil (pieza 3k).
    */
   perfilAsociado?: PerfilAsociado | null;
+  /**
+   * Lugar para el botón «Ver comprobante» (components/cuenta/ComprobanteDesembolso.tsx, lo crea otro
+   * agente). Solo se pinta cuando la solicitud está «Desembolsado».
+   */
+  accionDesembolso?: ReactNode;
 };
 
 /** «Aprobada» → verde, «Rechazada» → rojo, «En revisión» / cualquier otro → ámbar (pieza 3a, Badge). */
@@ -68,12 +76,6 @@ const ESTADO_A_BADGE: Record<string, EstadoBadge> = {
 
 /** id del aviso de crédito bloqueado (pieza 3p): el mosaico apagado lo referencia con aria-describedby. */
 const ID_AVISO_CREDITO = "aviso-credito-bloqueado";
-
-/** «$ 2.500.000» → 2500000 (solo para el medidor visual; no es un nuevo cálculo de tope). */
-function numeroDesdeTexto(texto: string) {
-  const limpio = texto.replace(/[^\d]/g, "");
-  return limpio ? Number(limpio) : 0;
-}
 
 /**
  * Sello del comprobante (pieza 2b y 2c: isotipo en un círculo punteado,
@@ -160,31 +162,9 @@ function ColumnaLateral({
   /** D-16: mensaje de por qué no puede pedir crédito (null = sí puede). */
   creditoBloqueado?: string | null;
 }) {
-  const toperNumero = numeroDesdeTexto(tope);
-  const usadoNumero = montoUsado ? numeroDesdeTexto(montoUsado) : 0;
-  const fraccion = toperNumero > 0 ? Math.min(usadoNumero / toperNumero, 1) : 0;
-
   return (
     <div className="flex flex-col gap-4">
-      <section className="relative flex flex-col gap-1.5 overflow-hidden rounded-28 bg-ga-verde p-5 text-white lg:gap-3 lg:p-6">
-        <span aria-hidden="true" className="absolute -right-10 -bottom-16 h-44 w-44 rounded-full bg-ga-verde-oscuro" />
-        <span className="relative text-14 text-ga-verde-claro lg:text-15">Tope disponible para tu grado</span>
-        <span className="relative font-display text-26 font-extrabold leading-none tracking-cifra text-white lg:text-[46px]">
-          {tope}
-        </span>
-        {/* Medidor: solo cuando ya hay una solicitud que compare contra el tope. */}
-        {montoUsado ? (
-          <>
-            <div className="relative h-2.5 overflow-hidden rounded-full bg-white/18 lg:h-2.5">
-              <div
-                className="h-full origin-left rounded-full bg-ga-ambar-fondo-fuerte transition-transform duration-500 ease-spring"
-                style={{ width: "100%", transform: `scaleX(${fraccion})` }}
-              />
-            </div>
-            <span className="relative text-13 text-ga-verde-claro lg:text-14">Tu solicitud usa {montoUsado}</span>
-          </>
-        ) : null}
-      </section>
+      <TarjetaTope tope={tope} montoUsado={montoUsado} />
 
       <nav id="sorteo" aria-label="Accesos" className="grid scroll-mt-4 grid-cols-2 gap-3 lg:grid-cols-1">
         {/* → /cuenta/solicitar (formulario de solicitud de crédito). */}
@@ -251,11 +231,13 @@ export function Cuenta({
   cedula,
   grado,
   institucion,
+  fotoCarneUrl,
   activo,
   accionSalir,
   whatsappUrl,
   perfilAsociado,
   ganadorSorteo,
+  accionDesembolso,
 }: CuentaProps) {
   // D-16: mensaje si NO puede pedir crédito (no operando, inactivo, sin cupo…); null = puede.
   const creditoBloqueado = perfilAsociado && !perfilAsociado.credito.puedeSolicitar ? perfilAsociado.credito.mensaje : null;
@@ -361,6 +343,8 @@ export function Cuenta({
                   {/* La tasa se guarda en la solicitud pero NO se muestra al asociado (decisión 25-sep): es de uso interno. */}
                   Te avisaremos por correo cuando cambie el estado.
                 </p>
+                {/* TODO(comprobante): «Ver comprobante» del desembolso (slot `accionDesembolso`). */}
+                {solicitud.estadoTexto === "Desembolsado" && accionDesembolso ? accionDesembolso : null}
                 {/* Pieza 3p: con solicitud en curso (o cualquier otro motivo) el mosaico «Nueva solicitud»
                     queda apagado y el motivo se ve aquí, enlazado por aria-describedby. */}
                 {creditoBloqueado ? <AvisoCreditoBloqueado id={ID_AVISO_CREDITO} mensaje={creditoBloqueado} /> : null}
@@ -382,7 +366,14 @@ export function Cuenta({
         {/* Carné (pieza 2b): con los datos que ya existen hoy (nombre, cédula
             enmascarada, grado); institución y «activo» quedan para cuando
             exista esa columna. */}
-        <CarneVirtual nombre={nombre} cedula={cedula} grado={grado} institucion={institucion} activo={activo} />
+        <CarneVirtual
+          nombre={nombre}
+          cedula={cedula}
+          grado={grado}
+          institucion={institucion}
+          activo={activo}
+          fotoUrl={fotoCarneUrl}
+        />
 
         <section
           id="convenios"

@@ -39,3 +39,6 @@ __pycache__/
 
 # capturas de las verificaciones (pesadas; el reporte .md sí se versiona)
 docs/verificaciones/**/*.png
+
+# Documentos de entrega con datos personales (cédula, teléfono): no van al repositorio
+docs/entrega/privado/

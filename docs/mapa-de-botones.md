@@ -155,6 +155,14 @@ Sin maqueta (no hay diseño en `design/`): usa los mismos tokens y componentes d
 | «Aprobar» | Definido | `app/admin/creditos/actions.ts#resolverCredito`: valida con zod → la base vuelve a validar (nadie resuelve su propia solicitud, una resuelta no cambia) → envía el correo de resultado (`enviarResultadoCredito`). |
 | «Rechazar» + motivo | Definido | El motivo es obligatorio (zod en el cliente y `solicitudes_motivo_rechazo_chk` en la base); si falta, error bajo el campo. |
 
+### 8b2. Comprobante de desembolso y «Eliminar definitivamente»
+| Elemento | Estado | Comportamiento |
+|---|---|---|
+| «Marcar desembolsado» + comprobante (opcional, recomendado) | Definido | `marcarDesembolsado` (RPC `admin_marcar_desembolsado`) y, si hay archivo, lo verifica y lo liga con `admin_registrar_comprobante`. El archivo (JPG/PNG/WEBP/PDF, máx. 5 MB) lo sube el navegador directo al bucket privado `comprobantes-desembolso` con una URL firmada (`prepararSubidaComprobante`); el servidor comprueba el tipo real por los bytes. Si el comprobante falla, el desembolso queda marcado y se avisa. El correo de desembolso menciona que el comprobante está en su cuenta. |
+| «Subir / Reemplazar comprobante» y «Ver comprobante» (crédito ya desembolsado) | Definido | `guardarComprobanteDesembolso` y `urlComprobanteAdmin` (URL firmada de 3 min). Reemplazar borra el archivo anterior y deja el historial («Comprobante subido» / «Comprobante reemplazado»). El admin no sube el de su propio crédito. |
+| «Ver comprobante» (asociado, `/cuenta`, junto a «Desembolsado») | Definido (componente listo; falta conectarlo en el slot `accionDesembolso`) | `components/cuenta/ComprobanteDesembolso.tsx` + `app/cuenta/comprobante/actions.ts#urlComprobanteDesembolso`: solo lectura del PROPIO crédito (se verifica con la sesión del asociado; URL firmada de 3 min). |
+| «Eliminar definitivamente» (ficha `/admin/asociados/[id]`) | Definido | `app/admin/asociados/eliminar-actions.ts`. **Anonimiza** (conserva créditos, pagos, comisiones e historial ligados a «Asociado eliminado»). Solo admin; el asociado debe estar dado de baja; no a uno mismo; asesores y admins no; sin crédito pendiente. Paso 1: advertencia + motivo (5 a 300) + casilla «entiendo» → código de 6 números al correo del admin (10 min, 3 intentos; solo se guarda su HMAC). Paso 2: con el código correcto borra afiliación, fotos, comprobantes, token del carné, recuperaciones y el usuario de Auth, y deja una fila inmutable en `eliminaciones_asociados` (quién, cuándo, motivo). Si falla borrar Storage/Auth queda «Reintentar» sin pedir otro código. |
+
 ### 8c. Asesores `/admin/asesores`
 | Elemento | Estado | Comportamiento |
 |---|---|---|

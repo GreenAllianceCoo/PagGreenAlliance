@@ -411,8 +411,8 @@ describe("afiliación aprobada → perfil (§2.12)", () => {
     });
   });
   it("una afiliación antigua (sin nómina completa) no manda nómina a medias", () => {
-    const datos = datosPerfilDeAfiliacion({ cedula: "1", grado: "PP", nomina_entidad: "Nequi", nomina_tipo: null, nomina_numero: null });
-    expect(datos).toEqual({ cedula: "1", grado: "PP" });
+    const datos = datosPerfilDeAfiliacion({ cedula: "1", grado: "PT", nomina_entidad: "Nequi", nomina_tipo: null, nomina_numero: null });
+    expect(datos).toEqual({ cedula: "1", grado: "PT" });
   });
   it("textoCuentaNomina y nombreGradoEmbebido", () => {
     expect(textoCuentaNomina("Bancolombia", "ahorros", "123")).toBe("Bancolombia · Ahorros · 123");

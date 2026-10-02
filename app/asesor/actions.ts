@@ -1,7 +1,13 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { vistaClienteBuscado, type ClienteBuscado, type FilaClienteAsesor } from "@/lib/asesor/busqueda";
+import {
+  vistaBusquedaGeneral,
+  vistaClienteBuscado,
+  type ClienteBuscado,
+  type FilaClienteAsesor,
+  type ResultadoBusquedaGeneral,
+} from "@/lib/asesor/busqueda";
 import { metaDeClic } from "@/lib/asesor/premios";
 import { exigirAsesor } from "@/lib/asesor/servidor";
 import { formatearPesos } from "@/lib/cuenta";
@@ -9,7 +15,7 @@ import { dentroDelLimite } from "@/lib/servidor/limite";
 import { registrar } from "@/lib/servidor/registro";
 import { createClient } from "@/lib/supabase/server";
 import { erroresPorCampo } from "@/lib/validaciones/comunes";
-import { esquemaBuscarCliente, leerBuscarCliente } from "@/lib/validaciones/asesor";
+import { esquemaBuscarCliente, esquemaBuscarGeneral, leerBuscarCliente, leerBuscarGeneral } from "@/lib/validaciones/asesor";
 
 /**
  * «Salir» del asesor: mismo mecanismo que app/cuenta/actions.ts (no se
@@ -107,4 +113,53 @@ export async function registrarClicPremios(meta?: number): Promise<void> {
   if (error) {
     registrar("error", { evento: "registrar_clic_premios_fallo", codigo: error.code, mensaje: error.message });
   }
+}
+
+/** Búsqueda general: tope por minuto y por asesor (además del mínimo de caracteres y del máximo de 10 filas de la base). */
+const MAX_BUSQUEDAS_GENERALES_POR_MINUTO = 20;
+const VENTANA_BUSQUEDA_GENERAL_SEGUNDOS = 60;
+
+export type EstadoBuscarGeneral = {
+  /** undefined = todavía no buscó; [] = sin resultados. */
+  resultados?: ResultadoBusquedaGeneral[];
+  errores?: { texto?: string };
+  error?: string;
+  /** Lo que escribió (para no borrarlo). */
+  texto?: string;
+};
+
+/**
+ * «Buscar asociado» (búsqueda general): por nombre o cédula entre TODOS los
+ * asociados activos. La base (buscar_asociados_general) devuelve solo nombre,
+ * cédula enmascarada y a quién pertenece; mínimo 4 caracteres y 10 filas.
+ * Aquí se valida con el mismo esquema y se limita la frecuencia.
+ */
+export async function buscarAsociadoGeneral(
+  _previo: EstadoBuscarGeneral,
+  formData: FormData,
+): Promise<EstadoBuscarGeneral> {
+  const entrada = leerBuscarGeneral(formData);
+  const resultado = esquemaBuscarGeneral.safeParse(entrada);
+  if (!resultado.success) {
+    return { errores: erroresPorCampo<"texto">(resultado.error), texto: entrada.texto };
+  }
+
+  const { supabase, userId } = await exigirAsesor();
+  if (
+    !(await dentroDelLimite(
+      "asesor-buscar-general",
+      userId,
+      MAX_BUSQUEDAS_GENERALES_POR_MINUTO,
+      VENTANA_BUSQUEDA_GENERAL_SEGUNDOS,
+    ))
+  ) {
+    return { error: "Hiciste muchas búsquedas seguidas. Espera un minuto e intenta de nuevo.", texto: entrada.texto };
+  }
+
+  const { data, error } = await supabase.rpc("buscar_asociados_general", { p_texto: resultado.data.texto });
+  if (error) {
+    registrar("error", { evento: "buscar_asociados_general_fallo", codigo: error.code, mensaje: error.message });
+    return { error: "No pudimos buscar. Intenta de nuevo.", texto: entrada.texto };
+  }
+  return { resultados: vistaBusquedaGeneral(data), texto: entrada.texto };
 }

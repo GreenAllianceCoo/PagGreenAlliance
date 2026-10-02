@@ -81,7 +81,7 @@ type Escenario = {
 function crearSupabaseFalso(escenario: Escenario = {}) {
   const {
     usuario = { id: ID_SESION },
-    grado = "PP",
+    grado = "PT",
     sinPerfil = false,
     sinTope = false,
     ultimaSolicitud = null,
@@ -248,29 +248,29 @@ describe("crearSolicitud · monto", () => {
   });
 
   it("acepta el monto mínimo (100.000)", async () => {
-    const { insertados } = crearSupabaseFalso({ grado: "PP" });
+    const { insertados } = crearSupabaseFalso({ grado: "PT" });
     const { redirigeA } = await enviar({ porcentaje: "50", monto: "100000" });
     expect(redirigeA).toBe("/cuenta");
     expect(insertados).toHaveLength(1);
   });
 
-  it("acepta monto igual al tope del grado (PP 50% = 1.000.000)", async () => {
-    const { insertados } = crearSupabaseFalso({ grado: "PP" });
-    const { redirigeA } = await enviar({ porcentaje: "50", monto: "1000000" });
+  it("acepta monto igual al tope del grado (PT 50% = 1.300.000)", async () => {
+    const { insertados } = crearSupabaseFalso({ grado: "PT" });
+    const { redirigeA } = await enviar({ porcentaje: "50", monto: "1300000" });
     expect(redirigeA).toBe("/cuenta");
     expect(insertados).toHaveLength(1);
-    expect(insertados[0].monto_solicitado).toBe(1000000);
+    expect(insertados[0].monto_solicitado).toBe(1300000);
   });
 
-  it("rechaza monto mayor al tope del grado (PP 50% = 1.000.001) y no inserta", async () => {
-    const { insertados } = crearSupabaseFalso({ grado: "PP" });
-    const { resultado } = await enviar({ porcentaje: "50", monto: "1000001" });
+  it("rechaza monto mayor al tope del grado (PT 50% = 1.300.001) y no inserta", async () => {
+    const { insertados } = crearSupabaseFalso({ grado: "PT" });
+    const { resultado } = await enviar({ porcentaje: "50", monto: "1300001" });
     expect(resultado?.error).toBeTruthy();
     expect(insertados).toHaveLength(0);
   });
 
-  it("usa el tope del grado del perfil, no el de otro grado (PP no puede pedir el tope de OF)", async () => {
-    const { insertados } = crearSupabaseFalso({ grado: "PP" });
+  it("usa el tope del grado del perfil, no el de otro grado (PT no puede pedir el tope de OF)", async () => {
+    const { insertados } = crearSupabaseFalso({ grado: "PT" });
     const { resultado } = await enviar({ porcentaje: "100", monto: "4200000" });
     expect(resultado?.error).toBeTruthy();
     expect(insertados).toHaveLength(0);
@@ -357,7 +357,7 @@ describe("crearSolicitud · solicitud pendiente", () => {
 
 describe("crearSolicitud · datos que se insertan", () => {
   it("usa el asociado_id de la sesión e ignora los campos manipulados del formulario", async () => {
-    const { insertados } = crearSupabaseFalso({ grado: "PP" });
+    const { insertados } = crearSupabaseFalso({ grado: "PT" });
     await enviar({
       porcentaje: "50",
       monto: "1000000",
@@ -405,14 +405,14 @@ describe("crearSolicitud · mensajes de error", () => {
   it("no expone el mensaje del trigger de tope (con montos internos) cuando la base rechaza", async () => {
     crearSupabaseFalso({
       errorInsert: {
-        message: "El monto solicitado (1000001) supera el tope de 1000000 para el grado PP con devolución del 50%",
+        message: "El monto solicitado (1300001) supera el tope de 1300000 para el grado PT con devolución del 50%",
         code: "P0001",
       },
     });
     const { resultado } = await enviar({ porcentaje: "50", monto: "500000" });
     expect(resultado?.error).toBeTruthy();
     expect(resultado!.error).not.toContain("P0001");
-    expect(resultado!.error).not.toContain("1000000");
+    expect(resultado!.error).not.toContain("1300000");
   });
 });
 

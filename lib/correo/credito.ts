@@ -63,18 +63,28 @@ export async function enviarDesembolsoCredito(datos: {
   /** AAAA-MM-DD */
   fecha: string;
   fechaTexto: string;
+  /** El admin subió el comprobante de la transferencia: el correo avisa que está en su cuenta. */
+  conComprobante?: boolean;
 }) {
   const monto = Math.round(datos.monto).toLocaleString("es-CO");
+  const textoComprobante = datos.conComprobante ? "El comprobante de la transferencia ya está disponible en tu cuenta." : "";
   try {
     await enviarConRespaldo({
       para: datos.correo,
       variablePlantilla: "RESEND_TEMPLATE_CREDITO_DESEMBOLSADO",
-      variables: { NOMBRE: datos.nombre, MONTO: monto, FECHA: datos.fechaTexto },
+      // COMPROBANTE solo viaja cuando hay comprobante (la plantilla de Resend puede incluir {{{COMPROBANTE}}}).
+      variables: {
+        NOMBRE: datos.nombre,
+        MONTO: monto,
+        FECHA: datos.fechaTexto,
+        ...(datos.conComprobante ? { COMPROBANTE: textoComprobante } : {}),
+      },
       asunto: "Tu crédito de Green Alliance fue desembolsado",
       texto: [
         `Hola ${datos.nombre},`,
         "",
         `Tu crédito por $ ${monto} fue desembolsado el ${datos.fechaTexto}. Desde esa fecha empieza a contar tu plazo de 3 meses.`,
+        ...(textoComprobante ? ["", textoComprobante] : []),
         "",
         "Cooperativa Green Alliance",
       ].join("\n"),

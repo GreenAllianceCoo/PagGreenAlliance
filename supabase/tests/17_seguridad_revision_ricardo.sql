@@ -5,7 +5,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(25);
+select plan(27);
 
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('17000000-0000-4000-a000-0000000000a1', 'r.ric@prueba.test',  '{"cedula":"1700000001"}',              '{"nombre_completo":"Admin Que Atiende"}'),
@@ -13,9 +13,9 @@ insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('17000000-0000-4000-a000-0000000000a3', 'r.baja@prueba.test', '{"cedula":"1700000003"}',              '{"nombre_completo":"Admin De Baja"}'),
   ('17000000-0000-4000-a000-0000000000e1', 'r.as@prueba.test',   '{"cedula":"1700000010"}',              '{"nombre_completo":"Asesor R"}'),
   ('17000000-0000-4000-a000-00000000000c', 'r.cli@prueba.test',  '{"cedula":"1234567890123"}',           '{"nombre_completo":"Cliente de Ricardo"}'),
-  ('17000000-0000-4000-a000-00000000000d', 'r.cli2@prueba.test', '{"cedula":"1700000020","grado":"PP"}', '{"nombre_completo":"Cliente del Asesor"}');
+  ('17000000-0000-4000-a000-00000000000d', 'r.cli2@prueba.test', '{"cedula":"1700000020","grado":"PT"}', '{"nombre_completo":"Cliente del Asesor"}');
 -- (La cédula de 13 dígitos no pasa el formato: queda PENDIENTE-…; se fija abajo.)
-update public.perfiles set cedula = '1700000019', grado = 'PP' where id = '17000000-0000-4000-a000-00000000000c';
+update public.perfiles set cedula = '1700000019', grado = 'PT' where id = '17000000-0000-4000-a000-00000000000c';
 update public.perfiles set rol = 'admin', atiende_asociados = true where id = '17000000-0000-4000-a000-0000000000a1';
 update public.perfiles set rol = 'admin' where id in ('17000000-0000-4000-a000-0000000000a2', '17000000-0000-4000-a000-0000000000a3');
 update public.perfiles set activo = false where id = '17000000-0000-4000-a000-0000000000a3';
@@ -26,7 +26,8 @@ insert into public.procesos_ejecutivos (asociado_id, estado) values
   ('17000000-0000-4000-a000-00000000000c', 'operando'),
   ('17000000-0000-4000-a000-00000000000d', 'operando');
 insert into public.pagos_comision (id, asesor_id, periodo_corte, concepto, monto) values
-  ('17000000-0000-4000-b000-000000000001', '17000000-0000-4000-a000-0000000000a1', '2026-09-15', 'ingreso_nuevo', 500000);
+  ('17000000-0000-4000-b000-000000000001', '17000000-0000-4000-a000-0000000000a1', '2026-09-15', 'ingreso_nuevo', 500000),
+  ('17000000-0000-4000-b000-000000000003', '17000000-0000-4000-a000-0000000000a1', '2026-09-15', 'embargo_operativo', 100000);
 insert into public.solicitudes_credito (asociado_id, porcentaje_devolucion, monto_solicitado)
 values ('17000000-0000-4000-a000-00000000000d', '50', 500000);
 
@@ -51,30 +52,26 @@ set local request.jwt.claims = '{"sub":"17000000-0000-4000-a000-0000000000a2","r
 select is(public.es_admin(), true, 'un admin activo sigue siendo admin');
 
 -- ------------------------------------------------------------
--- RS-01: el admin que atiende no se registra ni corrige comisiones
+-- RS-01 (regla cambiada 2026-10-01): el admin que atiende sí registra y corrige sus comisiones; el asesor no
 -- ------------------------------------------------------------
 set local request.jwt.claims = '{"sub":"17000000-0000-4000-a000-0000000000a1","role":"authenticated"}';
 
-select throws_ok(
+select lives_ok(
   $$ insert into public.pagos_comision (asesor_id, periodo_corte, concepto, monto)
-     values ('17000000-0000-4000-a000-0000000000a1', '2026-09-15', 'ingreso_nuevo', 5000000) $$,
-  'P0001', 'Otro administrador debe registrar tus comisiones',
-  'nadie se registra un pago a su propio nombre'
+     values ('17000000-0000-4000-a000-0000000000a1', '2026-08-15', 'ingreso_nuevo', 5000000) $$,
+  'el admin que atiende sí se registra un pago a su propio nombre (aprobado por Sebas 2026-10-01)'
 );
-select throws_ok(
-  $$ select public.admin_editar_pago_comision('17000000-0000-4000-b000-000000000001', 'Subirme la comisión', 5000000) $$,
-  'P0001', 'Otro administrador debe registrar tus comisiones',
-  'nadie corrige un pago propio'
+select lives_ok(
+  $$ select public.admin_editar_pago_comision('17000000-0000-4000-b000-000000000001', 'Corrección de mi propio pago', 550000) $$,
+  'el admin que atiende sí corrige un pago propio'
 );
-select throws_ok(
-  $$ select public.admin_anular_pago_comision('17000000-0000-4000-b000-000000000001', 'Anular el mío') $$,
-  'P0001', 'Otro administrador debe registrar tus comisiones',
-  'nadie anula un pago propio'
+select lives_ok(
+  $$ select public.admin_anular_pago_comision('17000000-0000-4000-b000-000000000003', 'Anular el mío por error') $$,
+  'el admin que atiende sí anula un pago propio'
 );
-select throws_ok(
+select lives_ok(
   $$ select public.admin_actualizar_proceso_ejecutivo('17000000-0000-4000-a000-00000000000c', 'terminado') $$,
-  'P0001', 'Otro administrador debe actualizar el proceso de tus clientes',
-  'el admin que atiende no cambia el proceso de sus propios clientes'
+  'el admin que atiende sí cambia el proceso de sus propios clientes (aprobado por Sebas 2026-10-01)'
 );
 select throws_ok(
   $$ select public.admin_actualizar_proceso_ejecutivo('17000000-0000-4000-a000-0000000000a1', 'reparto') $$,
@@ -101,6 +98,21 @@ select lives_ok(
   $$ select public.admin_actualizar_proceso_ejecutivo('17000000-0000-4000-a000-00000000000c', 'terminado') $$,
   'otro admin cambia el proceso de los clientes del admin que atiende'
 );
+
+-- El asesor (aunque sea el dueño del cliente) sigue sin poder nada de esto
+set local request.jwt.claims = '{"sub":"17000000-0000-4000-a000-0000000000e1","role":"authenticated"}';
+select throws_ok(
+  $$ select public.admin_actualizar_proceso_ejecutivo('17000000-0000-4000-a000-00000000000d', 'terminado') $$,
+  'P0001', 'Solo un administrador puede cambiar el proceso ejecutivo',
+  'el asesor no cambia el proceso ejecutivo de sus clientes'
+);
+select throws_ok(
+  $$ insert into public.pagos_comision (asesor_id, periodo_corte, concepto, monto)
+     values ('17000000-0000-4000-a000-0000000000e1', '2026-09-15', 'ingreso_nuevo', 500000) $$,
+  '42501', null,
+  'el asesor no se registra pagos de comisión a sí mismo'
+);
+set local request.jwt.claims = '{"sub":"17000000-0000-4000-a000-0000000000a2","role":"authenticated"}';
 
 -- ------------------------------------------------------------
 -- RS-10: un pago nace vigente y con tope

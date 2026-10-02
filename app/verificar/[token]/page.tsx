@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { esTokenCarne, vistaVerificacion } from "@/lib/carne";
+import { urlFotoCarnePorToken } from "@/lib/carneFoto";
 import { registrar } from "@/lib/servidor/registro";
 import { createClient } from "@/lib/supabase/server";
 
@@ -26,6 +27,8 @@ export default async function VerificarCarnePage({ params }: { params: Promise<{
     if (error) registrar("error", { evento: "verificar_carne_fallo", codigo: error.code, mensaje: error.message });
     datos = vistaVerificacion(data);
   }
+  // La foto solo sale si el carné es válido Y el asociado está activo (lo exige la base también).
+  const fotoUrl = datos?.activo && esTokenCarne(token) ? await urlFotoCarnePorToken(token) : null;
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-[520px] flex-col items-center justify-center gap-5 px-5 py-10">
@@ -41,6 +44,18 @@ export default async function VerificarCarnePage({ params }: { params: Promise<{
           <h1 id="titulo-verif" className="m-0 font-display text-24 font-extrabold text-ga-verde-oscuro">
             Afiliado verificado
           </h1>
+          {fotoUrl ? (
+            // URL firmada de Storage (caduca en minutos): no pasa por next/image.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={fotoUrl}
+              alt={`Foto de ${datos.nombre}`}
+              width={160}
+              height={160}
+              data-testid="foto-verificacion"
+              className="h-40 w-40 rounded-20 bg-ga-fondo-suave object-cover"
+            />
+          ) : null}
           <strong className="break-words font-display text-22 font-extrabold text-ga-navy">{datos.nombre}</strong>
           <dl className="m-0 grid grid-cols-1 gap-3 text-15">
             <div>

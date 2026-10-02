@@ -38,7 +38,7 @@ export function DetalleProcesoAsociado({ detalle, bloqueado = false }: { detalle
         <input type="hidden" name="asociadoId" value={asociado.id} />
         {bloqueado ? (
           <p role="status" className="m-0 text-14 font-semibold text-admin-texto-2">
-            Este proceso es tuyo o de uno de tus clientes: otro administrador debe actualizarlo.
+            Este proceso es tuyo: otro administrador debe actualizarlo.
           </p>
         ) : null}
         <CampoAdmin

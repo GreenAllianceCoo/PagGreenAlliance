@@ -15,10 +15,10 @@ select plan(48);
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('19000000-0000-4000-a000-0000000000e1', 'r2.as@prueba.test',  '{"cedula":"1900000010"}',              '{"nombre_completo":"Asesor R2"}'),
   ('19000000-0000-4000-a000-0000000000e2', 'r2.as2@prueba.test', '{"cedula":"1900000011"}',              '{"nombre_completo":"Asesor Dos"}'),
-  ('19000000-0000-4000-a000-00000000000a', 'r2.a@prueba.test',   '{"cedula":"1900000001","grado":"PP"}', '{"nombre_completo":"Ana Operando"}'),
-  ('19000000-0000-4000-a000-00000000000b', 'r2.b@prueba.test',   '{"cedula":"1900000002","grado":"PP"}', '{"nombre_completo":"Beto Pendiente"}'),
-  ('19000000-0000-4000-a000-00000000000c', 'r2.c@prueba.test',   '{"cedula":"1900000003","grado":"PP"}', '{"nombre_completo":"Carla Baja"}'),
-  ('19000000-0000-4000-a000-00000000000d', 'r2.d@prueba.test',   '{"cedula":"1900000004","grado":"PP"}', '{"nombre_completo":"Dario Retiro"}'),
+  ('19000000-0000-4000-a000-00000000000a', 'r2.a@prueba.test',   '{"cedula":"1900000001","grado":"PT"}', '{"nombre_completo":"Ana Operando"}'),
+  ('19000000-0000-4000-a000-00000000000b', 'r2.b@prueba.test',   '{"cedula":"1900000002","grado":"PT"}', '{"nombre_completo":"Beto Pendiente"}'),
+  ('19000000-0000-4000-a000-00000000000c', 'r2.c@prueba.test',   '{"cedula":"1900000003","grado":"PT"}', '{"nombre_completo":"Carla Baja"}'),
+  ('19000000-0000-4000-a000-00000000000d', 'r2.d@prueba.test',   '{"cedula":"1900000004","grado":"PT"}', '{"nombre_completo":"Dario Retiro"}'),
   ('19000000-0000-4000-a000-0000000000ad', 'r2.adm@prueba.test', '{"cedula":"1900000009"}',              '{"nombre_completo":"Admin R2"}');
 update public.perfiles set rol = 'asesor' where id in ('19000000-0000-4000-a000-0000000000e1', '19000000-0000-4000-a000-0000000000e2');
 update public.perfiles set rol = 'admin'  where id = '19000000-0000-4000-a000-0000000000ad';
@@ -72,7 +72,7 @@ select is(
 select is(
   (select string_agg(codigo || '=' || coalesce(grupo_credito::text, '-'), ' ' order by orden)
      from public.grados where seleccionable),
-  'PP=PP PT=PT SI=SI IT=IT IJ=IJ SLP=PT C3=PT CS=PT CP=SI SS=IT SV=IJ SP=IJ ST=IT TE=IJ CT=CT MY=MY TC=TC',
+  'PT=PT SI=SI IT=IT IJ=IJ SLP=PT C3=PT CS=PT CP=SI SS=IT SV=IJ SP=IJ ST=IT TE=IJ CT=CT MY=MY TC=TC',
   'remapeo de grados a grupos (§12.1)'
 );
 
@@ -146,14 +146,14 @@ returns void language sql as $f$
   ) values ('Prueba', 'Dominio', p_cedula, p_grado, p_inst::public.institucion_afiliacion, '3001900000', '3001900000',
             'personal.' || p_cedula || '@correo.test', p_correo, 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now());
 $f$;
-select throws_ok($$ select pg_temp.afiliar('1900000101', 'PP', 'policia', 'yo@gmail.com') $$,
+select throws_ok($$ select pg_temp.afiliar('1900000101', 'PT', 'policia', 'yo@gmail.com') $$,
   'P0001', 'Usa tu correo institucional de la Policía (@policia.gov.co)', 'Policía rechaza gmail');
 select throws_ok($$ select pg_temp.afiliar('1900000102', 'CS', 'ejercito', 'yo@policia.gov.co') $$,
   'P0001', 'Usa tu correo institucional del Ejército (@buzonejercito.mil.co o @ejercito.mil.co)',
   'Ejército rechaza el dominio de la Policía');
-select throws_ok($$ select pg_temp.afiliar('1900000103', 'PP', 'policia', 'yo@x.policia.gov.co') $$,
+select throws_ok($$ select pg_temp.afiliar('1900000103', 'PT', 'policia', 'yo@x.policia.gov.co') $$,
   'P0001', 'Usa tu correo institucional de la Policía (@policia.gov.co)', 'sin comodines de subdominio');
-select lives_ok($$ select pg_temp.afiliar('1900000104', 'PP', 'policia', 'yo@correo.policia.gov.co') $$,
+select lives_ok($$ select pg_temp.afiliar('1900000104', 'PT', 'policia', 'yo@correo.policia.gov.co') $$,
   'Policía acepta correo.policia.gov.co');
 select lives_ok($$ select pg_temp.afiliar('1900000105', 'CS', 'ejercito', 'yo@buzonejercito.mil.co') $$,
   'Ejército acepta buzonejercito.mil.co');
@@ -300,7 +300,7 @@ select throws_ok(
 set local request.jwt.claims = '{"sub":"19000000-0000-4000-a000-00000000000b","role":"authenticated"}';
 select is(
   (select grado || '|' || (nombre in ('Ana Operando', 'Dario Retiro'))::text from public.ganador_sorteo_vigente()),
-  'Patrullero de Policía|true',
+  'Patrullero|true',
   'cualquier asociado activo ve grado y nombre del ganador'
 );
 select is(

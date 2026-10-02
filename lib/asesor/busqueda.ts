@@ -64,3 +64,37 @@ export function vistaClienteBuscado(fila: FilaClienteAsesor): ClienteBuscado {
       : { configurada: false, texto: TEXTO_SIN_CUPO_CORTO, mensaje: MENSAJE_SIN_CUPO },
   };
 }
+
+// ---------------------------------------------------------------------------
+// Búsqueda GENERAL (todos los asociados de la cooperativa)
+// ---------------------------------------------------------------------------
+
+/** Fila de public.buscar_asociados_general(p_texto): solo estos tres datos. */
+export type FilaBusquedaGeneral = {
+  nombre: string;
+  cedula_enmascarada: string;
+  asesor_texto: string;
+};
+
+export type ResultadoBusquedaGeneral = {
+  nombre: string;
+  /** «2.9••.•••.002» (la base ya la enmascara; nunca llega completa). */
+  cedulaEnmascarada: string;
+  /** Nombre del asesor, «Cooperativa» o «Sin asesor». */
+  asesor: string;
+};
+
+/** Texto cuando no hay coincidencias. */
+export const MENSAJE_SIN_RESULTADOS_GENERAL = "No encontramos asociados con ese dato.";
+
+/** Convierte las filas de la RPC; descarta cualquier otro campo que llegara por error. */
+export function vistaBusquedaGeneral(filas: unknown): ResultadoBusquedaGeneral[] {
+  if (!Array.isArray(filas)) return [];
+  return filas
+    .filter((f): f is FilaBusquedaGeneral => !!f && typeof f === "object" && typeof (f as FilaBusquedaGeneral).nombre === "string")
+    .map((f) => ({
+      nombre: f.nombre,
+      cedulaEnmascarada: String(f.cedula_enmascarada ?? ""),
+      asesor: String(f.asesor_texto ?? "Sin asesor"),
+    }));
+}

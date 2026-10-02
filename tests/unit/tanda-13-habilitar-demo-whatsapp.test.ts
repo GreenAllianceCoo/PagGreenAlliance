@@ -112,20 +112,20 @@ describe("demo Policía / Ejército (§13.3)", () => {
   const g = (codigo: string, p: boolean, e: boolean, grupo: GradoCatalogo["grupoCredito"], orden: number): GradoCatalogo => ({
     codigo, nombre: codigo + " nombre", policia: p, ejercito: e, grupoCredito: grupo, orden, seleccionable: true,
   });
-  const catalogo = [g("PP", true, false, "PP", 1), g("SLP", false, true, null, 2), g("TE", true, true, "IJ", 3)];
+  const catalogo = [g("PT", true, false, "PT", 1), g("SLP", false, true, null, 2), g("TE", true, true, "IJ", 3)];
   const pq = (m: number): PaqueteDemo[] => [{ porcentaje: "50", capacidad_maxima: m, tasa_interes_mensual: 0.01, plazo_meses: 3 }];
-  const porGrupo = { PP: pq(1), IJ: pq(2) } as never;
+  const porGrupo = { PT: pq(1), IJ: pq(2) } as never;
 
   it("ofrece las dos instituciones y filtra los grados por institución", () => {
     expect(INSTITUCIONES_DEMO.map((i) => i.codigo)).toEqual(["policia", "ejercito"]);
-    expect(gradosDemoDeInstitucion(catalogo, "policia").map((x) => x.codigo)).toEqual(["PP", "TE"]);
+    expect(gradosDemoDeInstitucion(catalogo, "policia").map((x) => x.codigo)).toEqual(["PT", "TE"]);
     expect(gradosDemoDeInstitucion(catalogo, "ejercito").map((x) => x.codigo)).toEqual(["SLP", "TE"]);
   });
   it("el cupo sale del grupo del grado; sin grupo = sin cupo", () => {
-    expect(paquetesDeGradoDemo(catalogo, porGrupo, "PP")[0].capacidad_maxima).toBe(1);
+    expect(paquetesDeGradoDemo(catalogo, porGrupo, "PT")[0].capacidad_maxima).toBe(1);
     expect(paquetesDeGradoDemo(catalogo, porGrupo, "TE")[0].capacidad_maxima).toBe(2);
     expect(paquetesDeGradoDemo(catalogo, porGrupo, "SLP")).toEqual([]);
-    expect(paquetesDeGradoDemo(catalogo, null, "PP")).toEqual([]);
+    expect(paquetesDeGradoDemo(catalogo, null, "PT")).toEqual([]);
   });
 });
 

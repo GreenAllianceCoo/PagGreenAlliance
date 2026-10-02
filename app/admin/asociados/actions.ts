@@ -1,12 +1,16 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { exigirAdmin } from "@/lib/admin/servidor";
 import { correoDeCedula } from "@/lib/ingreso/servidor";
 import { enviarCreditoHabilitado } from "@/lib/correo/credito";
 import { destinatariosAviso } from "@/lib/correo/destinatarios";
 import { avisarCorreoInstitucional } from "@/lib/correo/institucional";
+import { avisarCambioCorreoIngreso } from "@/lib/correo/recuperacion";
+import { dentroDelLimite } from "@/lib/servidor/limite";
 import { registrar } from "@/lib/servidor/registro";
+import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { erroresPorCampo, textoDe } from "@/lib/validaciones/comunes";
 import {
   esquemaActualizarProceso,
@@ -16,6 +20,10 @@ import {
   type CampoActualizarProceso,
   type CampoEstadoAsociado,
 } from "@/lib/validaciones/admin";
+import {
+  esquemaCambiarCorreoAdmin,
+  type CampoCambiarCorreoAdmin,
+} from "@/lib/validaciones/recuperacion";
 
 export type EstadoActualizarProceso = {
   errores?: Partial<Record<CampoActualizarProceso, string>>;
@@ -219,5 +227,154 @@ export async function habilitarCredito(
       ? `Crédito habilitado. Aún no podrá pedir porque ${pendientes.join(" y ")}.`
       : "Crédito habilitado. Ya puede hacer una nueva solicitud.",
     pendientes,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Recuperación de acceso: «Cambiar correo de ingreso»
+// ---------------------------------------------------------------------------
+
+export type EstadoCambiarCorreoIngreso = {
+  errores?: Partial<Record<CampoCambiarCorreoAdmin | "confirmaCelular", string>>;
+  error?: string;
+  mensaje?: string;
+};
+
+/** Textos de admin_validar_cambio_correo() / admin_registrar_cambio_correo() listos para mostrar. */
+const MENSAJES_CAMBIO_CORREO = [
+  "Otro administrador debe cambiar el correo de tus clientes",
+  "No puedes cambiar tu propio correo de ingreso desde aquí; usa tu perfil",
+  "El motivo debe tener entre 5 y 300 caracteres",
+  "El asociado no existe",
+  "Otro administrador debe cambiar el correo: cambiaste el asesor de esta persona hace menos de 24 horas",
+  "No hay una solicitud de recuperación pendiente de esta persona",
+];
+
+/**
+ * «Cambiar correo de ingreso» (recuperación de acceso). Solo el admin, con
+ * motivo obligatorio (5 a 300). Orden (SEC-REC-03: validar ANTES de tocar
+ * Auth): valida → límite → RPC admin_validar_cambio_correo (asociado, no es
+ * suyo ni su cliente, no le cambió el asesor en 24 h, hay solicitud de
+ * recuperación PENDIENTE) → si el celular escrito no coincidía con el del
+ * perfil exige la casilla «verifiqué por el celular del perfil» → cambia el
+ * correo de AUTH con service role (el correo solo vive allí) → cierra TODAS las
+ * sesiones de esa persona (SEC-REC-04) → deja el historial y cierra la
+ * solicitud con admin_registrar_cambio_correo → avisa al correo anterior y al
+ * nuevo (después de responder). Campos: asociadoId, correo, motivo y
+ * confirmaCelular (casilla).
+ */
+export async function cambiarCorreoIngreso(
+  _previo: EstadoCambiarCorreoIngreso,
+  formData: FormData,
+): Promise<EstadoCambiarCorreoIngreso> {
+  const { supabase, userId } = await exigirAdmin();
+
+  const resultado = esquemaCambiarCorreoAdmin.safeParse({
+    asociadoId: textoDe(formData, "asociadoId"),
+    correo: textoDe(formData, "correo"),
+    motivo: textoDe(formData, "motivo"),
+  });
+  if (!resultado.success) {
+    return { errores: erroresPorCampo<CampoCambiarCorreoAdmin>(resultado.error) };
+  }
+  const { asociadoId, correo, motivo } = resultado.data;
+  const confirmaCelular = textoDe(formData, "confirmaCelular") === "on";
+
+  if (asociadoId === userId) {
+    return { error: "No puedes cambiar tu propio correo de ingreso desde aquí; usa tu perfil." };
+  }
+  if (!(await dentroDelLimite("admin-cambio-correo", userId, 10, 60 * 60))) {
+    return { error: "Hiciste muchos cambios seguidos. Intenta de nuevo en una hora." };
+  }
+
+  // 1) Validar ANTES de tocar Auth (con la sesión del admin: el actor es quien llama).
+  const { data: solicitudId, error: errorValidar } = await supabase.rpc("admin_validar_cambio_correo", {
+    p_asociado_id: asociadoId,
+    p_motivo: motivo,
+  });
+  if (errorValidar || !solicitudId) {
+    const conocido = MENSAJES_CAMBIO_CORREO.find((m) => errorValidar?.message?.includes(m));
+    if (!conocido) {
+      registrar("error", { evento: "admin_cambio_correo_validar_fallo", codigo: errorValidar?.code });
+    }
+    return { error: conocido ? `${conocido}.` : "No pudimos guardar el cambio. Intenta de nuevo." };
+  }
+
+  // 2) SEC-REC-01: si el celular escrito no es el del perfil, confirmación aparte.
+  const { data: solicitud } = await supabase
+    .from("solicitudes_recuperacion_acceso")
+    .select("celular_coincide")
+    .eq("id", solicitudId as string)
+    .maybeSingle();
+  if (solicitud && solicitud.celular_coincide === false && !confirmaCelular) {
+    return {
+      errores: {
+        confirmaCelular: "Confirma que verificaste la identidad por el celular del perfil, no por el escrito en la solicitud.",
+      },
+    };
+  }
+
+  const { data: perfil } = await supabase
+    .from("perfiles")
+    .select("nombre_completo")
+    .eq("id", asociadoId)
+    .maybeSingle();
+  const nombre = (perfil?.nombre_completo as string | undefined) ?? "asociado";
+
+  // 3) Cambio en Auth (service role, solo servidor).
+  const admin = crearClienteAdmin();
+  const { data: actual, error: errorLectura } = await admin.auth.admin.getUserById(asociadoId);
+  if (errorLectura || !actual?.user) {
+    registrar("error", { evento: "admin_cambio_correo_lectura_fallo", estado: errorLectura?.status });
+    return { error: "No pudimos guardar el cambio. Intenta de nuevo." };
+  }
+  const anterior = actual.user.email ?? null;
+  if (anterior && anterior.toLowerCase() === correo) {
+    return { errores: { correo: "Ese ya es su correo de ingreso." } };
+  }
+  const { error: errorCambio } = await admin.auth.admin.updateUserById(asociadoId, {
+    email: correo,
+    email_confirm: true,
+  });
+  if (errorCambio) {
+    if (errorCambio.code === "email_exists" || errorCambio.status === 422) {
+      return { errores: { correo: "Ese correo ya lo usa otra cuenta." } };
+    }
+    registrar("error", { evento: "admin_cambio_correo_fallo", estado: errorCambio.status, codigo: errorCambio.code });
+    return { error: "No pudimos guardar el cambio. Intenta de nuevo." };
+  }
+
+  // 4) SEC-REC-04: cerrar todas las sesiones abiertas de esa persona (si el
+  //    correo viejo estaba comprometido, el intruso queda fuera).
+  const { error: errorSesiones } = await admin.rpc("cerrar_sesiones_usuario", { p_user_id: asociadoId });
+  if (errorSesiones) {
+    registrar("error", { evento: "admin_cambio_correo_cerrar_sesiones_fallo", codigo: errorSesiones.code });
+  }
+
+  // 5) Historial + solicitud atendida (con la sesión del admin).
+  const { error: errorHistorial } = await supabase.rpc("admin_registrar_cambio_correo", {
+    p_asociado_id: asociadoId,
+    p_motivo: motivo,
+  });
+  if (errorHistorial) {
+    // El correo YA cambió: no se deshace; se deja el aviso en el registro del servidor.
+    registrar("error", {
+      evento: "admin_cambio_correo_historial_fallo",
+      codigo: errorHistorial.code,
+      mensaje: errorHistorial.message,
+    });
+    revalidatePath(`/admin/asociados/${asociadoId}`);
+    return { error: "El correo cambió, pero no pudimos guardar el historial. Avisa al equipo técnico." };
+  }
+
+  after(() => avisarCambioCorreoIngreso({ nombre, anterior, nuevo: correo }));
+
+  revalidatePath("/admin/asociados");
+  revalidatePath(`/admin/asociados/${asociadoId}`);
+  revalidatePath("/admin/alertas");
+  return {
+    mensaje: errorSesiones
+      ? "Correo de ingreso cambiado, pero no pudimos cerrar sus sesiones abiertas. Avisa al equipo técnico."
+      : "Correo de ingreso cambiado y sesiones anteriores cerradas. Avisamos al correo anterior y al nuevo.",
   };
 }

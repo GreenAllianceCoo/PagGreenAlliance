@@ -31,7 +31,7 @@ describe("sanitizarFilaResumen · nunca campos privados", () => {
       perfil_id: "id-1",
       nombre: "Juan Pérez",
       cedula: "1234567890",
-      grado: "PP",
+      grado: "PT",
       estado_afiliacion: null,
       estado_credito: "pendiente",
       // Campos que NUNCA debe exponer resumen_clientes_asesor(); si llegaran
@@ -56,7 +56,7 @@ describe("sanitizarFilaResumen · nunca campos privados", () => {
   });
 
   it("no serializa nada más si se pasa el objeto entero a JSON (control extra de fuga)", () => {
-    const cruda = { origen: "asociado", nombre: "A", cedula: "1", grado: "PP", nequi: "3009998877" };
+    const cruda = { origen: "asociado", nombre: "A", cedula: "1", grado: "PT", nequi: "3009998877" };
     const limpia = sanitizarFilaResumen(cruda);
     expect(JSON.stringify(limpia)).not.toContain("3009998877");
   });
@@ -64,18 +64,18 @@ describe("sanitizarFilaResumen · nunca campos privados", () => {
 
 describe("idFilaResumen", () => {
   it("usa perfil_id cuando es un asociado", () => {
-    expect(idFilaResumen(fila({ origen: "asociado", nombre: "A", cedula: "1", grado: "PP", perfil_id: "p-1" }))).toBe("p-1");
+    expect(idFilaResumen(fila({ origen: "asociado", nombre: "A", cedula: "1", grado: "PT", perfil_id: "p-1" }))).toBe("p-1");
   });
   it("usa solicitud_id cuando es una solicitud de afiliación", () => {
     expect(
-      idFilaResumen(fila({ origen: "solicitud_afiliacion", nombre: "A", cedula: "1", grado: "PP", solicitud_id: "s-1" })),
+      idFilaResumen(fila({ origen: "solicitud_afiliacion", nombre: "A", cedula: "1", grado: "PT", solicitud_id: "s-1" })),
     ).toBe("s-1");
   });
 });
 
 describe("estadoCliente", () => {
   it("asociado sin solicitud de crédito", () => {
-    expect(estadoCliente(fila({ origen: "asociado", nombre: "A", cedula: "1", grado: "PP" }))).toEqual({
+    expect(estadoCliente(fila({ origen: "asociado", nombre: "A", cedula: "1", grado: "PT" }))).toEqual({
       clave: "asociado",
       etiqueta: "Asociado sin solicitud",
     });
@@ -85,7 +85,7 @@ describe("estadoCliente", () => {
     ["aprobado", "Crédito aprobado"],
     ["rechazado", "Crédito rechazado"],
   ] as const)("asociado con crédito %s", (estado, etiqueta) => {
-    const f = fila({ origen: "asociado", nombre: "A", cedula: "1", grado: "PP", estado_credito: estado });
+    const f = fila({ origen: "asociado", nombre: "A", cedula: "1", grado: "PT", estado_credito: estado });
     expect(estadoCliente(f)).toEqual({ clave: `credito_${estado}`, etiqueta });
   });
   it.each([
@@ -94,14 +94,14 @@ describe("estadoCliente", () => {
     ["aprobada", "Afiliación aprobada"],
     ["rechazada", "Afiliación rechazada"],
   ] as const)("solicitud de afiliación %s", (estado, etiqueta) => {
-    const f = fila({ origen: "solicitud_afiliacion", nombre: "A", cedula: "1", grado: "PP", estado_afiliacion: estado });
+    const f = fila({ origen: "solicitud_afiliacion", nombre: "A", cedula: "1", grado: "PT", estado_afiliacion: estado });
     expect(estadoCliente(f)).toEqual({ clave: `afiliacion_${estado}`, etiqueta });
   });
 });
 
 describe("filtrarClientes", () => {
   const filas = [
-    fila({ origen: "asociado", nombre: "Juan Pérez", cedula: "1000000001", grado: "PP", estado_credito: "aprobado" }),
+    fila({ origen: "asociado", nombre: "Juan Pérez", cedula: "1000000001", grado: "PT", estado_credito: "aprobado" }),
     fila({ origen: "asociado", nombre: "María Gómez", cedula: "1000000002", grado: "OF" }),
     fila({ origen: "solicitud_afiliacion", nombre: "Andrés Ruiz", cedula: "1000000003", grado: "PT", estado_afiliacion: "pendiente" }),
   ];
@@ -134,8 +134,8 @@ describe("filtrarClientes", () => {
 describe("opcionesEstadoCliente", () => {
   it("siempre incluye «Todos» y solo los estados presentes, sin repetir", () => {
     const filas = [
-      fila({ origen: "asociado", nombre: "A", cedula: "1", grado: "PP", estado_credito: "aprobado" }),
-      fila({ origen: "asociado", nombre: "B", cedula: "2", grado: "PP", estado_credito: "aprobado" }),
+      fila({ origen: "asociado", nombre: "A", cedula: "1", grado: "PT", estado_credito: "aprobado" }),
+      fila({ origen: "asociado", nombre: "B", cedula: "2", grado: "PT", estado_credito: "aprobado" }),
     ];
     const opciones = opcionesEstadoCliente(filas);
     expect(opciones[0].clave).toBe("todos");

@@ -4,14 +4,17 @@ import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
-import { ConvenioCard } from "@/components/ui/ConvenioCard";
+import { ListaConvenios } from "@/components/pantallas/ListaConvenios";
 import { IconoCheck, IconoVolver } from "@/components/ui/Iconos";
+import { CarneVirtual } from "@/components/ui/CarneVirtual";
+import { CamposSolicitud, formatoCOP } from "@/components/cuenta/CamposSolicitud";
+import { TarjetaTope } from "@/components/cuenta/TarjetaTope";
 import { EncabezadoAsesor } from "@/components/asesor/EncabezadoAsesor";
+import { MONTO_MINIMO } from "@/lib/credito";
 import { CONVENIOS } from "@/lib/convenios";
 import {
   CLIENTE_DEMO,
   INSTITUCIONES_DEMO,
-  MONTO_MINIMO,
   gradosDemoDeInstitucion,
   paquetesDeGradoDemo,
   topeMaximoDemo,
@@ -20,12 +23,6 @@ import {
 } from "@/lib/asesor/datosDemo";
 import { TEXTO_SIN_CUPO_CORTO, type GradoCatalogo } from "@/lib/gradosCatalogo";
 import type { CodigoInstitucion } from "@/lib/validaciones/instituciones";
-
-const PASO_MONTO = 50000;
-
-function formatCOP(valor: number) {
-  return `$ ${Math.round(valor).toLocaleString("es-CO")}`;
-}
 
 type CuentaDemoProps = {
   nombreAsesor: string;
@@ -83,7 +80,8 @@ export function CuentaDemo({
   const tope = topeMaximoDemo(paquetes);
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [porcentaje, setPorcentaje] = useState<"50" | "100">(paquetes[0]?.porcentaje ?? "50");
+  // Pieza 3t: sin porcentaje elegido de entrada; «Enviar solicitud de ejemplo» queda apagado hasta elegirlo.
+  const [porcentaje, setPorcentaje] = useState<"" | "50" | "100">("");
   const paquete = useMemo(
     () => paquetes.find((p) => p.porcentaje === porcentaje) ?? paquetes[0],
     [paquetes, porcentaje],
@@ -102,13 +100,12 @@ export function CuentaDemo({
   function cambiarGrado(nuevo: string) {
     setGrado(nuevo);
     const nuevosPaquetes = paquetesDeGradoDemo(catalogoGrados, paquetesPorGrado, nuevo);
-    const nuevoPorcentaje = nuevosPaquetes[0]?.porcentaje ?? "50";
-    setPorcentaje(nuevoPorcentaje);
+    setPorcentaje("");
     setMonto(nuevosPaquetes[0]?.capacidad_maxima ?? MONTO_MINIMO);
     setConfirmada(false);
   }
 
-  function elegirPorcentaje(p: PaqueteDemo) {
+  function elegirPorcentaje(p: Pick<PaqueteDemo, "porcentaje" | "capacidad_maxima">) {
     setPorcentaje(p.porcentaje);
     setMonto(p.capacidad_maxima);
   }
@@ -154,15 +151,15 @@ export function CuentaDemo({
           >
             <IconoVolver tamano={22} grosor={1.8} />
           </Link>
-          <h1 className="m-0 flex flex-col gap-0.5 font-extrabold text-ga-navy lg:block lg:text-32">
-            <span className="text-15 font-normal text-ga-texto-3 lg:text-32 lg:font-extrabold lg:text-ga-navy">
+          <h1 className="m-0 flex flex-col gap-0.5 text-ga-navy lg:block">
+            <span className="text-15 font-normal text-ga-texto-3 lg:font-display lg:text-44 lg:font-extrabold lg:text-ga-navy">
               Hola,
             </span>{" "}
-            <span className="text-24 lg:text-32">{CLIENTE_DEMO.nombre}</span>
+            <span className="font-display text-30 font-extrabold lg:text-44">{CLIENTE_DEMO.nombre}</span>
           </h1>
         </div>
 
-        <div className="flex flex-col gap-4 rounded-18 bg-white p-5 lg:flex-row lg:gap-6 lg:p-6">
+        <div className="flex flex-col gap-4 rounded-28 bg-white p-5 lg:flex-row lg:gap-6 lg:p-6">
           {/* Selector segmentado Policía / Ejército: radios nativos (flechas del teclado y lector de pantalla). */}
           <fieldset className="m-0 flex flex-1 flex-col gap-1.5 border-0 p-0">
             <legend className="mb-1.5 p-0 text-15 font-bold">Institución del cliente</legend>
@@ -202,10 +199,10 @@ export function CuentaDemo({
         </div>
 
         <div className="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:gap-6">
-          <section className="flex flex-col gap-4 rounded-18 bg-white p-5 lg:col-span-2 lg:gap-5.5 lg:p-7">
+          <section className="flex flex-col gap-4 rounded-28 bg-white p-5 lg:col-span-2 lg:gap-5.5 lg:p-8">
             {!mostrarFormulario ? (
               <>
-                <h2 className="m-0 text-18 font-extrabold lg:text-20">Tu solicitud</h2>
+                <h2 className="m-0 font-display text-18 font-extrabold lg:text-24">Tu solicitud</h2>
                 {sinDatos ? (
                   <p role="alert" className="m-0 text-14 font-semibold text-ga-error">
                     No pudimos cargar los topes de crédito. Recarga la página; si sigue igual, avisa al equipo técnico.
@@ -235,10 +232,10 @@ export function CuentaDemo({
                 >
                   <IconoCheck tamano={24} grosor={2} />
                 </span>
-                <h2 className="m-0 text-18 font-extrabold lg:text-20">Solicitud de ejemplo enviada</h2>
+                <h2 className="m-0 font-display text-18 font-extrabold lg:text-24">Solicitud de ejemplo enviada</h2>
                 <p className="m-0 text-15 leading-150 text-ga-texto-2">
                   Esto es una simulación: no se guardó ninguna solicitud real. Monto de ejemplo{" "}
-                  {formatCOP(monto)} al {porcentaje}%.
+                  {formatoCOP(monto)} al {porcentaje} %.
                 </p>
                 <Button
                   variante="secundario"
@@ -259,67 +256,18 @@ export function CuentaDemo({
                   enviarSolicitudDemo();
                 }}
               >
-                <h2 className="m-0 text-18 font-extrabold lg:text-20">Solicita tu crédito</h2>
-                <fieldset className="m-0 flex flex-col gap-1.5 border-0 p-0">
-                  <legend className="mb-1.5 p-0 text-15 font-bold">Porcentaje de devolución</legend>
-                  <div className="grid grid-cols-2 gap-3">
-                    {paquetes.map((p) => (
-                      <label key={p.porcentaje} className="cursor-pointer">
-                        <input
-                          type="radio"
-                          name="porcentaje-demo"
-                          value={p.porcentaje}
-                          checked={porcentaje === p.porcentaje}
-                          onChange={() => elegirPorcentaje(p)}
-                          className="peer sr-only"
-                        />
-                        <span className="flex min-h-13.5 items-center justify-center rounded-12 border-1.5 border-ga-borde bg-white px-3 py-2 text-center text-16 font-extrabold leading-tight text-ga-texto transition-colors peer-checked:border-ga-verde peer-checked:bg-ga-verde-tint peer-checked:text-ga-verde">
-                          {p.porcentaje}% de devolución
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
-
-                {paquete ? (
-                  <div className="flex flex-col gap-1.5">
-                    <div className="flex items-baseline justify-between gap-3">
-                      <label htmlFor="monto-demo" className="text-15 font-bold">
-                        Monto a desembolsar
-                      </label>
-                      <output htmlFor="monto-demo" className="text-24 font-extrabold text-ga-navy">
-                        {formatCOP(monto)}
-                      </output>
-                    </div>
-                    <input
-                      id="monto-demo"
-                      type="range"
-                      min={Math.min(MONTO_MINIMO, paquete.capacidad_maxima)}
-                      max={paquete.capacidad_maxima}
-                      step={PASO_MONTO}
-                      value={monto}
-                      onChange={(e) => setMonto(Number(e.target.value))}
-                      aria-valuetext={formatCOP(monto)}
-                      className="h-11 w-full accent-ga-verde"
-                    />
-                    <div className="flex justify-between text-13 text-ga-texto-3">
-                      <span>Mínimo {formatCOP(Math.min(MONTO_MINIMO, paquete.capacidad_maxima))}</span>
-                      <span>Tope {formatCOP(paquete.capacidad_maxima)}</span>
-                    </div>
-                  </div>
-                ) : null}
-
-                {paquete ? (
-                  <dl className="m-0 grid grid-cols-2 gap-3">
-                    <div className="flex flex-col gap-0.5 rounded-12 bg-ga-fondo-suave p-3.5">
-                      <dt className="text-14 text-ga-texto-3">Plazo</dt>
-                      <dd className="m-0 text-16 font-bold text-ga-texto">{paquete.plazo_meses} meses</dd>
-                    </div>
-                  </dl>
-                ) : null}
+                <h2 className="m-0 font-display text-18 font-extrabold lg:text-24">Solicita tu crédito</h2>
+                <CamposSolicitud
+                  paquetes={paquetes}
+                  gradoNombre={nombreGrado}
+                  porcentaje={porcentaje}
+                  monto={monto}
+                  onPorcentaje={elegirPorcentaje}
+                  onMonto={setMonto}
+                />
 
                 <div className="flex flex-col gap-3 sm:flex-row">
-                  <Button cargando={enviando} textoCargando="Enviando…" className="lg:self-start lg:px-9">
+                  <Button disabled={porcentaje === ""} cargando={enviando} textoCargando="Enviando…" className="lg:self-start lg:px-9">
                     Enviar solicitud de ejemplo
                   </Button>
                   <Button
@@ -336,10 +284,10 @@ export function CuentaDemo({
           </section>
 
           <div className="flex flex-col gap-4">
-            <section className="flex flex-col gap-1.5 rounded-18 bg-ga-navy p-5 text-white lg:p-6">
-              <span className="text-14 text-ga-navy-texto-suave">Tope disponible para el grado {nombreGrado}</span>
-              <span className="text-26 font-extrabold lg:text-30">{sinCupo ? TEXTO_SIN_CUPO_CORTO : formatCOP(tope)}</span>
-            </section>
+            <TarjetaTope
+              tope={sinCupo ? TEXTO_SIN_CUPO_CORTO : formatoCOP(tope)}
+              etiqueta={`Tope disponible para el grado ${nombreGrado}`}
+            />
             <ButtonLink href={volver.href} variante="terciario" className="gap-2">
               {volver.texto}
             </ButtonLink>
@@ -349,17 +297,24 @@ export function CuentaDemo({
           </div>
         </div>
 
-        <section id="convenios-ejemplo" className="flex flex-col gap-4 rounded-18 bg-white p-5 lg:px-7 lg:py-6">
-          <h2 className="m-0 text-18 font-extrabold">Convenios de ejemplo</h2>
-          <div className="flex flex-col gap-3 lg:grid lg:grid-cols-5">
-            {CONVENIOS.map((convenio) => (
-              <ConvenioCard key={convenio.nombre} convenio={convenio} variante="enlace" href="#convenios-ejemplo" />
-            ))}
-          </div>
+        {/* Carné (pieza 2b/3u): el mismo de /cuenta, con los datos de ejemplo. */}
+        <CarneVirtual
+          nombre={CLIENTE_DEMO.nombre}
+          cedula={CLIENTE_DEMO.cedula}
+          grado={nombreGrado}
+          institucion={INSTITUCIONES_DEMO.find((i) => i.codigo === institucion)?.nombre}
+          activo
+          hrefQr={null}
+          hrefConvenios="#convenios-ejemplo"
+        />
+
+        <section id="convenios-ejemplo" className="flex flex-col gap-4 rounded-28 bg-white p-5 lg:px-8 lg:py-7">
+          <h2 className="m-0 font-display text-18 font-extrabold lg:text-22">Convenios de ejemplo</h2>
+          <ListaConvenios convenios={CONVENIOS} variante="cuenta" />
         </section>
 
-        <section className="flex flex-col gap-4 rounded-18 bg-white p-5 lg:px-7 lg:py-6">
-          <h2 className="m-0 text-18 font-extrabold">Datos del cliente (ejemplo)</h2>
+        <section className="flex flex-col gap-4 rounded-28 bg-white p-5 lg:px-8 lg:py-7">
+          <h2 className="m-0 font-display text-18 font-extrabold lg:text-22">Datos del cliente (ejemplo)</h2>
           <dl className="m-0 grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div className="flex flex-col gap-0.5 rounded-12 bg-ga-fondo-suave p-3.5">
               <dt className="text-14 text-ga-texto-3">Nombre</dt>

@@ -5,7 +5,7 @@
 -- Ingreso con código (/ingresar): el correo con el código de 6 dígitos llega
 -- a Mailpit (http://127.0.0.1:54324), no a un buzón real.
 --
---   Asociado 1 · cédula 1234567890 · grado PP · correo asociado.prueba@greenalliance.test
+--   Asociado 1 · cédula 1234567890 · grado PT · correo asociado.prueba@greenalliance.test
 --                con una solicitud de crédito pendiente (500.000 al 50 %).
 --   Asociado 2 · cédula 1234567891 · grado SI · correo sin.solicitudes@greenalliance.test
 --                sin solicitudes (estado vacío de /cuenta).
@@ -31,7 +31,7 @@ insert into auth.users (
   'asociado.prueba@greenalliance.test',
   extensions.crypt('Prueba123!', extensions.gen_salt('bf')),
   now(),
-  '{"provider":"email","providers":["email"],"cedula":"1234567890","grado":"PP"}',
+  '{"provider":"email","providers":["email"],"cedula":"1234567890","grado":"PT"}',
   '{"nombre_completo":"Asociado de Prueba","telefono":"3001234567"}',
   now(), now(), '', '', '', ''
 ),
@@ -70,7 +70,7 @@ insert into auth.identities (
 -- handle_new_user ya toma cédula y grado de raw_app_meta_data; se fijan otra vez
 -- por si el trigger cambia en el futuro.
 update public.perfiles
-   set cedula = '1234567890', grado = 'PP', telefono = '3001234567'
+   set cedula = '1234567890', grado = 'PT', telefono = '3001234567'
  where id = '4c7808d8-085f-42ed-9e5d-f53c117b4cd1';
 
 update public.perfiles
@@ -331,3 +331,39 @@ insert into public.solicitudes_afiliacion (
   'Quiero saber cuándo empieza el conteo.',
   now()
 );
+
+-- ============================================================
+-- Secretario de prueba (rol secretario, migración 20261003100000).
+-- Cédula 1234567896 · correo secretario.prueba@greenalliance.test.
+-- Ve el Resumen y las afiliaciones; no tiene ningún otro permiso.
+-- ============================================================
+insert into auth.users (
+  instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+  raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+  confirmation_token, recovery_token, email_change, email_change_token_new
+) values (
+  '00000000-0000-0000-0000-000000000000',
+  '5ec7e7a2-1b9d-4c0e-8a3f-6d2b7c9e4f10',
+  'authenticated', 'authenticated',
+  'secretario.prueba@greenalliance.test',
+  extensions.crypt('Prueba123!', extensions.gen_salt('bf')),
+  now(),
+  '{"provider":"email","providers":["email"],"cedula":"1234567896"}',
+  '{"nombre_completo":"Secretaria de Prueba"}',
+  now(), now(), '', '', '', ''
+);
+
+insert into auth.identities (
+  id, user_id, provider_id, provider, identity_data, last_sign_in_at, created_at, updated_at
+) values (
+  gen_random_uuid(),
+  '5ec7e7a2-1b9d-4c0e-8a3f-6d2b7c9e4f10',
+  '5ec7e7a2-1b9d-4c0e-8a3f-6d2b7c9e4f10',
+  'email',
+  '{"sub":"5ec7e7a2-1b9d-4c0e-8a3f-6d2b7c9e4f10","email":"secretario.prueba@greenalliance.test","email_verified":true}',
+  now(), now(), now()
+);
+
+update public.perfiles
+   set cedula = '1234567896', rol = 'secretario'
+ where id = '5ec7e7a2-1b9d-4c0e-8a3f-6d2b7c9e4f10';

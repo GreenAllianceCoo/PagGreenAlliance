@@ -10,6 +10,8 @@ type Props = {
   /** null = no se pudo cargar (no es admin o falló la RPC): estado de error. */
   metricas: MetricasAdmin | null;
   alertasPendientes: number;
+  /** El secretario ve las mismas cifras, sin enlaces a secciones que no tiene (Sorteo, Alertas). */
+  soloLectura?: boolean;
 };
 
 /** Barra de relleno animada con `transform` (scaleX); sin movimiento con prefers-reduced-motion (globals.css). */
@@ -23,7 +25,7 @@ function Relleno({ parte, indice, clase = "bg-admin-verde" }: { parte: number; i
 }
 
 /** Pieza 3r (4.7): «Resumen de clientes». Solo cifras agregadas, sin datos personales ni tasa. */
-export function ResumenAdmin({ metricas, alertasPendientes }: Props) {
+export function ResumenAdmin({ metricas, alertasPendientes, soloLectura = false }: Props) {
   const encabezado = (
     <div className="flex flex-col gap-1">
       <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Resumen de clientes</h1>
@@ -65,9 +67,13 @@ export function ResumenAdmin({ metricas, alertasPendientes }: Props) {
         <TarjetaKpi etiqueta="Asociados activos" valor={metricas.asociadosActivos} />
         <TarjetaKpi etiqueta="Afiliaciones pendientes" valor={metricas.afiliacionesPendientes} tono="ambar" />
         <TarjetaKpi etiqueta="Créditos pendientes" valor={metricas.creditosPendientes} tono="ambar" />
-        <Link href="/admin/sorteo" className="flex flex-col no-underline [&>div]:flex-1">
+        {soloLectura ? (
           <TarjetaKpi etiqueta="Inscritos al sorteo del mes" valor={metricas.inscritosSorteoMes} />
-        </Link>
+        ) : (
+          <Link href="/admin/sorteo" className="flex flex-col no-underline [&>div]:flex-1">
+            <TarjetaKpi etiqueta="Inscritos al sorteo del mes" valor={metricas.inscritosSorteoMes} />
+          </Link>
+        )}
         <TarjetaKpi
           etiqueta="Desembolsos del mes"
           valor={metricas.desembolsosMes.conteo}
@@ -114,6 +120,7 @@ export function ResumenAdmin({ metricas, alertasPendientes }: Props) {
               </ul>
             </section>
 
+            {soloLectura ? null : (
             <section aria-labelledby="alertas-resumen" className="flex flex-col gap-2 rounded-20 bg-admin-superficie p-5">
               <h2 id="alertas-resumen" className="m-0 font-display text-18 font-extrabold">
                 Alertas pendientes · {alertasPendientes}
@@ -122,6 +129,7 @@ export function ResumenAdmin({ metricas, alertasPendientes }: Props) {
                 Ir a Alertas →
               </Link>
             </section>
+            )}
           </div>
         </div>
       )}

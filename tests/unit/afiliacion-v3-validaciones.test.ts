@@ -29,7 +29,7 @@ function g(codigo: string, policia: boolean, ejercito: boolean, grupo: GradoCata
   return { codigo, nombre: `Grado ${codigo}`, policia, ejercito, grupoCredito: grupo, orden, seleccionable };
 }
 const CATALOGO: GradoCatalogo[] = [
-  g("PP", true, false, "PP", 1),
+  g("PT", true, false, "PT", 1),
   g("IJ", true, false, null, 5),
   g("SLP", false, true, null, 6),
   g("CS", false, true, null, 8),
@@ -45,7 +45,7 @@ const VALIDO = {
   apellidos: "  Pérez   Gómez  ",
   cedula: "1.234.567.890",
   institucion: "policia",
-  grado_id: "PP",
+  grado_id: "PT",
   nequi: "301 000 0000",
   nomina_entidad: "Bancolombia",
   nomina_entidad_otra: "",
@@ -79,7 +79,7 @@ describe("afiliación v3 · formulario válido", () => {
       apellidos: "Pérez Gómez",
       cedula: "1234567890",
       institucion: "policia",
-      grado_id: "PP",
+      grado_id: "PT",
       nequi: "3010000000",
       celular: "3001234567",
       correo_institucional: "juan.perez@policia.gov.co",
@@ -121,8 +121,8 @@ describe("afiliación v3 · institución y grado (§1)", () => {
   it.each(["", "armada", "Policia"])("institución: rechaza %j", (institucion) => {
     expect(errorDe("institucion", conCambio({ institucion }))).toBe("Selecciona tu institución.");
   });
-  it("Policía: acepta PP, IJ y TE", () => {
-    for (const grado_id of ["PP", "IJ", "TE"]) expect(errorDe("grado_id", conCambio({ grado_id }))).toBeUndefined();
+  it("Policía: acepta PT, IJ y TE", () => {
+    for (const grado_id of ["PT", "IJ", "TE"]) expect(errorDe("grado_id", conCambio({ grado_id }))).toBeUndefined();
   });
   it("Ejército: acepta SLP, CS y TE", () => {
     for (const grado_id of ["SLP", "CS", "TE"]) {
@@ -130,7 +130,7 @@ describe("afiliación v3 · institución y grado (§1)", () => {
     }
   });
   it("rechaza un grado de la otra institución", () => {
-    expect(errorDe("grado_id", conCambio({ institucion: "ejercito", grado_id: "PP" }))).toBe(
+    expect(errorDe("grado_id", conCambio({ institucion: "ejercito", grado_id: "PT" }))).toBe(
       "Ese grado no corresponde a la institución que elegiste.",
     );
     expect(errorDe("grado_id", conCambio({ institucion: "policia", grado_id: "CS" }))).toBe(
@@ -325,12 +325,12 @@ describe("afiliación v3 · FormData", () => {
 
 describe("catálogo de grados · filtro por institución (§1)", () => {
   it("Policía y Ejército ven solo sus grados seleccionables, en orden", () => {
-    expect(gradosDeInstitucion(CATALOGO, "policia").map((x) => x.codigo)).toEqual(["PP", "IJ", "TE"]);
+    expect(gradosDeInstitucion(CATALOGO, "policia").map((x) => x.codigo)).toEqual(["PT", "IJ", "TE"]);
     expect(gradosDeInstitucion(CATALOGO, "ejercito").map((x) => x.codigo)).toEqual(["SLP", "CS", "TE"]);
     expect(gradosDeInstitucion(CATALOGO, "")).toEqual([]);
   });
   it("al cambiar de institución, el grado se limpia si ya no aplica", () => {
-    expect(gradoTrasCambiarInstitucion(CATALOGO, "ejercito", "PP")).toBe("");
+    expect(gradoTrasCambiarInstitucion(CATALOGO, "ejercito", "PT")).toBe("");
     expect(gradoTrasCambiarInstitucion(CATALOGO, "ejercito", "TE")).toBe("TE");
     expect(gradoTrasCambiarInstitucion(CATALOGO, "policia", "")).toBe("");
   });

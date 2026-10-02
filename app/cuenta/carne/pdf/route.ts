@@ -1,5 +1,6 @@
 import { cargarPerfilAsociado } from "@/lib/asociado/servidor";
 import { esTokenCarne, rutaVerificacion } from "@/lib/carne";
+import { fotoCarneParaPdf } from "@/lib/carneFoto";
 import { generarCarnePdf } from "@/lib/carnePdf";
 import { hoyBogota } from "@/lib/fechas";
 import { registrar } from "@/lib/servidor/registro";
@@ -30,7 +31,9 @@ export async function GET() {
   if (!esTokenCarne(token)) return new Response("No se pudo generar el carné", { status: 500, headers: CABECERAS });
 
   try {
+    const foto = await fotoCarneParaPdf(user.id);
     const bytes = await generarCarnePdf({
+      foto,
       nombre: perfil.nombre,
       grado: perfil.gradoNombre ?? "Sin asignar",
       institucion: perfil.institucion,

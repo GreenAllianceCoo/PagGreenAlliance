@@ -11,6 +11,8 @@ export type DatosCarnePdf = {
   cedula: string;
   /** Texto que codifica el QR (URL pública de verificación). */
   urlVerificacion: string;
+  /** Foto del asociado (JPEG o PNG). Si falta o no se puede leer, el PDF sale sin foto. */
+  foto?: { bytes: Uint8Array; tipo: "jpg" | "png" } | null;
 };
 
 const ANCHO = 600;
@@ -78,6 +80,19 @@ export async function generarCarnePdf(datos: DatosCarnePdf): Promise<Uint8Array>
     font: normal,
     color: MENTA,
   });
+
+  // Foto (cuadrada) sobre el QR, a la derecha, si hay.
+  if (datos.foto) {
+    try {
+      const imagen = datos.foto.tipo === "png" ? await pdf.embedPng(datos.foto.bytes) : await pdf.embedJpg(datos.foto.bytes);
+      const ladoFoto = 88;
+      const fx = qx + (lado - ladoFoto) / 2;
+      pagina.drawRectangle({ x: fx - 3, y: 241, width: ladoFoto + 6, height: ladoFoto + 6, color: BLANCO });
+      pagina.drawImage(imagen, { x: fx, y: 244, width: ladoFoto, height: ladoFoto });
+    } catch {
+      // imagen dañada: el carné sale igual, sin foto
+    }
+  }
 
   // Texto, columna izquierda
   const maxTexto = qx - 32 - 24;

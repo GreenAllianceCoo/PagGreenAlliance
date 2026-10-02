@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 01-oct-2026 (migraciones 20261001000000 y 20261001100000 aplicadas; convenios administrables y carné hechos; falta aplicar 20261002000000 y fusionar develop→main, e2523de).
+Actualizado: 02-oct-2026 (todo en develop: recuperación de acceso, comprobante de desembolso, eliminar definitivamente, secretario, búsqueda de asesores y foto del carné; falta aplicar 5 migraciones con respaldo y fusionar develop→main; entrega final el 7-oct).
 
 ## Dónde quedamos
 

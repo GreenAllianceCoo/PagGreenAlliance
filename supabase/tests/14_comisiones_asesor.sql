@@ -12,9 +12,9 @@ insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('14000000-0000-4000-a000-0000000000e1', 'c.x@prueba.test',   '{"cedula":"1400000010"}',              '{"nombre_completo":"Asesor X"}'),
   ('14000000-0000-4000-a000-0000000000e2', 'c.y@prueba.test',   '{"cedula":"1400000011"}',              '{"nombre_completo":"Asesor Y"}'),
   ('14000000-0000-4000-a000-000000000001', 'c.c1@prueba.test',  '{"cedula":"1400000001","grado":"TE"}', '{"nombre_completo":"Cliente Uno"}'),
-  ('14000000-0000-4000-a000-000000000002', 'c.c2@prueba.test',  '{"cedula":"1400000002","grado":"PP"}', '{"nombre_completo":"Cliente Dos"}'),
+  ('14000000-0000-4000-a000-000000000002', 'c.c2@prueba.test',  '{"cedula":"1400000002","grado":"PT"}', '{"nombre_completo":"Cliente Dos"}'),
   ('14000000-0000-4000-a000-000000000003', 'c.c3@prueba.test',  '{"cedula":"1400000003","grado":"SI"}', '{"nombre_completo":"Cliente Tres"}'),
-  ('14000000-0000-4000-a000-00000000000f', 'c.z@prueba.test',   '{"cedula":"1400000009","grado":"PP"}', '{"nombre_completo":"Asociado Z"}'),
+  ('14000000-0000-4000-a000-00000000000f', 'c.z@prueba.test',   '{"cedula":"1400000009","grado":"PT"}', '{"nombre_completo":"Asociado Z"}'),
   ('14000000-0000-4000-a000-0000000000ad', 'c.adm@prueba.test', '{"cedula":"1400000099"}',              '{"nombre_completo":"Admin Comisiones"}');
 update public.perfiles set rol = 'asesor' where id in ('14000000-0000-4000-a000-0000000000e1', '14000000-0000-4000-a000-0000000000e2');
 update public.perfiles set rol = 'admin'  where id = '14000000-0000-4000-a000-0000000000ad';
