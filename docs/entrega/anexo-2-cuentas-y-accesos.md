@@ -11,22 +11,22 @@ Borrador prellenado el 2026-10-01 con lo que consta en el repositorio. Lo marcad
 | Campo | Dato |
 |---|---|
 | Dominio | `greenallianceco.com` (sitio en `https://www.greenallianceco.com`) |
-| Registrador del dominio | **PENDIENTE (Sebas)** |
-| Correo titular del dominio | **PENDIENTE (Sebas)** |
+| Registrador del dominio | Gestionado por Sebastián Sandoval (contratista) a nombre de Ricardo Varón Penagos; proveedor registrador: **por confirmar** |
+| Correo titular del dominio | soporte@greenallianceco.com (titular: Ricardo Varón Penagos) |
 | Hosting | Vercel, plan Pro (despliega la rama `main`; nombre del proyecto en Vercel: **PENDIENTE (Sebas)**) |
-| Cuenta titular del hosting | **PENDIENTE (Sebas)** |
+| Cuenta titular del hosting | soporte@greenallianceco.com (titular: Ricardo Varón Penagos; configurada por Sebastián Sandoval) |
 | Base de datos / Supabase | Supabase, proyecto ref `sqpmxizxkqorccpvjwoz` (Postgres, Auth y Storage). Plan: **PENDIENTE (Sebas)** |
-| Cuenta titular de base de datos | **PENDIENTE (Sebas)** |
-| Servicio de correo / Resend | Resend (correos a asociados y SMTP del código de ingreso). Cuenta: **PENDIENTE (Sebas)**. Dominio verificado del remitente: **PENDIENTE (Sebas)** |
+| Cuenta titular de base de datos | soporte@greenallianceco.com (titular: Ricardo Varón Penagos; configurada por Sebastián Sandoval) |
+| Servicio de correo / Resend | Resend (correos a asociados y SMTP del código de ingreso). Cuenta: soporte@greenallianceco.com (titular: Ricardo Varón Penagos). Dominio verificado del remitente: greenallianceco.com |
 | Repositorio del código | https://github.com/GreenAllianceCoo/PagGreenAlliance (organización/cuenta `GreenAllianceCoo`) |
-| Administrador principal de la cooperativa | **PENDIENTE (Sebas)**: nombre, cédula y correo institucional |
+| Administrador principal de la cooperativa | RICARDO VARÓN PENAGOS, C.C. 1.124.998.852, soporte@greenallianceco.com |
 | Fecha de entrega de credenciales | **PENDIENTE (Sebas)** |
 
 ## 2. Servicios complementarios
 
 | Servicio | Uso | Titular |
 |---|---|---|
-| Número de WhatsApp de contacto (`NEXT_PUBLIC_WHATSAPP`) | Botones de contacto y ayuda en el ingreso | **PENDIENTE (Sebas)** |
+| Número de WhatsApp de contacto (`NEXT_PUBLIC_WHATSAPP`) | Botones de contacto y ayuda en el ingreso | 311 724 1942 |
 | DNS del dominio | Apunta el dominio a Vercel y verifica el remitente de Resend (registros SPF/DKIM) | Mismo registrador o proveedor DNS: **PENDIENTE (Sebas)** |
 | Gestor de contraseñas de la cooperativa | Guardar las credenciales y secretos de la sección 4 | **PENDIENTE (cooperativa)** |
 | Nube y disco para respaldos | Ver `respaldo-y-restauracion.md`, sección 4 | **PENDIENTE (cooperativa)** |
@@ -64,7 +64,7 @@ La cláusula décima pide que el dominio y las cuentas esenciales queden a nombr
 
 **Antes de empezar**
 
-- [ ] La cooperativa crea o designa un **correo institucional** para las cuentas técnicas (p. ej. `tecnologia@greenallianceco.com`; la landing ya muestra `soporte@greenallianceco.com`), con la contraseña y la verificación en dos pasos en su poder. **PENDIENTE (cooperativa)**
+- [x] Las cuentas técnicas (dominio, Vercel, Supabase y Resend) están a nombre de la cooperativa con el correo institucional `soporte@greenallianceco.com`. Falta confirmar que la contraseña y la verificación en dos pasos de ese correo queden en poder de Ricardo Varón Penagos.
 - [ ] La cooperativa designa al **administrador principal** (sección 1).
 - [ ] Se hace un respaldo completo con `scripts/respaldo.sh --con-storage` y se entrega a la cooperativa.
 
@@ -125,7 +125,7 @@ En constancia, se firma en ____________________, a los ____ días del mes de ___
 | LA COOPERATIVA | EL CONTRATISTA |
 |---|---|
 | COOPERATIVA GREEN ALLIANCE | SEBASTIÁN SANDOVAL |
-| NIT. 902.103.335-7 | C.C. No. **PENDIENTE (Sebas)** |
-| Representante Legal: RICARDO VARÓN PENAGOS | Domicilio: **PENDIENTE (Sebas)** |
-| C.C. 1.124.998.852 de Cumaribo, Vichada | Correo: **PENDIENTE (Sebas)** / Tel.: **PENDIENTE (Sebas)** |
+| NIT. 902.103.335-7 | C.C. No. 1.052.380.429 |
+| Representante Legal: RICARDO VARÓN PENAGOS | Domicilio: Carrera 24 # 10-30, Bucaramanga |
+| C.C. 1.124.998.852 de Cumaribo, Vichada | Correo: sebas.sandovalh@gmail.com / Tel.: 321 207 2537 |
 | Firma: ______________________________ | Firma: ______________________________ |

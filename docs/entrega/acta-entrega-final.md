@@ -9,7 +9,7 @@ Cláusulas novena (entrega final), trigésima primera (actas de entrega), sépti
 | Fecha | ______ de __________________ de 2026 |
 | Lugar | ________________________________ |
 | LA COOPERATIVA | COOPERATIVA GREEN ALLIANCE, NIT 902.103.335-7, representada por RICARDO VARÓN PENAGOS, C.C. 1.124.998.852 de Cumaribo, Vichada |
-| EL CONTRATISTA | SEBASTIÁN SANDOVAL, C.C. ____________________ |
+| EL CONTRATISTA | SEBASTIÁN SANDOVAL, C.C. 1.052.380.429 |
 | Supervisor designado por la cooperativa (cláusula trigésima) | ________________________________ |
 | Etapa | Entrega integral: pruebas, documentación, accesos, código y aceptación final (fase 6) |
 | Plataforma | https://www.greenallianceco.com |
@@ -170,7 +170,7 @@ Los reportes de errores en garantía se envían por escrito al correo designado 
 | LA COOPERATIVA | EL CONTRATISTA |
 |---|---|
 | COOPERATIVA GREEN ALLIANCE | SEBASTIÁN SANDOVAL |
-| NIT. 902.103.335-7 | C.C. No. ____________________ |
+| NIT. 902.103.335-7 | C.C. No. 1.052.380.429 |
 | Representante Legal: RICARDO VARÓN PENAGOS | |
 | C.C. 1.124.998.852 de Cumaribo, Vichada | |
 | Firma: ______________________________ | Firma: ______________________________ |
