@@ -6,9 +6,10 @@ import { NextResponse, type NextRequest } from "next/server";
  * - /cuenta y sus subrutas (p. ej. /cuenta/solicitar) requieren sesión:
  *   sin sesión → /ingresar.
  * - /admin y /asesor también requieren sesión (sin sesión → /ingresar). El
- *   ROL (admin / asesor) no se comprueba aquí: cada página y cada Server
- *   Action de esas dos áreas lo vuelven a comprobar con `exigirAdmin()` (o el
- *   equivalente del asesor), porque el proxy no es la única barrera.
+ *   ROL (admin / secretario / asesor) no se comprueba aquí: cada página y cada
+ *   Server Action de esas dos áreas lo vuelven a comprobar con `exigirAdmin()`
+ *   (solo admin), `exigirAdminOSecretario()` (Resumen y afiliaciones) o el
+ *   equivalente del asesor, porque el proxy no es la única barrera.
  * - /ingresar (y sus pasos) con sesión → /cuenta. Así los botones de la landing
  *   que apuntan a /ingresar («Mi cuenta», «Ingresar», «Solicitar crédito»,
  *   «Ver beneficios en mi cuenta») llevan a /cuenta cuando ya hay sesión.
