@@ -4,7 +4,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
-import { ConvenioCard } from "@/components/ui/ConvenioCard";
+import { ListaConvenios } from "@/components/pantallas/ListaConvenios";
 import { IconoCheck, IconoVolver } from "@/components/ui/Iconos";
 import { EncabezadoAsesor } from "@/components/asesor/EncabezadoAsesor";
 import { CONVENIOS } from "@/lib/convenios";
@@ -351,11 +351,7 @@ export function CuentaDemo({
 
         <section id="convenios-ejemplo" className="flex flex-col gap-4 rounded-18 bg-white p-5 lg:px-7 lg:py-6">
           <h2 className="m-0 text-18 font-extrabold">Convenios de ejemplo</h2>
-          <div className="flex flex-col gap-3 lg:grid lg:grid-cols-5">
-            {CONVENIOS.map((convenio) => (
-              <ConvenioCard key={convenio.nombre} convenio={convenio} variante="enlace" href="#convenios-ejemplo" />
-            ))}
-          </div>
+          <ListaConvenios convenios={CONVENIOS} variante="cuenta" />
         </section>
 
         <section className="flex flex-col gap-4 rounded-18 bg-white p-5 lg:px-7 lg:py-6">
