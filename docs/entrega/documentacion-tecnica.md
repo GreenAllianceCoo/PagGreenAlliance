@@ -343,4 +343,4 @@ La plataforma está hecha para que otra persona o empresa la pueda continuar sin
   - Supabase es Postgres estándar; el esquema y los datos se exportan con `pg_dump`/`supabase db dump`. Auth y Storage son las partes más ligadas a Supabase.
   - Resend se puede cambiar por otro proveedor de correo modificando solo `lib/correo/resend.ts`.
 - **Documentación para el siguiente equipo:** este documento, `README.md`, `docs/entrega/manual-administracion.md` (qué hace cada botón del panel; `docs/mapa-de-botones.md` está desactualizado y no debe usarse como referencia), `docs/resend-plantillas.md`, `docs/spec-requerimientos-ricardo-2026-09-29.md` (reglas de negocio) y las pruebas automáticas, que describen el comportamiento esperado.
-- **Accesos:** el inventario y la lista de transferencia están en `anexo-2-cuentas-y-accesos.md`.
+- **Accesos:** el inventario y la lista de transferencia están en el Anexo No. 2 del contrato, que se entrega aparte (no está en el repositorio porque lleva datos personales).
