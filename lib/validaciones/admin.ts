@@ -104,6 +104,23 @@ export const esquemaCambiarEstadoAsociado = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Equipo: cambiar el rol de un secretario / asesor
+// ---------------------------------------------------------------------------
+
+export const CAMPOS_CAMBIAR_ROL_EQUIPO = ["perfilId", "rol", "motivo"] as const;
+export type CampoCambiarRolEquipo = (typeof CAMPOS_CAMBIAR_ROL_EQUIPO)[number];
+
+/** Roles a los que se puede pasar a alguien del equipo (la base valida además cuál cambio es posible). */
+export const ROLES_DESTINO_EQUIPO = ["asesor", "admin", "secretario"] as const;
+
+/** «Cambiar rol» de /admin/asesores: motivo obligatorio (5 a 300 caracteres, igual que la base). */
+export const esquemaCambiarRolEquipo = z.object({
+  perfilId: z.uuid({ error: "Falta la persona." }),
+  rol: z.enum(ROLES_DESTINO_EQUIPO, { error: "Elige el nuevo rol." }),
+  motivo: esquemaCambiarEstadoAsociado.shape.motivo,
+});
+
+// ---------------------------------------------------------------------------
 // Habilitar crédito tras un rechazo (§13.2)
 // ---------------------------------------------------------------------------
 

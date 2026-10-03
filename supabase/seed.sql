@@ -335,7 +335,7 @@ insert into public.solicitudes_afiliacion (
 -- ============================================================
 -- Secretario de prueba (rol secretario, migración 20261003100000).
 -- Cédula 1234567896 · correo secretario.prueba@greenalliance.test.
--- Ve el Resumen y las afiliaciones; no tiene ningún otro permiso.
+-- Ve el Resumen y las afiliaciones, ve Asociados y Créditos en solo lectura (sin tasa) y cambia el proceso ejecutivo; nada más.
 -- ============================================================
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,

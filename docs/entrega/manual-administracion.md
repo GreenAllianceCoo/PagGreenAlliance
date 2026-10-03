@@ -2,7 +2,7 @@
 
 **Para:** Ricardo Varón Penagos (representante legal) y las personas que la Cooperativa Green Alliance designe como administradores de la plataforma.
 **Sitio:** https://www.greenallianceco.com
-**Versión del manual:** 1 de octubre de 2026
+**Versión del manual:** 2 de octubre de 2026
 
 Este manual explica, paso a paso, cómo usar el panel de administración. No hace falta saber de programación.
 
@@ -26,6 +26,7 @@ Este manual explica, paso a paso, cómo usar el panel de administración. No hac
 14. Rol de secretario
 15. Qué ve el asociado
 16. Preguntas frecuentes
+17. Historial del equipo
 
 ---
 
@@ -66,6 +67,7 @@ En computador el menú está a la izquierda; en celular, en pestañas arriba. Ti
 | Alertas | Avisos de los asociados (retiro anticipado, renovación) |
 | Convenios | Empresas aliadas que se muestran en la página y en la cuenta del asociado |
 | Sorteo | Inscritos y boletas del sorteo mensual, y el botón para sortear |
+| Historial | Lo que hizo cada administrador y secretario (solo el administrador; sección 17) |
 | Demostración | Una cuenta de ejemplo para mostrar la plataforma sin datos reales |
 
 ---
@@ -330,7 +332,14 @@ Arriba de la lista dice si ya hay ganador del **bono de 50 asociados ($1.000.000
 
 **Interruptor «Atiende asociados».** Solo aparece en los administradores. Si está encendido, ese administrador aparece como asesor en el formulario de afiliación y puede tener clientes (es el caso de Ricardo). Un asesor normal siempre atiende.
 
-> Hoy **no existe** la opción de desactivar a un asesor. Si se necesita, hay que definir con el equipo técnico qué pasa con sus clientes.
+**Secretarios y cambio de rol.** En la fila de cada **secretario** hay dos botones (cada uno pide un **motivo** de 5 a 300 caracteres, que queda en el historial):
+
+- **«Desactivar» / «Reactivar»:** un secretario desactivado **pierde el acceso** al panel y no puede ingresar; al reactivarlo lo recupera. Es el mismo mecanismo de «cuenta inactiva» que usan los asociados dados de baja.
+- **«Cambiar rol»:** pasa al secretario a **asesor** o a **administrador**. En la fila de un **asesor** el botón lo pasa a **secretario** (si el asesor tiene clientes asignados, primero hay que reasignarlos y la plataforma lo avisa).
+
+Un administrador **no** puede cambiar su propio rol ni desactivarse: debe hacerlo otro administrador. Los demás cambios de rol (por ejemplo, de asesor a administrador) no están disponibles desde aquí.
+
+> Hoy **no existe** la opción de desactivar a un asesor o a un administrador (solo a los secretarios). Si se necesita, hay que definir con el equipo técnico qué pasa con sus clientes.
 
 ### 8.3 Cómo se calculan las comisiones
 
@@ -482,7 +491,7 @@ El asesor (también llamado «embajador») entra con su cédula y su código, y 
 
 - **Resumen:** sus cifras y el avance hacia los **premios** de 50 y 100 asociados. Si otro asesor ya ganó un premio, solo ve «Ya fue ganado», sin saber quién.
 - **Clientes:** la lista de **sus** asociados y afiliaciones referidas, con buscador y filtro por estado. Puede **buscar a un cliente por cédula** y ver su grado, su institución, el estado de su proceso ejecutivo y su **capacidad de endeudamiento** (cupo al 50 % y al 100 %). Nunca ve el celular, el correo, la cuenta ni las fotos del cliente, ni a los clientes de otros asesores.
-  - **Buscar en toda la cooperativa:** debajo del buscador anterior hay otro, para saber si una persona **ya es asociada y de quién es** (por ejemplo, antes de afiliar a alguien que otro asesor ya trajo). Se escribe un **nombre o una cédula** (mínimo **4 letras o 4 números**) y salen como máximo **10 personas**, cada una con solo tres datos: su **nombre**, su **cédula parcialmente oculta** y su **asesor** («Cooperativa» si la atiende la administración, o «Sin asesor»). **No** muestra estados, créditos, celular ni correo. Solo busca entre asociados activos, y tiene un límite de búsquedas por minuto (si lo supera, pide esperar un momento).
+  - **Buscar en toda la cooperativa:** debajo del buscador anterior hay otro, para saber si una persona **ya es asociada y de quién es** (por ejemplo, antes de afiliar a alguien que otro asesor ya trajo). Se escribe un **nombre o una cédula** (mínimo **4 letras o 4 números**) y salen como máximo **10 personas**, cada una con solo tres datos: su **nombre**, su **cédula parcialmente oculta** y su **asesor** (el **nombre** de quien lo atiende, sea asesor o administrador —por ejemplo «Ricardo»—, o «Sin asesor»). **No** muestra estados, créditos, celular ni correo. Solo busca entre asociados activos, y tiene un límite de búsquedas por minuto (si lo supera, pide esperar un momento).
 - **Comisiones:** el periodo actual (del 16 al 15), los **ingresos nuevos** y los **clientes operativos** con su valor, y el botón **«Acumulado ganado a la fecha»**, que muestra la suma de los pagos registrados por la cooperativa (oculta hasta que la toca). También tiene el enlace al **simulador de crédito**.
 
 El asesor **no puede** aprobar nada, cambiar estados ni registrar pagos.
@@ -491,33 +500,37 @@ El asesor **no puede** aprobar nada, cambiar estados ni registrar pagos.
 
 ## 14. Rol de secretario
 
-El **secretario** es una persona de apoyo que revisa las afiliaciones y consulta el Resumen, **sin** poder tocar nada más. Entra como todos, con su **cédula y el código** que le llega a su correo, y la plataforma lo lleva al panel de administración con un menú reducido.
+El **secretario** es una persona de apoyo que revisa las afiliaciones, consulta el Resumen y mira Asociados y Créditos **en solo lectura**. Entra como todos, con su **cédula y el código** que le llega a su correo, y la plataforma lo lleva al panel de administración con un menú reducido: **Resumen, Afiliaciones, Créditos y Asociados**.
 
 ### 14.1 Qué puede hacer
 
 - Ver el **Resumen** (las mismas cifras que el administrador).
 - Ver y **editar las afiliaciones**: revisar la ficha y las fotos, **marcar como contactado**, **aprobar** (crea la cuenta y envía el correo «Ingreso aceptado», igual que el administrador), **rechazar** y **asignar el asesor** a un asociado que todavía no tiene (no puede cambiar un asesor ya asignado). No puede corregir los datos que escribió el solicitante: la plataforma solo permite cambiar el estado.
+- Ver la lista de **Asociados** y la **ficha** de cada uno, y **cambiar el estado del proceso ejecutivo** y la **fecha de inicio del embargo**, igual que el administrador (queda en el historial del proceso con su nombre y la fecha). No puede cambiar el proceso de su propia cuenta.
+- Ver la lista de **Créditos** (pendientes, aprobados y rechazados) y el detalle de cada solicitud, **sin** botones de acción y **sin la tasa de interés** (igual que el asociado, que tampoco la ve).
 
 ### 14.2 Qué NO puede hacer
 
-- Eliminar a nadie, dar de baja o reactivar.
-- Entrar a **Créditos, Asociados, Asesores, Alertas, Convenios, Sorteo ni Demostración**: esas secciones **no aparecen** en su menú y, si escribe la dirección a mano, la plataforma lo devuelve al Resumen. Tampoco puede registrar pagos de comisión, hacer el sorteo, habilitar créditos ni cambiar el correo de ingreso de un asociado.
+- **Dar de baja ni reactivar** a un asociado, ni **eliminarlo definitivamente**.
+- **Habilitar un nuevo crédito**, **aprobar, rechazar o marcar el desembolso** de un crédito, ni **subir o ver comprobantes**.
+- **Cambiar el correo de ingreso** de un asociado, ni ver su foto del carné.
+- Entrar a **Asesores, Alertas, Convenios, Sorteo, Historial ni Demostración**: esas secciones **no aparecen** en su menú y, si escribe la dirección a mano, la plataforma lo devuelve al Resumen. Tampoco puede registrar pagos de comisión ni hacer el sorteo.
 - Cambiar su propio rol ni el de nadie.
 
-> Decisión de esta versión: el secretario **no** ve las listas de Asociados ni de Créditos, ni siquiera de solo lectura. Esas pantallas mezclan consulta con botones de acción (baja, eliminar, desembolso, correo) y datos delicados (tasa de interés); abrirlas en solo lectura exige rehacer las pantallas. Si la cooperativa lo pide, se puede agregar después.
+Los botones que no le corresponden **no se muestran**, y además la plataforma y la base de datos los rechazan aunque alguien intente usarlos por otro camino.
 
-### 14.3 Crear un secretario
+### 14.3 Crear, desactivar o cambiar el rol de un secretario
 
-Solo un **administrador**:
-1. Entre a **Asesores**.
-2. En **«Registrar secretario»**, llene cédula, correo, nombres y apellidos.
-3. Toque **«Registrar secretario»**.
+Solo un **administrador**, en **Asesores**:
+1. Para **crear**: en **«Registrar secretario»**, llene cédula, correo, nombres y apellidos y toque **«Registrar secretario»**. La persona entra con su cédula y el código que le llega a ese correo.
+2. Para **desactivar** (pierde el acceso) o **reactivar**: botón **«Desactivar»** / **«Reactivar»** en su fila, con un motivo obligatorio.
+3. Para **cambiar su rol** a asesor o administrador: botón **«Cambiar rol»**, con un motivo obligatorio. (Un asesor sin clientes también puede pasar a secretario.)
 
-La persona entra con su cédula y el código que le llega a ese correo. Hoy el rol se asigna al crear la persona; **no** hay botón para dar de baja a un secretario desde la plataforma (si hace falta, avise al equipo técnico).
+Un administrador no puede cambiar su propio rol ni desactivarse (sección 8.2).
 
 ### 14.4 Qué queda registrado
 
-Todo cambio de estado de una afiliación guarda **quién lo hizo, con qué rol y cuándo**; la asignación de asesor guarda quién y cuándo, y la creación de cada secretario guarda qué administrador lo creó y cuándo. Este registro está en la base de datos y lo consulta el equipo técnico a pedido de la cooperativa.
+Todo cambio de estado de una afiliación guarda **quién lo hizo, con qué rol y cuándo**; lo mismo los cambios del proceso ejecutivo, las asignaciones de asesor, las bajas y desactivaciones, y los cambios de rol (con su motivo). El administrador lo consulta, en lenguaje claro, en **Historial** (sección 17).
 
 ---
 
@@ -571,3 +584,25 @@ Hoy no se puede desde el panel. Pídalo al equipo técnico.
 
 **¿Dónde están las cifras de cupos y tasas?**
 Están configuradas en la base de datos según la presentación de negocio. Para cambiarlas hay que pedírselo al equipo técnico.
+
+---
+
+## 17. Historial del equipo
+
+Solo el **administrador** ve la sección **«Historial»** del menú. Muestra, en frases claras, **lo que hizo cada administrador, secretario y asesor**, con la fecha y la hora de Colombia, lo más reciente primero. Por ejemplo:
+
+> **Sofía Secretaria** · Aprobó la afiliación de Juan Pérez — Secretario · 2 oct 2026 10:15
+
+Aparecen estos movimientos:
+
+- afiliaciones: aprobada, rechazada, marcada como contactada;
+- cambios del **proceso ejecutivo** (con la fecha de inicio del embargo si se registró);
+- **asignaciones de asesor**;
+- **cambios de rol**, **desactivaciones** y **reactivaciones** del equipo, y **bajas** de asociados (con el motivo que escribió quien lo hizo);
+- créditos: aprobado, rechazado, desembolsado, habilitado y comprobante subido.
+
+**Filtros.** Arriba hay tres campos: **Persona** (elija a alguien del equipo o «Todas»), **Desde** y **Hasta** (días, ambos incluidos). Toque **«Filtrar»**; **«Quitar filtros»** vuelve a mostrar todo.
+
+**Páginas.** Se muestran 25 movimientos por página; abajo están **«Anterior»** y **«Siguiente»**, con el total de movimientos.
+
+> Los cambios de estado de afiliación y de rol se registran desde la publicación de esta versión (lo anterior no aparece), y las asignaciones de asesor hechas antes aparecen sin el nombre del asesor.

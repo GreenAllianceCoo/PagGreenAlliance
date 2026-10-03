@@ -12,7 +12,7 @@ type EncabezadoAdminProps = {
   seccion: Seccion;
   /** Alertas pendientes (pieza 3m): se ve como contador junto a «Alertas» en las pestañas de celular. */
   alertasPendientes?: number;
-  /** Un secretario solo ve «Resumen» y «Afiliaciones» (el servidor rechaza el resto). */
+  /** Un secretario solo ve Resumen, Afiliaciones, Créditos y Asociados (el servidor rechaza el resto). */
   rol?: "admin" | "secretario";
 };
 

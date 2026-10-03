@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { PanelCreditos, type FilaCreditoPanel } from "@/components/admin/PanelCreditos";
-import { exigirAdmin } from "@/lib/admin/servidor";
+import { exigirAdminOSecretario } from "@/lib/admin/servidor";
 import { cargarKpisAdmin } from "@/lib/admin/kpis";
 import { cargarPaquetesDemo } from "@/lib/asesor/cargarPaquetesDemo";
 import { formatearPesos } from "@/lib/cuenta";
@@ -30,9 +30,14 @@ type FilaCruda = {
   perfiles: { nombre_completo: string; cedula: string; telefono: string | null } | null;
 };
 
-/** Lista de solicitudes de crédito (pieza 2d): menú lateral, KPIs, búsqueda, lista + detalle. */
+/**
+ * Lista de solicitudes de crédito (pieza 2d): menú lateral, KPIs, búsqueda, lista + detalle.
+ * El secretario la ve en SOLO LECTURA: sin aprobar, rechazar, desembolsar ni comprobantes,
+ * y sin la tasa de interés (ni se le pide a la base: la RPC de tasas es solo admin).
+ */
 export default async function CreditosPage({ searchParams }: { searchParams: Promise<{ estado?: string }> }) {
-  const { supabase, nombre } = await exigirAdmin();
+  const { supabase, nombre, rol } = await exigirAdminOSecretario();
+  const soloLectura = rol === "secretario";
   const { estado: estadoCrudo } = await searchParams;
   const estado: Estado = esEstadoValido(estadoCrudo) ? estadoCrudo : "pendiente";
 
@@ -55,7 +60,8 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
       .eq("estado", estado)
       .order("fecha_solicitud", { ascending: false }),
     cargarKpisAdmin(supabase),
-    cargarPaquetesDemo(supabase, "admin_creditos_grados_fallo"),
+    // El secretario no tiene los topes (tabla_credito_con_tasa es solo admin): sin aviso de tope, sin error en el registro.
+    soloLectura ? Promise.resolve(null) : cargarPaquetesDemo(supabase, "admin_creditos_grados_fallo"),
   ]);
 
   const crudas = (data ?? []) as unknown as FilaCruda[];
@@ -64,7 +70,7 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
   // solicitudes_credito.tasa_interes_mensual por la API; el admin la pide con
   // esta RPC (solo admin), por los ids de la lista.
   const tasas = new Map<string, number>();
-  if (crudas.length > 0) {
+  if (!soloLectura && crudas.length > 0) {
     const { data: filasTasa, error: errorTasas } = await supabase.rpc("admin_tasas_solicitudes", {
       p_ids: crudas.map((f) => f.id),
     });
@@ -81,7 +87,7 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
     estado: f.estado,
     monto_solicitado: Number(f.monto_solicitado),
     porcentaje_devolucion: f.porcentaje_devolucion,
-    tasa_interes_mensual: tasas.get(f.id) ?? 0,
+    tasa_interes_mensual: soloLectura ? null : (tasas.get(f.id) ?? 0),
     grado: f.grado,
     fecha_solicitud: f.fecha_solicitud,
     fecha_respuesta: f.fecha_respuesta,
@@ -94,7 +100,7 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
   }));
 
   return (
-    <AdminShell nombre={nombre} seccion="creditos" contadorSeccionActual={estado === "pendiente" ? filas.length : undefined}>
+    <AdminShell nombre={nombre} seccion="creditos" rol={rol} contadorSeccionActual={estado === "pendiente" ? filas.length : undefined}>
       {error ? (
         <p className="m-0 rounded-12 bg-admin-superficie p-4 text-15 text-admin-rojo-2">
           No pudimos cargar las solicitudes. Intenta de nuevo.
@@ -104,6 +110,7 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
           filas={filas}
           estadoFiltro={estado}
           conteoFiltroActual={filas.length}
+          soloLectura={soloLectura}
           paquetesPorGrado={paquetesPorGrado ?? {}}
           kpis={{
             creditosPendientes: kpis.creditosPendientes,

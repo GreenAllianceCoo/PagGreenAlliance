@@ -177,7 +177,8 @@ select set_eq(
         'mis_premios_asesor', 'registrar_clic_premios', 'admin_premios_asesores', 'mi_carne_token', 'regenerar_carne_token', 'verificar_carne', 'admin_inscritos_sorteo',
                               'admin_registrar_cambio_correo', 'admin_rechazar_recuperacion', 'admin_validar_cambio_correo',
                               'admin_registrar_comprobante',
-                              'es_secretario', 'es_admin_o_secretario', 'secretario_asignar_asesor', 'buscar_asociados_general'],
+                              'es_secretario', 'es_admin_o_secretario', 'secretario_asignar_asesor', 'buscar_asociados_general',
+                              'admin_cambiar_rol_equipo', 'admin_historial_equipo'],
   'solo estas funciones security definer (que se validan solas) las ejecuta authenticated'
 );
 select is_empty(

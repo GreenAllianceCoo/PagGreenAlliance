@@ -9,6 +9,8 @@ import { erroresPorCampo } from "@/lib/validaciones/comunes";
 import {
   esquemaAnularPagoComision,
   esquemaAtiendeAsociados,
+  esquemaCambiarRolEquipo,
+  type CampoCambiarRolEquipo,
   esquemaEditarPagoComision,
   leerFormularioEditarPago,
   type CampoEditarPagoComision,
@@ -153,6 +155,58 @@ export async function registrarPagoComision(
 
   revalidatePath("/admin/asesores");
   return { mensaje: "Pago registrado." };
+}
+
+export type EstadoCambiarRolEquipo = {
+  errores?: Partial<Record<CampoCambiarRolEquipo, string>>;
+  error?: string;
+  mensaje?: string;
+};
+
+/** Textos de admin_cambiar_rol_equipo() listos para mostrar. */
+const MENSAJES_CAMBIO_ROL = [
+  "No puedes cambiar tu propio rol; debe hacerlo otro administrador",
+  "Ese cambio de rol no está permitido",
+  "Tiene clientes asignados; reasígnalos antes de pasarlo a secretario",
+  "La persona no existe",
+];
+
+/**
+ * «Cambiar rol» de un miembro del equipo (secretario a asesor o admin, asesor a
+ * secretario). Solo el admin, por la RPC admin_cambiar_rol_equipo: motivo obligatorio
+ * (5 a 300), nunca el propio rol, y queda en historial_cambio_rol con el motivo
+ * (se ve en «Historial del equipo»). Campos: perfilId, rol (el nuevo) y motivo.
+ */
+export async function cambiarRolEquipo(
+  _previo: EstadoCambiarRolEquipo,
+  formData: FormData,
+): Promise<EstadoCambiarRolEquipo> {
+  const { supabase, userId } = await exigirAdmin();
+
+  const resultado = esquemaCambiarRolEquipo.safeParse({
+    perfilId: textoDe(formData, "perfilId"),
+    rol: textoDe(formData, "rol"),
+    motivo: textoDe(formData, "motivo"),
+  });
+  if (!resultado.success) {
+    return { errores: erroresPorCampo<CampoCambiarRolEquipo>(resultado.error) };
+  }
+  const { perfilId, rol, motivo } = resultado.data;
+  if (perfilId === userId) return { error: "No puedes cambiar tu propio rol; debe hacerlo otro administrador." };
+
+  const { error } = await supabase.rpc("admin_cambiar_rol_equipo", { p_perfil_id: perfilId, p_rol: rol, p_motivo: motivo });
+  if (error) {
+    const conocido = MENSAJES_CAMBIO_ROL.find((m) => error.message?.includes(m));
+    if (!conocido) {
+      registrar("error", { evento: "admin_cambiar_rol_equipo_fallo", codigo: error.code, mensaje: error.message });
+    }
+    return { error: conocido ? `${conocido}.` : "No pudimos guardar el cambio. Intenta de nuevo." };
+  }
+
+  revalidatePath("/admin/asesores");
+  revalidatePath("/admin/historial");
+  revalidatePath("/afiliacion");
+  return { mensaje: "Rol cambiado." };
 }
 
 export type EstadoAtiendeAsociados = { error?: string; mensaje?: string };
