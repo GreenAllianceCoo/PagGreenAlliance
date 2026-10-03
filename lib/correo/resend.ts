@@ -34,11 +34,14 @@ export async function enviarPlantillaResend({
   para,
   plantilla,
   variables,
+  asunto,
   responderA,
 }: {
   para: string | string[];
   plantilla: string;
   variables: VariablesPlantilla;
+  /** Se manda siempre que se tenga: si la plantilla de Resend no trae asunto por defecto, Resend responde 422. */
+  asunto?: string;
   responderA?: string;
 }) {
   const llave = process.env.RESEND_API_KEY;
@@ -51,6 +54,7 @@ export async function enviarPlantillaResend({
     body: JSON.stringify({
       from: remitente,
       to: Array.isArray(para) ? para : [para],
+      ...(asunto ? { subject: asunto } : {}),
       template: { id: plantilla, variables: escaparVariables(variables) },
       ...(responderA ? { reply_to: responderA } : {}),
     }),
@@ -121,7 +125,7 @@ export async function enviarConRespaldo({
   const plantilla = process.env[variablePlantilla];
   if (plantilla) {
     try {
-      await enviarPlantillaResend({ para: lista, plantilla, variables, responderA });
+      await enviarPlantillaResend({ para: lista, plantilla, variables, asunto, responderA });
       return "plantilla";
     } catch (error) {
       registrar("warn", {
