@@ -26,6 +26,8 @@ const SECRETARIO = { cedula: "1234567896", correo: "secretario.prueba@greenallia
 const ADMIN = { cedula: "1234567899", correo: "admin.prueba@greenalliance.test" };
 const ASESOR = { cedula: "1234567892", correo: "asesor.prueba@greenalliance.test" };
 const ID_SECRETARIO = "5ec7e7a2-1b9d-4c0e-8a3f-6d2b7c9e4f10";
+/** Asociada «Sin Solicitudes» (seed.sql, cédula 1234567891). */
+const ID_ASOCIADO_2 = "7d1f0c2a-3b4e-4f5a-8b6c-9d0e1f2a3b4c";
 
 async function ingresar(page: Page, cedula: string, correo: string, destino: string) {
   await limpiarLimites();
@@ -64,6 +66,7 @@ test.describe.configure({ mode: "serial" });
 const cedulaSolicitud = cedulaUnica();
 let idSolicitud = "";
 let cedulaNuevoSecretario = "";
+let nombreNuevoSecretario = "";
 
 test.beforeAll(async () => {
   const { cuerpo } = await adminRest("solicitudes_afiliacion", {
@@ -102,11 +105,13 @@ test.afterAll(async () => {
   }
 });
 
-test("el secretario entra a /admin y su menú solo tiene Resumen y Afiliaciones", async ({ browser }, testInfo) => {
+test("el secretario entra a /admin y su menú tiene Resumen, Afiliaciones, Créditos y Asociados", async ({ browser }, testInfo) => {
   const page = await sesion(browser, testInfo, SECRETARIO, "/admin");
   await expect(page.getByRole("heading", { name: "Resumen de clientes" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Afiliaciones" }).first()).toBeAttached();
-  for (const oculto of ["Créditos", "Asociados", "Asesores", "Alertas", "Convenios", "Sorteo", "Demostración"]) {
+  for (const visible of ["Afiliaciones", "Créditos", "Asociados"]) {
+    await expect(page.getByRole("link", { name: visible, exact: true }).first()).toBeAttached();
+  }
+  for (const oculto of ["Asesores", "Alertas", "Convenios", "Sorteo", "Historial", "Demostración"]) {
     await expect(page.getByRole("link", { name: oculto, exact: true })).toHaveCount(0);
   }
   // Sin enlaces a Sorteo ni Alertas dentro del Resumen.
@@ -115,10 +120,62 @@ test("el secretario entra a /admin y su menú solo tiene Resumen y Afiliaciones"
 
 test("las rutas de admin que no son suyas lo devuelven a /admin (servidor)", async ({ browser }, testInfo) => {
   const page = await sesion(browser, testInfo, SECRETARIO, "/admin");
-  for (const ruta of ["creditos", "asociados", "asesores", "alertas", "convenios", "sorteo", "demo"]) {
+  for (const ruta of ["asesores", "alertas", "convenios", "sorteo", "demo", "historial"]) {
     await page.goto(`/admin/${ruta}`);
     await page.waitForURL(/\/admin$/);
     await expect(page.getByRole("heading", { name: "Resumen de clientes" })).toBeVisible();
+  }
+});
+
+test("Créditos en solo lectura: sin aprobar, rechazar, desembolsar ni tasa de interés", async ({ browser }, testInfo) => {
+  const page = await sesion(browser, testInfo, SECRETARIO, "/admin");
+  for (const estado of ["pendiente", "aprobado", "rechazado"]) {
+    await page.goto(`/admin/creditos?estado=${estado}`);
+    await expect(page.getByRole("heading", { name: "Créditos" })).toBeVisible();
+    for (const accion of [/^Aprobar/, /^Rechazar/, /Marcar desembolsado/, /comprobante/i]) {
+      await expect(page.getByRole("button", { name: accion })).toHaveCount(0);
+    }
+    await expect(page.getByText(/% mensual|mensual$/)).toHaveCount(0);
+  }
+});
+
+test("Asociados: el secretario ve la ficha y cambia el proceso ejecutivo, sin baja, eliminar, habilitar ni correo", async ({ browser }, testInfo) => {
+  const page = await sesion(browser, testInfo, SECRETARIO, "/admin");
+  const { cuerpo: antes } = await adminRest(
+    `procesos_ejecutivos?select=estado,fecha_inicio_embargo&asociado_id=eq.${ID_ASOCIADO_2}`,
+  );
+  const original = (antes as { estado: string; fecha_inicio_embargo: string | null }[])[0];
+  try {
+    await page.goto("/admin/asociados");
+    await expect(page.getByRole("heading", { name: "Asociados" })).toBeVisible();
+    await page.getByLabel("Buscar por nombre o cédula").fill("Sin Solicitudes");
+    await page.keyboard.press("Enter");
+    await page.getByRole("link", { name: /Asociada Sin Solicitudes/ }).click();
+    await page.waitForURL(`**/admin/asociados/${ID_ASOCIADO_2}`);
+
+    // Lo que NO le toca.
+    await expect(page.getByRole("button", { name: /Dar de baja|Reactivar/ })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /Habilitar crédito/ })).toHaveCount(0);
+    await expect(page.getByText("Eliminar definitivamente")).toHaveCount(0);
+    await expect(page.getByText(/correo de ingreso/i)).toHaveCount(0);
+    await expect(page.getByText("Estado de la cuenta")).toHaveCount(0);
+
+    // Lo que SÍ: el proceso ejecutivo.
+    await page.getByLabel("Estado del proceso ejecutivo").selectOption("terminado");
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await expect(page.getByText("Proceso actualizado.")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(/Cambió el proceso a «Terminado»/).first()).toBeVisible({ timeout: 15_000 });
+
+    const { cuerpo } = await adminRest(
+      `historial_proceso_ejecutivo?select=admin_id,estado_nuevo&asociado_id=eq.${ID_ASOCIADO_2}&estado_nuevo=eq.terminado`,
+    );
+    expect((cuerpo as unknown[]).length).toBeGreaterThanOrEqual(1);
+    for (const fila of cuerpo as { admin_id: string }[]) expect(fila.admin_id).toBe(ID_SECRETARIO);
+  } finally {
+    await adminRest(`procesos_ejecutivos?asociado_id=eq.${ID_ASOCIADO_2}`, {
+      method: "PATCH",
+      body: JSON.stringify({ estado: original.estado, fecha_inicio_embargo: original.fecha_inicio_embargo }),
+    });
   }
 });
 
@@ -146,13 +203,43 @@ test("el secretario revisa una afiliación: la marca contactada y queda en el hi
 test("la base rechaza lo que el secretario no puede hacer (API directa con su sesión)", async () => {
   const token = await tokenDeUsuario(SECRETARIO.correo);
 
-  // Lectura: afiliaciones sí; créditos, pagos y el historial de roles no.
+  // Lectura: afiliaciones y créditos sí (sin tasa); pagos y el historial de roles no.
   const afil = await usuarioRest(`solicitudes_afiliacion?select=id&id=eq.${idSolicitud}`, token);
   expect((afil.cuerpo as unknown[]).length).toBe(1);
-  for (const tabla of ["solicitudes_credito", "pagos_comision", "historial_cambio_rol"]) {
+  const creditos = await usuarioRest("solicitudes_credito?select=id,monto_solicitado&limit=1", token);
+  expect(creditos.status).toBe(200);
+  expect((creditos.cuerpo as unknown[]).length).toBe(1);
+  const tasa = await usuarioRest("solicitudes_credito?select=tasa_interes_mensual&limit=1", token);
+  expect(tasa.status).toBeGreaterThanOrEqual(400);
+  for (const tabla of ["pagos_comision", "historial_cambio_rol", "historial_solicitudes", "historial_estado_asociado"]) {
     const r = await usuarioRest(`${tabla}?select=id&limit=1`, token);
     expect(r.cuerpo, tabla).toEqual([]);
   }
+  // Créditos: ni aprobar, ni desembolsar, ni ver las tasas con la función del admin.
+  const aprobar = await usuarioRest("solicitudes_credito?estado=eq.pendiente", token, {
+    method: "PATCH",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({ estado: "aprobado" }),
+  });
+  if (aprobar.status < 300) expect(aprobar.cuerpo).toEqual([]);
+  const desembolso = await usuarioRest("rpc/admin_marcar_desembolsado", token, {
+    method: "POST",
+    body: JSON.stringify({ p_solicitud_id: "00000000-0000-4000-a000-000000000000" }),
+  });
+  expect(desembolso.status).toBeGreaterThanOrEqual(400);
+  const habilitar = await usuarioRest("rpc/admin_habilitar_credito", token, {
+    method: "POST",
+    body: JSON.stringify({ p_asociado_id: ID_ASOCIADO_2, p_motivo: "No debe poder" }),
+  });
+  expect(habilitar.status).toBeGreaterThanOrEqual(400);
+  // Cambiar el rol de alguien o ver el historial del equipo: solo admin.
+  const cambiarRol = await usuarioRest("rpc/admin_cambiar_rol_equipo", token, {
+    method: "POST",
+    body: JSON.stringify({ p_perfil_id: ID_SECRETARIO, p_rol: "asesor", p_motivo: "No debe poder" }),
+  });
+  expect(cambiarRol.status).toBeGreaterThanOrEqual(400);
+  const historial = await usuarioRest("rpc/admin_historial_equipo", token, { method: "POST", body: "{}" });
+  expect(historial.status).toBeGreaterThanOrEqual(400);
 
   // Escritura: nada de perfiles, convenios ni pagos.
   const rol = await usuarioRest(`perfiles?id=eq.${ID_SECRETARIO}`, token, {
@@ -202,9 +289,11 @@ test("un admin crea un secretario desde /admin/asesores y queda en el historial 
   await page.getByLabel("Cédula del secretario").fill(cedulaNuevoSecretario);
   await page.getByLabel("Correo del secretario").fill(`nuevo.sec.${cedulaNuevoSecretario}@prueba.test`);
   await page.getByLabel("Nombres del secretario").fill("Nuria");
-  await page.getByLabel("Apellidos del secretario").fill("Secretaria Nueva");
+  const sufijo = [...cedulaNuevoSecretario.slice(-5)].map((d) => "ABCDEFGHIJ"[Number(d)]).join("");
+  nombreNuevoSecretario = `Nuria Secretaria ${sufijo}`;
+  await page.getByLabel("Apellidos del secretario").fill(`Secretaria ${sufijo}`);
   await page.getByRole("button", { name: "Registrar secretario" }).click();
-  await expect(page.getByText(/Secretario «Nuria Secretaria Nueva» creado/)).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText(new RegExp(`Secretario «${nombreNuevoSecretario}» creado`))).toBeVisible({ timeout: 20_000 });
 
   const { cuerpo } = await adminRest(`perfiles?select=id,rol&cedula=eq.${cedulaNuevoSecretario}`);
   const perfil = (cuerpo as { id: string; rol: string }[])[0];
@@ -220,6 +309,108 @@ test("el formulario de secretario muestra errores por campo y no envía vacío",
   await page.getByRole("button", { name: "Registrar secretario" }).click();
   await expect(page.locator("#secretario-cedula-error")).toBeVisible();
   await expect(page.locator("#secretario-cedula")).toBeFocused();
+});
+
+// ---------------------------------------------------------------------------
+// Equipo: cambiar rol, desactivar, e «Historial del equipo» (solo admin)
+// ---------------------------------------------------------------------------
+
+test("el admin cambia el rol de un secretario (con motivo) y de vuelta; el motivo es obligatorio", async ({ browser }, testInfo) => {
+  const page = await sesion(browser, testInfo, ADMIN, "/admin");
+  await page.goto("/admin/asesores");
+  const nombre = nombreNuevoSecretario;
+
+  // Sin motivo: error por campo con aria-describedby y foco.
+  await page.getByRole("button", { name: `Cambiar rol de ${nombre}` }).click();
+  const dialogo = page.getByRole("dialog");
+  await dialogo.getByLabel("Nuevo rol").selectOption("asesor");
+  await dialogo.getByRole("button", { name: "Cambiar rol", exact: true }).click();
+  const motivo = dialogo.getByLabel(/^Motivo/);
+  await expect(motivo).toBeFocused();
+  await expect(motivo).toHaveAttribute("aria-invalid", "true");
+  await expect(dialogo.getByRole("alert")).toContainText("El motivo debe tener entre 5 y 300 caracteres");
+
+  // Con motivo: pasa a asesor.
+  await motivo.fill("Pasa a atender asociados");
+  await dialogo.getByRole("button", { name: "Cambiar rol", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0, { timeout: 15_000 });
+  const fila = page.getByRole("listitem").filter({ hasText: nombre });
+  await expect(fila).toContainText("Asesor");
+  const { cuerpo: perfiles } = await adminRest(`perfiles?select=id,rol&cedula=eq.${cedulaNuevoSecretario}`);
+  expect((perfiles as { rol: string }[])[0].rol).toBe("asesor");
+  const { cuerpo: hist } = await adminRest(
+    `historial_cambio_rol?select=rol_anterior,rol_nuevo,motivo&perfil_id=eq.${(perfiles as { id: string }[])[0].id}&order=created_at`,
+  );
+  expect(hist).toMatchObject([
+    { rol_anterior: "asociado", rol_nuevo: "secretario" },
+    { rol_anterior: "secretario", rol_nuevo: "asesor", motivo: "Pasa a atender asociados" },
+  ]);
+
+  // Y de vuelta a secretario (un asesor sin clientes).
+  await page.getByRole("button", { name: `Cambiar rol de ${nombre}` }).click();
+  await page.getByRole("dialog").getByLabel("Nuevo rol").selectOption("secretario");
+  await page.getByRole("dialog").getByLabel(/^Motivo/).fill("Vuelve a la secretaría");
+  await page.getByRole("dialog").getByRole("button", { name: "Cambiar rol", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0, { timeout: 15_000 });
+  await expect(fila).toContainText("Secretario");
+});
+
+test("el admin desactiva y reactiva a un secretario; un admin no se ve los botones a sí mismo", async ({ browser }, testInfo) => {
+  const page = await sesion(browser, testInfo, ADMIN, "/admin");
+  await page.goto("/admin/asesores");
+  const nombre = nombreNuevoSecretario;
+  const fila = page.getByRole("listitem").filter({ hasText: nombre });
+
+  await page.getByRole("button", { name: `Desactivar a ${nombre}` }).click();
+  await page.getByRole("dialog").getByLabel(/^Motivo/).fill("Deja de colaborar");
+  await page.getByRole("dialog").getByRole("button", { name: "Desactivar", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0, { timeout: 15_000 });
+  await expect(fila).toContainText("Inactivo");
+  const { cuerpo } = await adminRest(`perfiles?select=activo&cedula=eq.${cedulaNuevoSecretario}`);
+  expect(cuerpo).toEqual([{ activo: false }]);
+
+  await page.getByRole("button", { name: `Reactivar a ${nombre}` }).click();
+  await page.getByRole("dialog").getByLabel(/^Motivo/).fill("Vuelve a colaborar");
+  await page.getByRole("dialog").getByRole("button", { name: "Reactivar", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0, { timeout: 15_000 });
+  await expect(fila).not.toContainText("Inactivo");
+
+  // El admin en sesión no tiene botones sobre sí mismo.
+  const propia = page.getByRole("listitem").filter({ hasText: "Administrador" }).filter({ hasText: "1234567899" });
+  await expect(propia.getByRole("button", { name: /Cambiar rol|Desactivar/ })).toHaveCount(0);
+});
+
+test("Historial del equipo: lo que hicieron secretario y admin, con filtros y en español", async ({ browser }, testInfo) => {
+  const page = await sesion(browser, testInfo, ADMIN, "/admin");
+  const { cuerpo: adm } = await adminRest("perfiles?select=id&cedula=eq.1234567899");
+  const idAdmin = (adm as { id: string }[])[0].id;
+
+  await page.goto("/admin/historial");
+  await expect(page.getByRole("heading", { name: "Historial del equipo" })).toBeVisible();
+  const lista = page.getByTestId("historial-equipo");
+  await expect(lista).toContainText("Marcó como contactada la afiliación de Persona Para Secretaria");
+  await expect(lista).toContainText("Secretaria de Prueba");
+  await expect(lista).toContainText(`Cambió el rol de ${nombreNuevoSecretario} de secretario a asesor`);
+  await expect(lista).toContainText("Motivo: Pasa a atender asociados");
+  await expect(lista).toContainText(`Desactivó a ${nombreNuevoSecretario} (secretario)`);
+  await expect(lista).toContainText(/\d{1,2} (ene|feb|mar|abr|may|jun|jul|ago|sep|oct|nov|dic) \d{4} \d{2}:\d{2}/);
+
+  // Por persona: solo la secretaria.
+  await page.goto(`/admin/historial?persona=${ID_SECRETARIO}`);
+  await expect(lista).toContainText("Secretaria de Prueba");
+  await expect(lista).not.toContainText("Cambió el rol de Nuria");
+  // Por persona: el admin.
+  await page.goto(`/admin/historial?persona=${idAdmin}`);
+  await expect(lista).toContainText(`Cambió el rol de ${nombreNuevoSecretario}`);
+  await expect(lista).not.toContainText("Marcó como contactada");
+
+  // Por fechas: un día lejano no trae nada.
+  await page.goto("/admin/historial");
+  await page.getByLabel("Desde").fill("2030-01-01");
+  await page.getByRole("button", { name: "Filtrar" }).click();
+  await expect(page.getByText("No hay movimientos con esos filtros.")).toBeVisible();
+  await page.getByRole("link", { name: "Quitar filtros" }).click();
+  await expect(page.getByTestId("historial-equipo")).toBeVisible();
 });
 
 // ---------------------------------------------------------------------------
@@ -256,6 +447,21 @@ test("el asesor busca en toda la cooperativa: solo nombre, cédula enmascarada y
   await expect(resultados).not.toContainText("1234567891");
   await expect(resultados).not.toContainText("sin.solicitudes@");
   await expect(resultados).not.toContainText("3001234567");
+
+  // Si lo atiende un administrador, se ve el nombre del administrador (no «Cooperativa»).
+  const { cuerpo: adm } = await adminRest("perfiles?select=id,nombre_completo&cedula=eq.1234567899");
+  const admin = (adm as { id: string; nombre_completo: string }[])[0];
+  try {
+    await adminRest(`perfiles?id=eq.${admin.id}`, { method: "PATCH", body: JSON.stringify({ atiende_asociados: true }) });
+    await adminRest(`perfiles?id=eq.${ID_ASOCIADO_2}`, { method: "PATCH", body: JSON.stringify({ asesor_id: admin.id }) });
+    await buscador.fill("1234567891");
+    await page.getByRole("button", { name: "Buscar", exact: true }).last().click();
+    await expect(resultados).toContainText(admin.nombre_completo);
+    await expect(resultados).not.toContainText("Cooperativa");
+  } finally {
+    await adminRest(`perfiles?id=eq.${ID_ASOCIADO_2}`, { method: "PATCH", body: JSON.stringify({ asesor_id: null }) });
+    await adminRest(`perfiles?id=eq.${admin.id}`, { method: "PATCH", body: JSON.stringify({ atiende_asociados: false }) });
+  }
 
   // Por nombre, de un asociado suyo: se ve el nombre del asesor.
   await buscador.fill("Asociado de Prueba");

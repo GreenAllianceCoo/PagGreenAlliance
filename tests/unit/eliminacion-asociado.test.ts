@@ -207,11 +207,13 @@ describe("confirmarEliminacionAsociado", () => {
     );
 
   it("código correcto: anonimiza, borra archivos y usuario de Auth, y cierra la limpieza", async () => {
-    responde({ resultado: "ok", archivos: ["afiliacion-documentos/solicitudes/a/f.jpg", "comprobantes-desembolso/s/c.pdf"] });
+    responde({ resultado: "ok", archivos: ["afiliacion-documentos/solicitudes/a/f.jpg", "fotos-carne/u/c.jpg"] });
     const r = await confirmarEliminacionAsociado({}, entrada());
     expect(r.mensaje).toBe("Asociado eliminado definitivamente.");
     expect(m.remove).toHaveBeenCalledWith("afiliacion-documentos", ["solicitudes/a/f.jpg"]);
-    expect(m.remove).toHaveBeenCalledWith("comprobantes-desembolso", ["s/c.pdf"]);
+    expect(m.remove).toHaveBeenCalledWith("fotos-carne", ["u/c.jpg"]);
+    // Los comprobantes de desembolso NO se borran aquí: se guardan 30 días (los borra la tarea programada).
+    expect(m.remove).not.toHaveBeenCalledWith("comprobantes-desembolso", expect.anything());
     expect(m.deleteUser).toHaveBeenCalledWith(ASOCIADO);
     expect(m.rpc).toHaveBeenCalledWith("admin_cerrar_limpieza_eliminacion", { p_admin_id: ADMIN, p_solicitud_id: SOLICITUD });
     const args = m.rpc.mock.calls.find((c) => c[0] === "admin_confirmar_eliminacion")![1] as Record<string, string>;

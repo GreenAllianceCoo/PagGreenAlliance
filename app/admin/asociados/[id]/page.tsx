@@ -2,36 +2,58 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { ComprobantesPorBorrar, type ComprobantePorBorrar } from "@/components/admin/ComprobantesPorBorrar";
+import { fechaBogotaDeInstante } from "@/lib/fechas";
 import { CorreoIngresoAsociado } from "@/components/admin/CorreoIngresoAsociado";
 import { DetalleProcesoAsociado } from "@/components/admin/DetalleProcesoAsociado";
 import { EliminarAsociado } from "@/components/admin/EliminarAsociado";
 import { IconoVolver } from "@/components/ui/Iconos";
-import { exigirAdmin } from "@/lib/admin/servidor";
+import { exigirAdminOSecretario } from "@/lib/admin/servidor";
 import { urlFotoCarneDeAsociado } from "@/lib/carneFoto";
 import { cargarDetalleProceso } from "@/lib/admin/asociados";
 import { cargarCorreoIngresoAsociado } from "@/lib/admin/recuperaciones";
 
 export const metadata: Metadata = { title: "Asociado · Admin · Green Alliance" };
 
-/** Detalle del asociado: proceso ejecutivo, inicio del embargo e historial (pieza 3m). */
+/**
+ * Detalle del asociado: proceso ejecutivo, inicio del embargo e historial (pieza 3m).
+ * El secretario la ve en solo lectura salvo el proceso ejecutivo: sin baja, eliminar, habilitar
+ * crédito, correo de ingreso, foto del carné ni comprobantes (el servidor y la base lo impiden).
+ */
 export default async function DetalleAsociadoPage({ params }: { params: Promise<{ id: string }> }) {
-  const { supabase, nombre, userId } = await exigirAdmin();
+  const { supabase, nombre, userId, rol } = await exigirAdminOSecretario();
+  const esAdmin = rol === "admin";
   const { id } = await params;
-  const detalle = await cargarDetalleProceso(supabase, id);
+  const detalle = await cargarDetalleProceso(supabase, id, { incluirHabilitar: esAdmin });
   if (!detalle) notFound();
   const { asociado } = detalle;
-  const correoIngreso = asociado.eliminado
+  const correoIngreso = asociado.eliminado || !esAdmin
     ? { pendiente: null, historial: [] }
     : await cargarCorreoIngresoAsociado(supabase, id, userId);
   // Foto del carné (propia o la selfie de la afiliación): URL firmada corta, solo para el admin.
-  const fotoCarne = asociado.eliminado || asociado.rol !== "asociado" ? null : await urlFotoCarneDeAsociado(asociado.id);
+  const fotoCarne = !esAdmin || asociado.eliminado || asociado.rol !== "asociado" ? null : await urlFotoCarneDeAsociado(asociado.id);
+  // Comprobantes de desembolso del eliminado: se guardan 30 días y solo el admin los ve.
+  let comprobantesPorBorrar: ComprobantePorBorrar[] = [];
+  if (esAdmin && asociado.eliminado) {
+    const { data } = await supabase
+      .from("solicitudes_credito")
+      .select("id, comprobante_borrar_at")
+      .eq("asociado_id", id)
+      .not("comprobante_borrar_at", "is", null)
+      .not("comprobante_subido_at", "is", null)
+      .order("comprobante_borrar_at");
+    comprobantesPorBorrar = (data ?? []).map((s) => {
+      const [anio, mes, dia] = fechaBogotaDeInstante(s.comprobante_borrar_at as string).split("-");
+      return { solicitudId: s.id as string, borrarEl: `${dia}/${mes}/${anio}` };
+    });
+  }
   // El admin mueve el proceso de sus propios clientes (pedido de Sebas, 1-oct); solo el suyo no.
   const procesoBloqueado = asociado.id === userId;
   // El cambio de correo de ingreso sigue exigiendo otro admin para sus clientes (toma de cuentas).
   const correoBloqueado = procesoBloqueado || asociado.asesorId === userId;
 
   return (
-    <AdminShell nombre={nombre} seccion="asociados">
+    <AdminShell nombre={nombre} seccion="asociados" rol={rol}>
       <div className="flex items-center gap-3">
         <Link
           href="/admin/asociados"
@@ -47,14 +69,17 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
         </h1>
       </div>
       {asociado.eliminado ? (
-        <p role="status" className="m-0 max-w-[640px] rounded-20 bg-admin-superficie p-5.5 text-15 leading-150 text-admin-texto-2">
-          <strong className="text-admin-texto">Asociado eliminado.</strong> Sus datos personales se borraron; solo se conservan
-          sus cifras (créditos, pagos y comisiones) y el registro de quién lo eliminó y por qué.
-        </p>
+        <>
+          <p role="status" className="m-0 max-w-[640px] rounded-20 bg-admin-superficie p-5.5 text-15 leading-150 text-admin-texto-2">
+            <strong className="text-admin-texto">Asociado eliminado.</strong> Sus datos personales se borraron; solo se conservan
+            sus cifras (créditos, pagos y comisiones) y el registro de quién lo eliminó y por qué.
+          </p>
+          {esAdmin && comprobantesPorBorrar.length > 0 ? <ComprobantesPorBorrar comprobantes={comprobantesPorBorrar} /> : null}
+        </>
       ) : (
         <div className="flex max-w-[640px] flex-col gap-4">
-          <DetalleProcesoAsociado detalle={detalle} bloqueado={procesoBloqueado} />
-          {asociado.rol === "asociado" ? (
+          <DetalleProcesoAsociado detalle={detalle} bloqueado={procesoBloqueado} soloProceso={!esAdmin} />
+          {esAdmin && asociado.rol === "asociado" ? (
             <section aria-labelledby="titulo-foto-carne" className="flex items-center gap-4 rounded-20 bg-admin-superficie p-5.5">
               {fotoCarne ? (
                 // URL firmada de Storage (caduca en minutos): no pasa por next/image.
@@ -82,15 +107,17 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
               </div>
             </section>
           ) : null}
-          <CorreoIngresoAsociado
-            asociadoId={asociado.id}
-            nombre={asociado.nombre}
-            pendiente={correoIngreso.pendiente}
-            historial={correoIngreso.historial}
-            bloqueado={correoBloqueado}
-          />
+          {esAdmin ? (
+            <CorreoIngresoAsociado
+              asociadoId={asociado.id}
+              nombre={asociado.nombre}
+              pendiente={correoIngreso.pendiente}
+              historial={correoIngreso.historial}
+              bloqueado={correoBloqueado}
+            />
+          ) : null}
           {/* Pedido de Sebas (1-oct): anonimizar al asociado dado de baja. Asesores y admins no se eliminan por aquí. */}
-          {asociado.rol === "asociado" ? (
+          {esAdmin && asociado.rol === "asociado" ? (
             <section className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5.5">
               <h2 className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Eliminar definitivamente</h2>
               <EliminarAsociado

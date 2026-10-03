@@ -44,7 +44,7 @@ export async function avisarCorreoInstitucional(
 
     if (plantilla) {
       try {
-        await enviarPlantillaResend({ para: [para], plantilla, variables: { URL_INGRESO: enlace } });
+        await enviarPlantillaResend({ para: [para], plantilla, variables: { URL_INGRESO: enlace }, asunto: ASUNTO_AVISO_INSTITUCIONAL });
         return;
       } catch (error) {
         registrar("warn", {

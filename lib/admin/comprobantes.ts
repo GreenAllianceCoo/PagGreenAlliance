@@ -57,6 +57,7 @@ const MENSAJES_COMPROBANTE = [
   "El archivo del comprobante no se encontró",
   "La ruta del comprobante no es válida",
   "Solo un administrador puede subir comprobantes",
+  "Este asociado ya fue eliminado; su comprobante ya no se puede cambiar",
 ];
 
 export type ResultadoComprobante = { ok: true } | { ok: false; error: string };

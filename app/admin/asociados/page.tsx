@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AdminShell } from "@/components/admin/AdminShell";
-import { exigirAdmin } from "@/lib/admin/servidor";
+import { exigirAdminOSecretario } from "@/lib/admin/servidor";
 import { listarAsociadosConProceso } from "@/lib/admin/asociados";
 import { enmascararCedula } from "@/lib/mascara";
 import { ESTADOS_PROCESO } from "@/lib/procesoEjecutivo";
 
 export const metadata: Metadata = { title: "Asociados · Admin · Green Alliance" };
 
-/** Lista de asociados con el estado de su proceso ejecutivo (pieza 3m). */
+/** Lista de asociados con el estado de su proceso ejecutivo (pieza 3m). La ven admin y secretario. */
 export default async function AsociadosPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const { supabase, nombre } = await exigirAdmin();
+  const { supabase, nombre, rol } = await exigirAdminOSecretario();
   const { q = "" } = await searchParams;
   const { filas, error } = await listarAsociadosConProceso(supabase);
   const texto = q.trim().toLowerCase();
@@ -20,7 +20,7 @@ export default async function AsociadosPage({ searchParams }: { searchParams: Pr
     : filas;
 
   return (
-    <AdminShell nombre={nombre} seccion="asociados">
+    <AdminShell nombre={nombre} seccion="asociados" rol={rol}>
       <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Asociados</h1>
       <form role="search" className="flex">
         <label htmlFor="buscar-asociado" className="sr-only">

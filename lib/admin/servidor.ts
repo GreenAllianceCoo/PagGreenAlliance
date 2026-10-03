@@ -2,7 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-/** Roles que entran a /admin. El secretario ve solo Resumen y Afiliaciones. */
+/** Roles que entran a /admin. El secretario ve Resumen y Afiliaciones, y Créditos y Asociados en solo lectura (en Asociados cambia el proceso ejecutivo). */
 export type RolPanel = "admin" | "secretario";
 
 async function leerSesionPanel() {

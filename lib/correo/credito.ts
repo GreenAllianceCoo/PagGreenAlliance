@@ -72,12 +72,12 @@ export async function enviarDesembolsoCredito(datos: {
     await enviarConRespaldo({
       para: datos.correo,
       variablePlantilla: "RESEND_TEMPLATE_CREDITO_DESEMBOLSADO",
-      // COMPROBANTE solo viaja cuando hay comprobante (la plantilla de Resend puede incluir {{{COMPROBANTE}}}).
+      // COMPROBANTE viaja SIEMPRE (vacía si no hay comprobante): en Resend toda variable sin valor por defecto es obligatoria.
       variables: {
         NOMBRE: datos.nombre,
         MONTO: monto,
         FECHA: datos.fechaTexto,
-        ...(datos.conComprobante ? { COMPROBANTE: textoComprobante } : {}),
+        COMPROBANTE: textoComprobante,
       },
       asunto: "Tu crédito de Green Alliance fue desembolsado",
       texto: [

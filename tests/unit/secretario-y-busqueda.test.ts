@@ -6,7 +6,7 @@ import {
   MENSAJE_BUSQUEDA_CORTA,
   normalizarTextoBusqueda,
 } from "@/lib/validaciones/asesor";
-import { esquemaCrearAsesor, leerFormularioAsesor } from "@/lib/validaciones/admin";
+import { esquemaCambiarRolEquipo, esquemaCrearAsesor, leerFormularioAsesor } from "@/lib/validaciones/admin";
 
 describe("normalizarTextoBusqueda", () => {
   it("quita espacios sobrantes en los nombres", () => {
@@ -87,14 +87,43 @@ describe("rol al crear equipo (esquemaCrearAsesor)", () => {
 });
 
 describe("menú por rol", () => {
-  it("el secretario solo ve Resumen y Afiliaciones", () => {
-    expect(seccionesDelRol("secretario").map((s) => s.clave)).toEqual(["resumen", "afiliaciones"]);
-    expect([...SECCIONES_SECRETARIO]).toEqual(["resumen", "afiliaciones"]);
+  it("el secretario ve Resumen, Afiliaciones, Créditos y Asociados (y nada más)", () => {
+    expect(seccionesDelRol("secretario").map((s) => s.clave)).toEqual(["resumen", "afiliaciones", "creditos", "asociados"]);
+    expect([...SECCIONES_SECRETARIO]).toEqual(["resumen", "afiliaciones", "creditos", "asociados"]);
+  });
+  it("el Historial del equipo es solo del admin", () => {
+    expect(seccionesDelRol("secretario").map((s) => s.clave)).not.toContain("historial");
+    expect(seccionesDelRol("admin").map((s) => s.clave)).toContain("historial");
   });
   it("el admin ve todas", () => {
     const claves = seccionesDelRol("admin").map((s) => s.clave);
     for (const c of ["resumen", "afiliaciones", "creditos", "asociados", "asesores", "alertas", "convenios", "sorteo"]) {
       expect(claves).toContain(c);
     }
+  });
+});
+
+describe("esquemaCambiarRolEquipo", () => {
+  const base = { perfilId: "5ec7e7a2-1b9d-4c0e-8a3f-6d2b7c9e4f10", rol: "asesor", motivo: "  Pasa a atender   asociados " };
+  it("acepta un cambio válido y recorta el motivo", () => {
+    const r = esquemaCambiarRolEquipo.safeParse(base);
+    expect(r.success && r.data.motivo).toBe("Pasa a atender asociados");
+  });
+  it("acepta los tres roles del equipo", () => {
+    for (const rol of ["asesor", "admin", "secretario"]) expect(esquemaCambiarRolEquipo.safeParse({ ...base, rol }).success).toBe(true);
+  });
+  it("rechaza roles que no son del equipo", () => {
+    for (const rol of ["asociado", "superadmin", ""]) expect(esquemaCambiarRolEquipo.safeParse({ ...base, rol }).success).toBe(false);
+  });
+  it("exige el motivo (5 a 300 caracteres)", () => {
+    for (const motivo of ["", "   ", "abc", "a".repeat(301)]) {
+      const r = esquemaCambiarRolEquipo.safeParse({ ...base, motivo });
+      expect(r.success).toBe(false);
+      if (!r.success) expect(r.error.issues[0].message).toBe("El motivo debe tener entre 5 y 300 caracteres.");
+    }
+    expect(esquemaCambiarRolEquipo.safeParse({ ...base, motivo: "a".repeat(300) }).success).toBe(true);
+  });
+  it("rechaza una persona que no es un uuid", () => {
+    expect(esquemaCambiarRolEquipo.safeParse({ ...base, perfilId: "123" }).success).toBe(false);
   });
 });
