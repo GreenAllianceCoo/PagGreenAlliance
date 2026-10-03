@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { FormularioAsesor } from "@/components/admin/FormularioAsesor";
+import { GestionEquipo } from "@/components/admin/GestionEquipo";
 import { InterruptorAtiende } from "@/components/admin/InterruptorAtiende";
 import { FormularioPagoComision, ListaPagosComision } from "@/components/admin/PagosComision";
 import { exigirAdmin } from "@/lib/admin/servidor";
@@ -72,6 +73,7 @@ export default async function AsesoresPage() {
                   <span className="text-16 font-extrabold text-white">{a.nombre}</span>
                   <span className="text-13 text-admin-texto-3">
                     Cédula {a.cedula} · {a.rol === "admin" ? "Administrador" : a.rol === "secretario" ? "Secretario" : "Asesor"}
+                    {a.activo ? "" : " · Inactivo"}
                   </span>
                   <span className="text-14 text-admin-texto-2">
                     {a.clientes} {a.clientes === 1 ? "cliente" : "clientes"} · {a.afiliaciones}{" "}
@@ -91,14 +93,18 @@ export default async function AsesoresPage() {
                     );
                   })()}
                 </div>
-                {a.rol === "admin" ? (
-                  <InterruptorAtiende perfilId={a.id} nombre={a.nombre} atiende={a.atiendeAsociados} />
-                ) : null}
+                <div className="flex flex-col items-start gap-2 sm:items-end">
+                  {a.rol === "admin" ? (
+                    <InterruptorAtiende perfilId={a.id} nombre={a.nombre} atiende={a.atiendeAsociados} />
+                  ) : null}
+                  {/* Secretarios: desactivar/reactivar y cambiar rol; asesores: pasar a secretario. Nunca el propio. */}
+                  <GestionEquipo perfilId={a.id} nombre={a.nombre} rol={a.rol} activo={a.activo} esPropio={a.id === userId} />
+                </div>
               </li>
             ))}
           </ul>
         )}
-        {/* TODO(pendiente-spec): desactivar un asesor (no hay columna «activo» ni regla definida). */}
+        {/* TODO(pendiente-spec): desactivar un asesor o un admin (solo está definido para secretarios). */}
       </section>
 
       <FormularioPagoComision asesores={quienesCobran} periodos={opcionesPeriodoCorte(hoyBogota())} />

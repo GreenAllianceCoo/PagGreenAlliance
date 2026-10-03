@@ -16,7 +16,16 @@ const INICIAL: EstadoActualizarProceso = {};
  * RS-01: `bloqueado` = el admin en sesión es el asesor de este asociado (o es él mismo):
  * otro administrador debe cambiar el proceso (la base también lo impide).
  */
-export function DetalleProcesoAsociado({ detalle, bloqueado = false }: { detalle: Detalle; bloqueado?: boolean }) {
+export function DetalleProcesoAsociado({
+  detalle,
+  bloqueado = false,
+  soloProceso = false,
+}: {
+  detalle: Detalle;
+  bloqueado?: boolean;
+  /** Secretario: solo cambia el proceso ejecutivo (sin baja/reactivar ni habilitar crédito). */
+  soloProceso?: boolean;
+}) {
   const [toast, setToast] = useState<string | null>(null);
   const [estado, despachar] = useActionState(async (p: EstadoActualizarProceso, f: FormData) => {
     const r = await actualizarProcesoEjecutivo(p, f);
@@ -45,7 +54,7 @@ export function DetalleProcesoAsociado({ detalle, bloqueado = false }: { detalle
           id="proceso-estado"
           label="Estado del proceso ejecutivo"
           error={estado.errores?.estado}
-          ayuda="Solo el admin lo cambia; el asociado lo ve en su perfil, sin poder editarlo."
+          ayuda="Solo el equipo de la cooperativa lo cambia; el asociado lo ve en su perfil, sin poder editarlo."
         >
           {(c) => (
             <SelectAdmin {...c} name="estado" defaultValue={detalle.estado ?? "reparto"} disabled={bloqueado}>
@@ -84,21 +93,23 @@ export function DetalleProcesoAsociado({ detalle, bloqueado = false }: { detalle
         </BotonAdmin>
       </form>
 
-      {/* §12.6 (pieza 3q): dar de baja / reactivar con motivo obligatorio. */}
-      <div className="flex flex-col gap-2.5 border-t border-admin-borde-sutil pt-4">
-        <h2 className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Estado de la cuenta</h2>
-        <BajaAsociado
-          key={String(asociado.activo)}
-          asociadoId={asociado.id}
-          nombre={asociado.nombre}
-          activo={asociado.activo}
-          bloqueado={bloqueado}
-          onResuelto={setToast}
-        />
-      </div>
+      {/* §12.6 (pieza 3q): dar de baja / reactivar con motivo obligatorio. Solo admin. */}
+      {soloProceso ? null : (
+        <div className="flex flex-col gap-2.5 border-t border-admin-borde-sutil pt-4">
+          <h2 className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Estado de la cuenta</h2>
+          <BajaAsociado
+            key={String(asociado.activo)}
+            asociadoId={asociado.id}
+            nombre={asociado.nombre}
+            activo={asociado.activo}
+            bloqueado={bloqueado}
+            onResuelto={setToast}
+          />
+        </div>
+      )}
 
-      {/* §13.2: solo si la última solicitud está rechazada y sin habilitar. */}
-      {detalle.puedeHabilitarCredito ? (
+      {/* §13.2: solo si la última solicitud está rechazada y sin habilitar. Solo admin. */}
+      {!soloProceso && detalle.puedeHabilitarCredito ? (
         <div className="flex flex-col gap-2.5 border-t border-admin-borde-sutil pt-4">
           <h2 className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Crédito</h2>
           <HabilitarCredito asociadoId={asociado.id} nombre={asociado.nombre} bloqueado={bloqueado} onResuelto={setToast} />

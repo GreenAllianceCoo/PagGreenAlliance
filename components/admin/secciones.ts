@@ -14,13 +14,15 @@ export const SECCIONES = [
   { href: "/admin/alertas", etiqueta: "Alertas", clave: "alertas" },
   { href: "/admin/convenios", etiqueta: "Convenios", clave: "convenios" },
   { href: "/admin/sorteo", etiqueta: "Sorteo", clave: "sorteo" },
+  // Solo admin: lo que hizo cada admin y secretario (afiliaciones, procesos, roles, créditos).
+  { href: "/admin/historial", etiqueta: "Historial", clave: "historial" },
   { href: "/admin/demo", etiqueta: "Demostración", clave: "demo" },
 ] as const;
 
 export type Seccion = (typeof SECCIONES)[number]["clave"];
 
-/** Lo único que ve un secretario en el menú (el servidor además rechaza el resto). */
-export const SECCIONES_SECRETARIO: readonly Seccion[] = ["resumen", "afiliaciones"];
+/** Lo que ve un secretario en el menú: Créditos y Asociados en solo lectura (el servidor además rechaza el resto). */
+export const SECCIONES_SECRETARIO: readonly Seccion[] = ["resumen", "afiliaciones", "creditos", "asociados"];
 
 /** Secciones que muestra el menú según el rol. */
 export function seccionesDelRol(rol: "admin" | "secretario") {

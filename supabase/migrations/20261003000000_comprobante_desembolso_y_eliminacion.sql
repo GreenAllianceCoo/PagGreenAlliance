@@ -13,14 +13,7 @@
 --     * admin_registrar_comprobante(): admin, solo si ya hay desembolso, no en su
 --       propio crédito, la ruta debe ser de esa solicitud y existir en el bucket.
 --       Deja historial (subido / reemplazado) y devuelve la ruta anterior para
---       que el servidor borre el archivo viejo. No acepta créditos de un asociado
---       ya eliminado.
---     * solicitudes_credito.comprobante_borrar_at: fecha de borrado programado. La
---       pone la eliminación definitiva (eliminado_at + 30 días); mientras tanto el
---       comprobante sigue en Storage, accesible SOLO al admin (el asociado ya no existe).
---     * Tarea programada (app/api/cron/limpiar-fotos): comprobantes_vencidos() +
---       liberar_comprobantes() borran los vencidos; comprobantes_huerfanos() lista los
---       archivos subidos y nunca ligados con más de 24 h. Todas SOLO service_role.
+--       que el servidor borre el archivo viejo.
 --
 --  B. Eliminar definitivamente = ANONIMIZAR a un asociado (conserva la contabilidad)
 --     * perfiles.eliminado_at. La fila de perfiles se queda (créditos, pagos,
@@ -29,9 +22,7 @@
 --       sin celular, correo institucional ni cuenta de nómina.
 --     * Se borran: su afiliación (solicitudes_afiliacion con su cédula), sus
 --       solicitudes de recuperación de acceso, su token de carné y (por el servidor)
---       las fotos de Storage y el usuario de Auth. Los COMPROBANTES DE DESEMBOLSO no se
---       borran de inmediato: se guardan 30 días (comprobante_borrar_at) y la tarea
---       programada los borra al vencer (decisión de Sebas, 2-oct).
+--       las fotos de Storage y el usuario de Auth.
 --     * perfiles.id ya NO referencia a auth.users (si no, borrar el usuario de Auth
 --       arrastraría el perfil y sus cifras). La cascada se conserva con el trigger
 --       tr_perfil_al_borrar_usuario: borrar un usuario de Auth sigue borrando su
@@ -68,11 +59,7 @@ on conflict (id) do update set
 alter table public.solicitudes_credito
   add column if not exists comprobante_path        text,
   add column if not exists comprobante_subido_at   timestamptz,
-  add column if not exists comprobante_subido_por  uuid references public.perfiles (id),
-  add column if not exists comprobante_borrar_at   timestamptz;
-
-comment on column public.solicitudes_credito.comprobante_borrar_at is
-  'Borrado programado del comprobante (eliminación definitiva del asociado + 30 días). La tarea programada lo borra de Storage y limpia la referencia al vencer.';
+  add column if not exists comprobante_subido_por  uuid references public.perfiles (id);
 
 comment on column public.solicitudes_credito.comprobante_path is
   'Ruta en el bucket comprobantes-desembolso («<solicitud>/<uuid>.<ext>»). No se concede a authenticated: el servidor la lee con service role.';
@@ -97,10 +84,7 @@ begin
   end if;
 end $$;
 
-grant select (comprobante_subido_at, comprobante_borrar_at) on public.solicitudes_credito to authenticated;
-
-create index if not exists ix_solicitudes_comprobante_borrar_at
-  on public.solicitudes_credito (comprobante_borrar_at) where comprobante_borrar_at is not null;
+grant select (comprobante_subido_at) on public.solicitudes_credito to authenticated;
 
 -- ------------------------------------------------------------
 -- A.3 RPC del admin: registrar / reemplazar el comprobante
@@ -132,9 +116,6 @@ begin
   end if;
   if v_sol.asociado_id = auth.uid() then
     raise exception 'No puede subir el comprobante de su propio crédito; debe hacerlo otro administrador';
-  end if;
-  if exists (select 1 from public.perfiles pe where pe.id = v_sol.asociado_id and pe.eliminado_at is not null) then
-    raise exception 'Este asociado ya fue eliminado; su comprobante ya no se puede cambiar';
   end if;
   if p_ruta !~ ('^' || p_solicitud_id::text || '/[0-9a-f-]{36}\.(jpg|png|webp|pdf)$') then
     raise exception 'La ruta del comprobante no es válida';
@@ -462,14 +443,18 @@ begin
   perform public.validar_eliminacion_asociado(p_admin_id, v_sol.asociado_id);
   select * into v_perfil from public.perfiles p where p.id = v_sol.asociado_id for update;
 
-  -- Archivos de Storage a borrar ya (afiliación), antes de limpiar las filas.
-  -- Los comprobantes de desembolso NO van aquí: se guardan 30 días (más abajo).
+  -- Archivos de Storage a borrar (afiliación y comprobantes), antes de limpiar las filas.
   v_archivos :=
     coalesce((
       select array_agg('afiliacion-documentos/' || regexp_replace(f.ruta, '^afiliacion-documentos/', ''))
         from public.solicitudes_afiliacion sa
         cross join lateral unnest(array[sa.foto_cedula_frente, sa.foto_cedula_reverso, sa.foto_selfie]) as f(ruta)
        where sa.cedula = v_perfil.cedula and f.ruta is not null
+    ), '{}'::text[])
+    || coalesce((
+      select array_agg('comprobantes-desembolso/' || sc.comprobante_path)
+        from public.solicitudes_credito sc
+       where sc.asociado_id = v_perfil.id and sc.comprobante_path is not null
     ), '{}'::text[]);
 
   -- Datos personales fuera.
@@ -479,9 +464,8 @@ begin
   update public.historial_cambio_correo_ingreso h
      set motivo = 'Registro anonimizado'
    where h.perfil_id = v_perfil.id;
-  -- Comprobantes de desembolso: se conservan 30 días, solo visibles al admin; luego los borra la tarea programada.
   update public.solicitudes_credito sc
-     set comprobante_borrar_at = now() + interval '30 days'
+     set comprobante_path = null, comprobante_subido_at = null
    where sc.asociado_id = v_perfil.id and sc.comprobante_path is not null;
 
   update public.perfiles p
@@ -525,66 +509,3 @@ as $$
 $$;
 revoke all on function public.admin_cerrar_limpieza_eliminacion(uuid, uuid) from public, anon, authenticated;
 grant execute on function public.admin_cerrar_limpieza_eliminacion(uuid, uuid) to service_role;
-
--- ------------------------------------------------------------
--- C. Tarea programada: borrar comprobantes vencidos y huérfanos (SOLO service_role)
--- ------------------------------------------------------------
--- Comprobantes de asociados eliminados cuyo plazo de 30 días ya venció.
-create or replace function public.comprobantes_vencidos(p_limite integer default 200)
-returns table (solicitud_id uuid, ruta text)
-language sql
-stable
-security definer
-set search_path = ''
-as $$
-  select s.id, s.comprobante_path
-    from public.solicitudes_credito s
-   where s.comprobante_path is not null
-     and s.comprobante_borrar_at is not null
-     and s.comprobante_borrar_at <= now()
-   order by s.comprobante_borrar_at, s.id
-   limit greatest(coalesce(p_limite, 200), 0);
-$$;
-revoke all on function public.comprobantes_vencidos(integer) from public, anon, authenticated;
-grant execute on function public.comprobantes_vencidos(integer) to service_role;
-
--- Después de borrar el archivo de Storage: limpia la referencia (solo si ya venció).
-create or replace function public.liberar_comprobantes(p_solicitud_ids uuid[])
-returns integer
-language plpgsql
-security definer
-set search_path = ''
-as $$
-declare
-  v_n integer;
-begin
-  update public.solicitudes_credito s
-     set comprobante_path = null, comprobante_subido_at = null, comprobante_borrar_at = null
-   where s.id = any (coalesce(p_solicitud_ids, '{}'::uuid[]))
-     and s.comprobante_borrar_at is not null
-     and s.comprobante_borrar_at <= now();
-  get diagnostics v_n = row_count;
-  return v_n;
-end;
-$$;
-revoke all on function public.liberar_comprobantes(uuid[]) from public, anon, authenticated;
-grant execute on function public.liberar_comprobantes(uuid[]) to service_role;
-
--- Archivos subidos y nunca ligados a una solicitud, con más de 24 h.
-create or replace function public.comprobantes_huerfanos(p_limite integer default 500)
-returns table (name text)
-language sql
-stable
-security definer
-set search_path = ''
-as $$
-  select o.name
-    from storage.objects o
-   where o.bucket_id = 'comprobantes-desembolso'
-     and o.created_at < now() - interval '24 hours'
-     and not exists (select 1 from public.solicitudes_credito s where s.comprobante_path = o.name)
-   order by o.created_at, o.name
-   limit greatest(coalesce(p_limite, 500), 0);
-$$;
-revoke all on function public.comprobantes_huerfanos(integer) from public, anon, authenticated;
-grant execute on function public.comprobantes_huerfanos(integer) to service_role;

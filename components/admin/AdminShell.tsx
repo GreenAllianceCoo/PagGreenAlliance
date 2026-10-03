@@ -21,7 +21,7 @@ type AdminShellProps = {
    * fila «KPIs del admin» — para ga-funcionalidad-botones).
    */
   contadorSeccionActual?: number;
-  /** Un secretario ve un menú reducido (Resumen y Afiliaciones). Por defecto, admin. */
+  /** Un secretario ve un menú reducido (Resumen, Afiliaciones, Créditos y Asociados). Por defecto, admin. */
   rol?: "admin" | "secretario";
   children: ReactNode;
 };
@@ -35,6 +35,7 @@ const TONO_CHIP: Record<Seccion, string> = {
   asesores: "bg-admin-superficie-2 text-admin-texto-2",
   convenios: "bg-admin-superficie-2 text-admin-texto-2",
   sorteo: "bg-admin-superficie-2 text-admin-texto-2",
+  historial: "bg-admin-superficie-2 text-admin-texto-2",
   demo: "bg-admin-superficie-2 text-admin-texto-2",
 };
 

@@ -80,7 +80,7 @@ export type ResultadoBusquedaGeneral = {
   nombre: string;
   /** «2.9••.•••.002» (la base ya la enmascara; nunca llega completa). */
   cedulaEnmascarada: string;
-  /** Nombre del asesor, «Cooperativa» o «Sin asesor». */
+  /** Nombre de quien lo atiende (asesor o administrador, p. ej. «Ricardo») o «Sin asesor». */
   asesor: string;
 };
 

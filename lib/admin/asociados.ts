@@ -105,6 +105,8 @@ export type DetalleProcesoAsociado = {
 export async function cargarDetalleProceso(
   supabase: SupabaseClient,
   asociadoId: string,
+  /** El secretario no habilita créditos: no se consulta el historial de solicitudes (solo lo lee el admin). */
+  opciones: { incluirHabilitar?: boolean } = {},
 ): Promise<DetalleProcesoAsociado | null> {
   const [{ data: perfil }, { data: proceso }, { data: historial }, { data: ultimas }] = await Promise.all([
     supabase.from("perfiles").select("id, nombre_completo, cedula, grado, institucion, asesor_id, activo, rol, eliminado_at").eq("id", asociadoId).maybeSingle(),
@@ -127,7 +129,7 @@ export async function cargarDetalleProceso(
   // §13.2: ¿la última está rechazada y sin habilitar? (el historial solo lo lee el admin)
   const ultima = ultimas?.[0] as { id: string; estado: string } | undefined;
   let puedeHabilitarCredito = false;
-  if (ultima?.estado === "rechazado") {
+  if (opciones.incluirHabilitar !== false && ultima?.estado === "rechazado") {
     const { data: habilitada } = await supabase
       .from("historial_solicitudes")
       .select("id")

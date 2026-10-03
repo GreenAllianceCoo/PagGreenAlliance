@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
-import { exigirAdmin } from "@/lib/admin/servidor";
+import { exigirAdmin, exigirAdminOSecretario } from "@/lib/admin/servidor";
 import { correoDeCedula } from "@/lib/ingreso/servidor";
 import { enviarCreditoHabilitado } from "@/lib/correo/credito";
 import { destinatariosAviso } from "@/lib/correo/destinatarios";
@@ -44,7 +44,7 @@ const MENSAJES_DE_LA_BASE = [
 /**
  * Selector «Estado del proceso ejecutivo» + «Fecha de inicio del embargo»
  * del detalle del asociado (spec-requerimientos-ricardo §3.6–§3.7 y §6,
- * pieza 3m). Solo el admin; escribe SOLO por la RPC
+ * pieza 3m). Admin o secretario (decisión de Sebas, 2-oct); escribe SOLO por la RPC
  * admin_actualizar_proceso_ejecutivo (la tabla no tiene privilegios de
  * escritura para authenticated) y el historial lo deja un trigger con la
  * fecha y el admin. Fecha vacía = conservar la actual (o hoy, al pasar a
@@ -54,7 +54,7 @@ export async function actualizarProcesoEjecutivo(
   _previo: EstadoActualizarProceso,
   formData: FormData,
 ): Promise<EstadoActualizarProceso> {
-  const { supabase } = await exigirAdmin();
+  const { supabase } = await exigirAdminOSecretario();
 
   const resultado = esquemaActualizarProceso.safeParse({
     asociadoId: textoDe(formData, "asociadoId"),
@@ -139,6 +139,8 @@ export async function cambiarEstadoAsociado(
 
   revalidatePath("/admin/asociados");
   revalidatePath(`/admin/asociados/${asociadoId}`);
+  revalidatePath("/admin/asesores"); // también sirve para desactivar o reactivar a un secretario
+  revalidatePath("/admin/historial");
   return { mensaje: activo ? "Asociado reactivado." : "Asociado dado de baja." };
 }
 

@@ -23,7 +23,8 @@ export type FilaCreditoPanel = {
   estado: EstadoCredito;
   monto_solicitado: number;
   porcentaje_devolucion: "50" | "100";
-  tasa_interes_mensual: number;
+  /** null = no se muestra (el secretario no ve la tasa). */
+  tasa_interes_mensual: number | null;
   grado: string;
   fecha_solicitud: string;
   fecha_respuesta: string | null;
@@ -67,6 +68,8 @@ type Props = {
   conteoFiltroActual: number;
   /** Topes reales de `grados_credito` (vacío si no se pudieron leer: sin aviso de tope; RS-08: sin copia de respaldo). */
   paquetesPorGrado: Partial<Record<CodigoGrado, PaqueteDemo[]>>;
+  /** Secretario: solo mira. Sin aprobar, rechazar, desembolsar, comprobantes ni atajos A/R. */
+  soloLectura?: boolean;
   kpis: {
     creditosPendientes: number;
     afiliacionesPendientes: number;
@@ -80,7 +83,7 @@ type Props = {
  * estado, lista + detalle en la misma vista, aprobar en 2 pasos, rechazar
  * con motivo obligatorio, toast y atajos J/K/A/R/Esc.
  */
-export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquetesPorGrado, kpis }: Props) {
+export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquetesPorGrado, soloLectura = false, kpis }: Props) {
   const [busqueda, setBusqueda] = useState("");
   const filtradas = useMemo(() => filas.filter((f) => coincideBusqueda(busqueda, f.nombre, f.cedula)), [filas, busqueda]);
 
@@ -200,6 +203,7 @@ export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquete
             key={seleccionado.id}
             fila={seleccionado}
             paquetesPorGrado={paquetesPorGrado}
+            soloLectura={soloLectura}
             onResuelto={(mensaje) => setToast(mensaje)}
           />
         ) : (
@@ -219,10 +223,12 @@ export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquete
 function DetalleCredito({
   fila,
   paquetesPorGrado,
+  soloLectura,
   onResuelto,
 }: {
   fila: FilaCreditoPanel;
   paquetesPorGrado: Partial<Record<CodigoGrado, PaqueteDemo[]>>;
+  soloLectura: boolean;
   onResuelto: (mensaje: string) => void;
 }) {
   const [paso, setPaso] = useState<"idle" | "aprobar" | "rechazar">("idle");
@@ -244,13 +250,13 @@ function DetalleCredito({
         setPaso("idle");
         return;
       }
-      if (enCampo || fila.estado !== "pendiente") return;
+      if (enCampo || soloLectura || fila.estado !== "pendiente") return;
       if (e.key === "a" || e.key === "A") setPaso("aprobar");
       else if (e.key === "r" || e.key === "R") setPaso("rechazar");
     }
     window.addEventListener("keydown", alTeclado);
     return () => window.removeEventListener("keydown", alTeclado);
-  }, [fila.estado]);
+  }, [fila.estado, soloLectura]);
 
   const tope = topeDelPaquete(paquetesPorGrado, fila.grado, fila.porcentaje_devolucion);
   const dentroDelTope = tope !== undefined ? fila.monto_solicitado <= tope : undefined;
@@ -288,9 +294,11 @@ function DetalleCredito({
           <span className="rounded-full bg-admin-superficie-2 px-[11px] py-1.5 text-13 font-bold">
             {fila.porcentaje_devolucion}%
           </span>
-          <span className="rounded-full bg-admin-superficie-2 px-[11px] py-1.5 text-13 font-bold">
-            {formatTasa(Number(fila.tasa_interes_mensual))} mensual
-          </span>
+          {fila.tasa_interes_mensual === null ? null : (
+            <span className="rounded-full bg-admin-superficie-2 px-[11px] py-1.5 text-13 font-bold">
+              {formatTasa(Number(fila.tasa_interes_mensual))} mensual
+            </span>
+          )}
         </div>
       </div>
 
@@ -301,7 +309,7 @@ function DetalleCredito({
       ) : dentroDelTope === false ? (
         <div className="rounded-14 bg-admin-rojo-fondo p-3.5 text-14 leading-145 text-admin-rojo-claro">
           <strong className="text-admin-rojo-2">Supera el tope por {formatearPesos(fila.monto_solicitado - tope!)}.</strong>{" "}
-          Tope del grado: {formatearPesos(tope!)}. No se puede aprobar; recházala con el motivo.
+          Tope del grado: {formatearPesos(tope!)}.{soloLectura ? "" : " No se puede aprobar; recházala con el motivo."}
         </div>
       ) : null}
 
@@ -309,11 +317,13 @@ function DetalleCredito({
         <>
           <p className="m-0 rounded-14 bg-admin-superficie-2 p-3.5 text-14 text-admin-texto-2">
             {fila.estado === "aprobado"
-              ? "Este crédito ya fue aprobado. No hay más acciones disponibles."
+              ? soloLectura
+                ? "Este crédito ya fue aprobado."
+                : "Este crédito ya fue aprobado. No hay más acciones disponibles."
               : `Rechazado${fila.motivo_rechazo ? `. Motivo: ${fila.motivo_rechazo}` : "."}`}
           </p>
-          {/* §12.2 (pieza 3q): la única acción que queda en un crédito aprobado. */}
-          {fila.estado === "aprobado" ? (
+          {/* §12.2 (pieza 3q): la única acción que queda en un crédito aprobado. El secretario no la ve. */}
+          {fila.estado === "aprobado" && !soloLectura ? (
             <MarcarDesembolsado
               solicitudId={fila.id}
               fechaDesembolso={fila.fecha_desembolso}
@@ -322,6 +332,10 @@ function DetalleCredito({
             />
           ) : null}
         </>
+      ) : soloLectura ? (
+        <p className="m-0 rounded-14 bg-admin-superficie-2 p-3.5 text-14 text-admin-texto-2">
+          Pendiente de revisión por la administración.
+        </p>
       ) : paso === "idle" ? (
         <div className="grid grid-cols-2 gap-2.5">
           <button

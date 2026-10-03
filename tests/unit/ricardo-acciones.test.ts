@@ -30,6 +30,7 @@ vi.mock("@/lib/supabase/admin", () => ({ crearClienteAdmin: vi.fn() }));
 vi.mock("@/lib/correo/alertas", () => ({ avisarAdminsDeAlerta: m.avisarAdmins }));
 vi.mock("@/lib/admin/servidor", () => ({
   exigirAdmin: vi.fn(async () => ({ supabase: m.cliente, userId: m.adminId, nombre: "Admin" })),
+  exigirAdminOSecretario: vi.fn(async () => ({ supabase: m.cliente, userId: m.adminId, nombre: "Admin", rol: "admin" })),
 }));
 vi.mock("@/lib/asesor/servidor", () => ({
   exigirAsesor: vi.fn(async () => ({ supabase: m.cliente, userId: "asesor-1", nombre: "Asesor", rol: "asesor" })),

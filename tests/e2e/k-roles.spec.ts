@@ -124,7 +124,7 @@ test("admin entra a /admin y aprueba la afiliación de ejemplo (2 pasos)", async
 
   await page.goto("/admin/creditos");
   await expect(page.getByText("Asociado de Prueba").first()).toBeVisible();
-  for (const ruta of ["/admin/asesores", "/admin/sorteo"]) {
+  for (const ruta of ["/admin/asesores", "/admin/sorteo", "/admin/historial"]) {
     const r = await page.goto(ruta);
     expect(r?.status()).toBe(200);
   }
