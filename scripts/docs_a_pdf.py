@@ -8,6 +8,7 @@ Lee docs/entrega/*.md y docs/entrega/privado/*.md y deja cada PDF junto a su .md
 Los .md son la fuente editable; los PDF son lo que se entrega.
 """
 import glob
+import io
 import os
 import re
 
@@ -28,6 +29,13 @@ FUENTES = [
     ("Simbolos", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", False, False),
     ("Simbolos", "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", True, False),
     ("Mono", "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", False, False),
+    # Windows nativo (sin WSL).
+    ("Cuerpo", "C:/Windows/Fonts/arial.ttf", False, False),
+    ("Cuerpo", "C:/Windows/Fonts/arialbd.ttf", True, False),
+    ("Cuerpo", "C:/Windows/Fonts/ariali.ttf", False, True),
+    ("Cuerpo", "C:/Windows/Fonts/arialbi.ttf", True, True),
+    ("Simbolos", "C:/Windows/Fonts/seguisym.ttf", False, False),
+    ("Mono", "C:/Windows/Fonts/consola.ttf", False, False),
 ]
 
 CSS = f"""
@@ -89,7 +97,8 @@ def generar(ruta_md):
     titulo, html_doc = a_html(texto)
     arch, caras = archivo_fuentes()
     story = pymupdf.Story(html=html_doc, user_css=caras + CSS, archive=arch)
-    temporal = ruta_md[:-3] + ".tmp.pdf"
+    # En memoria: en Windows un archivo temporal queda bloqueado por el escritor.
+    temporal = io.BytesIO()
     escritor = pymupdf.DocumentWriter(temporal)
     pagina = pymupdf.paper_rect("letter")
     marco = pagina + (54, 54, -54, -60)
@@ -104,7 +113,7 @@ def generar(ruta_md):
     escritor.close()
 
     # Pie de página con título y numeración.
-    doc = pymupdf.open(temporal)
+    doc = pymupdf.open("pdf", temporal.getvalue())
     total = len(doc)
     corto = titulo if len(titulo) <= 70 else titulo[:67] + "…"
     for i, p in enumerate(doc):
@@ -124,7 +133,6 @@ def generar(ruta_md):
     salida = ruta_md[:-3] + ".pdf"
     doc.save(salida, garbage=3, deflate=True)
     doc.close()
-    os.remove(temporal)
     print(f"{salida}: {total} páginas")
 
 

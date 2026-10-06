@@ -131,7 +131,7 @@ Siempre en cuentas **a nombre de LA COOPERATIVA** (cláusula décima), nunca en 
 | Semanales | Las últimas **8** (dos meses) |
 | Antes de migración | **3 meses** desde la migración |
 | Mensuales | **12 meses** |
-| Respaldo de entrega final | Mientras la cooperativa lo considere necesario (mínimo durante la garantía de 90 días) |
+| Respaldo de entrega final | Mientras la cooperativa lo considere necesario (mínimo durante la garantía de 30 días) |
 
 Al borrar respaldos vencidos, borrarlos de las dos ubicaciones. Si la política de tratamiento de datos de la cooperativa fija plazos distintos, prevalece la política.
 
