@@ -11,7 +11,7 @@ import { CamposSolicitud, formatoCOP } from "@/components/cuenta/CamposSolicitud
 import { TarjetaTope } from "@/components/cuenta/TarjetaTope";
 import { EncabezadoAsesor } from "@/components/asesor/EncabezadoAsesor";
 import { MONTO_MINIMO } from "@/lib/credito";
-import { CONVENIOS } from "@/lib/convenios";
+import type { Convenio } from "@/lib/convenios";
 import {
   CLIENTE_DEMO,
   INSTITUCIONES_DEMO,
@@ -30,6 +30,8 @@ type CuentaDemoProps = {
   paquetesPorGrado: Record<CodigoGrado, PaqueteDemo[]> | null;
   /** §13.3: catálogo `grados` (con institución y grupo de crédito) para el selector Policía / Ejército. [] = no se pudo leer. */
   catalogoGrados: GradoCatalogo[];
+  /** Los mismos convenios de la página principal y de /cuenta (tabla `convenios`), para que la demo no se desactualice. */
+  convenios: Convenio[];
   /** Server Action de «Salir» (misma del resto de /asesor). */
   accionSalir?: (formData: FormData) => void;
   /** Encabezado propio (p. ej. el de /admin); si falta, el del asesor. */
@@ -51,12 +53,14 @@ const VOLVER_ASESOR = { href: "/asesor", texto: "Volver a Mis clientes" };
  * Cuenta de demostración del asesor (spec-fase-2.md §5): «se ve igual que
  * /cuenta de un asociado, con datos de ejemplo». No hay maqueta propia: usa
  * los mismos tokens y tarjetas que Cuenta.tsx (que no se puede editar), en
- * un componente nuevo. NUNCA llama a Supabase: es 100% estado local.
+ * un componente nuevo. NUNCA llama a Supabase: es 100% estado local (los
+ * convenios y los cupos los lee la página en el servidor).
  */
 export function CuentaDemo({
   nombreAsesor,
   paquetesPorGrado,
   catalogoGrados,
+  convenios,
   accionSalir,
   encabezado,
   volver = VOLVER_ASESOR,
@@ -309,8 +313,8 @@ export function CuentaDemo({
         />
 
         <section id="convenios-ejemplo" className="flex flex-col gap-4 rounded-28 bg-white p-5 lg:px-8 lg:py-7">
-          <h2 className="m-0 font-display text-18 font-extrabold lg:text-22">Convenios de ejemplo</h2>
-          <ListaConvenios convenios={CONVENIOS} variante="cuenta" />
+          <h2 className="m-0 font-display text-18 font-extrabold lg:text-22">Convenios</h2>
+          <ListaConvenios convenios={convenios} variante="cuenta" />
         </section>
 
         <section className="flex flex-col gap-4 rounded-28 bg-white p-5 lg:px-8 lg:py-7">
