@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CuentaDemo } from "@/components/asesor/CuentaDemo";
 import { cargarPaquetesDemo } from "@/lib/asesor/cargarPaquetesDemo";
 import { cargarCatalogoGrados } from "@/lib/grados";
+import { cargarConvenios } from "@/lib/conveniosServidor";
 import { exigirAsesor } from "@/lib/asesor/servidor";
 import { cerrarSesionAsesor } from "../actions";
 
@@ -20,9 +21,10 @@ export default async function AsesorDemoPage() {
   const { supabase, nombre } = await exigirAsesor();
 
   // §13.3: grados por institución (catálogo público) + cupos/tasa por grupo (RPC solo asesor/admin).
-  const [paquetesPorGrado, catalogoGrados] = await Promise.all([
+  const [paquetesPorGrado, catalogoGrados, convenios] = await Promise.all([
     cargarPaquetesDemo(supabase, "asesor_demo_grados_fallo"),
     cargarCatalogoGrados(supabase),
+    cargarConvenios(),
   ]);
 
   return (
@@ -30,6 +32,7 @@ export default async function AsesorDemoPage() {
       nombreAsesor={nombre}
       paquetesPorGrado={paquetesPorGrado}
       catalogoGrados={catalogoGrados}
+      convenios={convenios}
       accionSalir={cerrarSesionAsesor}
     />
   );

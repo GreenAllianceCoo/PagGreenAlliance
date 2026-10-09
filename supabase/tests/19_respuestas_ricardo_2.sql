@@ -72,7 +72,7 @@ select is(
 select is(
   (select string_agg(codigo || '=' || coalesce(grupo_credito::text, '-'), ' ' order by orden)
      from public.grados where seleccionable),
-  'PT=PT SI=SI IT=IT IJ=IJ SLP=PT C3=PT CS=PT CP=SI SS=IT SV=IJ SP=IJ ST=IT TE=IJ CT=CT MY=MY TC=TC',
+  'PP=PP PT=PT SI=SI IT=IT IJ=IJ SLP=PT C3=PT CS=PT CP=SI SS=IT SV=IJ SP=IJ ST=IT TE=IJ CT=CT MY=MY TC=TC',
   'remapeo de grados a grupos (§12.1)'
 );
 
