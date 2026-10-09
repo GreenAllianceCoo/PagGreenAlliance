@@ -1,10 +1,10 @@
 -- ============================================================
--- Green Alliance · pgTAP · Recuperación de acceso (20261002500000).
+-- Green Alliance · pgTAP · Recuperación de acceso (20261002500000) + hallazgos del 8-oct H-03 y H-05 (20261009000000).
 -- ============================================================
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(28);
+select plan(40);
 
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('27000000-0000-4000-a000-000000000001', 'r.uno@prueba.test', '{"cedula":"2700000001","grado":"PT"}', '{"nombre_completo":"Asociado R1"}'),
@@ -35,7 +35,7 @@ select ok(
   'crear_solicitud_recuperacion: solo service_role'
 );
 select ok(
-  not has_function_privilege('anon', 'public.admin_registrar_cambio_correo(uuid, text)', 'execute')
+  not has_function_privilege('anon', 'public.admin_registrar_cambio_correo(uuid, uuid, text)', 'execute')
   and not has_function_privilege('anon', 'public.admin_rechazar_recuperacion(uuid, text)', 'execute'),
   'anon no ejecuta las funciones de admin de recuperación'
 );
@@ -49,13 +49,17 @@ select is(
   (select celular_coincide from public.solicitudes_recuperacion_acceso where cedula = '2700000001'),
   true, 'el celular escrito coincide con el del perfil'
 );
-select is(
+select isnt(
   public.crear_solicitud_recuperacion('2700000001', 'otro.uno@prueba.test', '3009998877', 'Segundo intento de la misma persona'),
-  null, 'ya hay una pendiente: no crea otra'
+  null, 'H-05: con una pendiente, otra con otro correo también se crea'
 );
 select is(
-  (select count(*)::int from public.solicitudes_recuperacion_acceso where cedula = '2700000001'),
-  1, 'una sola pendiente por persona'
+  public.crear_solicitud_recuperacion('2700000001', 'OTRO.uno@prueba.test', '3009998877', 'Repite exactamente el mismo pedido'),
+  null, 'H-05: repetir el mismo correo no duplica la solicitud'
+);
+select is(
+  (select count(*)::int from public.solicitudes_recuperacion_acceso where cedula = '2700000001' and estado = 'pendiente'),
+  2, 'H-05: dos pendientes por persona (un tercero ya no bloquea a la víctima)'
 );
 select is(
   public.crear_solicitud_recuperacion('2799999999', 'x@prueba.test', '3001112233', 'Cédula que no existe'),
@@ -75,7 +79,7 @@ set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"27000000-0000-4000-a000-000000000001","role":"authenticated"}', true);
 select is((select count(*)::int from public.solicitudes_recuperacion_acceso), 0, 'el asociado no lee solicitudes de recuperación');
 select throws_ok(
-  $$ select public.admin_registrar_cambio_correo('27000000-0000-4000-a000-000000000001', 'Intento de un asociado') $$,
+  $$ select public.admin_registrar_cambio_correo('27000000-0000-4000-a000-000000000001', gen_random_uuid(), 'Intento de un asociado') $$,
   'Solo un administrador puede cambiar el correo de ingreso',
   'un asociado no puede registrar cambios de correo'
 );
@@ -86,12 +90,12 @@ select throws_ok(
 );
 
 select set_config('request.jwt.claims', '{"sub":"27000000-0000-4000-a000-0000000000ae","role":"authenticated"}', true);
-select is((select count(*)::int from public.solicitudes_recuperacion_acceso), 1, 'el admin lee las solicitudes');
+select is((select count(*)::int from public.solicitudes_recuperacion_acceso), 2, 'el admin lee todas las solicitudes (H-05: varias por persona)');
 
 -- RS-01: el asesor-admin no cambia el correo de sus clientes
 select set_config('request.jwt.claims', '{"sub":"27000000-0000-4000-a000-0000000000ad","role":"authenticated"}', true);
 select throws_ok(
-  $$ select public.admin_registrar_cambio_correo('27000000-0000-4000-a000-000000000002', 'Cambio sobre mi propio cliente') $$,
+  $$ select public.admin_registrar_cambio_correo('27000000-0000-4000-a000-000000000002', gen_random_uuid(), 'Cambio sobre mi propio cliente') $$,
   'Otro administrador debe cambiar el correo de tus clientes',
   'RS-01: el admin que atiende al asociado no puede cambiarle el correo'
 );
@@ -100,21 +104,61 @@ select throws_ok(
 select set_config('request.jwt.claims', '{"sub":"27000000-0000-4000-a000-0000000000ae","role":"authenticated"}', true);
 -- SEC-REC-03: sin solicitud pendiente no se cambia el correo de nadie
 select throws_ok(
-  $$ select public.admin_registrar_cambio_correo('27000000-0000-4000-a000-000000000002', 'Sin solicitud pendiente') $$,
+  $$ select public.admin_registrar_cambio_correo('27000000-0000-4000-a000-000000000002', gen_random_uuid(), 'Sin solicitud pendiente') $$,
   'No hay una solicitud de recuperación pendiente de esta persona',
   'SEC-REC-03: sin solicitud pendiente no se cambia el correo'
 );
 select throws_ok(
-  $$ select public.admin_registrar_cambio_correo('27000000-0000-4000-a000-000000000001', 'cort') $$,
+  $$ select public.admin_registrar_cambio_correo('27000000-0000-4000-a000-000000000001',
+       (select id from public.solicitudes_recuperacion_acceso where correo_nuevo = 'nuevo.uno@prueba.test'), 'cort') $$,
   'El motivo debe tener entre 5 y 300 caracteres'
 );
+-- H-03: la solicitud elegida debe ser pendiente de ESA persona
+select throws_ok(
+  $$ select public.admin_validar_cambio_correo('27000000-0000-4000-a000-000000000001', gen_random_uuid(), 'Solicitud inventada') $$,
+  'La solicitud elegida no es una solicitud pendiente de esta persona',
+  'H-03: no se aplica una solicitud que no es de la persona'
+);
+-- H-03: 10 minutos de espera desde que se creó
+select throws_ok(
+  $$ select * from public.admin_validar_cambio_correo('27000000-0000-4000-a000-000000000001',
+       (select id from public.solicitudes_recuperacion_acceso where correo_nuevo = 'nuevo.uno@prueba.test'), 'Verificado por llamada') $$,
+  'La solicitud debe tener al menos 10 minutos de creada',
+  'H-03: una solicitud recién creada no se puede aplicar'
+);
+reset role;
+update public.solicitudes_recuperacion_acceso set created_at = now() - interval '20 minutes' where cedula = '2700000001';
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"27000000-0000-4000-a000-0000000000ae","role":"authenticated"}', true);
+select is(
+  (select o_correo_nuevo from public.admin_validar_cambio_correo('27000000-0000-4000-a000-000000000001',
+     (select id from public.solicitudes_recuperacion_acceso where correo_nuevo = 'nuevo.uno@prueba.test'), 'Verificado por llamada')),
+  'nuevo.uno@prueba.test', 'H-03: la validación devuelve el correo de la solicitud (el admin no lo escribe)'
+);
+-- H-03: si en Auth hay un correo distinto al de la solicitud, no se registra
+select throws_ok(
+  $$ select public.admin_registrar_cambio_correo('27000000-0000-4000-a000-000000000001',
+       (select id from public.solicitudes_recuperacion_acceso where correo_nuevo = 'nuevo.uno@prueba.test'), 'Verificado por llamada') $$,
+  'El correo de ingreso actual no coincide con el de la solicitud elegida',
+  'H-03: el correo en Auth debe ser exactamente el de la solicitud'
+);
+-- El servidor aplica el correo de la solicitud en Auth (aquí, directo) y luego registra
+reset role;
+update auth.users set email = 'nuevo.uno@prueba.test' where id = '27000000-0000-4000-a000-000000000001';
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"27000000-0000-4000-a000-0000000000ae","role":"authenticated"}', true);
 select isnt(
-  public.admin_registrar_cambio_correo('27000000-0000-4000-a000-000000000001', 'Verificado por llamada'),
+  public.admin_registrar_cambio_correo('27000000-0000-4000-a000-000000000001',
+    (select id from public.solicitudes_recuperacion_acceso where correo_nuevo = 'nuevo.uno@prueba.test'), 'Verificado por llamada'),
   null, 'el admin registra el cambio de correo'
 );
 select is(
-  (select estado from public.solicitudes_recuperacion_acceso where cedula = '2700000001'),
-  'atendida', 'la solicitud pendiente queda atendida'
+  (select estado from public.solicitudes_recuperacion_acceso where correo_nuevo = 'nuevo.uno@prueba.test'),
+  'atendida', 'la solicitud elegida queda atendida'
+);
+select is(
+  (select estado from public.solicitudes_recuperacion_acceso where correo_nuevo = 'otro.uno@prueba.test'),
+  'reemplazada', 'H-05: la otra pendiente de la misma persona queda «reemplazada»'
 );
 select is(
   (select count(*)::int from public.historial_cambio_correo_ingreso where perfil_id = '27000000-0000-4000-a000-000000000001' and origen = 'admin'),
@@ -145,11 +189,25 @@ values ('27000000-0000-4000-a000-000000000001', '27000000-0000-4000-a000-0000000
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"27000000-0000-4000-a000-0000000000ae","role":"authenticated"}', true);
 select throws_ok(
-  $$ select public.admin_validar_cambio_correo('27000000-0000-4000-a000-000000000001', 'Validar tras cambiar el asesor') $$,
+  $$ select public.admin_validar_cambio_correo('27000000-0000-4000-a000-000000000001', gen_random_uuid(), 'Validar tras cambiar el asesor') $$,
   'Otro administrador debe cambiar el correo: cambiaste el asesor de esta persona hace menos de 24 horas',
   'SEC-REC-03: no cambia el correo quien cambió el asesor hace menos de 24 h'
 );
 reset role;
+
+-- H-05: tope de 3 pendientes por persona; la más vieja pasa a «reemplazada»
+select isnt(public.crear_solicitud_recuperacion('2700000002', 'tope1@prueba.test', '3001112233', 'Primera del tope'), null, 'tope: 1ª');
+select isnt(public.crear_solicitud_recuperacion('2700000002', 'tope2@prueba.test', '3001112233', 'Segunda del tope'), null, 'tope: 2ª');
+select isnt(public.crear_solicitud_recuperacion('2700000002', 'tope3@prueba.test', '3001112233', 'Tercera del tope'), null, 'tope: 3ª');
+select isnt(public.crear_solicitud_recuperacion('2700000002', 'tope4@prueba.test', '3001112233', 'Cuarta del tope'), null, 'tope: 4ª se crea');
+select is(
+  (select count(*)::int from public.solicitudes_recuperacion_acceso where cedula = '2700000002' and estado = 'pendiente'),
+  3, 'H-05: máximo 3 pendientes por persona'
+);
+select is(
+  (select estado from public.solicitudes_recuperacion_acceso where correo_nuevo = 'tope1@prueba.test'),
+  'reemplazada', 'H-05: la más vieja pasó a «reemplazada»'
+);
 
 -- El trigger de perfiles deja huella de cada cambio de asesor
 select set_config('request.jwt.claims', '', true);

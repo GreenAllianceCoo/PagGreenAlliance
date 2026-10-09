@@ -23,9 +23,12 @@ describe("esquemaBuscarGeneral", () => {
     expect(esquemaBuscarGeneral.safeParse({ texto: "Pere" }).success).toBe(true);
     expect(esquemaBuscarGeneral.safeParse({ texto: "María José" }).success).toBe(true);
   });
-  it("acepta 4 a 10 dígitos de cédula (con puntos)", () => {
-    const r = esquemaBuscarGeneral.safeParse({ texto: "1.234" });
-    expect(r.success && r.data.texto).toBe("1234");
+  it("acepta 6 a 10 dígitos de cédula exacta (con puntos; H-02)", () => {
+    // Menos de 6 dígitos: rechaza
+    expect(esquemaBuscarGeneral.safeParse({ texto: "1.234" }).success).toBe(false);
+    // 6-10 dígitos: acepta
+    const r = esquemaBuscarGeneral.safeParse({ texto: "123.456" });
+    expect(r.success && r.data.texto).toBe("123456");
     expect(esquemaBuscarGeneral.safeParse({ texto: "1234567890" }).success).toBe(true);
   });
   it("rechaza menos de 4 caracteres, con el mensaje en español", () => {

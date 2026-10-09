@@ -15,6 +15,8 @@ type Props = {
   activo: boolean;
   /** RS-01: el admin no cambia su propio estado ni el de sus clientes. */
   bloqueado?: boolean;
+  /** H-07: el perfil es admin; no se puede desactivar desde aquí. */
+  esAdmin?: boolean;
   onResuelto: (mensaje: string) => void;
 };
 
@@ -23,7 +25,7 @@ type Props = {
  * (5 a 300 caracteres; lo valida el servidor). El modal atrapa el foco y cierra con Esc.
  * Movimiento: el del Modal compartido (transform/opacity, con reduced-motion).
  */
-export function BajaAsociado({ asociadoId, nombre, activo, bloqueado = false, onResuelto }: Props) {
+export function BajaAsociado({ asociadoId, nombre, activo, bloqueado = false, esAdmin = false, onResuelto }: Props) {
   const [abierto, setAbierto] = useState(false);
   const [estado, accion] = useActionState(cambiarEstadoAsociado, INICIAL);
   const [motivo, setMotivo] = useState("");
@@ -37,6 +39,17 @@ export function BajaAsociado({ asociadoId, nombre, activo, bloqueado = false, on
 
   const tituloId = `baja-titulo-${asociadoId}`;
   const error = estado.errores?.motivo ?? estado.error;
+
+  // H-07: no se puede desactivar a un admin desde la app
+  if (esAdmin && darDeBaja) {
+    return (
+      <div className="flex flex-col gap-2.5">
+        <p role="status" className="m-0 text-14 font-semibold text-admin-texto-2">
+          No se puede desactivar a un administrador desde la app. Contacta al equipo técnico si es necesario.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-2.5">

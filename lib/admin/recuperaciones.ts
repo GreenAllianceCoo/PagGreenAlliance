@@ -10,7 +10,7 @@ import { registrar } from "@/lib/servidor/registro";
  * admin (solicitudes_recuperacion_acceso, historial_cambio_correo_ingreso).
  */
 
-export type EstadoRecuperacion = "pendiente" | "atendida" | "rechazada";
+export type EstadoRecuperacion = "pendiente" | "atendida" | "rechazada" | "reemplazada";
 
 export type FilaRecuperacion = {
   id: string;
@@ -121,19 +121,20 @@ export type CambioCorreoHistorial = {
   cuando: string | undefined;
 };
 
-/** Para la ficha del asociado: solicitud pendiente (si hay) e historial de cambios del correo. */
+/** Para la ficha del asociado: solicitudes pendientes (hasta 3; H-05) e historial de cambios del correo. */
 export async function cargarCorreoIngresoAsociado(
   supabase: SupabaseClient,
   asociadoId: string,
   adminId: string,
-): Promise<{ pendiente: FilaRecuperacion | null; historial: CambioCorreoHistorial[] }> {
-  const [{ data: pend }, { data: hist }] = await Promise.all([
+): Promise<{ pendientes: FilaRecuperacion[]; historial: CambioCorreoHistorial[] }> {
+  const [{ data: pends }, { data: hist }] = await Promise.all([
     supabase
       .from("solicitudes_recuperacion_acceso")
       .select(COLUMNAS)
       .eq("perfil_id", asociadoId)
       .eq("estado", "pendiente")
-      .maybeSingle(),
+      .order("created_at", { ascending: true })
+      .limit(3),
     supabase
       .from("historial_cambio_correo_ingreso")
       .select("id, origen, actor_id, motivo, created_at")
@@ -147,7 +148,7 @@ export async function cargarCorreoIngresoAsociado(
     : { data: [] };
   const nombre = new Map((perfiles ?? []).map((p) => [p.id as string, p.nombre_completo as string]));
   return {
-    pendiente: pend ? (await armarFilas(supabase, [pend as FilaBase], adminId))[0] : null,
+    pendientes: await armarFilas(supabase, (pends ?? []) as FilaBase[], adminId),
     historial: (hist ?? []).map((h) => ({
       id: h.id as string,
       origen: h.origen as "admin" | "asociado",

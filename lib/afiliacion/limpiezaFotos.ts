@@ -41,7 +41,7 @@ export function cronAutorizado(encabezado: string | null, secreto: string | unde
 
 export type ResultadoLimpieza = { revisados: number; borrados: number };
 
-/** Borra las fotos huérfanas que devuelve la base, en lotes de 100. */
+/** Borra las fotos huérfanas de afiliación que devuelve la base, en lotes de 100. */
 export async function limpiarFotosHuerfanas(admin: SupabaseClient): Promise<ResultadoLimpieza> {
   const { data, error } = await admin.rpc("fotos_huerfanas_afiliacion", { p_limite: LIMITE_POR_EJECUCION });
   if (error) throw new Error(`No se pudieron listar las fotos huérfanas: ${error.message}`);
@@ -58,6 +58,37 @@ export async function limpiarFotosHuerfanas(admin: SupabaseClient): Promise<Resu
     const { error: errorBorrar } = await almacen.remove(lote);
     if (errorBorrar) {
       registrar("error", { evento: "limpieza_fotos_borrado_fallo", mensaje: errorBorrar.message });
+      continue;
+    }
+    borrados += lote.length;
+  }
+  return { revisados: nombres.length, borrados };
+}
+
+const BUCKET_FOTOS_CARNE = "fotos-carne";
+/** Ruta en fotos-carne: «<asociado>/<uuid>.<ext>» (la misma regla de fotos_carne_ruta_chk). */
+const RUTA_VALIDA_CARNE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/[0-9a-f-]{36}\.(jpg|png|webp)$/i;
+
+/**
+ * H-09: borra las fotos del carné subidas y nunca confirmadas (más de 24 h y
+ * sin fila en fotos_carne) que devuelve la base, en lotes de 100.
+ */
+export async function limpiarFotosCarneHuerfanas(admin: SupabaseClient): Promise<ResultadoLimpieza> {
+  const { data, error } = await admin.rpc("fotos_carne_huerfanas", { p_limite: LIMITE_POR_EJECUCION });
+  if (error) throw new Error(`No se pudieron listar las fotos del carné huérfanas: ${error.message}`);
+
+  const nombres = ((data ?? []) as { name: string }[])
+    .map((f) => f?.name)
+    .filter((n): n is string => typeof n === "string" && RUTA_VALIDA_CARNE.test(n));
+  if (nombres.length === 0) return { revisados: 0, borrados: 0 };
+
+  const almacen = admin.storage.from(BUCKET_FOTOS_CARNE);
+  let borrados = 0;
+  for (let i = 0; i < nombres.length; i += TAMANO_LOTE_BORRADO) {
+    const lote = nombres.slice(i, i + TAMANO_LOTE_BORRADO);
+    const { error: errorBorrar } = await almacen.remove(lote);
+    if (errorBorrar) {
+      registrar("error", { evento: "limpieza_carne_borrado_fallo", mensaje: errorBorrar.message });
       continue;
     }
     borrados += lote.length;

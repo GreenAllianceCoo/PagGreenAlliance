@@ -43,7 +43,7 @@ export function rutaComprobante(solicitudId: string, identificador: string, tipo
 
 /** true si la ruta es «<esa solicitud>/<uuid>.<ext permitida>». */
 export function rutaEsDeSolicitud(ruta: string, solicitudId: string) {
-  return new RegExp(`^${solicitudId}/[0-9a-f-]{36}\.(jpg|png|webp|pdf)$`).test(ruta);
+  return new RegExp(`^${solicitudId}/[0-9a-f-]{36}\\.(jpg|png|webp|pdf)$`).test(ruta);
 }
 
 /** Detecta el tipo REAL por los primeros bytes (JPEG, PNG, WEBP o PDF). */

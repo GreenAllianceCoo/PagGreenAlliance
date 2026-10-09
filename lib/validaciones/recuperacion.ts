@@ -40,12 +40,12 @@ export const esquemaRecuperacion = z.object({
 // Admin: «Cambiar correo de ingreso» y «Rechazar» una solicitud
 // ---------------------------------------------------------------------------
 
-export const CAMPOS_CAMBIAR_CORREO_ADMIN = ["asociadoId", "correo", "motivo"] as const;
+export const CAMPOS_CAMBIAR_CORREO_ADMIN = ["asociadoId", "solicitudId", "motivo"] as const;
 export type CampoCambiarCorreoAdmin = (typeof CAMPOS_CAMBIAR_CORREO_ADMIN)[number];
 
 export const esquemaCambiarCorreoAdmin = z.object({
   asociadoId: z.uuid({ error: "Falta el asociado." }),
-  correo: esquemaCorreo,
+  solicitudId: z.uuid({ error: "Falta elegir una solicitud." }),
   motivo: esquemaMotivo("Escribe el motivo."),
 });
 

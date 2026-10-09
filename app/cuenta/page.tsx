@@ -4,7 +4,7 @@ import { RUTA_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 import { cargarPerfilAsociado } from "@/lib/asociado/servidor";
 import { WHATSAPP_URL } from "@/lib/config";
 import { urlFotoCarneDeAsociado } from "@/lib/carneFoto";
-import { cargarConvenios } from "@/lib/conveniosServidor";
+import { cargarConveniosAutenticados } from "@/lib/conveniosServidor";
 import { textoTope, vistaSolicitud, type FilaSolicitud } from "@/lib/cuenta";
 import { hoyBogota } from "@/lib/fechas";
 import { enmascararCorreo } from "@/lib/mascara";
@@ -54,7 +54,7 @@ export default async function CuentaPage({
     // F2-01 (20260924000600): el número solo se puede leer por esta RPC, y
     // solo devuelve valor cuando la boleta ya está "confirmada".
     supabase.rpc("mi_boleta_sorteo", { p_anio: anio, p_mes: mes }).maybeSingle(),
-    cargarConvenios(),
+    cargarConveniosAutenticados(supabase),
     cargarGanadorSorteo(supabase),
     // §13.2: fecha en que el admin habilitó un nuevo crédito tras el rechazo (null = no). Nunca el motivo.
     supabase.rpc("mi_habilitacion_credito"),

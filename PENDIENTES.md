@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 02-oct-2026 (todo en develop: recuperación de acceso, comprobante de desembolso, eliminar definitivamente, secretario, búsqueda de asesores y foto del carné; falta aplicar 5 migraciones con respaldo y fusionar develop→main; entrega final el 7-oct).
+Actualizado: 09-oct-2026 (hallazgos de seguridad del 8-oct corregidos en código, H-04 cerrado por riesgo aceptado; falta aplicar la migración 20261009000000 y desplegar junto con el código; pgTAP y e2e sin correr por SVM).
 
 ## Dónde quedamos
 

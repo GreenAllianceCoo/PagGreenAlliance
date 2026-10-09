@@ -2,20 +2,20 @@ import type { CambioCorreoHistorial, FilaRecuperacion } from "@/lib/admin/recupe
 import { CambiarCorreoIngreso } from "./CambiarCorreoIngreso";
 
 /**
- * Sección «Correo de ingreso» de la ficha del asociado (recuperación de acceso):
- * acción «Cambiar correo de ingreso» (solo admin), la solicitud pendiente si la
- * hay y el historial de cambios (quién, cuándo y por qué; sin mostrar correos).
+ * Sección «Correo de ingreso» de la ficha del asociado (recuperación de acceso, H-03):
+ * acción «Cambiar correo de ingreso» (solo admin), las solicitudes pendientes si las
+ * hay (máximo 3, H-05) y el historial de cambios (quién, cuándo y por qué; sin mostrar correos).
  */
 export function CorreoIngresoAsociado({
   asociadoId,
   nombre,
-  pendiente,
+  pendientes,
   historial,
   bloqueado = false,
 }: {
   asociadoId: string;
   nombre: string;
-  pendiente: FilaRecuperacion | null;
+  pendientes: FilaRecuperacion[];
   historial: CambioCorreoHistorial[];
   /** RS-01: el admin es el asesor de este asociado (o es él mismo). */
   bloqueado?: boolean;
@@ -25,13 +25,20 @@ export function CorreoIngresoAsociado({
       <h2 id="correo-ingreso-titulo" className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
         Correo de ingreso
       </h2>
-      {pendiente ? (
-        <p role="status" className="m-0 rounded-14 bg-admin-ambar-fondo p-3.5 text-14 leading-145 text-admin-ambar">
-          <strong>Pidió recuperar el acceso</strong> el {pendiente.creada}. Correo nuevo: {pendiente.correoNuevo}. Celular{" "}
-          {pendiente.celularCoincide ? "coincide" : "NO coincide"} con el de su perfil.
-        </p>
+      {pendientes.length > 0 ? (
+        <div role="status" className="m-0 rounded-14 bg-admin-ambar-fondo p-3.5 text-14 leading-145 text-admin-ambar">
+          <strong>Solicitudes de recuperación pendientes:</strong>
+          <ul className="m-1.5 list-inside list-disc">
+            {pendientes.map((s) => (
+              <li key={s.id}>
+                Correo nuevo: {s.correoNuevo} · Celular {s.celularCoincide ? "coincide" : "NO coincide"} ·{" "}
+                {s.creada}
+              </li>
+            ))}
+          </ul>
+        </div>
       ) : null}
-      {!pendiente && !bloqueado ? (
+      {pendientes.length === 0 && !bloqueado ? (
         <p role="status" className="m-0 text-14 font-semibold text-admin-texto-2">
           Solo se cambia el correo de ingreso cuando la persona pidió recuperar el acceso desde la pantalla de ingreso.
         </p>
@@ -44,9 +51,9 @@ export function CorreoIngresoAsociado({
       <CambiarCorreoIngreso
         asociadoId={asociadoId}
         nombre={nombre}
-        correoSugerido={pendiente?.correoNuevo}
-        bloqueado={bloqueado || !pendiente}
-        exigeConfirmarCelular={pendiente ? !pendiente.celularCoincide : false}
+        solicitudes={pendientes}
+        bloqueado={bloqueado || pendientes.length === 0}
+        solicitudPrincipal={pendientes[0] ?? null}
       />
       {historial.length > 0 ? (
         <ol className="m-0 flex list-none flex-col gap-2.5 p-0">
