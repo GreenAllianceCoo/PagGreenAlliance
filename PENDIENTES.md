@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 02-oct-2026 (todo en develop: recuperación de acceso, comprobante de desembolso, eliminar definitivamente, secretario, búsqueda de asesores y foto del carné; falta aplicar 5 migraciones con respaldo y fusionar develop→main; entrega final el 7-oct).
+Actualizado: 08-oct-2026 (revisión de seguridad del 8-oct con hallazgos H-01 a H-10 por corregir; falta aplicar las migraciones con respaldo y fusionar develop→main; entrega final el viernes 9-oct, garantía 9-oct al 7-nov y soporte desde el 8-nov).
 
 ## Dónde quedamos
 
