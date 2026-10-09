@@ -659,7 +659,7 @@
       "estado": "Bloqueado",
       "origen": "Propuesta",
       "agente": "ga-diseno-a-codigo",
-      "bloqueo": "30-sep: fotos reales de la landing por llegar (cooperativa); cifras ya corregidas (§12)."
+      "bloqueo": "Falta de la cooperativa: fotos, cifras, testimonios y fotos de las sedes."
     },
     {
       "id": "5.4",
@@ -669,10 +669,9 @@
       "depende": [
         "5.2"
       ],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Agregado",
-      "agente": "ga-diseno-a-codigo",
-      "bloqueo": "30-sep: política v1 del Dr. Breinner publicada en la rama politica-datos-v1; falta su revisión de 7.3, 8 y 18 (selfie como dato sensible; aclarar que no se reporta a centrales)."
+      "agente": "ga-diseno-a-codigo"
     },
     {
       "id": "5.5",
@@ -763,7 +762,7 @@
         "4.3",
         "4.5"
       ],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Propuesta",
       "agente": "ga-escritor-tests"
     },
@@ -781,7 +780,7 @@
         "3.9",
         "4.6"
       ],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Propuesta",
       "agente": "ga-revisor-seguridad",
       "nota": "25-sep: aprobado con observaciones contra producción (main, merge 5a39d34). Hallazgos: S-15 correos Resend sin escapar HTML (P-83), F2-08 sin corregir (P-88), política de datos con placeholders en vivo (P-75 a P-81). Sigue En curso porque depende de 4.3, que no está Hecho."
@@ -795,7 +794,6 @@
         "6.1",
         "5.5",
         "2.8",
-        "5.3",
         "5.4",
         "2.11",
         "5.6",
@@ -804,7 +802,7 @@
         "3.9",
         "4.6"
       ],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Propuesta",
       "agente": "ga-verificador-qa + ga-verificador-responsive",
       "nota": "25-sep: QA de producción con veredicto «con observaciones» (main, merge 5a39d34). Hallazgos: A-01 ayuda de dominio institucional (P-86, condicionado a P-85), M-01 WhatsApp sin espacios (P-84, ya corregido en local), M-02 dominio raíz sin redirigir a veces (P-87, Vercel), M-03 vigilancia ya resuelto (P-13). Sigue En curso porque depende de 6.1, 5.3, 5.4, 2.11 y 5.6, que no están Hecho."
@@ -835,7 +833,7 @@
         "6.10",
         "6.13"
       ],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Propuesta",
       "agente": "Yo",
       "simultanea": false,
@@ -850,7 +848,7 @@
         "6.5",
         "4.4"
       ],
-      "estado": "Pendiente",
+      "estado": "En curso",
       "origen": "Propuesta",
       "agente": "Yo + cooperativa"
     },
@@ -862,7 +860,7 @@
       "depende": [
         "6.5"
       ],
-      "estado": "Pendiente",
+      "estado": "En curso",
       "origen": "Propuesta",
       "agente": "Yo"
     },
@@ -956,7 +954,7 @@
         "3.7",
         "4.5"
       ],
-      "estado": "Pendiente",
+      "estado": "En curso",
       "origen": "Agregado",
       "agente": "Sebas (antes Carlos Pardo)",
       "nota": "29-sep: no entregada en la primera tanda (ver 5.10 y 4.7 para el veredicto NO fusionable del resto del paquete). Sigue pendiente."
@@ -969,7 +967,7 @@
       "depende": [
         "6.1"
       ],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "ga-verificador-qa (antes Carlos Pardo)",
       "nota": "25-sep: la máscara ahora oculta también el dominio, formato «xx•••@•••» (ver P-85). 29-sep: entrega revisada sin pruebas propias (ver 5.10); NO fusionable, se pidió rehacer sobre rediseno-c-plus (además ga-verificador-qa ya reescribió b-ingreso y j-produccion el 27-sep como parte de 4.11/6.17, así que el alcance real que falta se reduce a lo que quede desactualizado tras fusionar develop). 01-oct: e2e al día con v3 y máscara nueva (escritorio 171/4, celular 143/3, fallas corregidas y confirmadas); sigue En curso solo porque depende de 6.1."
@@ -1129,7 +1127,7 @@
       "depende": [
         "6.22"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "ga-funcionalidad-botones + ga-diseno-a-codigo"
     },
@@ -1372,7 +1370,7 @@
         "6.39",
         "6.40"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "Sebas",
       "simultanea": false
@@ -1977,7 +1975,7 @@
       "tarea": "Correo «Resultado del crédito» (aprobado / no aprobado) al asociado al resolver una solicitud",
       "responsable": "ga-funcionalidad-botones",
       "prioridad": "Alta",
-      "estado": "En curso",
+      "estado": "Hecho",
       "gantt": "4.3",
       "nota": "24-sep: enviarResultadoCredito ya está conectado al aprobar/rechazar en /admin (probado en local); falta que Sebas configure el SMTP/Resend de producción (2.4) para que salga de verdad."
     },
@@ -2032,7 +2030,7 @@
       "tarea": "Subir a GitHub y desplegar en Vercel",
       "responsable": "Yo",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.5",
       "nota": ""
     },
@@ -2208,7 +2206,7 @@
       "tarea": "Actualizar tests/e2e a la afiliación v2 y a la nueva máscara de correo",
       "responsable": "ga-escritor-tests",
       "prioridad": "Alta",
-      "estado": "En curso",
+      "estado": "Hecho",
       "gantt": "6.1",
       "nota": "d-afiliacion.spec.ts usa el formulario viejo (nombres y apellidos, unidad) y hace falta reescribirlo entero para institución/Nequi/asesor/fotos (k-roles.spec.ts ya cubre un caso feliz v2 pero no reemplaza la cobertura de D). 24-sep: ga-escritor-tests lo reescribió entero (48 pruebas × 2 proyectos); 92/96 pasan, 4 fallan por un bug real de la app (ver P-74), no de la prueba. b-ingreso.spec.ts, i-despliegue.spec.ts y j-produccion.spec.ts siguen con el formato viejo de máscara de correo y dominios (formato nuevo xx•••@yy•••.co); ese trabajo pasa a Carlos Pardo (ver P-71, 6.15). Falta correr npm run test:db (pgTAP), bloqueado por el permiso de la sandbox. Actualización: el bug de P-74 ya está corregido y d-afiliacion pasa 96/96; pgTAP 222/222 corrido por la sesión principal."
     },
@@ -2340,7 +2338,7 @@
       "tarea": "Pruebas en celulares reales (Android e iPhone): cámara, código, sorteo, crédito y correos en Gmail/Outlook, con informe y capturas",
       "responsable": "Sebas",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "En curso",
       "gantt": "6.14",
       "nota": "Encargo externo (500.000 COP) por PR a develop. Ver P-73."
     },
@@ -2461,7 +2459,7 @@
       "tarea": "Revisión de la política de datos por un abogado (Dr. Breinner: secciones 7.3, 8 y 18)",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "En curso",
       "gantt": "5.4",
       "nota": "24-sep: reportado por la sesión principal; falta antes de publicar /politica-de-datos."
     },
@@ -2736,7 +2734,7 @@
       "tarea": "R-09: quién registra los pagos de comisión",
       "responsable": "Sebas + Ricardo",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "",
       "nota": "R-10 y R-11 cerrados por Sebas (§12.14)."
     },
@@ -2758,7 +2756,7 @@
       "tarea": "Backlog: premio al primer asesor",
       "responsable": "ga-funcionalidad-botones",
       "prioridad": "Baja",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "5.11",
       "nota": "Spec §12.12"
     },
@@ -2791,7 +2789,7 @@
       "tarea": "¿«Inscritos al sorteo» entra al dashboard del admin?",
       "responsable": "Cooperativa",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "4.7",
       "nota": "30-sep: reportado por ga-disenador-lienzo y ga-diseno-a-codigo."
     },
@@ -2868,7 +2866,7 @@
       "tarea": "Entrega final y último pago el viernes 9-oct (garantía 9-oct al 7-nov, soporte desde el 8-nov)",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.29",
       "nota": "08-oct: la entrega pasó del miércoles 7-oct al viernes 9-oct."
     },
@@ -2879,7 +2877,7 @@
       "tarea": "Preguntas sobre el rol secretario (¿ve Asociados/Créditos en solo lectura?)",
       "responsable": "Cooperativa",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "4.20",
       "nota": ""
     },
@@ -2890,7 +2888,7 @@
       "tarea": "¿Se borran los comprobantes de desembolso al eliminar definitivamente a un asociado?",
       "responsable": "Cooperativa",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "4.19",
       "nota": ""
     },
@@ -2901,7 +2899,7 @@
       "tarea": "¿El carné sin foto lleva una silueta?",
       "responsable": "Cooperativa",
       "prioridad": "Baja",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "5.15",
       "nota": ""
     },
@@ -2912,7 +2910,7 @@
       "tarea": "Moderación de las fotos que sube el asociado al carné",
       "responsable": "Cooperativa",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "5.15",
       "nota": ""
     },
@@ -2945,7 +2943,7 @@
       "tarea": "¿El nombre completo del asociado puede verse públicamente en /verificar?",
       "responsable": "Cooperativa",
       "prioridad": "Baja",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "5.14",
       "nota": "01-oct: planteado por ga-revisor-seguridad."
     },
@@ -3102,6 +3100,17 @@
       "estado": "Hecho",
       "gantt": "6.40",
       "nota": "09-oct: código y migración van juntos. Desactivar a un admin ya no se puede desde la app; si la cooperativa lo necesita, hace falta otra migración. 09-oct: Hecho por Sebas."
+    },
+    {
+      "id": "P-140",
+      "categoria": "Decisión",
+      "area": "Admin",
+      "tarea": "Preguntar a la cooperativa cómo se desactiva o se baja de rol a un administrador (desde el 9-oct la app no lo permite, por H-07)",
+      "responsable": "Cooperativa",
+      "prioridad": "Media",
+      "estado": "Pendiente",
+      "gantt": "",
+      "nota": "09-oct: si la cooperativa lo necesita, hace falta otra migración."
     }
   ],
   "bitacora": [
@@ -3944,6 +3953,13 @@
       "tareas": "6.38, 6.39, 6.40 (P-137, P-138, P-139)",
       "cambio": "SVM activado, migración 20261009000000 aplicada y código desplegado",
       "detalle": "Verificado en producción: migración remota aplicada y landing sin números de convenios (6 convenios con whatsapp null; solo queda el WhatsApp de la cooperativa). Pruebas: pgTAP desde cero 32 archivos, 826 PASS; e2e escritorio y celular 395 pasaron, 47 omitidas a propósito por proyecto y 0 fallos (39,9 min); unitarias 755 en verde."
+    },
+    {
+      "fecha": "2026-10-09",
+      "agente": "ga-supervisor-avances",
+      "tareas": "5.4, 5.11, 6.1, 6.2, 6.3, 6.5, 6.15, 6.29, 6.7, 6.14, 6.6, 5.3 (P-37, P-42, P-58, P-70, P-81, P-106, P-108, P-111, P-118 a P-122, P-125, P-140)",
+      "cambio": "Limpieza del plan pedida por Sebas: se cierran tareas ya hechas",
+      "detalle": "Hecho: 5.4 (la página /politica-de-datos existe; la revisión del abogado sigue aparte en P-81), 5.11 (premios de asesores 50 y 100, migración 20261002100000), 6.1 (755 pruebas unitarias en verde), 6.2 (revisión de seguridad del 8-oct con hallazgos corregidos y en producción), 6.3 (e2e escritorio y celular 395 pasaron, 0 fallos), 6.5 (desplegado en www.greenallianceco.com), 6.15 (e2e al día) y 6.29 (entrega final, acta y último pago, cerrada por Sebas hoy). En curso: 6.7 (capacitación por Ricardo), 6.14 (celulares reales) y 6.6 (usuarios reales, sigue durante la garantía). 5.3 queda Bloqueada esperando a la cooperativa (fotos, cifras, testimonios, sedes); 6.12 sigue Pendiente (Sebas). Pendientes cerrados: P-37, P-42, P-58, P-106, P-108, P-111, P-118, P-119, P-120, P-121, P-122, P-125. P-70 y P-81 pasan a En curso. Nuevo P-140: cómo se desactiva o baja de rol a un administrador. Para poder cerrar 6.3 se quitó su dependencia de 5.3, porque el contenido real de la cooperativa no impide el QA."
     }
   ]
 }
