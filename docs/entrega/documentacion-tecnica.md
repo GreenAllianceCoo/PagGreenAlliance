@@ -273,6 +273,7 @@ Se configuran en Vercel (**Settings → Environment Variables**). La plantilla c
 | `INGRESO_COOKIE_SECRET` | Solo servidor | Cifra la cookie entre los pasos del ingreso |
 | `LIMITE_HMAC_SECRET` | Solo servidor | Claves de los límites de intentos y ticket de subida de fotos. Obligatoria: sin ella el build falla |
 | `CRON_SECRET` | Solo servidor | Autoriza la tarea programada (32+ caracteres) |
+| `ALERTA_TECNICA_CORREOS` | Solo servidor | Opcional. Correos (separados por coma) que reciben la alerta diaria si el límite de intentos falla. Si falta, va a soporte@greenallianceco.com |
 | `RESEND_API_KEY` | Solo servidor | Envío de correos. Obligatoria |
 | `EMAIL_FROM` | Solo servidor | Remitente verificado en Resend. Obligatoria |
 | `RESEND_TEMPLATE_INGRESO_ACEPTADO`, `RESEND_TEMPLATE_CREDITO_APROBADO`, `RESEND_TEMPLATE_CREDITO_RECHAZADO`, `RESEND_TEMPLATE_SORTEO_BOLETA` | Solo servidor | Plantillas de Resend (la del sorteo es obligatoria) |
