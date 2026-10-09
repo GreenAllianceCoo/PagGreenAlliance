@@ -1536,9 +1536,10 @@
       "actividad": "Activar SVM en el BIOS para Docker y volver a correr pgTAP y e2e",
       "peso": 1,
       "depende": [],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
-      "agente": "Sebas"
+      "agente": "Sebas",
+      "nota": "09-oct: SVM activado; WSL y Docker funcionan (P-137)."
     },
     {
       "id": "6.39",
@@ -1551,11 +1552,11 @@
         "6.34",
         "6.36"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "Sebas",
       "simultanea": false,
-      "nota": "Verificar antes migration list --linked. Debe ir junto con el despliegue del código nuevo."
+      "nota": "09-oct: Sebas aplicó la migración 20261009000000; verificado en producción (P-138)."
     },
     {
       "id": "6.40",
@@ -1565,10 +1566,11 @@
       "depende": [
         "6.39"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "Sebas",
-      "simultanea": false
+      "simultanea": false,
+      "nota": "09-oct: desplegado junto con la migración (P-139)."
     }
   ],
   "pendientes": [
@@ -3075,9 +3077,9 @@
       "tarea": "Activar SVM en el BIOS (Docker) para volver a correr pgTAP y e2e",
       "responsable": "Sebas",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.38",
-      "nota": "08-oct: SVM quedó apagado tras pasar a Windows 11; pgTAP y e2e no corren."
+      "nota": "08-oct: SVM quedó apagado tras pasar a Windows 11; pgTAP y e2e no corren. 09-oct: Hecho por Sebas."
     },
     {
       "id": "P-138",
@@ -3086,9 +3088,9 @@
       "tarea": "Aplicar con respaldo previo la migración 20261009000000 (hallazgos de seguridad del 8-oct), verificando antes migration list --linked",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.39",
-      "nota": "09-oct: incluye la RPC fotos_carne_huerfanas. Sin ella el código nuevo no funciona."
+      "nota": "09-oct: incluye la RPC fotos_carne_huerfanas. Sin ella el código nuevo no funciona. 09-oct: Hecho por Sebas."
     },
     {
       "id": "P-139",
@@ -3097,9 +3099,9 @@
       "tarea": "Desplegar el código nuevo de inmediato junto con la migración 20261009000000",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.40",
-      "nota": "09-oct: código y migración van juntos. Desactivar a un admin ya no se puede desde la app; si la cooperativa lo necesita, hace falta otra migración."
+      "nota": "09-oct: código y migración van juntos. Desactivar a un admin ya no se puede desde la app; si la cooperativa lo necesita, hace falta otra migración. 09-oct: Hecho por Sebas."
     }
   ],
   "bitacora": [
@@ -3935,6 +3937,13 @@
       "tareas": "6.27, 6.28, 6.32 a 6.37, 6.39, 6.40, P-116, P-117, P-126 a P-139",
       "cambio": "Hallazgos de seguridad cerrados en código; Sebas cerró 4 pendientes",
       "detalle": "Sebas hizo P-116, P-117, P-135 y P-136. Hechos en código P-126, P-127, P-128, P-130 a P-134 (H-09 rehecho con fotos_carne_huerfanas; npm audit fix con 0 vulnerabilidades en producción; 755 unitarias, tsc, lint y build verdes; pgTAP y e2e sin correr por SVM). P-129 (H-04) cerrado por riesgo aceptado. Nuevos pendientes de Sebas: aplicar 20261009000000 (P-138, 6.39) y desplegar junto (P-139, 6.40). P-137 (SVM) sigue pendiente."
+    },
+    {
+      "fecha": "2026-10-09",
+      "agente": "sesión principal",
+      "tareas": "6.38, 6.39, 6.40 (P-137, P-138, P-139)",
+      "cambio": "SVM activado, migración 20261009000000 aplicada y código desplegado",
+      "detalle": "Verificado en producción: migración remota aplicada y landing sin números de convenios (6 convenios con whatsapp null; solo queda el WhatsApp de la cooperativa). Pruebas: pgTAP desde cero 32 archivos, 826 PASS; e2e escritorio y celular 395 pasaron, 47 omitidas a propósito por proyecto y 0 fallos (39,9 min); unitarias 755 en verde."
     }
   ]
 }

@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 09-oct-2026 (hallazgos de seguridad del 8-oct corregidos en código, H-04 cerrado por riesgo aceptado; falta aplicar la migración 20261009000000 y desplegar junto con el código; pgTAP y e2e sin correr por SVM).
+Actualizado: 09-oct-2026 (SVM activado, migración 20261009000000 aplicada y código desplegado; pgTAP 826 PASS, e2e 395 pasaron y 0 fallos, unitarias 755).
 
 ## Dónde quedamos
 
