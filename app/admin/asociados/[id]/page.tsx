@@ -28,7 +28,7 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
   if (!detalle) notFound();
   const { asociado } = detalle;
   const correoIngreso = asociado.eliminado || !esAdmin
-    ? { pendiente: null, historial: [] }
+    ? { pendientes: [], historial: [] }
     : await cargarCorreoIngresoAsociado(supabase, id, userId);
   // Foto del carné (propia o la selfie de la afiliación): URL firmada corta, solo para el admin.
   const fotoCarne = !esAdmin || asociado.eliminado || asociado.rol !== "asociado" ? null : await urlFotoCarneDeAsociado(asociado.id);
@@ -111,7 +111,7 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
             <CorreoIngresoAsociado
               asociadoId={asociado.id}
               nombre={asociado.nombre}
-              pendiente={correoIngreso.pendiente}
+              pendientes={correoIngreso.pendientes}
               historial={correoIngreso.historial}
               bloqueado={correoBloqueado}
             />

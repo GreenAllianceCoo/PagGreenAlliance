@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { CuentaDemo } from "@/components/asesor/CuentaDemo";
 import { cargarPaquetesDemo } from "@/lib/asesor/cargarPaquetesDemo";
 import { cargarCatalogoGrados } from "@/lib/grados";
-import { cargarConvenios } from "@/lib/conveniosServidor";
+import { cargarConveniosAutenticados } from "@/lib/conveniosServidor";
 import { exigirAsesor } from "@/lib/asesor/servidor";
 import { cerrarSesionAsesor } from "../actions";
 
@@ -24,7 +24,7 @@ export default async function AsesorDemoPage() {
   const [paquetesPorGrado, catalogoGrados, convenios] = await Promise.all([
     cargarPaquetesDemo(supabase, "asesor_demo_grados_fallo"),
     cargarCatalogoGrados(supabase),
-    cargarConvenios(),
+    cargarConveniosAutenticados(supabase),
   ]);
 
   return (

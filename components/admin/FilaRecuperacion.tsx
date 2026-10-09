@@ -118,9 +118,9 @@ export function FilaRecuperacion({ fila }: { fila: Fila }) {
           <CambiarCorreoIngreso
             asociadoId={fila.perfilId}
             nombre={fila.nombre}
-            correoSugerido={fila.correoNuevo}
+            solicitudes={[fila]}
             bloqueado={fila.bloqueado}
-            exigeConfirmarCelular={!fila.celularCoincide}
+            solicitudPrincipal={fila}
           />
           <Rechazar solicitudId={fila.id} nombre={fila.nombre} />
         </div>

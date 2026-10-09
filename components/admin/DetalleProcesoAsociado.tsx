@@ -103,6 +103,7 @@ export function DetalleProcesoAsociado({
             nombre={asociado.nombre}
             activo={asociado.activo}
             bloqueado={bloqueado}
+            esAdmin={asociado.rol === "admin"}
             onResuelto={setToast}
           />
         </div>

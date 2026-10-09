@@ -435,7 +435,7 @@ test("el asesor busca en toda la cooperativa: solo nombre, cédula enmascarada y
   // Menos de 4 caracteres: error por campo, sin consulta.
   await buscador.fill("Ase");
   await page.getByRole("button", { name: "Buscar", exact: true }).last().click();
-  await expect(page.getByText("Escribe al menos 4 letras del nombre o 4 números de la cédula.")).toBeVisible();
+  await expect(page.getByText("Escribe al menos 4 letras del nombre o la cédula completa (6 a 10 números).")).toBeVisible();
 
   // Por cédula de un asociado que no es de este asesor.
   await buscador.fill("1234567891");

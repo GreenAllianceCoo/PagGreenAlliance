@@ -1,7 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { registrar } from "@/lib/servidor/registro";
-import { COLUMNAS_CONVENIO_PUBLICAS, urlLogo, type FilaConvenio } from "@/lib/conveniosServidor";
+import { COLUMNAS_CONVENIO_AUTENTICADAS, urlLogo, type FilaConvenioAutenticada } from "@/lib/conveniosServidor";
 
 /** Convenio tal como lo edita el admin (incluye los ocultos). */
 export type ConvenioAdmin = {
@@ -27,14 +27,14 @@ export type ConvenioAdmin = {
 export async function listarConveniosAdmin(supabase: SupabaseClient): Promise<{ convenios: ConvenioAdmin[]; error: boolean }> {
   const { data, error } = await supabase
     .from("convenios")
-    .select(COLUMNAS_CONVENIO_PUBLICAS)
+    .select(COLUMNAS_CONVENIO_AUTENTICADAS)
     .order("orden", { ascending: true })
     .order("nombre_empresa", { ascending: true });
   if (error) {
     registrar("error", { evento: "admin_convenios_fallo", codigo: error.code, mensaje: error.message });
     return { convenios: [], error: true };
   }
-  const filas = (data ?? []) as unknown as FilaConvenio[];
+  const filas = (data ?? []) as unknown as FilaConvenioAutenticada[];
   return {
     error: false,
     convenios: filas.map((f) => ({

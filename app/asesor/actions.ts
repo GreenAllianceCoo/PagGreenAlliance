@@ -116,7 +116,7 @@ export async function registrarClicPremios(meta?: number): Promise<void> {
 }
 
 /** Búsqueda general: tope por minuto y por asesor (además del mínimo de caracteres y del máximo de 10 filas de la base). */
-const MAX_BUSQUEDAS_GENERALES_POR_MINUTO = 20;
+const MAX_BUSQUEDAS_GENERALES_POR_MINUTO = 10;
 const VENTANA_BUSQUEDA_GENERAL_SEGUNDOS = 60;
 
 export type EstadoBuscarGeneral = {

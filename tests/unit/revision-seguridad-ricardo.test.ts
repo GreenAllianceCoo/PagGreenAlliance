@@ -34,7 +34,7 @@ vi.mock("@/lib/supabase/server", () => ({
 }));
 
 import { avisarCorreoInstitucional, TEXTO_AVISO_INSTITUCIONAL } from "@/lib/correo/institucional";
-import { cronAutorizado, EDAD_MINIMA_HUERFANAS_MS, limpiarFotosHuerfanas } from "@/lib/afiliacion/limpiezaFotos";
+import { cronAutorizado, EDAD_MINIMA_HUERFANAS_MS, limpiarFotosCarneHuerfanas, limpiarFotosHuerfanas } from "@/lib/afiliacion/limpiezaFotos";
 import { exigirAdmin } from "@/lib/admin/servidor";
 import { GET } from "@/app/api/cron/limpiar-fotos/route";
 
@@ -126,12 +126,29 @@ describe("RS-03 · ruta /api/cron/limpiar-fotos", () => {
     expect(m.clienteAdmin).not.toHaveBeenCalled();
   });
 
-  it("con el secreto correcto corre la limpieza", async () => {
+  it("con el secreto correcto corre la limpieza (H-09: incluye fotos-carne)", async () => {
     vi.stubEnv("CRON_SECRET", SECRETO);
     m.clienteAdmin.mockReturnValue(almacenFalso({ nombres: [] }).admin);
     const r = await GET(new Request("http://x", { headers: { authorization: `Bearer ${SECRETO}` } }));
     expect(r.status).toBe(200);
-    expect(await r.json()).toEqual({ ok: true, revisados: 0, borrados: 0, comprobantes: { vencidos: 0, huerfanos: 0 } });
+    expect(await r.json()).toEqual({
+      ok: true,
+      revisados: 0,
+      borrados: 0,
+      fotosCarne: { revisados: 0, borrados: 0 },
+      comprobantes: { vencidos: 0, huerfanos: 0 },
+    });
+  });
+});
+
+describe("H-09 · limpiarFotosCarneHuerfanas (RPC fotos_carne_huerfanas)", () => {
+  it("pide 500 a la RPC y borra solo rutas <asociado>/<uuid>.<ext>", async () => {
+    const buena = `${ID_A}/${ID_B}.jpg`;
+    const { admin, borrados } = almacenFalso({ nombres: [{ name: buena }, { name: "otra/cosa.jpg" }, { name: `${ID_A}/../x.jpg` }] });
+    const r = await limpiarFotosCarneHuerfanas(admin as never);
+    expect(admin.rpc).toHaveBeenCalledWith("fotos_carne_huerfanas", { p_limite: 500 });
+    expect(r).toEqual({ revisados: 1, borrados: 1 });
+    expect(borrados).toEqual([[buena]]);
   });
 });
 
