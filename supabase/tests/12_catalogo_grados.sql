@@ -23,13 +23,13 @@ select id, 'operando' from public.perfiles where id::text like '12000000-0000-40
 -- ------------------------------------------------------------
 -- Catálogo
 -- ------------------------------------------------------------
-select is((select count(*)::int from public.grados where seleccionable), 16, 'hay 16 grados seleccionables (PP ya no se ofrece)');
-select is(  (select seleccionable::text || '|' || nombre from public.grados where codigo = 'PP'),  'false|Patrullero de Policía',  'PP (Patrullero de Policía) ya no es seleccionable; queda solo Patrullero (PT)');
+select is((select count(*)::int from public.grados where seleccionable), 17, 'hay 17 grados seleccionables (PP volvió el 8-oct)');
+select is(  (select seleccionable::text || '|' || nombre from public.grados where codigo = 'PP'),  'true|Patrullero de Policía',  'PP (Patrullero de Policía) se ofrece de nuevo, aparte de Patrullero (PT)');
 
 select is(
   (select array_agg(codigo order by orden) from public.grados where policia and seleccionable),
-  array['PT','SI','IT','IJ','ST','TE','CT','MY','TC'],
-  'Policía ve PT, SI, IT, IJ y ST–TC'
+  array['PP','PT','SI','IT','IJ','ST','TE','CT','MY','TC'],
+  'Policía ve PP, PT, SI, IT, IJ y ST–TC'
 );
 
 select is(
@@ -166,7 +166,7 @@ select throws_ok(
   'P0001', 'El grado OF ya no se puede elegir; escoge tu grado exacto',
   'una afiliación nueva no puede usar el grado heredado OF'
 );
-select throws_ok(  $$ insert into public.solicitudes_afiliacion (       nombres, apellidos, cedula, grado, institucion, celular, nequi, email,       foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at     ) values ('Pedro', 'Patrullero', '1200000013', 'PP', 'policia', '3001000013', '3001000013',       'pedro@correo.test', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()) $$,  'P0001', 'El grado PP ya no se puede elegir; escoge tu grado exacto',  'una afiliación nueva no puede usar PP; debe elegir Patrullero (PT)');
+select lives_ok(  $$ insert into public.solicitudes_afiliacion (       nombres, apellidos, cedula, grado, institucion, celular, nequi, email,       foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at     ) values ('Pedro', 'Patrullero', '1200000013', 'PP', 'policia', '3001000013', '3001000013',       'pedro@correo.test', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()) $$,  'una afiliación nueva puede elegir Patrullero de Policía (PP) otra vez');
 
 select lives_ok(
   $$ insert into public.solicitudes_afiliacion (

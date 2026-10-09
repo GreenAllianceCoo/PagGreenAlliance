@@ -735,7 +735,7 @@ test.describe("D8 · Opciones de los desplegables", () => {
     const opciones = await page
       .locator("#af-grado option")
       .evaluateAll((os) => os.map((o) => (o as HTMLOptionElement).value));
-    expect(opciones).toEqual(["", "PT", "SI", "IT", "IJ", "ST", "TE", "CT", "MY", "TC"]);
+    expect(opciones).toEqual(["", "PP", "PT", "SI", "IT", "IJ", "ST", "TE", "CT", "MY", "TC"]);
     await expect(page.locator("#af-grado option").first()).toHaveText(
       "Selecciona tu grado",
     );
