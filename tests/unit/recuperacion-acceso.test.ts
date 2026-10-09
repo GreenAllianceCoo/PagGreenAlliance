@@ -81,11 +81,12 @@ describe("esquemas de recuperación de acceso", () => {
     if (!r.success) expect(r.error.issues[0].path[0]).toBe(campo);
   });
 
-  it("cambio de correo del admin: motivo obligatorio de 5 a 300 y correo válido", () => {
-    expect(esquemaCambiarCorreoAdmin.safeParse({ asociadoId: ID_ASOCIADO, correo: "a@b.co", motivo: "Verificado" }).success).toBe(true);
-    expect(esquemaCambiarCorreoAdmin.safeParse({ asociadoId: ID_ASOCIADO, correo: "a@b.co", motivo: "hola" }).success).toBe(false);
-    expect(esquemaCambiarCorreoAdmin.safeParse({ asociadoId: "no-uuid", correo: "a@b.co", motivo: "Verificado" }).success).toBe(false);
-    expect(esquemaCambiarCorreoAdmin.safeParse({ asociadoId: ID_ASOCIADO, correo: "malo", motivo: "Verificado" }).success).toBe(false);
+  it("cambio de correo del admin: motivo de 5 a 300 y una solicitud elegida (H-03: sin correo libre)", () => {
+    const base = { asociadoId: ID_ASOCIADO, solicitudId: ID_SOLICITUD, motivo: "Verificado" };
+    expect(esquemaCambiarCorreoAdmin.safeParse(base).success).toBe(true);
+    expect(esquemaCambiarCorreoAdmin.safeParse({ ...base, motivo: "hola" }).success).toBe(false);
+    expect(esquemaCambiarCorreoAdmin.safeParse({ ...base, asociadoId: "no-uuid" }).success).toBe(false);
+    expect(esquemaCambiarCorreoAdmin.safeParse({ ...base, solicitudId: "" }).success).toBe(false);
   });
 
   it("rechazo: solicitud uuid y motivo obligatorio", () => {
@@ -160,17 +161,27 @@ describe("cambiarCorreoIngreso (admin)", () => {
   let rpcAdmin: ReturnType<typeof vi.fn>;
   let actualizar: ReturnType<typeof vi.fn>;
   let rpcServicio: ReturnType<typeof vi.fn>;
-  let validar: { data: string | null; error: { code?: string; message: string } | null };
+  // Error de admin_validar_cambio_correo (null = válida y devuelve la fila de la solicitud elegida).
+  let validar: { data: null; error: { code?: string; message: string } | null };
   let celularCoincide: boolean;
+  let correoSolicitud: string;
+  const respuestaValidar = () =>
+    validar.error
+      ? validar
+      : {
+          data: [{ o_solicitud_id: ID_SOLICITUD, o_correo_nuevo: correoSolicitud, o_celular_coincide: celularCoincide }],
+          error: null,
+        };
 
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(dentroDelLimite).mockResolvedValue(true);
-    validar = { data: ID_SOLICITUD, error: null };
+    validar = { data: null, error: null };
     celularCoincide = true;
+    correoSolicitud = "nuevo@correo.com";
     // Las RPC de admin se llaman con la sesión del admin: validar (antes de Auth) y registrar (después).
     rpcAdmin = vi.fn(async (nombre: string) =>
-      nombre === "admin_validar_cambio_correo" ? validar : { data: "historial-id", error: null },
+      nombre === "admin_validar_cambio_correo" ? respuestaValidar() : { data: "historial-id", error: null },
     );
     vi.mocked(exigirAdmin).mockResolvedValue({
       supabase: {
@@ -201,18 +212,23 @@ describe("cambiarCorreoIngreso (admin)", () => {
     } as never);
   });
 
-  const campos = { asociadoId: ID_ASOCIADO, correo: "Nuevo@Correo.com", motivo: "Verificado por llamada" };
+  const campos = { asociadoId: ID_ASOCIADO, solicitudId: ID_SOLICITUD, motivo: "Verificado por llamada" };
 
   it("cambia el correo de Auth, deja el historial y avisa a los dos correos", async () => {
     const r = await cambiarCorreoIngreso({}, formulario(campos));
     expect(r.mensaje).toMatch(/Correo de ingreso cambiado/);
     // SEC-REC-03: primero valida (RPC), después cambia Auth, cierra sesiones y registra.
-    expect(rpcAdmin.mock.calls[0][0]).toBe("admin_validar_cambio_correo");
+    expect(rpcAdmin.mock.calls[0]).toEqual([
+      "admin_validar_cambio_correo",
+      { p_asociado_id: ID_ASOCIADO, p_solicitud_id: ID_SOLICITUD, p_motivo: "Verificado por llamada" },
+    ]);
+    // H-03: el correo que se aplica es el de la solicitud, no uno escrito por el admin.
     expect(actualizar).toHaveBeenCalledWith(ID_ASOCIADO, { email: "nuevo@correo.com", email_confirm: true });
     // SEC-REC-04: cierra todas las sesiones de esa persona (service role).
     expect(rpcServicio).toHaveBeenCalledWith("cerrar_sesiones_usuario", { p_user_id: ID_ASOCIADO });
     expect(rpcAdmin).toHaveBeenCalledWith("admin_registrar_cambio_correo", {
       p_asociado_id: ID_ASOCIADO,
+      p_solicitud_id: ID_SOLICITUD,
       p_motivo: "Verificado por llamada",
     });
     expect(avisarCambioCorreoIngreso).toHaveBeenCalledWith({
@@ -265,12 +281,14 @@ describe("cambiarCorreoIngreso (admin)", () => {
     expect(actualizar).toHaveBeenCalledTimes(1);
   });
 
-  it("correo igual al actual o ya usado por otra cuenta: error en el campo", async () => {
-    const igual = await cambiarCorreoIngreso({}, formulario({ ...campos, correo: "viejo@correo.com" }));
-    expect(igual.errores?.correo).toMatch(/ya es su correo/);
+  it("correo de la solicitud igual al actual o ya usado por otra cuenta: no registra nada", async () => {
+    correoSolicitud = "viejo@correo.com";
+    const igual = await cambiarCorreoIngreso({}, formulario(campos));
+    expect(igual.error).toMatch(/ya es su correo/);
+    correoSolicitud = "nuevo@correo.com";
     actualizar.mockResolvedValueOnce({ error: { code: "email_exists", status: 422 } });
     const repetido = await cambiarCorreoIngreso({}, formulario(campos));
-    expect(repetido.errores?.correo).toMatch(/otra cuenta/);
+    expect(repetido.error).toMatch(/otra cuenta/);
     expect(rpcAdmin.mock.calls.map((c) => c[0])).not.toContain("admin_registrar_cambio_correo");
     expect(rpcServicio).not.toHaveBeenCalled();
   });
@@ -283,7 +301,7 @@ describe("cambiarCorreoIngreso (admin)", () => {
 
   it("si el historial falla, avisa que el correo sí cambió", async () => {
     rpcAdmin.mockImplementation(async (nombre: string) =>
-      nombre === "admin_validar_cambio_correo" ? validar : { data: null, error: { code: "XX000", message: "boom" } },
+      nombre === "admin_validar_cambio_correo" ? respuestaValidar() : { data: null, error: { code: "XX000", message: "boom" } },
     );
     const r = await cambiarCorreoIngreso({}, formulario(campos));
     expect(r.error).toMatch(/El correo cambió/);

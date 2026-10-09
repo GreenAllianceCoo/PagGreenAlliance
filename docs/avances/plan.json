@@ -1,6 +1,6 @@
 {
   "parametros": {
-    "actualizado": "2026-10-08",
+    "actualizado": "2026-10-09",
     "bloques_por_semana": 10,
     "nota_bloque": "1 bloque = 1 punto de peso ≈ media jornada de trabajo. Se puede cambiar en la hoja Resumen."
   },
@@ -1338,10 +1338,11 @@
         "5.15",
         "6.25"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "Sebas",
-      "simultanea": false
+      "simultanea": false,
+      "nota": "09-oct: Sebas lo aplicó (P-116)."
     },
     {
       "id": "6.28",
@@ -1352,9 +1353,10 @@
         "5.17",
         "4.19"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
-      "agente": "Sebas"
+      "agente": "Sebas",
+      "nota": "09-oct: Sebas lo configuró (P-117)."
     },
     {
       "id": "6.29",
@@ -1366,7 +1368,9 @@
         "6.27",
         "6.28",
         "6.32",
-        "6.36"
+        "6.36",
+        "6.39",
+        "6.40"
       ],
       "estado": "Pendiente",
       "origen": "Agregado",
@@ -1457,9 +1461,10 @@
       "depende": [
         "6.31"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
-      "agente": "ga-funcionalidad-botones + ga-auditor-supabase"
+      "agente": "ga-funcionalidad-botones + ga-auditor-supabase + sesión principal",
+      "nota": "09-oct: Hecho en código por la sesión principal (755 unitarias, tsc, lint y build en verde; pgTAP y e2e sin correr por SVM). Falta aplicar la migración 20261009000000 y desplegar."
     },
     {
       "id": "6.33",
@@ -1469,9 +1474,10 @@
       "depende": [
         "6.31"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
-      "agente": "ga-funcionalidad-botones + ga-auditor-supabase"
+      "agente": "ga-funcionalidad-botones + ga-auditor-supabase + sesión principal",
+      "nota": "09-oct: Hecho en código por la sesión principal (755 unitarias, tsc, lint y build en verde; pgTAP y e2e sin correr por SVM). Falta aplicar la migración 20261009000000 y desplegar. H-04 (foto en la verificación pública) cerrado: Sebas aceptó el riesgo."
     },
     {
       "id": "6.34",
@@ -1481,9 +1487,10 @@
       "depende": [
         "6.31"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
-      "agente": "ga-funcionalidad-botones"
+      "agente": "ga-funcionalidad-botones + ga-auditor-supabase + sesión principal",
+      "nota": "09-oct: Hecho en código por la sesión principal (755 unitarias, tsc, lint y build en verde; pgTAP y e2e sin correr por SVM). Falta aplicar la migración 20261009000000 y desplegar. H-09 rehecho con la RPC fotos_carne_huerfanas."
     },
     {
       "id": "6.35",
@@ -1493,9 +1500,10 @@
       "depende": [
         "6.31"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
-      "agente": "Sebas"
+      "agente": "sesión principal",
+      "nota": "09-oct: npm audit fix: 0 vulnerabilidades en dependencias de producción (quedan solo en herramientas de desarrollo, requieren --force)."
     },
     {
       "id": "6.36",
@@ -1505,10 +1513,11 @@
       "depende": [
         "5.19"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "Sebas",
-      "simultanea": false
+      "simultanea": false,
+      "nota": "09-oct: Sebas aplicó la migración 20261008000000 (P-135)."
     },
     {
       "id": "6.37",
@@ -1516,9 +1525,10 @@
       "actividad": "Borrar en el SQL Editor las 2 solicitudes de crédito de prueba (cuenta eliminada)",
       "peso": 1,
       "depende": [],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
-      "agente": "Sebas"
+      "agente": "Sebas",
+      "nota": "09-oct: Sebas borró las solicitudes de prueba (P-136)."
     },
     {
       "id": "6.38",
@@ -1529,6 +1539,36 @@
       "estado": "Pendiente",
       "origen": "Agregado",
       "agente": "Sebas"
+    },
+    {
+      "id": "6.39",
+      "fase": 6,
+      "actividad": "Aplicar con respaldo la migración 20261009000000 (hallazgos de seguridad del 8-oct) en producción",
+      "peso": 1,
+      "depende": [
+        "6.32",
+        "6.33",
+        "6.34",
+        "6.36"
+      ],
+      "estado": "Pendiente",
+      "origen": "Agregado",
+      "agente": "Sebas",
+      "simultanea": false,
+      "nota": "Verificar antes migration list --linked. Debe ir junto con el despliegue del código nuevo."
+    },
+    {
+      "id": "6.40",
+      "fase": 6,
+      "actividad": "Desplegar el código de los hallazgos de seguridad junto con la migración 20261009000000",
+      "peso": 1,
+      "depende": [
+        "6.39"
+      ],
+      "estado": "Pendiente",
+      "origen": "Agregado",
+      "agente": "Sebas",
+      "simultanea": false
     }
   ],
   "pendientes": [
@@ -2804,9 +2844,9 @@
       "tarea": "Aplicar con respaldo previo 20261002500000, 20261002600000, 20261003000000, 20261003100000 y 20261003200000 y 20261003300000 y fusionar develop→main",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.27",
-      "nota": "02-oct: 20261003000000 quita la FK perfiles.id → auth.users (cascada por trigger)."
+      "nota": "02-oct: 20261003000000 quita la FK perfiles.id → auth.users (cascada por trigger). 09-oct: Hecho por Sebas."
     },
     {
       "id": "P-117",
@@ -2815,9 +2855,9 @@
       "tarea": "Plantilla del sorteo en Vercel/Resend (variables NOMBRE, NUMERO_BOLETA, MES) y {{{COMPROBANTE}}} en la plantilla de desembolso",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.28",
-      "nota": "02-oct: sin la plantilla, el correo del sorteo cae a texto plano (docs/resend-plantillas.md)."
+      "nota": "02-oct: sin la plantilla, el correo del sorteo cae a texto plano (docs/resend-plantillas.md). 09-oct: Hecho por Sebas."
     },
     {
       "id": "P-118",
@@ -2914,9 +2954,9 @@
       "tarea": "H-01: el WhatsApp de convenios llega al navegador en la landing y anon puede leer telefono_contacto de la API",
       "responsable": "ga-funcionalidad-botones",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.32",
-      "nota": "08-oct: ga-revisor-seguridad."
+      "nota": "08-oct: ga-revisor-seguridad. 09-oct: Hecho en código; falta aplicar la migración 20261009000000 (P-138) y desplegar (P-139)."
     },
     {
       "id": "P-127",
@@ -2925,9 +2965,9 @@
       "tarea": "H-02: la cédula enmascarada se reconstruye buscando fragmentos (buscar_asociados_general); exigir coincidencia exacta y bajar el límite",
       "responsable": "ga-funcionalidad-botones",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.33",
-      "nota": "08-oct: ga-revisor-seguridad."
+      "nota": "08-oct: ga-revisor-seguridad. 09-oct: Hecho en código; falta aplicar la migración 20261009000000 (P-138) y desplegar (P-139)."
     },
     {
       "id": "P-128",
@@ -2936,9 +2976,9 @@
       "tarea": "H-03: un solo admin puede poner su correo en la cuenta de un asociado vía recuperación; atar el cambio al correo_nuevo de la solicitud",
       "responsable": "ga-auditor-supabase",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.33",
-      "nota": "08-oct: ga-revisor-seguridad."
+      "nota": "08-oct: ga-revisor-seguridad. 09-oct: Hecho en código; falta aplicar la migración 20261009000000 (P-138) y desplegar (P-139)."
     },
     {
       "id": "P-129",
@@ -2947,9 +2987,9 @@
       "tarea": "H-04: la verificación pública del QR muestra la foto del asociado (dato sensible); decisión de Sebas",
       "responsable": "ga-revisor-seguridad",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.33",
-      "nota": "08-oct: ga-revisor-seguridad. Descripción en el informe del revisor; no venía en el buzón."
+      "nota": "08-oct: ga-revisor-seguridad. Descripción en el informe del revisor; no venía en el buzón. 09-oct: cerrado, Sebas decidió dejarla (riesgo aceptado)."
     },
     {
       "id": "P-130",
@@ -2958,20 +2998,20 @@
       "tarea": "H-05: un tercero con la cédula bloquea la recuperación del asociado (una sola solicitud pendiente por perfil)",
       "responsable": "ga-revisor-seguridad",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.33",
-      "nota": "08-oct: ga-revisor-seguridad. Descripción en el informe del revisor; no venía en el buzón."
+      "nota": "08-oct: ga-revisor-seguridad. Descripción en el informe del revisor; no venía en el buzón. 09-oct: Hecho en código; falta aplicar la migración 20261009000000 (P-138) y desplegar (P-139)."
     },
     {
       "id": "P-131",
       "categoria": "Seguridad",
       "area": "Dependencias",
       "tarea": "H-06: npm audit fix (sharp y source-map-js, 2 altas con arreglo disponible)",
-      "responsable": "Sebas",
+      "responsable": "sesión principal",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.35",
-      "nota": "08-oct: ga-revisor-seguridad."
+      "nota": "08-oct: ga-revisor-seguridad. 09-oct: npm audit fix aplicado, 0 vulnerabilidades en producción (herramientas de desarrollo requieren --force)."
     },
     {
       "id": "P-132",
@@ -2980,9 +3020,9 @@
       "tarea": "H-07: un admin puede desactivar a otro admin sin control (admin_cambiar_estado_asociado)",
       "responsable": "ga-revisor-seguridad",
       "prioridad": "Baja",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.34",
-      "nota": "08-oct: ga-revisor-seguridad. Descripción en el informe del revisor; no venía en el buzón."
+      "nota": "08-oct: ga-revisor-seguridad. Descripción en el informe del revisor; no venía en el buzón. 09-oct: Hecho en código; falta aplicar la migración 20261009000000 (P-138) y desplegar (P-139)."
     },
     {
       "id": "P-133",
@@ -2991,9 +3031,9 @@
       "tarea": "H-09: fotos-carne huérfanas por URLs de subida sin confirmar; agregarlas al cron",
       "responsable": "ga-revisor-seguridad",
       "prioridad": "Baja",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.34",
-      "nota": "08-oct: ga-revisor-seguridad. Descripción en el informe del revisor; no venía en el buzón."
+      "nota": "08-oct: ga-revisor-seguridad. Descripción en el informe del revisor; no venía en el buzón. 09-oct: Hecho en código; falta aplicar la migración 20261009000000 (P-138) y desplegar (P-139). H-09 rehecho con la RPC fotos_carne_huerfanas."
     },
     {
       "id": "P-134",
@@ -3002,9 +3042,9 @@
       "tarea": "H-10: regex de rutaEsDeSolicitud con el punto mal escapado en lib/comprobantes.ts (no explotable)",
       "responsable": "ga-revisor-seguridad",
       "prioridad": "Baja",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.34",
-      "nota": "08-oct: ga-revisor-seguridad. Descripción en el informe del revisor; no venía en el buzón."
+      "nota": "08-oct: ga-revisor-seguridad. Descripción en el informe del revisor; no venía en el buzón. 09-oct: Hecho en código; falta aplicar la migración 20261009000000 (P-138) y desplegar (P-139)."
     },
     {
       "id": "P-135",
@@ -3013,9 +3053,9 @@
       "tarea": "Aplicar la migración 20261008000000 (Patrullero de Policía) con respaldo previo",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.36",
-      "nota": "08-oct: db push, verificando antes migration list --linked."
+      "nota": "08-oct: db push, verificando antes migration list --linked. 09-oct: Hecho por Sebas."
     },
     {
       "id": "P-136",
@@ -3024,9 +3064,9 @@
       "tarea": "Borrar las 2 solicitudes de crédito de prueba (cuenta eliminada) en el SQL Editor",
       "responsable": "Sebas",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.37",
-      "nota": "08-oct: el sistema de permisos bloqueó el borrado desde el agente."
+      "nota": "08-oct: el sistema de permisos bloqueó el borrado desde el agente. 09-oct: Hecho por Sebas."
     },
     {
       "id": "P-137",
@@ -3038,6 +3078,28 @@
       "estado": "Pendiente",
       "gantt": "6.38",
       "nota": "08-oct: SVM quedó apagado tras pasar a Windows 11; pgTAP y e2e no corren."
+    },
+    {
+      "id": "P-138",
+      "categoria": "Configuración",
+      "area": "Base de datos",
+      "tarea": "Aplicar con respaldo previo la migración 20261009000000 (hallazgos de seguridad del 8-oct), verificando antes migration list --linked",
+      "responsable": "Sebas",
+      "prioridad": "Alta",
+      "estado": "Pendiente",
+      "gantt": "6.39",
+      "nota": "09-oct: incluye la RPC fotos_carne_huerfanas. Sin ella el código nuevo no funciona."
+    },
+    {
+      "id": "P-139",
+      "categoria": "Configuración",
+      "area": "Despliegue",
+      "tarea": "Desplegar el código nuevo de inmediato junto con la migración 20261009000000",
+      "responsable": "Sebas",
+      "prioridad": "Alta",
+      "estado": "Pendiente",
+      "gantt": "6.40",
+      "nota": "09-oct: código y migración van juntos. Desactivar a un admin ya no se puede desde la app; si la cooperativa lo necesita, hace falta otra migración."
     }
   ],
   "bitacora": [
@@ -3852,6 +3914,27 @@
       "tareas": "5.19, 6.29, 6.36 a 6.38, P-118, P-135 a P-137",
       "cambio": "Demo con convenios reales, PP y fecha de entrega",
       "detalle": "Demo con convenios reales, PP vuelve a ofrecerse (migración 20261008000000 sin aplicar), agentes un escalón abajo. Entrega final movida al viernes 9-oct; garantía 9-oct al 7-nov, soporte desde el 8-nov (6.26 y 6.29 actualizadas). Pendientes de Sebas: aplicar la migración, borrar 2 solicitudes de prueba, activar SVM para pgTAP y e2e."
+    },
+    {
+      "fecha": "2026-10-09",
+      "agente": "ga-auditor-supabase",
+      "tareas": "6.32, 6.33, 6.34, P-126, P-127, P-128, P-130, P-132",
+      "cambio": "Migración 20261009000000 y pruebas pgTAP escritas",
+      "detalle": "Anon sin telefono_contacto, cédula exacta en la búsqueda general, cambio de correo atado a la solicitud con espera de 10 min, hasta 3 recuperaciones pendientes por persona, no se desactiva a un admin. Pruebas 27 actualizada y 31 nueva; sin aplicar ni correr (Docker apagado)."
+    },
+    {
+      "fecha": "2026-10-09",
+      "agente": "ga-funcionalidad-botones",
+      "tareas": "6.32, 6.33, 6.34, P-126, P-127, P-128, P-132, P-133, P-134",
+      "cambio": "Código de los hallazgos H-01, H-02, H-03, H-07, H-09 y H-10",
+      "detalle": "Su reporte decía todo hecho, pero H-09 estaba mal (listaba carpetas y leía una columna inexistente); prevalece el reporte de la sesión principal, que lo rehízo."
+    },
+    {
+      "fecha": "2026-10-09",
+      "agente": "sesión principal",
+      "tareas": "6.27, 6.28, 6.32 a 6.37, 6.39, 6.40, P-116, P-117, P-126 a P-139",
+      "cambio": "Hallazgos de seguridad cerrados en código; Sebas cerró 4 pendientes",
+      "detalle": "Sebas hizo P-116, P-117, P-135 y P-136. Hechos en código P-126, P-127, P-128, P-130 a P-134 (H-09 rehecho con fotos_carne_huerfanas; npm audit fix con 0 vulnerabilidades en producción; 755 unitarias, tsc, lint y build verdes; pgTAP y e2e sin correr por SVM). P-129 (H-04) cerrado por riesgo aceptado. Nuevos pendientes de Sebas: aplicar 20261009000000 (P-138, 6.39) y desplegar junto (P-139, 6.40). P-137 (SVM) sigue pendiente."
     }
   ]
 }

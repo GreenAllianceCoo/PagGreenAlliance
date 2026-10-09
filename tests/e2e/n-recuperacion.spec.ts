@@ -142,6 +142,11 @@ test.describe("N1 · formulario público", () => {
 test.describe("N2 · admin cambia el correo y el asociado ingresa con el nuevo", () => {
   test("el admin ve la solicitud, cambia el correo y la solicitud queda atendida", async ({ page }) => {
     test.setTimeout(180_000);
+    // H-03: la solicitud debe tener al menos 10 minutos de creada para poder atenderla.
+    await adminRest(`solicitudes_recuperacion_acceso?perfil_id=eq.${asociado.id}&estado=eq.pendiente`, {
+      method: "PATCH",
+      body: JSON.stringify({ created_at: new Date(Date.now() - 15 * 60_000).toISOString() }),
+    });
     await ingresar(page, CEDULA_ADMIN, CORREO_ADMIN, "/admin");
     await page.goto("/admin/alertas");
     const fila = page.getByTestId("fila-recuperacion").filter({ hasText: asociado.nombre });
@@ -151,7 +156,10 @@ test.describe("N2 · admin cambia el correo y el asociado ingresa con el nuevo",
 
     await fila.getByRole("button", { name: "Cambiar correo de ingreso" }).click();
     const dialogo = page.getByRole("dialog");
-    await expect(dialogo.getByLabel("Correo nuevo")).toHaveValue(asociado.correoNuevo);
+    // H-03: no hay campo de correo libre; se aplica el de la solicitud elegida.
+    await expect(dialogo.getByLabel("Solicitud de recuperación")).not.toHaveValue("");
+    await expect(dialogo).toContainText(`Correo nuevo: ${asociado.correoNuevo}`);
+    await expect(dialogo.getByRole("textbox", { name: "Correo nuevo" })).toHaveCount(0);
 
     // Motivo obligatorio: sin motivo, error en el campo y foco.
     await dialogo.getByRole("button", { name: "Cambiar correo" }).click();

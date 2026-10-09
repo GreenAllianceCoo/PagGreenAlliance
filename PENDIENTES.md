@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 08-oct-2026 (revisión de seguridad del 8-oct con hallazgos H-01 a H-10 por corregir; falta aplicar las migraciones con respaldo y fusionar develop→main; entrega final el viernes 9-oct, garantía 9-oct al 7-nov y soporte desde el 8-nov).
+Actualizado: 09-oct-2026 (hallazgos de seguridad del 8-oct corregidos en código, H-04 cerrado por riesgo aceptado; falta aplicar la migración 20261009000000 y desplegar junto con el código; pgTAP y e2e sin correr por SVM).
 
 ## Dónde quedamos
 
