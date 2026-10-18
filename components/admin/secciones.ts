@@ -14,6 +14,8 @@ export const SECCIONES = [
   { href: "/admin/alertas", etiqueta: "Alertas", clave: "alertas" },
   { href: "/admin/convenios", etiqueta: "Convenios", clave: "convenios" },
   { href: "/admin/sorteo", etiqueta: "Sorteo", clave: "sorteo" },
+  // Solo admin: pausar el ingreso de asociados y avisos para su próximo ingreso (18-oct).
+  { href: "/admin/plataforma", etiqueta: "Plataforma", clave: "plataforma" },
   // Solo admin: lo que hizo cada admin y secretario (afiliaciones, procesos, roles, créditos).
   { href: "/admin/historial", etiqueta: "Historial", clave: "historial" },
   { href: "/admin/demo", etiqueta: "Demostración", clave: "demo" },

@@ -35,6 +35,19 @@ export function enlaceWhatsappConMensaje(numero: string | undefined, mensaje: st
 /** Enlace del pie: el número configurado o, si falta, el de la cooperativa (573183894034). */
 export const WHATSAPP_URL_PIE = enlaceWhatsappConMensaje(WHATSAPP_DIGITOS || WHATSAPP_RESPALDO, MENSAJE_WHATSAPP_PIE);
 
+/**
+ * Botón flotante «Escríbenos por WhatsApp» (pedido de Sebas, 18-oct): con
+ * sesión de asociado el mensaje lleva su nombre (nunca la cédula ni otros
+ * datos); sin sesión, el mismo mensaje del pie.
+ */
+export function enlaceWhatsappFlotante(nombre?: string | null) {
+  const limpio = nombre?.trim().replace(/\s+/g, " ").slice(0, 80);
+  const mensaje = limpio
+    ? `Hola, soy ${limpio}, de la Cooperativa Green Alliance. Quiero hacer una consulta.`
+    : MENSAJE_WHATSAPP_PIE;
+  return enlaceWhatsappConMensaje(WHATSAPP_DIGITOS || WHATSAPP_RESPALDO, mensaje);
+}
+
 // Tiempo de respuesta a una solicitud de afiliación (confirmado por la cooperativa).
 export const TIEMPO_RESPUESTA = "poco tiempo";
 

@@ -4,7 +4,10 @@ import { CONCEPTOS_COMISION, esDiaDeCorte, leerMontoPesos, MONTO_MAXIMO_PAGO } f
 const MENSAJE_MONTO_TOPE = `El monto no puede pasar de $ ${MONTO_MAXIMO_PAGO.toLocaleString("es-CO")}.`;
 import { diasEntre, esFechaISO, hoyBogota } from "@/lib/fechas";
 import { ESTADOS_PROCESO } from "@/lib/procesoEjecutivo";
-import { esquemaCedula, esquemaCorreo, textoDe } from "./comunes";
+import { cuentaNominaResuelta, reglasCuentaNomina } from "./afiliacion";
+import { esquemaCedula, esquemaCorreo, MENSAJES, normalizarCelular, textoDe } from "./comunes";
+import { correoInstitucionalValido, MENSAJE_DOMINIO_INSTITUCIONAL } from "./dominiosInstitucionales";
+import type { CodigoInstitucion } from "./instituciones";
 
 /**
  * Esquemas del panel /admin. Mismo patrón que el resto del proyecto: un solo
@@ -102,6 +105,85 @@ export const esquemaCambiarEstadoAsociado = z.object({
         .max(300, { error: "El motivo debe tener entre 5 y 300 caracteres." }),
     ),
 });
+
+// ---------------------------------------------------------------------------
+// Editar datos del asociado (nombre, celular, correo institucional, nómina)
+// ---------------------------------------------------------------------------
+
+export type CampoEditarDatosAsociado =
+  | "asociadoId"
+  | "nombre"
+  | "telefono"
+  | "correoInstitucional"
+  | "nomina_entidad"
+  | "nomina_entidad_otra"
+  | "nomina_tipo"
+  | "nomina_numero";
+
+/** Texto opcional de un correo: vacío → null; si viene, en minúsculas y con formato válido. */
+const esquemaCorreoOpcional = z
+  .string()
+  .transform((v) => v.trim().toLowerCase())
+  .pipe(z.union([z.literal(""), z.email({ error: "Revisa el correo: no es válido." }).max(254)]))
+  .transform((v) => (v === "" ? null : v));
+
+/**
+ * «Editar datos» de la ficha del asociado (solo admin). Cédula, grado,
+ * institución y asesor NO se editan aquí (cambian el ingreso, el cupo o las
+ * comisiones). El correo institucional debe ser del dominio de su institución
+ * (mismos dominios que la afiliación). Nómina vacía (sin entidad) = sin cuenta.
+ */
+export function crearEsquemaEditarDatosAsociado(institucion: CodigoInstitucion | null) {
+  return z
+    .object({
+      asociadoId: z.uuid({ error: "Falta el asociado." }),
+      nombre: z
+        .string({ error: "Escribe el nombre." })
+        .transform((v) => v.trim().replace(/\s+/g, " "))
+        .pipe(
+          z
+            .string()
+            .min(2, { error: "El nombre debe tener al menos 2 caracteres." })
+            .max(120, { error: "El nombre puede tener máximo 120 caracteres." })
+            .regex(/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$/, { error: "El nombre solo puede tener letras y espacios." }),
+        ),
+      telefono: z
+        .string()
+        .transform((v) => (v.trim() === "" ? null : normalizarCelular(v)))
+        .pipe(z.union([z.null(), z.string().regex(/^3[0-9]{9}$/, { error: MENSAJES.celularFormato })])),
+      correoInstitucional: esquemaCorreoOpcional,
+      nomina_entidad: z.string().trim(),
+      nomina_entidad_otra: z.string().transform((v) => v.trim().replace(/\s+/g, " ")),
+      nomina_tipo: z.string().trim(),
+      nomina_numero: z.string().transform((v) => v.replace(/[\s.\-]/g, "")),
+    })
+    .superRefine((datos, z4) => {
+      // RS-M2: sin institución no hay dominio que validar, así que no se acepta correo institucional.
+      if (datos.correoInstitucional && !institucion) {
+        z4.addIssue({
+          code: "custom",
+          path: ["correoInstitucional"],
+          message: "El asociado no tiene institución registrada: no se puede guardar un correo institucional.",
+        });
+      }
+      if (datos.correoInstitucional && institucion && !correoInstitucionalValido(datos.correoInstitucional, institucion)) {
+        z4.addIssue({
+          code: "custom",
+          path: ["correoInstitucional"],
+          message: MENSAJE_DOMINIO_INSTITUCIONAL[institucion].replace("Usa tu", "Usa el"),
+        });
+      }
+      if (datos.nomina_entidad) reglasCuentaNomina(datos, z4);
+    })
+    .transform(({ nomina_entidad, nomina_entidad_otra, nomina_tipo, nomina_numero, ...resto }) => ({
+      ...resto,
+      nomina: nomina_entidad
+        ? cuentaNominaResuelta({ nomina_entidad, nomina_entidad_otra, nomina_tipo, nomina_numero })
+        : null,
+    }));
+}
+
+export type DatosEditadosAsociado = z.output<ReturnType<typeof crearEsquemaEditarDatosAsociado>>;
 
 // ---------------------------------------------------------------------------
 // Equipo: cambiar el rol de un secretario / asesor

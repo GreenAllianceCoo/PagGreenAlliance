@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 09-oct-2026 (limpieza del plan: tareas ya hechas cerradas; avance 96,7 %).
+Actualizado: 18-oct-2026 (migraciones 20261014000000 y 20261018000000 aplicadas; falta aplicar 20261018100000, sacar los respaldo-*.sql de la carpeta, revisar public/logos.rar y probar la selfie en un celular real).
 
 ## Dónde quedamos
 

@@ -2,7 +2,7 @@
 
 **Para:** Ricardo Varón Penagos (representante legal) y las personas que la Cooperativa Green Alliance designe como administradores de la plataforma.
 **Sitio:** https://www.greenallianceco.com
-**Versión del manual:** 2 de octubre de 2026
+**Versión del manual:** 18 de octubre de 2026
 
 Este manual explica, paso a paso, cómo usar el panel de administración. No hace falta saber de programación.
 
@@ -14,7 +14,7 @@ Este manual explica, paso a paso, cómo usar el panel de administración. No hac
 2. Cómo ingresar
 3. Resumen (tablero)
 4. Afiliaciones: revisar y aprobar o rechazar
-5. Asociados: proceso ejecutivo, baja, reactivación y crédito
+5. Asociados: datos, proceso ejecutivo, baja, reactivación y crédito
 6. Cambiar el correo de ingreso de un asociado (recuperación de acceso)
 7. Créditos: aprobar, rechazar y marcar el desembolso
 8. Asesores: registro, comisiones, pagos y premios
@@ -27,13 +27,14 @@ Este manual explica, paso a paso, cómo usar el panel de administración. No hac
 15. Qué ve el asociado
 16. Preguntas frecuentes
 17. Historial del equipo
+18. Plataforma: pausar el ingreso de asociados y avisos
 
 ---
 
 ## 1. Reglas que conviene saber antes de empezar
 
 - **No hay contraseñas.** Todos (administradores, asesores y asociados) entran con su cédula y un código de 6 dígitos que llega al correo.
-- **Nadie se cambia a sí mismo.** Un administrador puede manejar a todos los asociados, incluidos los suyos si también atiende asociados (por ejemplo, Ricardo): mover su proceso ejecutivo, asignárselos y aprobar o habilitar sus créditos. Lo único que debe hacer **otro administrador** es lo que toca a su **propia** cuenta (su proceso, su estado o su crédito) y el cambio del correo de ingreso de sus clientes, que es una protección contra el robo de cuentas. Los asesores no pueden cambiar estados ni registrar pagos.
+- **Nadie se cambia a sí mismo.** Un administrador puede manejar a todos los asociados, incluidos los suyos si también atiende asociados (por ejemplo, Ricardo): mover su proceso ejecutivo, asignárselos y aprobar o habilitar sus créditos. Lo único que debe hacer **otro administrador** es lo que toca a su **propia** cuenta (su proceso, su estado, su crédito o sus datos), y también el cambio del correo de ingreso y la edición de los datos de sus propios clientes, que es una protección contra el robo de cuentas. Los asesores no pueden cambiar estados ni registrar pagos.
 - **Los motivos quedan guardados.** Dar de baja, reactivar, habilitar crédito, corregir o anular un pago y cambiar el correo de ingreso piden un motivo (de 5 a 300 caracteres) que queda en el historial con la fecha y el nombre de quien lo hizo.
 - **El asociado nunca ve la tasa de interés.** Solo la ven los administradores, en la ficha del crédito.
 - **Correos:** los datos (cédula, montos, motivo de rechazo, número del sorteo) van **solo al correo personal** del asociado. Al correo institucional solo llega un aviso sin datos: «Tienes una novedad en tu cuenta de Green Alliance; ingresa para verla».
@@ -67,6 +68,7 @@ En computador el menú está a la izquierda; en celular, en pestañas arriba. Ti
 | Alertas | Avisos de los asociados (retiro anticipado, renovación) |
 | Convenios | Empresas aliadas que se muestran en la página y en la cuenta del asociado |
 | Sorteo | Inscritos y boletas del sorteo mensual, y el botón para sortear |
+| Plataforma | Pausar el ingreso de asociados y publicar avisos para su próximo ingreso (solo el administrador; sección 18) |
 | Historial | Lo que hizo cada administrador y secretario (solo el administrador; sección 17) |
 | Demostración | Una cuenta de ejemplo para mostrar la plataforma sin datos reales |
 
@@ -153,9 +155,23 @@ Si la afiliación está aprobada y el asociado **todavía no tiene asesor**, apa
 
 Una vez asignado, **no se puede cambiar ni quitar** desde el panel. Si se necesita, pídalo al equipo técnico.
 
+### 4.7 Solicitudes repetidas
+
+La plataforma **no guarda** una solicitud de afiliación nueva cuando la persona ya está registrada o ya tiene una solicitud en curso. Se descarta si:
+
+- la **cédula** ya pertenece a un asociado, asesor o administrador, o ya tiene una solicitud **Pendiente** o **Contactado**;
+- el **correo personal** ya lo usa otra cuenta u otra solicitud en curso;
+- el **correo institucional** ya pertenece a otro asociado o a otra solicitud en curso.
+
+Por seguridad, la persona ve el mismo mensaje «¡Solicitud enviada!» que en un envío normal, para que nadie pueda averiguar con el formulario quién está registrado. Por eso, en Afiliaciones **no aparece** la solicitud repetida.
+
+Una persona cuya solicitud fue **rechazada** sí puede volver a enviar el formulario.
+
+Si al aprobar una solicitud antigua aparece «Ese correo personal ya lo usa otra cuenta», rechácela o pida a la persona otro correo.
+
 ---
 
-## 5. Asociados: proceso ejecutivo, baja, reactivación y crédito
+## 5. Asociados: datos, proceso ejecutivo, baja, reactivación y crédito
 
 ### 5.1 Buscar un asociado
 
@@ -215,6 +231,28 @@ Cuando a un asociado se le rechaza una solicitud de crédito, queda bloqueado pa
 3. Toque **«Habilitar crédito»**.
 
 El asociado recibe un correo de aviso. Si todavía no puede pedir crédito por otra razón (por ejemplo, su proceso aún no está en «Operando» o está inactivo), el mensaje lo dice: «Crédito habilitado. Aún no podrá pedir porque…».
+
+### 5.6 Editar los datos del asociado
+
+En la ficha del asociado, el bloque **«Datos del asociado»** muestra su nombre, celular, correo institucional y cuenta de nómina. Para corregirlos:
+
+1. Toque **«Editar datos»**.
+2. Cambie lo que necesite:
+   - **Nombre completo:** solo letras y espacios.
+   - **Celular:** 10 dígitos que empiezan por 3. Puede dejarlo vacío.
+   - **Correo institucional:** debe ser del dominio de su institución (por ejemplo, @policia.gov.co). Si el asociado no tiene institución registrada, no se puede guardar. Si lo deja vacío, el asociado queda sin correo institucional y deja de recibir allí los avisos.
+   - **Cuenta de nómina:** elija la entidad. Si es un banco, elija el tipo de cuenta (ahorros o corriente) y escriba el número. Si es una billetera (Nequi, Daviplata…), el número es el celular. Si el banco no está en la lista, elija «Otra, ¿cuál?» y escriba el nombre. Si elige «Sin cuenta de nómina», se borra la cuenta.
+3. Toque **«Guardar cambios»**. Verá «Datos actualizados».
+
+Tenga en cuenta:
+
+- La **cédula**, el **grado**, la **institución** y el **asesor** no se cambian aquí, porque afectan el ingreso, el cupo de crédito y las comisiones. Si hace falta, pídalo al equipo técnico.
+- El **correo de ingreso** (el personal) tampoco se cambia aquí: se usa la sección 6.
+- No puede editar sus propios datos ni los de sus propios clientes; debe hacerlo otro administrador.
+- El secretario no ve este bloque.
+- El cambio queda guardado en la base de datos (quién, cuándo y qué campos cambió, sin los valores), pero todavía **no aparece** en la sección «Historial».
+- Estos datos solo se pueden cambiar desde aquí: la base de datos rechaza cualquier otro camino.
+- El asociado puede seguir cambiando su celular desde su perfil.
 
 ---
 
@@ -513,8 +551,8 @@ El **secretario** es una persona de apoyo que revisa las afiliaciones, consulta 
 
 - **Dar de baja ni reactivar** a un asociado, ni **eliminarlo definitivamente**.
 - **Habilitar un nuevo crédito**, **aprobar, rechazar o marcar el desembolso** de un crédito, ni **subir o ver comprobantes**.
-- **Cambiar el correo de ingreso** de un asociado, ni ver su foto del carné.
-- Entrar a **Asesores, Alertas, Convenios, Sorteo, Historial ni Demostración**: esas secciones **no aparecen** en su menú y, si escribe la dirección a mano, la plataforma lo devuelve al Resumen. Tampoco puede registrar pagos de comisión ni hacer el sorteo.
+- **Cambiar el correo de ingreso** de un asociado, **editar sus datos** (nombre, celular, correo institucional o cuenta de nómina) ni ver su foto del carné.
+- Entrar a **Asesores, Alertas, Convenios, Sorteo, Plataforma, Historial ni Demostración**: esas secciones **no aparecen** en su menú y, si escribe la dirección a mano, la plataforma lo devuelve al Resumen. Tampoco puede registrar pagos de comisión ni hacer el sorteo.
 - Cambiar su propio rol ni el de nadie.
 
 Los botones que no le corresponden **no se muestran**, y además la plataforma y la base de datos los rechazan aunque alguien intente usarlos por otro camino.
@@ -541,6 +579,7 @@ Al entrar con su cédula y su código, el asociado ve:
 - **Inicio:** el estado de su última solicitud de crédito, el botón **«Nueva solicitud»**, el **sorteo del mes** (del 1 al 5), el ganador del último sorteo y sus **convenios** (al tocar uno ve el detalle y el botón de WhatsApp).
 - **Solicitar crédito:** elige 50 % o 100 % de devolución y el monto (mínimo $100.000, en pasos de $50.000, hasta el tope de su grado). El plazo es de 3 meses. **No ve la tasa.** Solo puede pedir si está activo, si su proceso está en «Operando» y si no tiene otra solicitud pendiente.
 - **Perfil:** su nombre, asesor, grado e institución; la **línea de 8 pasos** del proceso ejecutivo; el **conteo de 36 meses** (empieza en «Operando»); los botones **«Retiro anticipado»** y **«Renovar los 36 meses»** (este se activa a los 24 meses); el **conteo de 3 meses** de su crédito (desde el desembolso), y su **celular** (editable). El correo de ingreso no se cambia desde el perfil: el perfil explica que, para cambiarlo, use «¿Ya no tienes acceso a tu correo?» en la pantalla de ingreso o escriba por WhatsApp (sección 6).
+- **Avisos y WhatsApp:** si la cooperativa publicó un aviso (sección 18), lo ve en una ventana al entrar. En todas las pantallas tiene un botón pequeño de WhatsApp abajo a la derecha que abre un mensaje con su nombre, dirigido al número de la cooperativa. El botón también aparece en la página pública, con un mensaje general.
 - **Carné con QR:** un carné virtual de «Afiliado Titular» que puede **descargar en PDF**. Quien escanee el QR ve su nombre, grado, institución y si está activo, pero no su cédula, celular ni datos de crédito. Si lo compartió por error, puede tocar **«Regenerar código»** y el QR anterior deja de servir.
 
 ---
@@ -571,7 +610,7 @@ La persona puede llenar el formulario de afiliación otra vez, o el equipo técn
 Use **«Corregir»** si el pago existe pero tiene un dato mal, o **«Anular»** si no debía existir (8.5).
 
 **¿Por qué no puedo cambiar el proceso (o el crédito, o el pago) de cierto asociado?**
-Porque es su propia cuenta (o, en el caso del correo de ingreso, uno de sus clientes). Debe hacerlo otro administrador.
+Porque es su propia cuenta (o, en el caso del correo de ingreso y de «Editar datos», uno de sus clientes). Debe hacerlo otro administrador.
 
 **Un asociado quiere pedir crédito y la pantalla dice «Podrás pedir tu crédito cuando tu proceso esté operando».**
 Su proceso ejecutivo aún no está en «Operando». Cuando lo esté, cambie el estado en su ficha (5.2).
@@ -579,8 +618,20 @@ Su proceso ejecutivo aún no está en «Operando». Cuando lo esté, cambie el e
 **Un asociado tiene «Tu perfil no tiene un grado asignado».**
 Avise al equipo técnico: el grado se toma de la afiliación al aprobarla.
 
+**Un asociado cambió de celular, de cuenta de nómina o tiene mal escrito el nombre.**
+Corríjalo en su ficha con **«Editar datos»** (5.6). Si es uno de sus clientes, pídaselo a otro administrador.
+
+**Una persona dice que llenó el formulario de afiliación, pero su solicitud no aparece.**
+Puede que ya esté registrada o que ya tenga una solicitud en curso con la misma cédula o el mismo correo (4.7). Búsquela por cédula en **Asociados** y en **Afiliaciones** (filtros Pendiente y Contactado). Si ya es asociada, solo tiene que ingresar con su cédula.
+
 **Quiero cambiar el asesor de un asociado.**
 Hoy no se puede desde el panel. Pídalo al equipo técnico.
+
+**Al afiliarse, la selfie dice que se ve borrosa u oscura, pero se ve bien.**
+Es solo un aviso: la persona puede seguir con esa foto. Desde el 18 de octubre la revisión de la selfie es menos estricta que la de la cédula (una cara tiene menos detalle que un documento) y la cámara se abre en alta resolución, así que este aviso debería salir muy poco.
+
+**Algo falla en la plataforma y no hay nadie del equipo técnico.**
+Pause el ingreso de asociados en **Plataforma** (sección 18) y avíseles por WhatsApp. Cuando se resuelva, toque «Reanudar el ingreso».
 
 **¿Dónde están las cifras de cupos y tasas?**
 Están configuradas en la base de datos según la presentación de negocio. Para cambiarlas hay que pedírselo al equipo técnico.
@@ -606,3 +657,40 @@ Aparecen estos movimientos:
 **Páginas.** Se muestran 25 movimientos por página; abajo están **«Anterior»** y **«Siguiente»**, con el total de movimientos.
 
 > Los cambios de estado de afiliación y de rol se registran desde la publicación de esta versión (lo anterior no aparece), y las asignaciones de asesor hechas antes aparecen sin el nombre del asesor.
+
+---
+
+## 18. Plataforma: pausar el ingreso de asociados y avisos
+
+Solo el **administrador** ve la sección **«Plataforma»** del menú.
+
+### 18.1 Pausar el ingreso de asociados
+
+Sirve para cerrar temporalmente la cuenta de los asociados, por ejemplo si algo falla y no hay nadie del equipo técnico disponible.
+
+1. Entre a **Plataforma**.
+2. Si quiere, escriba un **mensaje para los asociados** (de 5 a 300 caracteres), por ejemplo «Estamos haciendo ajustes. Volvemos a las 3 p. m.». Si lo deja vacío, verán: «Estamos haciendo ajustes en la plataforma. Vuelve a intentarlo más tarde o escríbenos por WhatsApp».
+3. Toque **«Pausar el ingreso de asociados»**. El recuadro se pone rojo y dice «En pausa».
+
+Mientras esté en pausa:
+
+- los asociados que intenten entrar a su cuenta, o que ya estén dentro, ven la pantalla **«Volvemos pronto»** con el mensaje, el botón de WhatsApp y «Salir». No pueden pedir crédito, inscribirse al sorteo ni enviar avisos;
+- los **administradores, secretarios y asesores** siguen entrando normalmente;
+- la página pública y el formulario de afiliación siguen abiertos.
+
+Para abrir de nuevo, toque **«Reanudar el ingreso»**. Debajo del estado se ve quién hizo el último cambio y cuándo, y cada pausa o reanudación queda registrada.
+
+### 18.2 Avisos para los asociados
+
+Un aviso es un mensaje que cada asociado ve **una sola vez**, en una ventana, **la próxima vez que entra** a su cuenta.
+
+1. En **Plataforma → Avisos para los asociados**, escriba el **título** (de 3 a 80 caracteres) y el **mensaje** (de 5 a 1000).
+2. Toque **«Publicar aviso»**.
+
+Tenga en cuenta:
+
+- Lo ven los asociados que ya estaban registrados cuando se publicó. Quien se afilie después no lo ve.
+- Si hay varios avisos sin ver, salen uno tras otro.
+- No se envía por correo ni llega como notificación al celular: aparece cuando la persona entra.
+- En la lista de avisos se ve quién lo publicó, cuándo y **cuántos asociados ya lo vieron**.
+- **«Retirar»** deja de mostrar el aviso a quienes todavía no lo han visto. No se puede editar ni borrar: si se equivocó, retírelo y publique uno nuevo.

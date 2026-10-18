@@ -34,7 +34,26 @@ export const UMBRAL_BRILLO_MAXIMO = 235;
 /** Lado MENOR mínimo de la foto original, en píxeles (una cédula legible necesita resolución). */
 export const LADO_MENOR_MINIMO_PX = 600;
 
+/**
+ * Selfie (perfil «selfie»): una cara tiene muchos menos bordes que una cédula
+ * (piel lisa y fondo desenfocado, y muchas cámaras frontales suavizan la
+ * imagen), y la cámara de la página puede entregar 640×480. Con los umbrales
+ * de la cédula casi toda selfie salía «dudosa» aunque se viera bien (reporte
+ * de Sebas, 18-oct). Se mide con umbrales propios.
+ */
+export const UMBRAL_NITIDEZ_SELFIE = 12;
+export const LADO_MENOR_MINIMO_SELFIE_PX = 360;
+export const UMBRAL_BRILLO_MINIMO_SELFIE = 45;
+
+export type PerfilFoto = "documento" | "selfie";
+
+const UMBRALES: Record<PerfilFoto, { nitidez: number; ladoMenor: number; brilloMinimo: number }> = {
+  documento: { nitidez: UMBRAL_NITIDEZ, ladoMenor: LADO_MENOR_MINIMO_PX, brilloMinimo: UMBRAL_BRILLO_MINIMO },
+  selfie: { nitidez: UMBRAL_NITIDEZ_SELFIE, ladoMenor: LADO_MENOR_MINIMO_SELFIE_PX, brilloMinimo: UMBRAL_BRILLO_MINIMO_SELFIE },
+};
+
 export const MENSAJE_FOTO_DUDOSA = "La foto se ve borrosa u oscura, tómala de nuevo";
+export const MENSAJE_SELFIE_DUDOSA = "Puede que la selfie esté borrosa u oscura. Si tu cara se ve bien, úsala así";
 
 export type ImagenRGBA = {
   data: Uint8ClampedArray | Uint8Array | number[];
@@ -119,13 +138,15 @@ export function evaluarCalidadFoto(
     anchoOriginal: imagen.width,
     altoOriginal: imagen.height,
   },
+  perfil: PerfilFoto = "documento",
 ): ResultadoCalidadFoto {
+  const umbral = UMBRALES[perfil];
   const nitidez = varianzaLaplaciano(imagen);
   const brillo = brilloMedio(imagen);
-  const borrosa = nitidez < UMBRAL_NITIDEZ;
-  const oscura = brillo < UMBRAL_BRILLO_MINIMO;
+  const borrosa = nitidez < umbral.nitidez;
+  const oscura = brillo < umbral.brilloMinimo;
   const quemada = brillo > UMBRAL_BRILLO_MAXIMO;
-  const pequena = Math.min(original.anchoOriginal, original.altoOriginal) < LADO_MENOR_MINIMO_PX;
+  const pequena = Math.min(original.anchoOriginal, original.altoOriginal) < umbral.ladoMenor;
   return {
     nitidez,
     brillo,

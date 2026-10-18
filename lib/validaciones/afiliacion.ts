@@ -225,6 +225,59 @@ const camposFotos = {
 
 type SalidaTexto = z.output<z.ZodObject<typeof camposTexto>>;
 
+/** Campos de la cuenta de nómina tal como llegan del formulario (ya recortados). */
+export type EntradaCuentaNomina = {
+  nomina_entidad: string;
+  nomina_entidad_otra: string;
+  nomina_tipo: string;
+  nomina_numero: string;
+};
+
+/**
+ * Cuenta de nómina en cascada: entidad → (tipo) → número. La comparten la
+ * afiliación y la edición de datos del asociado en /admin.
+ */
+export function reglasCuentaNomina(datos: EntradaCuentaNomina, z4: { addIssue: (issue: { code: "custom"; path: string[]; message: string }) => void }) {
+  const entidad = datos.nomina_entidad;
+  if (!entidad) {
+    z4.addIssue({ code: "custom", path: ["nomina_entidad"], message: MENSAJES_AFILIACION.entidad });
+    return;
+  }
+  if (entidad !== OPCION_OTRA_ENTIDAD && !esEntidadDeLista(entidad)) {
+    z4.addIssue({ code: "custom", path: ["nomina_entidad"], message: MENSAJES_AFILIACION.entidad });
+    return;
+  }
+  if (entidad === OPCION_OTRA_ENTIDAD) {
+    const otra = datos.nomina_entidad_otra;
+    if (!otra) {
+      z4.addIssue({ code: "custom", path: ["nomina_entidad_otra"], message: MENSAJES_AFILIACION.entidadOtra });
+    } else if (otra.length < 2 || otra.length > 60) {
+      z4.addIssue({ code: "custom", path: ["nomina_entidad_otra"], message: MENSAJES_AFILIACION.entidadOtraFormato });
+    }
+  }
+
+  const numero = datos.nomina_numero;
+  if (esBilletera(entidad)) {
+    // TODO(confirmar: R-03) billetera = depósito electrónico; el número es un celular.
+    const celular = normalizarCelular(numero);
+    if (!celular) {
+      z4.addIssue({ code: "custom", path: ["nomina_numero"], message: MENSAJES_AFILIACION.numeroCuenta });
+    } else if (!/^3[0-9]{9}$/.test(celular)) {
+      z4.addIssue({ code: "custom", path: ["nomina_numero"], message: MENSAJES_AFILIACION.numeroBilletera });
+    }
+    return;
+  }
+
+  if (!(TIPOS_CUENTA_BANCO as readonly string[]).includes(datos.nomina_tipo)) {
+    z4.addIssue({ code: "custom", path: ["nomina_tipo"], message: MENSAJES_AFILIACION.tipoCuenta });
+  }
+  if (!numero) {
+    z4.addIssue({ code: "custom", path: ["nomina_numero"], message: MENSAJES_AFILIACION.numeroCuenta });
+  } else if (!/^[0-9]{6,20}$/.test(numero)) {
+    z4.addIssue({ code: "custom", path: ["nomina_numero"], message: MENSAJES_AFILIACION.numeroCuentaFormato });
+  }
+}
+
 /** Reglas que dependen de varios campos o del contexto (grado, asesor, nómina, correos). */
 function reglasCruzadas(ctx: ContextoAfiliacion) {
   return (datos: SalidaTexto, z4: z.core.$RefinementCtx<SalidaTexto>) => {
@@ -259,45 +312,7 @@ function reglasCruzadas(ctx: ContextoAfiliacion) {
       z4.addIssue({ code: "custom", path: ["email"], message: MENSAJES_AFILIACION.correosIguales });
     }
 
-    // Cuenta de nómina: entidad → (tipo) → número.
-    const entidad = datos.nomina_entidad;
-    if (!entidad) {
-      z4.addIssue({ code: "custom", path: ["nomina_entidad"], message: MENSAJES_AFILIACION.entidad });
-      return;
-    }
-    if (entidad !== OPCION_OTRA_ENTIDAD && !esEntidadDeLista(entidad)) {
-      z4.addIssue({ code: "custom", path: ["nomina_entidad"], message: MENSAJES_AFILIACION.entidad });
-      return;
-    }
-    if (entidad === OPCION_OTRA_ENTIDAD) {
-      const otra = datos.nomina_entidad_otra;
-      if (!otra) {
-        z4.addIssue({ code: "custom", path: ["nomina_entidad_otra"], message: MENSAJES_AFILIACION.entidadOtra });
-      } else if (otra.length < 2 || otra.length > 60) {
-        z4.addIssue({ code: "custom", path: ["nomina_entidad_otra"], message: MENSAJES_AFILIACION.entidadOtraFormato });
-      }
-    }
-
-    const numero = datos.nomina_numero;
-    if (esBilletera(entidad)) {
-      // TODO(confirmar: R-03) billetera = depósito electrónico; el número es un celular.
-      const celular = normalizarCelular(numero);
-      if (!celular) {
-        z4.addIssue({ code: "custom", path: ["nomina_numero"], message: MENSAJES_AFILIACION.numeroCuenta });
-      } else if (!/^3[0-9]{9}$/.test(celular)) {
-        z4.addIssue({ code: "custom", path: ["nomina_numero"], message: MENSAJES_AFILIACION.numeroBilletera });
-      }
-      return;
-    }
-
-    if (!(TIPOS_CUENTA_BANCO as readonly string[]).includes(datos.nomina_tipo)) {
-      z4.addIssue({ code: "custom", path: ["nomina_tipo"], message: MENSAJES_AFILIACION.tipoCuenta });
-    }
-    if (!numero) {
-      z4.addIssue({ code: "custom", path: ["nomina_numero"], message: MENSAJES_AFILIACION.numeroCuenta });
-    } else if (!/^[0-9]{6,20}$/.test(numero)) {
-      z4.addIssue({ code: "custom", path: ["nomina_numero"], message: MENSAJES_AFILIACION.numeroCuentaFormato });
-    }
+    reglasCuentaNomina(datos, z4);
   };
 }
 
@@ -308,14 +323,17 @@ function reglasCruzadas(ctx: ContextoAfiliacion) {
 const SIEMPRE = { when: (payload: { value: unknown }) => typeof payload.value === "object" && payload.value !== null };
 
 /** Deja la cuenta de nómina como la guarda la base (entidad final, tipo del enum, número limpio). */
-function resolverNomina<T extends SalidaTexto>(datos: T) {
+export function cuentaNominaResuelta(datos: EntradaCuentaNomina) {
   const billetera = esBilletera(datos.nomina_entidad);
-  const nomina = {
+  return {
     entidad: datos.nomina_entidad === OPCION_OTRA_ENTIDAD ? datos.nomina_entidad_otra : datos.nomina_entidad,
     tipo: (billetera ? "deposito_electronico" : datos.nomina_tipo) as TipoCuentaNomina,
     numero: billetera ? normalizarCelular(datos.nomina_numero) : datos.nomina_numero,
   };
-  return { ...datos, nomina };
+}
+
+function resolverNomina<T extends SalidaTexto>(datos: T) {
+  return { ...datos, nomina: cuentaNominaResuelta(datos) };
 }
 
 /**

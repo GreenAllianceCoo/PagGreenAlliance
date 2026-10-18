@@ -13,13 +13,16 @@ import { registrar } from "@/lib/servidor/registro";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { erroresPorCampo, textoDe } from "@/lib/validaciones/comunes";
 import {
+  crearEsquemaEditarDatosAsociado,
   esquemaActualizarProceso,
   esquemaCambiarEstadoAsociado,
   esquemaHabilitarCredito,
   type CampoHabilitarCredito,
   type CampoActualizarProceso,
+  type CampoEditarDatosAsociado,
   type CampoEstadoAsociado,
 } from "@/lib/validaciones/admin";
+import { esInstitucion } from "@/lib/validaciones/instituciones";
 import {
   esquemaCambiarCorreoAdmin,
   type CampoCambiarCorreoAdmin,
@@ -384,4 +387,99 @@ export async function cambiarCorreoIngreso(
       ? "Correo de ingreso cambiado, pero no pudimos cerrar sus sesiones abiertas. Avisa al equipo técnico."
       : "Correo de ingreso cambiado y sesiones anteriores cerradas. Avisamos al correo anterior y al nuevo.",
   };
+}
+
+export type EstadoEditarDatosAsociado = {
+  errores?: Partial<Record<CampoEditarDatosAsociado, string>>;
+  error?: string;
+  mensaje?: string;
+};
+
+/** Textos de admin_editar_datos_asociado() listos para mostrar. */
+const MENSAJES_EDITAR_DATOS = [
+  "No puedes editar tus propios datos; debe hacerlo otro administrador",
+  "No encontramos al asociado",
+  "Es uno de tus clientes: otro administrador debe editar sus datos",
+  "No hay cambios para guardar",
+];
+const MENSAJES_CORREO_INSTITUCIONAL = [
+  "El asociado no tiene institución registrada: no se puede guardar un correo institucional",
+  "El correo institucional no es del dominio de su institución",
+];
+
+/**
+ * «Editar datos» de la ficha del asociado (pedido de Sebas, 14-oct): nombre,
+ * celular, correo institucional y cuenta de nómina. Solo el admin y solo sobre
+ * perfiles con rol asociado que no estén eliminados. Como el cambio de correo de
+ * ingreso (RS-01), nadie edita sus propios datos ni los de sus clientes por aquí.
+ * Cédula, grado, institución y asesor no se tocan (ingreso, cupo y comisiones).
+ * Escribe SOLO por la RPC admin_editar_datos_asociado (migración 20261018100000),
+ * que repite estas reglas y deja historial_cambio_datos_perfil; un UPDATE directo
+ * de esas columnas sobre otra persona lo rechaza la base (RS-M3).
+ */
+export async function editarDatosAsociado(
+  _previo: EstadoEditarDatosAsociado,
+  formData: FormData,
+): Promise<EstadoEditarDatosAsociado> {
+  const { supabase, userId } = await exigirAdmin();
+
+  const asociadoId = textoDe(formData, "asociadoId");
+  if (asociadoId === userId) {
+    return { error: "No puedes editar tus propios datos; debe hacerlo otro administrador." };
+  }
+  if (!(await dentroDelLimite("admin-editar-datos", userId, 30, 60 * 60))) {
+    return { error: "Hiciste muchos cambios seguidos. Intenta de nuevo en una hora." };
+  }
+
+  const { data: perfil } = /^[0-9a-f-]{36}$/i.test(asociadoId)
+    ? await supabase
+        .from("perfiles")
+        .select("rol, asesor_id, eliminado_at, institucion")
+        .eq("id", asociadoId)
+        .maybeSingle()
+    : { data: null };
+  if (!perfil || perfil.rol !== "asociado" || perfil.eliminado_at) {
+    return { error: "No encontramos al asociado." };
+  }
+  if (perfil.asesor_id === userId) {
+    return { error: "Es uno de tus clientes: otro administrador debe editar sus datos." };
+  }
+
+  const resultado = crearEsquemaEditarDatosAsociado(esInstitucion(perfil.institucion) ? perfil.institucion : null).safeParse({
+    asociadoId,
+    nombre: textoDe(formData, "nombre"),
+    telefono: textoDe(formData, "telefono"),
+    correoInstitucional: textoDe(formData, "correoInstitucional"),
+    nomina_entidad: textoDe(formData, "nomina_entidad"),
+    nomina_entidad_otra: textoDe(formData, "nomina_entidad_otra"),
+    nomina_tipo: textoDe(formData, "nomina_tipo"),
+    nomina_numero: textoDe(formData, "nomina_numero"),
+  });
+  if (!resultado.success) {
+    return { errores: erroresPorCampo<CampoEditarDatosAsociado>(resultado.error) };
+  }
+  const datos = resultado.data;
+
+  const { data: campos, error } = await supabase.rpc("admin_editar_datos_asociado", {
+    p_asociado_id: asociadoId,
+    p_nombre: datos.nombre,
+    p_telefono: datos.telefono,
+    p_correo_institucional: datos.correoInstitucional,
+    p_nomina_entidad: datos.nomina?.entidad ?? null,
+    p_nomina_tipo: datos.nomina?.tipo ?? null,
+    p_nomina_numero: datos.nomina?.numero ?? null,
+  });
+  if (error) {
+    const deCorreo = MENSAJES_CORREO_INSTITUCIONAL.find((m) => error.message?.includes(m));
+    if (deCorreo) return { errores: { correoInstitucional: `${deCorreo}.` } };
+    const conocido = MENSAJES_EDITAR_DATOS.find((m) => error.message?.includes(m));
+    if (!conocido) registrar("error", { evento: "admin_editar_datos_fallo", codigo: error.code, mensaje: error.message });
+    return { error: conocido ? `${conocido}.` : "No pudimos guardar los cambios. Intenta de nuevo." };
+  }
+
+  registrar("info", { evento: "admin_editar_datos_asociado", actor_id: userId, asociado_id: asociadoId, campos });
+
+  revalidatePath("/admin/asociados");
+  revalidatePath(`/admin/asociados/${asociadoId}`);
+  return { mensaje: "Datos actualizados." };
 }
