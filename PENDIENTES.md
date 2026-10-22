@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 18-oct-2026 (migraciones 20261014000000 y 20261018000000 aplicadas; falta aplicar 20261018100000, sacar los respaldo-*.sql de la carpeta, revisar public/logos.rar y probar la selfie en un celular real).
+Actualizado: 22-oct-2026 (migración 20261018100000 aplicada; respaldos y logos.rar fuera del repo; faltan abrir y fusionar el PR develop → main y probar la selfie en un celular real).
 
 ## Dónde quedamos
 
