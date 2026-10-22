@@ -4,7 +4,7 @@
 **Representante legal:** Ricardo Varón Penagos
 **Plataforma:** https://www.greenallianceco.com
 **Contrato:** Contrato de prestación de servicios Nº 001-2026 (cláusulas tercera y vigésima: capacitación básica al personal designado)
-**Material de apoyo entregado:** «Manual de administración · Plataforma Green Alliance» (versión del 1 de octubre de 2026)
+**Material de apoyo entregado:** «Manual de administración · Plataforma Green Alliance» (versión del 18 de octubre de 2026)
 
 ---
 
@@ -26,12 +26,13 @@ Marque con una **X** los temas vistos y anote en qué sesión.
 | ☐ | Ingreso con cédula y código al correo; salir de la cuenta | 2 | ____ |
 | ☐ | Reglas generales: nadie se aprueba a sí mismo, motivos e historial, correos personal e institucional | 1 | ____ |
 | ☐ | Tablero «Resumen» y sus cifras | 3 | ____ |
-| ☐ | Afiliaciones: revisar datos y fotos, contactar por WhatsApp, aprobar, rechazar y asignar asesor | 4 | ____ |
+| ☐ | Afiliaciones: revisar datos y fotos, contactar por WhatsApp, aprobar, rechazar y asignar asesor; solicitudes repetidas | 4 | ____ |
 | ☐ | Asociados: búsqueda y los 8 pasos del proceso ejecutivo; fecha de inicio del embargo | 5.1 – 5.2 | ____ |
 | ☐ | Asociados: dar de baja y reactivar | 5.3 – 5.4 | ____ |
 | ☐ | Asociados: habilitar un nuevo crédito después de un rechazo | 5.5 | ____ |
+| ☐ | Asociados: editar datos (nombre, celular, correo institucional y cuenta de nómina) | 5.6 | ____ |
 | ☐ | Recuperación de acceso: verificar la identidad y cambiar el correo de ingreso | 6 | ____ |
-| ☐ | Créditos: revisar el tope, aprobar, rechazar con motivo y marcar el desembolso | 7 | ____ |
+| ☐ | Créditos: revisar el tope, aprobar, rechazar con motivo, marcar el desembolso y comprobante; eliminar definitivamente | 7 | ____ |
 | ☐ | Asesores: registrar un asesor e interruptor «Atiende asociados» | 8.1 – 8.2 | ____ |
 | ☐ | Comisiones: corte el 15, ingreso nuevo y embargo operativo | 8.3 | ____ |
 | ☐ | Pagos de comisión: registrar, corregir, anular y consultar la bitácora | 8.4 – 8.5 | ____ |
@@ -41,8 +42,11 @@ Marque con una **X** los temas vistos y anote en qué sesión.
 | ☐ | Convenios: crear, editar, ordenar, ocultar, eliminar y cargar el logo | 11 | ____ |
 | ☐ | Modo demostración (selector Policía / Ejército y grado) | 12 | ____ |
 | ☐ | Pantalla del asesor: resumen, clientes, comisiones y simulador | 13 | ____ |
-| ☐ | Pantalla del asociado: inicio, solicitud de crédito, perfil, sorteo y carné con QR | 14 | ____ |
-| ☐ | Preguntas frecuentes: correo que no llega, asociado sin acceso al correo, errores al aprobar o registrar | 15 | ____ |
+| ☐ | Rol de secretario: qué puede y qué no puede hacer; crearlo, desactivarlo o cambiarle el rol | 14 | ____ |
+| ☐ | Pantalla del asociado: inicio, solicitud de crédito, perfil, sorteo y carné con QR | 15 | ____ |
+| ☐ | Preguntas frecuentes: correo que no llega, asociado sin acceso al correo, errores al aprobar o registrar | 16 | ____ |
+| ☐ | Historial del equipo | 17 | ____ |
+| ☐ | Plataforma: pausar y reanudar el ingreso de asociados; publicar y retirar avisos | 18 | ____ |
 | ☐ | Otros: ____________________________________________ | — | ____ |
 
 ## 3. Asistentes

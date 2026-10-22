@@ -123,6 +123,10 @@ export async function aprobarAfiliacion(
       app_metadata: { cedula: solicitud.cedula, grado: solicitud.grado },
       user_metadata: { nombre_completo: solicitud.nombre, telefono: solicitud.celular },
     });
+    if (errorCrear?.code === "email_exists") {
+      // Solicitudes anteriores a la regla «sin repetidos» (migración 20261014000000).
+      return { error: "Ese correo personal ya lo usa otra cuenta. Rechaza esta solicitud o pide a la persona otro correo." };
+    }
     if (errorCrear || !creado?.user) {
       registrar("error", {
         evento: "afiliacion_aprobar_crear_usuario_fallo",

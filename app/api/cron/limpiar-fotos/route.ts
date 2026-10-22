@@ -1,6 +1,7 @@
 import { cronAutorizado, limpiarFotosHuerfanas, limpiarFotosCarneHuerfanas } from "@/lib/afiliacion/limpiezaFotos";
 import { limpiarComprobantes } from "@/lib/admin/limpiezaComprobantes";
 import { registrar } from "@/lib/servidor/registro";
+import { vigilarLimite } from "@/lib/servidor/saludLimite";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
  * - Del bucket `afiliacion-documentos`: fotos de solicitudes >3h sin vincularse (limpiarFotosHuerfanas).
  * - Del bucket `fotos-carne`: fotos >24h que no son vigentes en ningún perfil (limpiarFotosCarneHuerfanas, H-09).
  * - Comprobantes de desembolso: vencidos (30d de asociados eliminados) e huérfanos (>24h sin vincular).
+ * - Revisa que el límite de intentos funcione y, si no, avisa por correo una vez al día (saludLimite.ts).
  * Vercel Cron manda `Authorization: Bearer <CRON_SECRET>`; si falta o no coincide, responde 401.
  */
 export async function GET(request: Request) {
@@ -43,6 +45,8 @@ export async function GET(request: Request) {
     fallo = true;
     registrar("error", { evento: "limpieza_comprobantes_fallo", mensaje: error instanceof Error ? error.message : String(error) });
   }
-  if (fallo) return Response.json({ ok: false }, { status: 500 });
-  return Response.json({ ok: true, ...fotosAfiliacion, fotosCarne, comprobantes });
+  // No cuenta como fallo de la limpieza: tiene su propio aviso por correo.
+  const limite = await vigilarLimite(admin);
+  if (fallo) return Response.json({ ok: false, limite }, { status: 500 });
+  return Response.json({ ok: true, ...fotosAfiliacion, fotosCarne, comprobantes, limite });
 }

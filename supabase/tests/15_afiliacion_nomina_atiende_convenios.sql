@@ -178,7 +178,10 @@ select set_eq(
                               'admin_registrar_cambio_correo', 'admin_rechazar_recuperacion', 'admin_validar_cambio_correo',
                               'admin_registrar_comprobante',
                               'es_secretario', 'es_admin_o_secretario', 'secretario_asignar_asesor', 'buscar_asociados_general',
-                              'admin_cambiar_rol_equipo', 'admin_historial_equipo'],
+                              'admin_cambiar_rol_equipo', 'admin_historial_equipo',
+                              'estado_pausa_cuenta', 'admin_cambiar_pausa_cuenta', 'mis_avisos_pendientes',
+                              'marcar_aviso_visto', 'admin_crear_aviso', 'admin_desactivar_aviso',
+                              'admin_editar_datos_asociado'],
   'solo estas funciones security definer (que se validan solas) las ejecuta authenticated'
 );
 select is_empty(

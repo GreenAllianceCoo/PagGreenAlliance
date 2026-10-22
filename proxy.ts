@@ -10,6 +10,8 @@ import { NextResponse, type NextRequest } from "next/server";
  *   Server Action de esas dos áreas lo vuelven a comprobar con `exigirAdmin()`
  *   (solo admin), `exigirAdminOSecretario()` (Resumen y afiliaciones) o el
  *   equivalente del asesor, porque el proxy no es la única barrera.
+ * - /cuenta con la pausa activa y rol asociado → /cuenta-pausada
+ *   (estado_pausa_cuenta(), migración 20261018000000).
  * - /ingresar (y sus pasos) con sesión → /cuenta. Así los botones de la landing
  *   que apuntan a /ingresar («Mi cuenta», «Ingresar», «Solicitar crédito»,
  *   «Ver beneficios en mi cuenta») llevan a /cuenta cuando ya hay sesión.
@@ -56,6 +58,15 @@ export async function proxy(request: NextRequest) {
     ruta === "/admin" || ruta.startsWith("/admin/") ||
     ruta === "/asesor" || ruta.startsWith("/asesor/");
   if (!user && esPrivada) return redirigir("/ingresar");
+
+  // Pausa del ingreso de asociados (admin, /admin/plataforma): cubre páginas
+  // y Server Actions de /cuenta. Si la consulta falla (p. ej. la migración aún
+  // no está aplicada) no se bloquea a nadie.
+  const esCuenta = ruta === "/cuenta" || ruta.startsWith("/cuenta/");
+  if (user && esCuenta) {
+    const { data: pausa } = await supabase.rpc("estado_pausa_cuenta").maybeSingle<{ pausada: boolean }>();
+    if (pausa?.pausada) return redirigir("/cuenta-pausada");
+  }
 
   const esIngreso = ruta === "/ingresar" || ruta.startsWith("/ingresar/");
   if (user && esIngreso) return redirigir("/cuenta");

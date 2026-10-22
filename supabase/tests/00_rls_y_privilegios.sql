@@ -97,7 +97,11 @@ select is_empty(
                               'admin_registrar_cambio_correo', 'admin_rechazar_recuperacion', 'admin_validar_cambio_correo',
                               'admin_registrar_comprobante',
                               'es_secretario', 'es_admin_o_secretario', 'secretario_asignar_asesor', 'buscar_asociados_general',
-                              'admin_cambiar_rol_equipo', 'admin_historial_equipo')
+                              'admin_cambiar_rol_equipo', 'admin_historial_equipo',
+                              -- Pausa del ingreso y avisos (20261018000000): se validan solas.
+                              'estado_pausa_cuenta', 'admin_cambiar_pausa_cuenta', 'mis_avisos_pendientes',
+                              'marcar_aviso_visto', 'admin_crear_aviso', 'admin_desactivar_aviso',
+                              'admin_editar_datos_asociado')
         and (has_function_privilege('authenticated', p.oid, 'execute')
              or has_function_privilege('anon', p.oid, 'execute')) $$,
   'ninguna función security definer fuera de la lista blanca (las que se validan solas) es ejecutable por anon o authenticated'

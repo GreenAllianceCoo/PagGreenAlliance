@@ -1,6 +1,6 @@
 {
   "parametros": {
-    "actualizado": "2026-10-09",
+    "actualizado": "2026-10-22",
     "bloques_por_semana": 10,
     "nota_bloque": "1 bloque = 1 punto de peso ≈ media jornada de trabajo. Se puede cambiar en la hoja Resumen."
   },
@@ -659,7 +659,7 @@
       "estado": "Bloqueado",
       "origen": "Propuesta",
       "agente": "ga-diseno-a-codigo",
-      "bloqueo": "30-sep: fotos reales de la landing por llegar (cooperativa); cifras ya corregidas (§12)."
+      "bloqueo": "Falta de la cooperativa: fotos, cifras, testimonios y fotos de las sedes."
     },
     {
       "id": "5.4",
@@ -669,10 +669,9 @@
       "depende": [
         "5.2"
       ],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Agregado",
-      "agente": "ga-diseno-a-codigo",
-      "bloqueo": "30-sep: política v1 del Dr. Breinner publicada en la rama politica-datos-v1; falta su revisión de 7.3, 8 y 18 (selfie como dato sensible; aclarar que no se reporta a centrales)."
+      "agente": "ga-diseno-a-codigo"
     },
     {
       "id": "5.5",
@@ -763,7 +762,7 @@
         "4.3",
         "4.5"
       ],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Propuesta",
       "agente": "ga-escritor-tests"
     },
@@ -781,7 +780,7 @@
         "3.9",
         "4.6"
       ],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Propuesta",
       "agente": "ga-revisor-seguridad",
       "nota": "25-sep: aprobado con observaciones contra producción (main, merge 5a39d34). Hallazgos: S-15 correos Resend sin escapar HTML (P-83), F2-08 sin corregir (P-88), política de datos con placeholders en vivo (P-75 a P-81). Sigue En curso porque depende de 4.3, que no está Hecho."
@@ -795,7 +794,6 @@
         "6.1",
         "5.5",
         "2.8",
-        "5.3",
         "5.4",
         "2.11",
         "5.6",
@@ -804,7 +802,7 @@
         "3.9",
         "4.6"
       ],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Propuesta",
       "agente": "ga-verificador-qa + ga-verificador-responsive",
       "nota": "25-sep: QA de producción con veredicto «con observaciones» (main, merge 5a39d34). Hallazgos: A-01 ayuda de dominio institucional (P-86, condicionado a P-85), M-01 WhatsApp sin espacios (P-84, ya corregido en local), M-02 dominio raíz sin redirigir a veces (P-87, Vercel), M-03 vigilancia ya resuelto (P-13). Sigue En curso porque depende de 6.1, 5.3, 5.4, 2.11 y 5.6, que no están Hecho."
@@ -835,7 +833,7 @@
         "6.10",
         "6.13"
       ],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Propuesta",
       "agente": "Yo",
       "simultanea": false,
@@ -850,7 +848,7 @@
         "6.5",
         "4.4"
       ],
-      "estado": "Pendiente",
+      "estado": "En curso",
       "origen": "Propuesta",
       "agente": "Yo + cooperativa"
     },
@@ -862,7 +860,7 @@
       "depende": [
         "6.5"
       ],
-      "estado": "Pendiente",
+      "estado": "En curso",
       "origen": "Propuesta",
       "agente": "Yo"
     },
@@ -928,9 +926,9 @@
       "depende": [
         "6.11"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
-      "agente": "Yo (panel Vercel)"
+      "agente": "sesión principal"
     },
     {
       "id": "6.13",
@@ -956,7 +954,7 @@
         "3.7",
         "4.5"
       ],
-      "estado": "Pendiente",
+      "estado": "En curso",
       "origen": "Agregado",
       "agente": "Sebas (antes Carlos Pardo)",
       "nota": "29-sep: no entregada en la primera tanda (ver 5.10 y 4.7 para el veredicto NO fusionable del resto del paquete). Sigue pendiente."
@@ -969,7 +967,7 @@
       "depende": [
         "6.1"
       ],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "ga-verificador-qa (antes Carlos Pardo)",
       "nota": "25-sep: la máscara ahora oculta también el dominio, formato «xx•••@•••» (ver P-85). 29-sep: entrega revisada sin pruebas propias (ver 5.10); NO fusionable, se pidió rehacer sobre rediseno-c-plus (además ga-verificador-qa ya reescribió b-ingreso y j-produccion el 27-sep como parte de 4.11/6.17, así que el alcance real que falta se reduce a lo que quede desactualizado tras fusionar develop). 01-oct: e2e al día con v3 y máscara nueva (escritorio 171/4, celular 143/3, fallas corregidas y confirmadas); sigue En curso solo porque depende de 6.1."
@@ -1129,7 +1127,7 @@
       "depende": [
         "6.22"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "ga-funcionalidad-botones + ga-diseno-a-codigo"
     },
@@ -1372,7 +1370,7 @@
         "6.39",
         "6.40"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "Sebas",
       "simultanea": false
@@ -1536,9 +1534,10 @@
       "actividad": "Activar SVM en el BIOS para Docker y volver a correr pgTAP y e2e",
       "peso": 1,
       "depende": [],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
-      "agente": "Sebas"
+      "agente": "Sebas",
+      "nota": "09-oct: SVM activado; WSL y Docker funcionan (P-137)."
     },
     {
       "id": "6.39",
@@ -1551,11 +1550,11 @@
         "6.34",
         "6.36"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "Sebas",
       "simultanea": false,
-      "nota": "Verificar antes migration list --linked. Debe ir junto con el despliegue del código nuevo."
+      "nota": "09-oct: Sebas aplicó la migración 20261009000000; verificado en producción (P-138)."
     },
     {
       "id": "6.40",
@@ -1565,10 +1564,125 @@
       "depende": [
         "6.39"
       ],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "Sebas",
+      "simultanea": false,
+      "nota": "09-oct: desplegado junto con la migración (P-139)."
+    },
+    {
+      "id": "4.23",
+      "fase": 4,
+      "actividad": "Editar datos del asociado desde /admin (nombre, celular, correo institucional, cuenta de nómina) con límite de 30 cambios por hora",
+      "peso": 3,
+      "depende": [],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "sesión principal",
+      "nota": "18-oct: RS-M2/M3 y hallazgo F1 de QA corregidos (RPC admin_editar_datos_asociado, historial_cambio_datos_perfil, trigger contra UPDATE directo, formulario con onSubmit+startTransition); pgTAP 34 (16 casos) y vitest 773 en verde. 22-oct: migración 20261018100000 confirmada como aplicada en producción."
+    },
+    {
+      "id": "2.16",
+      "fase": 2,
+      "actividad": "Afiliación sin repetidos: el trigger rechaza cédula o correos ya registrados o con solicitud pendiente (migración 20261014000000, pgTAP 32)",
+      "peso": 3,
+      "depende": [],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "sesión principal",
+      "nota": "18-oct: migración 20261014000000 aplicada por Sebas; pgTAP 870 en verde (test 04 ajustado por la cédula de seed); revisión de seguridad y QA e2e sin hallazgos."
+    },
+    {
+      "id": "4.24",
+      "fase": 4,
+      "actividad": "Pausa del ingreso de asociados desde /admin/plataforma (solo admin): proxy.ts manda a /cuenta-pausada, con historial (migración 20261018000000, pgTAP 33)",
+      "peso": 3,
+      "depende": [],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "sesión principal",
+      "nota": "18-oct: migración 20261018000000 aplicada por Sebas; pgTAP 33 en verde; RS-M1 corregido (actualizarTelefono revisa la pausa); QA e2e en verde. F2 (URL queda en /cuenta durante la pausa) aceptado por cosmético."
+    },
+    {
+      "id": "4.25",
+      "fase": 4,
+      "actividad": "Avisos al próximo ingreso: se muestran una vez al entrar a /cuenta, con conteo de quiénes los vieron y opción de retirarlos",
+      "peso": 2,
+      "depende": [],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "sesión principal",
+      "nota": "18-oct: migración 20261018000000 aplicada; pgTAP 33 y QA e2e en verde. RS-B2 (marcar_aviso_visto filtra activos) va en la migración 20261018100000, aplicada en producción (confirmado 22-oct)."
+    },
+    {
+      "id": "3.11",
+      "fase": 3,
+      "actividad": "Botón flotante de WhatsApp: en páginas públicas con el mensaje del pie y en /cuenta con el nombre del asociado",
+      "peso": 1,
+      "depende": [],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "sesión principal",
+      "nota": "18-oct: código listo; QA e2e (spec r-cambios-18oct) en verde y revisión de seguridad sin hallazgos."
+    },
+    {
+      "id": "2.17",
+      "fase": 2,
+      "actividad": "Selfie de afiliación: perfil propio de calidad y cámara en HD para evitar falsos avisos de foto dudosa",
+      "peso": 1,
+      "depende": [],
+      "estado": "En curso",
+      "origen": "Agregado",
+      "agente": "sesión principal",
+      "nota": "18-oct: código y 4 pruebas listos; QA solo con cámara simulada. Falta probar la selfie con cámara real de un celular."
+    },
+    {
+      "id": "6.41",
+      "fase": 6,
+      "actividad": "Aplicar con respaldo las migraciones 20261014000000 (afiliación sin repetidos), 20261018000000 (pausa de cuenta y avisos) y 20261018100000 (editar datos en la base) y correr pgTAP 32, 33 y 34",
+      "peso": 1,
+      "depende": [
+        "2.16",
+        "4.24",
+        "4.25"
+      ],
+      "estado": "Hecho",
+      "origen": "Agregado",
+      "agente": "Sebas",
+      "simultanea": false,
+      "nota": "18-oct: aplicadas 20261014000000 y 20261018000000 (pgTAP 870 en verde con la base local reseteada). 22-oct: 20261018100000 confirmada como aplicada (migration list --linked)."
+    },
+    {
+      "id": "6.43",
+      "fase": 6,
+      "actividad": "Abrir y fusionar el PR develop → main en GitHub para desplegar los cambios del 18-oct (commit e0cbe5a)",
+      "peso": 1,
+      "depende": [
+        "6.41"
+      ],
       "estado": "Pendiente",
       "origen": "Agregado",
       "agente": "Sebas",
-      "simultanea": false
+      "simultanea": false,
+      "nota": "22-oct: develop ya tiene el merge y el push; gh no está instalado y la API quedó bloqueada por permisos, así que el PR lo abre Sebas desde GitHub."
+    },
+    {
+      "id": "6.42",
+      "fase": 6,
+      "actividad": "Revisión de seguridad y QA de Editar datos del asociado, Afiliación sin repetidos, Pausa de cuenta, Avisos, botón de WhatsApp y selfie",
+      "peso": 3,
+      "depende": [
+        "4.23",
+        "2.16",
+        "4.24",
+        "4.25",
+        "3.11",
+        "2.17"
+      ],
+      "estado": "En curso",
+      "origen": "Agregado",
+      "agente": "ga-revisor-seguridad",
+      "nota": "18-oct: revisión de seguridad hecha (RS-A1, M1 a M4, B2 y B3 atendidos o aceptados; npm audit 0) y QA e2e en verde (395, spec r-cambios-18oct). Quedan 4.23 y 4.25 (migración 20261018100000) y 2.17 (celular real)."
     }
   ],
   "pendientes": [
@@ -1975,7 +2089,7 @@
       "tarea": "Correo «Resultado del crédito» (aprobado / no aprobado) al asociado al resolver una solicitud",
       "responsable": "ga-funcionalidad-botones",
       "prioridad": "Alta",
-      "estado": "En curso",
+      "estado": "Hecho",
       "gantt": "4.3",
       "nota": "24-sep: enviarResultadoCredito ya está conectado al aprobar/rechazar en /admin (probado en local); falta que Sebas configure el SMTP/Resend de producción (2.4) para que salga de verdad."
     },
@@ -2030,7 +2144,7 @@
       "tarea": "Subir a GitHub y desplegar en Vercel",
       "responsable": "Yo",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.5",
       "nota": ""
     },
@@ -2160,11 +2274,11 @@
       "categoria": "Configuración",
       "area": "Vercel",
       "tarea": "Alerta en los logs de Vercel para limite_de_intentos_fallo y limite_secreto_faltante",
-      "responsable": "Yo (panel Vercel)",
+      "responsable": "sesión principal",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.12",
-      "nota": "Sugerido por ga-auditor-supabase en la auditoría de P-43."
+      "nota": "Sugerido por ga-auditor-supabase en la auditoría de P-43. 09-oct: resuelto con la revisión diaria del límite en el cron (no con alerta de Vercel)."
     },
     {
       "id": "P-55",
@@ -2206,7 +2320,7 @@
       "tarea": "Actualizar tests/e2e a la afiliación v2 y a la nueva máscara de correo",
       "responsable": "ga-escritor-tests",
       "prioridad": "Alta",
-      "estado": "En curso",
+      "estado": "Hecho",
       "gantt": "6.1",
       "nota": "d-afiliacion.spec.ts usa el formulario viejo (nombres y apellidos, unidad) y hace falta reescribirlo entero para institución/Nequi/asesor/fotos (k-roles.spec.ts ya cubre un caso feliz v2 pero no reemplaza la cobertura de D). 24-sep: ga-escritor-tests lo reescribió entero (48 pruebas × 2 proyectos); 92/96 pasan, 4 fallan por un bug real de la app (ver P-74), no de la prueba. b-ingreso.spec.ts, i-despliegue.spec.ts y j-produccion.spec.ts siguen con el formato viejo de máscara de correo y dominios (formato nuevo xx•••@yy•••.co); ese trabajo pasa a Carlos Pardo (ver P-71, 6.15). Falta correr npm run test:db (pgTAP), bloqueado por el permiso de la sandbox. Actualización: el bug de P-74 ya está corregido y d-afiliacion pasa 96/96; pgTAP 222/222 corrido por la sesión principal."
     },
@@ -2338,7 +2452,7 @@
       "tarea": "Pruebas en celulares reales (Android e iPhone): cámara, código, sorteo, crédito y correos en Gmail/Outlook, con informe y capturas",
       "responsable": "Sebas",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "En curso",
       "gantt": "6.14",
       "nota": "Encargo externo (500.000 COP) por PR a develop. Ver P-73."
     },
@@ -2459,7 +2573,7 @@
       "tarea": "Revisión de la política de datos por un abogado (Dr. Breinner: secciones 7.3, 8 y 18)",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "En curso",
       "gantt": "5.4",
       "nota": "24-sep: reportado por la sesión principal; falta antes de publicar /politica-de-datos."
     },
@@ -2734,7 +2848,7 @@
       "tarea": "R-09: quién registra los pagos de comisión",
       "responsable": "Sebas + Ricardo",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "",
       "nota": "R-10 y R-11 cerrados por Sebas (§12.14)."
     },
@@ -2756,7 +2870,7 @@
       "tarea": "Backlog: premio al primer asesor",
       "responsable": "ga-funcionalidad-botones",
       "prioridad": "Baja",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "5.11",
       "nota": "Spec §12.12"
     },
@@ -2789,7 +2903,7 @@
       "tarea": "¿«Inscritos al sorteo» entra al dashboard del admin?",
       "responsable": "Cooperativa",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "4.7",
       "nota": "30-sep: reportado por ga-disenador-lienzo y ga-diseno-a-codigo."
     },
@@ -2866,7 +2980,7 @@
       "tarea": "Entrega final y último pago el viernes 9-oct (garantía 9-oct al 7-nov, soporte desde el 8-nov)",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.29",
       "nota": "08-oct: la entrega pasó del miércoles 7-oct al viernes 9-oct."
     },
@@ -2877,7 +2991,7 @@
       "tarea": "Preguntas sobre el rol secretario (¿ve Asociados/Créditos en solo lectura?)",
       "responsable": "Cooperativa",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "4.20",
       "nota": ""
     },
@@ -2888,7 +3002,7 @@
       "tarea": "¿Se borran los comprobantes de desembolso al eliminar definitivamente a un asociado?",
       "responsable": "Cooperativa",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "4.19",
       "nota": ""
     },
@@ -2899,7 +3013,7 @@
       "tarea": "¿El carné sin foto lleva una silueta?",
       "responsable": "Cooperativa",
       "prioridad": "Baja",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "5.15",
       "nota": ""
     },
@@ -2910,7 +3024,7 @@
       "tarea": "Moderación de las fotos que sube el asociado al carné",
       "responsable": "Cooperativa",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "5.15",
       "nota": ""
     },
@@ -2943,7 +3057,7 @@
       "tarea": "¿El nombre completo del asociado puede verse públicamente en /verificar?",
       "responsable": "Cooperativa",
       "prioridad": "Baja",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "5.14",
       "nota": "01-oct: planteado por ga-revisor-seguridad."
     },
@@ -3075,9 +3189,9 @@
       "tarea": "Activar SVM en el BIOS (Docker) para volver a correr pgTAP y e2e",
       "responsable": "Sebas",
       "prioridad": "Media",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.38",
-      "nota": "08-oct: SVM quedó apagado tras pasar a Windows 11; pgTAP y e2e no corren."
+      "nota": "08-oct: SVM quedó apagado tras pasar a Windows 11; pgTAP y e2e no corren. 09-oct: Hecho por Sebas."
     },
     {
       "id": "P-138",
@@ -3086,9 +3200,9 @@
       "tarea": "Aplicar con respaldo previo la migración 20261009000000 (hallazgos de seguridad del 8-oct), verificando antes migration list --linked",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.39",
-      "nota": "09-oct: incluye la RPC fotos_carne_huerfanas. Sin ella el código nuevo no funciona."
+      "nota": "09-oct: incluye la RPC fotos_carne_huerfanas. Sin ella el código nuevo no funciona. 09-oct: Hecho por Sebas."
     },
     {
       "id": "P-139",
@@ -3097,9 +3211,64 @@
       "tarea": "Desplegar el código nuevo de inmediato junto con la migración 20261009000000",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.40",
-      "nota": "09-oct: código y migración van juntos. Desactivar a un admin ya no se puede desde la app; si la cooperativa lo necesita, hace falta otra migración."
+      "nota": "09-oct: código y migración van juntos. Desactivar a un admin ya no se puede desde la app; si la cooperativa lo necesita, hace falta otra migración. 09-oct: Hecho por Sebas."
+    },
+    {
+      "id": "P-140",
+      "categoria": "Decisión",
+      "area": "Admin",
+      "tarea": "Preguntar a la cooperativa cómo se desactiva o se baja de rol a un administrador (desde el 9-oct la app no lo permite, por H-07)",
+      "responsable": "Cooperativa",
+      "prioridad": "Media",
+      "estado": "Pendiente",
+      "gantt": "",
+      "nota": "09-oct: si la cooperativa lo necesita, hace falta otra migración."
+    },
+    {
+      "id": "P-141",
+      "categoria": "Configuración",
+      "area": "Base de datos",
+      "tarea": "Aplicar la migración 20261014000000 (afiliación sin repetidos) con db push y correr pgTAP con Docker",
+      "responsable": "Sebas",
+      "prioridad": "Alta",
+      "estado": "Hecho",
+      "gantt": "6.41",
+      "nota": "18-oct: aplicada por Sebas; pgTAP en verde."
+    },
+    {
+      "id": "P-142",
+      "categoria": "Configuración",
+      "area": "Base de datos",
+      "tarea": "Aplicar la migración 20261018000000 (pausa de cuenta y avisos) con db push y correr pgTAP 33 con Docker",
+      "responsable": "Sebas",
+      "prioridad": "Alta",
+      "estado": "Hecho",
+      "gantt": "6.41",
+      "nota": "18-oct: aplicada por Sebas; pgTAP 33 en verde. La prueba de selfie en celular real pasó a P-143."
+    },
+    {
+      "id": "P-143",
+      "categoria": "Configuración",
+      "area": "Base de datos",
+      "tarea": "Probar la selfie de afiliación con la cámara de un celular real (la migración 20261018100000 ya está aplicada; respaldos y logos.rar ya están fuera del repo)",
+      "responsable": "Sebas",
+      "prioridad": "Alta",
+      "estado": "En curso",
+      "gantt": "2.17",
+      "nota": "22-oct: migración 20261018100000 aplicada; respaldo-*.sql movidos a ../backups/2026-10-02; public/logos.rar (solo logos públicos) movido a la carpeta de la cooperativa. Solo falta la selfie en celular real (2.17)."
+    },
+    {
+      "id": "P-144",
+      "categoria": "Configuración",
+      "area": "Despliegue",
+      "tarea": "Abrir y fusionar el PR develop → main en GitHub para desplegar (commit e0cbe5a)",
+      "responsable": "Sebas",
+      "prioridad": "Alta",
+      "estado": "Pendiente",
+      "gantt": "6.43",
+      "nota": "22-oct: develop ya está actualizado en el remoto; gh no está instalado y la API quedó bloqueada por permisos."
     }
   ],
   "bitacora": [
@@ -3935,6 +4104,69 @@
       "tareas": "6.27, 6.28, 6.32 a 6.37, 6.39, 6.40, P-116, P-117, P-126 a P-139",
       "cambio": "Hallazgos de seguridad cerrados en código; Sebas cerró 4 pendientes",
       "detalle": "Sebas hizo P-116, P-117, P-135 y P-136. Hechos en código P-126, P-127, P-128, P-130 a P-134 (H-09 rehecho con fotos_carne_huerfanas; npm audit fix con 0 vulnerabilidades en producción; 755 unitarias, tsc, lint y build verdes; pgTAP y e2e sin correr por SVM). P-129 (H-04) cerrado por riesgo aceptado. Nuevos pendientes de Sebas: aplicar 20261009000000 (P-138, 6.39) y desplegar junto (P-139, 6.40). P-137 (SVM) sigue pendiente."
+    },
+    {
+      "fecha": "2026-10-09",
+      "agente": "sesión principal",
+      "tareas": "6.38, 6.39, 6.40 (P-137, P-138, P-139)",
+      "cambio": "SVM activado, migración 20261009000000 aplicada y código desplegado",
+      "detalle": "Verificado en producción: migración remota aplicada y landing sin números de convenios (6 convenios con whatsapp null; solo queda el WhatsApp de la cooperativa). Pruebas: pgTAP desde cero 32 archivos, 826 PASS; e2e escritorio y celular 395 pasaron, 47 omitidas a propósito por proyecto y 0 fallos (39,9 min); unitarias 755 en verde."
+    },
+    {
+      "fecha": "2026-10-09",
+      "agente": "ga-supervisor-avances",
+      "tareas": "5.4, 5.11, 6.1, 6.2, 6.3, 6.5, 6.15, 6.29, 6.7, 6.14, 6.6, 5.3 (P-37, P-42, P-58, P-70, P-81, P-106, P-108, P-111, P-118 a P-122, P-125, P-140)",
+      "cambio": "Limpieza del plan pedida por Sebas: se cierran tareas ya hechas",
+      "detalle": "Hecho: 5.4 (la página /politica-de-datos existe; la revisión del abogado sigue aparte en P-81), 5.11 (premios de asesores 50 y 100, migración 20261002100000), 6.1 (755 pruebas unitarias en verde), 6.2 (revisión de seguridad del 8-oct con hallazgos corregidos y en producción), 6.3 (e2e escritorio y celular 395 pasaron, 0 fallos), 6.5 (desplegado en www.greenallianceco.com), 6.15 (e2e al día) y 6.29 (entrega final, acta y último pago, cerrada por Sebas hoy). En curso: 6.7 (capacitación por Ricardo), 6.14 (celulares reales) y 6.6 (usuarios reales, sigue durante la garantía). 5.3 queda Bloqueada esperando a la cooperativa (fotos, cifras, testimonios, sedes); 6.12 sigue Pendiente (Sebas). Pendientes cerrados: P-37, P-42, P-58, P-106, P-108, P-111, P-118, P-119, P-120, P-121, P-122, P-125. P-70 y P-81 pasan a En curso. Nuevo P-140: cómo se desactiva o baja de rol a un administrador. Para poder cerrar 6.3 se quitó su dependencia de 5.3, porque el contenido real de la cooperativa no impide el QA."
+    },
+    {
+      "fecha": "2026-10-09",
+      "agente": "sesión principal",
+      "tareas": "6.12 (P-54)",
+      "cambio": "Alerta del límite de intentos resuelta desde el cron, no desde Vercel",
+      "detalle": "Vercel Pro sin Observability Plus no permite alertas por texto del log. El cron horario /api/cron/limpiar-fotos revisa el límite (lib/servidor/saludLimite.ts): LIMITE_HMAC_SECRET y conteo de intentos; si falla registra salud_limite_fallo y envía un correo diario a las 8 a. m. de Bogotá a ALERTA_TECNICA_CORREOS o soporte@greenallianceco.com. Documentado en documentacion-tecnica. 763 unitarias, tsc, lint y build en verde. Falta desplegar (Sebas); opcional crear ALERTA_TECNICA_CORREOS en Vercel."
+    },
+    {
+      "fecha": "2026-10-14",
+      "agente": "sesión principal",
+      "tareas": "4.23, 2.16, 6.41, 6.42 (P-141)",
+      "cambio": "Editar datos del asociado y Afiliación sin repetidos: código listo, migración sin aplicar",
+      "detalle": "Nuevo 4.23: en /admin/asociados/[id], sección «Datos del asociado» con «Editar datos» (solo admin; no a uno mismo ni a sus clientes; 30 cambios por hora; el registro guarda los campos cambiados); 6 pruebas unitarias, vitest 769 en verde. Nuevo 2.16: migración 20261014000000 con trigger que rechaza (23505) afiliaciones con cédula o correo personal o institucional ya con cuenta o solicitud pendiente o contactada; el formulario responde igual que un envío exitoso (S-06); pgTAP 32 (10 casos); al aprobar, mensaje claro si el correo ya existe en Auth. Ambas En curso. Nuevo 6.41 (Sebas aplica la migración y se corre pgTAP; Docker no corría) y 6.42 (revisión de seguridad y QA). Nuevo P-141."
+    },
+    {
+      "fecha": "2026-10-18",
+      "agente": "sesión principal",
+      "tareas": "4.24, 4.25, 3.11, 2.17, 6.41, 6.42 (P-142)",
+      "cambio": "Pausa del ingreso, avisos, botón de WhatsApp y selfie con perfil propio: código listo, migración sin aplicar",
+      "detalle": "Nuevos 4.24 (pausa en /admin/plataforma, proxy.ts, /cuenta-pausada, historial), 4.25 (avisos una vez al entrar a /cuenta, con conteo y retiro), 3.11 (botón flotante de WhatsApp) y 2.17 (selfie con perfil propio y cámara HD; antes casi toda selfie salía dudosa por usar umbrales de la cédula). Migración 20261018000000 y pgTAP 33 (18 casos). vitest 773, tsc, lint y build en verde; entregables y PDF actualizados. Todas En curso. 6.41 ahora cubre ambas migraciones (20261014000000 y 20261018000000) y depende de 4.24 y 4.25; 6.42 (peso 2 a 3, razón: suma cuatro funciones nuevas) depende de todas. Nuevo P-142. Falta probar la selfie en un celular real."
+    },
+    {
+      "fecha": "2026-10-18",
+      "agente": "ga-revisor-seguridad",
+      "tareas": "6.42",
+      "cambio": "Revisión de seguridad de los cambios sin commit: sin críticos",
+      "detalle": "1 alto (respaldos con datos personales sin ignorar), 4 medios (pausa saltable, correo institucional sin aviso, regla propio/clientes solo en la app, logos.rar publicado) y 3 bajos. npm audit: 0 vulnerabilidades. Atendidos por la sesión principal."
+    },
+    {
+      "fecha": "2026-10-18",
+      "agente": "sesión principal",
+      "tareas": "2.16, 4.24, 4.25, 4.23, 6.41, 6.42, 3.11 (P-141, P-142, P-143)",
+      "cambio": "Migraciones 20261014000000 y 20261018000000 aplicadas; pgTAP 870 en verde; hallazgos de seguridad corregidos",
+      "detalle": "Sebas aplicó las dos migraciones. 2.16 y 4.24 pasan a Hecho. Se corrigieron RS-A1, M1, M2, M3, M4, B2 (B3 aceptado); nueva migración 20261018100000 (RPC admin_editar_datos_asociado, historial, trigger) y pgTAP 34 con 16 casos; vitest 773 y build en verde. 4.23 y 4.25 quedan En curso hasta aplicar 20261018100000. 6.41 ahora cubre tres migraciones y sigue En curso. P-141 y P-142 Hecho; nuevo P-143 (Sebas): aplicar la migración, sacar respaldo-*.sql y revisar public/logos.rar. Pendiente opcional: avisar por correo al asociado cuando cambian su correo institucional o nómina (ga-correos)."
+    },
+    {
+      "fecha": "2026-10-18",
+      "agente": "ga-verificador-qa",
+      "tareas": "3.11, 2.16, 4.24, 4.25, 4.23, 2.17, 6.42",
+      "cambio": "QA e2e: 395 en verde, spec r-cambios-18oct (19 pruebas), hallazgos F1 y F2",
+      "detalle": "Sin regresiones (47 omitidas, 0 fallan). 3.11 pasa a Hecho. F1 (desplegable Entidad de Editar datos se reiniciaba) medio, corregido por la sesión principal con onSubmit+startTransition y spec en verde en escritorio y celular. F2 (URL en /cuenta durante la pausa) bajo, aceptado. La selfie con cámara real de celular no se pudo probar: 2.17 sigue En curso."
+    },
+    {
+      "fecha": "2026-10-22",
+      "agente": "sesión principal",
+      "tareas": "4.23, 4.25, 6.41, 6.43, 2.17 (P-143, P-144)",
+      "cambio": "Migración 20261018100000 aplicada; 4.23, 4.25 y 6.41 Hecho; merge a develop; respaldos y logos.rar fuera del repo",
+      "detalle": "migration list --linked confirma 20261018100000 en producción. Commit e0cbe5a en avance-pendientes, merge en develop y push. Los respaldo-*.sql pasaron a ../backups/2026-10-02 y public/logos.rar (solo logos públicos) a la carpeta de la cooperativa. P-143 queda En curso solo con la selfie en celular real (2.17). Nueva actividad 6.43 y pendiente P-144 (Sebas): abrir y fusionar el PR develop → main para desplegar, porque gh no está instalado y la API quedó bloqueada por permisos."
     }
   ]
 }

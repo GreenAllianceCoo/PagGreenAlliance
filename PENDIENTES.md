@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 09-oct-2026 (hallazgos de seguridad del 8-oct corregidos en código, H-04 cerrado por riesgo aceptado; falta aplicar la migración 20261009000000 y desplegar junto con el código; pgTAP y e2e sin correr por SVM).
+Actualizado: 22-oct-2026 (migración 20261018100000 aplicada; respaldos y logos.rar fuera del repo; faltan abrir y fusionar el PR develop → main y probar la selfie en un celular real).
 
 ## Dónde quedamos
 
@@ -64,7 +64,7 @@ Van en `lib/config.ts` (o en una variable de entorno) y en `lib/mock.ts` → dat
 - [x] **[N] días hábiles** de respuesta (`DIAS_RESPUESTA`). 24-sep: la cooperativa dio «4 horas o menos» en su lugar.
 - [x] **Correo de contacto** (`CORREO_CONTACTO`). 24-sep: soporte@greenallianceco.com.
 - [x] **Texto de vigilancia de Supersolidaria** (`TEXTO_VIGILANCIA`). 25-sep: confirmado, «Vigilada por Supersolidaria» (falta desplegar).
-- [ ] **Política de datos**: el texto y la ruta (se sugiere `/politica-de-datos`); hoy el enlace es `href="#"`.
+- [x] **Política de datos**: el texto y la ruta (se sugiere `/politica-de-datos`); hoy el enlace es `href="#"`.
 - [x] **Destino de «Nueva solicitud»** (nav, acceso rápido y estado vacío de `/cuenta`): → `/cuenta/solicitar`.
 - [ ] **Fotos reales** de asociados y apoyos, **cifras** y **testimonios** para la landing.
 - [x] **Tiempo de respuesta** real para la landing (hoy dice `[TIEMPO]`, y `[T]` en celular). 24-sep: «4 horas o menos».
@@ -115,7 +115,7 @@ Se decidió código por correo en vez de contraseña. Configurar en el panel de 
 ### Otros
 - [x] Formulario de solicitud de crédito conectado a la nueva `/cuenta`: vive en `/cuenta/solicitar` (muestra la tasa y exige mínimo 100.000).
 - [x] Panel de administración `/admin`: listado de solicitudes, aprobar y rechazar (rechazar pide motivo; un admin no puede resolver su propia solicitud). 24-sep: implementado y probado en local (commits 235ffbe, a13c2de).
-- [ ] Correo con Resend del resultado del crédito (aprobado / no aprobado) al asociado cuando se resuelve una solicitud. 24-sep: código conectado, falta el SMTP/Resend de producción.
+- [x] Correo con Resend del resultado del crédito (aprobado / no aprobado) al asociado cuando se resuelve una solicitud. 24-sep: código conectado, falta el SMTP/Resend de producción.
 - [x] ~~Importación de asociados desde Excel (cuando llegue).~~ Ya no aplica: decisión de la cooperativa 24-sep.
 
 ## 4. Verificación y cierre

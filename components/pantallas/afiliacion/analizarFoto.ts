@@ -6,10 +6,11 @@
 import {
   dimensionesAnalisis,
   evaluarCalidadFoto,
+  type PerfilFoto,
   type ResultadoCalidadFoto,
 } from "@/lib/afiliacion/calidadFoto";
 
-export async function analizarFoto(archivo: Blob): Promise<ResultadoCalidadFoto | null> {
+export async function analizarFoto(archivo: Blob, perfil: PerfilFoto = "documento"): Promise<ResultadoCalidadFoto | null> {
   try {
     const bitmap = await createImageBitmap(archivo);
     const { ancho, alto } = dimensionesAnalisis(bitmap.width, bitmap.height);
@@ -22,7 +23,7 @@ export async function analizarFoto(archivo: Blob): Promise<ResultadoCalidadFoto 
     const resultado = evaluarCalidadFoto(contexto.getImageData(0, 0, ancho, alto), {
       anchoOriginal: bitmap.width,
       altoOriginal: bitmap.height,
-    });
+    }, perfil);
     bitmap.close?.();
     return resultado;
   } catch {

@@ -42,3 +42,12 @@ docs/verificaciones/**/*.png
 
 # Documentos de entrega con datos personales (cédula, teléfono): no van al repositorio
 docs/entrega/privado/
+
+# Volcados de la base (datos personales de producción) y documentos de la cooperativa
+# en la raíz: nunca al repositorio (revisión de seguridad 18-oct, RS-A1/RS-B1/RS-M4).
+/respaldo-*.sql
+*.sql.gz
+/*.pdf
+/*.docx
+/*.pptx
+/public/logos.rar

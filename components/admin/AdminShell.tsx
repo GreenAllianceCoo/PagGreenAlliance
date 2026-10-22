@@ -35,6 +35,7 @@ const TONO_CHIP: Record<Seccion, string> = {
   asesores: "bg-admin-superficie-2 text-admin-texto-2",
   convenios: "bg-admin-superficie-2 text-admin-texto-2",
   sorteo: "bg-admin-superficie-2 text-admin-texto-2",
+  plataforma: "bg-admin-superficie-2 text-admin-texto-2",
   historial: "bg-admin-superficie-2 text-admin-texto-2",
   demo: "bg-admin-superficie-2 text-admin-texto-2",
 };
