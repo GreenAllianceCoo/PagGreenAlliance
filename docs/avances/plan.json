@@ -1,6 +1,6 @@
 {
   "parametros": {
-    "actualizado": "2026-10-18",
+    "actualizado": "2026-10-22",
     "bloques_por_semana": 10,
     "nota_bloque": "1 bloque = 1 punto de peso ≈ media jornada de trabajo. Se puede cambiar en la hoja Resumen."
   },
@@ -1576,10 +1576,10 @@
       "actividad": "Editar datos del asociado desde /admin (nombre, celular, correo institucional, cuenta de nómina) con límite de 30 cambios por hora",
       "peso": 3,
       "depende": [],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "sesión principal",
-      "nota": "18-oct: RS-M2/M3 y hallazgo F1 de QA corregidos (RPC admin_editar_datos_asociado, historial_cambio_datos_perfil, trigger contra UPDATE directo, formulario con onSubmit+startTransition); pgTAP 34 (16 casos) y vitest 773 en verde. Espera aplicar la migración 20261018100000 (Sebas)."
+      "nota": "18-oct: RS-M2/M3 y hallazgo F1 de QA corregidos (RPC admin_editar_datos_asociado, historial_cambio_datos_perfil, trigger contra UPDATE directo, formulario con onSubmit+startTransition); pgTAP 34 (16 casos) y vitest 773 en verde. 22-oct: migración 20261018100000 confirmada como aplicada en producción."
     },
     {
       "id": "2.16",
@@ -1609,10 +1609,10 @@
       "actividad": "Avisos al próximo ingreso: se muestran una vez al entrar a /cuenta, con conteo de quiénes los vieron y opción de retirarlos",
       "peso": 2,
       "depende": [],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "sesión principal",
-      "nota": "18-oct: migración 20261018000000 aplicada; pgTAP 33 y QA e2e en verde. RS-B2 (marcar_aviso_visto filtra activos) va en la migración 20261018100000, que falta aplicar (Sebas)."
+      "nota": "18-oct: migración 20261018000000 aplicada; pgTAP 33 y QA e2e en verde. RS-B2 (marcar_aviso_visto filtra activos) va en la migración 20261018100000, aplicada en producción (confirmado 22-oct)."
     },
     {
       "id": "3.11",
@@ -1646,11 +1646,25 @@
         "4.24",
         "4.25"
       ],
-      "estado": "En curso",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "Sebas",
       "simultanea": false,
-      "nota": "18-oct: aplicadas 20261014000000 y 20261018000000 (pgTAP 870 en verde con la base local reseteada). Falta aplicar 20261018100000 (Sebas, P-143)."
+      "nota": "18-oct: aplicadas 20261014000000 y 20261018000000 (pgTAP 870 en verde con la base local reseteada). 22-oct: 20261018100000 confirmada como aplicada (migration list --linked)."
+    },
+    {
+      "id": "6.43",
+      "fase": 6,
+      "actividad": "Abrir y fusionar el PR develop → main en GitHub para desplegar los cambios del 18-oct (commit e0cbe5a)",
+      "peso": 1,
+      "depende": [
+        "6.41"
+      ],
+      "estado": "Pendiente",
+      "origen": "Agregado",
+      "agente": "Sebas",
+      "simultanea": false,
+      "nota": "22-oct: develop ya tiene el merge y el push; gh no está instalado y la API quedó bloqueada por permisos, así que el PR lo abre Sebas desde GitHub."
     },
     {
       "id": "6.42",
@@ -3238,12 +3252,23 @@
       "id": "P-143",
       "categoria": "Configuración",
       "area": "Base de datos",
-      "tarea": "Aplicar la migración 20261018100000 (editar datos en la base, marcar_aviso_visto) con db push y correr pgTAP 34; sacar los respaldo-*.sql de la carpeta del proyecto; revisar qué contiene public/logos.rar; probar la selfie en un celular real",
+      "tarea": "Probar la selfie de afiliación con la cámara de un celular real (la migración 20261018100000 ya está aplicada; respaldos y logos.rar ya están fuera del repo)",
+      "responsable": "Sebas",
+      "prioridad": "Alta",
+      "estado": "En curso",
+      "gantt": "2.17",
+      "nota": "22-oct: migración 20261018100000 aplicada; respaldo-*.sql movidos a ../backups/2026-10-02; public/logos.rar (solo logos públicos) movido a la carpeta de la cooperativa. Solo falta la selfie en celular real (2.17)."
+    },
+    {
+      "id": "P-144",
+      "categoria": "Configuración",
+      "area": "Despliegue",
+      "tarea": "Abrir y fusionar el PR develop → main en GitHub para desplegar (commit e0cbe5a)",
       "responsable": "Sebas",
       "prioridad": "Alta",
       "estado": "Pendiente",
-      "gantt": "6.41",
-      "nota": "18-oct: verificar migration list --linked antes. Sin ella «Editar datos» del admin falla. Los respaldo-*.sql ya no se suben a git (RS-A1) pero siguen en el disco; logos.rar ya está ignorado (RS-M4)."
+      "gantt": "6.43",
+      "nota": "22-oct: develop ya está actualizado en el remoto; gh no está instalado y la API quedó bloqueada por permisos."
     }
   ],
   "bitacora": [
@@ -4135,6 +4160,13 @@
       "tareas": "3.11, 2.16, 4.24, 4.25, 4.23, 2.17, 6.42",
       "cambio": "QA e2e: 395 en verde, spec r-cambios-18oct (19 pruebas), hallazgos F1 y F2",
       "detalle": "Sin regresiones (47 omitidas, 0 fallan). 3.11 pasa a Hecho. F1 (desplegable Entidad de Editar datos se reiniciaba) medio, corregido por la sesión principal con onSubmit+startTransition y spec en verde en escritorio y celular. F2 (URL en /cuenta durante la pausa) bajo, aceptado. La selfie con cámara real de celular no se pudo probar: 2.17 sigue En curso."
+    },
+    {
+      "fecha": "2026-10-22",
+      "agente": "sesión principal",
+      "tareas": "4.23, 4.25, 6.41, 6.43, 2.17 (P-143, P-144)",
+      "cambio": "Migración 20261018100000 aplicada; 4.23, 4.25 y 6.41 Hecho; merge a develop; respaldos y logos.rar fuera del repo",
+      "detalle": "migration list --linked confirma 20261018100000 en producción. Commit e0cbe5a en avance-pendientes, merge en develop y push. Los respaldo-*.sql pasaron a ../backups/2026-10-02 y public/logos.rar (solo logos públicos) a la carpeta de la cooperativa. P-143 queda En curso solo con la selfie en celular real (2.17). Nueva actividad 6.43 y pendiente P-144 (Sebas): abrir y fusionar el PR develop → main para desplegar, porque gh no está instalado y la API quedó bloqueada por permisos."
     }
   ]
 }
