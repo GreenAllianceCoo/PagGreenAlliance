@@ -12,5 +12,3 @@ Formato (copiar debajo de la línea, uno por tarea):
 - Bloqueos o trabajo nuevo: qué falta, de quién, o «ninguno».
 ```
 
----
-

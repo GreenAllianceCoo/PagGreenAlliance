@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { asociadoActivo } from "@/lib/asociado/activo";
 import { MENSAJE_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
+import { cuentaPausada, MENSAJE_CUENTA_PAUSADA } from "@/lib/asociado/pausa";
 import { createClient } from "@/lib/supabase/server";
 import { erroresPorCampo, textoDe } from "@/lib/validaciones/comunes";
 import { esquemaTelefono } from "@/lib/validaciones/perfil";
@@ -47,6 +48,8 @@ export async function actualizarTelefono(
   if (!user) redirect("/ingresar");
   // §12.6: sin acceso si la cuenta está dada de baja.
   if (!(await asociadoActivo(supabase, user.id))) return { error: MENSAJE_CUENTA_INACTIVA, telefono: escrito };
+  // RS-M1: esta acción también se empaqueta fuera de /cuenta (donde el proxy aplica la pausa).
+  if (await cuentaPausada(supabase)) return { error: MENSAJE_CUENTA_PAUSADA, telefono: escrito };
 
   const { data, error } = await supabase
     .from("perfiles")

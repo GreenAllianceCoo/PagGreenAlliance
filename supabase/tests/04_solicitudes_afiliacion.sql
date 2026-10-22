@@ -26,7 +26,7 @@ insert into public.solicitudes_afiliacion (
   nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
   foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
 ) values (
-  'Pedro', 'Pérez', '1234567890', 'PT', 'policia', '3001234567', '3001234567',
+  'Pedro', 'Pérez', '1234567001', 'PT', 'policia', '3001234567', '3001234567',
   'pedro.perez@policia.gov.co', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()
 );
 
@@ -79,7 +79,7 @@ select throws_ok(
 
 with u as (
   update public.solicitudes_afiliacion set estado = 'aprobada'
-   where cedula = '1234567890' returning 1
+   where cedula = '1234567001' returning 1
 ) select is(count(*)::int, 0, 'un asociado no puede cambiar el estado de una afiliación') from u;
 
 -- ------------------------------------------------------------
@@ -88,30 +88,30 @@ with u as (
 set local request.jwt.claims = '{"sub":"00000000-0000-4000-a000-0000000000ad","role":"authenticated"}';
 
 select is(
-  (select count(*)::int from public.solicitudes_afiliacion where cedula = '1234567890'),
+  (select count(*)::int from public.solicitudes_afiliacion where cedula = '1234567001'),
   1,
   'admin lee las solicitudes de afiliación'
 );
 
 with u as (
   update public.solicitudes_afiliacion set estado = 'contactado'
-   where cedula = '1234567890' returning 1
+   where cedula = '1234567001' returning 1
 ) select is(count(*)::int, 1, 'admin puede cambiar el estado de una afiliación') from u;
 
 select is(
-  (select revisado_por from public.solicitudes_afiliacion where cedula = '1234567890'),
+  (select revisado_por from public.solicitudes_afiliacion where cedula = '1234567001'),
   '00000000-0000-4000-a000-0000000000ad'::uuid,
   'al cambiar el estado queda registrado el admin que revisó'
 );
 
 select throws_ok(
-  $$ update public.solicitudes_afiliacion set cedula = '9999999999' where cedula = '1234567890' $$,
+  $$ update public.solicitudes_afiliacion set cedula = '9999999999' where cedula = '1234567001' $$,
   'P0001', 'Solo se puede cambiar el estado de la solicitud de afiliación',
   'admin no puede cambiar la cédula que envió el solicitante'
 );
 
 select throws_ok(
-  $$ delete from public.solicitudes_afiliacion where cedula = '1234567890' $$,
+  $$ delete from public.solicitudes_afiliacion where cedula = '1234567001' $$,
   '42501', null,
   'nadie borra solicitudes de afiliación desde la API (ni el admin)'
 );
@@ -179,7 +179,7 @@ select throws_ok(
        nombres, apellidos, cedula, grado, institucion, celular, nequi, email,
        foto_cedula_frente, foto_cedula_reverso, foto_selfie, acepto_datos_at
      ) values (
-       'Cédula', 'Larga', '12345678901', 'PT', 'policia', '3000000008', '3000000008',
+       'Cédula', 'Larga', '12345670011', 'PT', 'policia', '3000000008', '3000000008',
        'c11@policia.gov.co', 'x/f.jpg', 'x/r.jpg', 'x/s.jpg', now()
      ) $$,
   '23514', null,

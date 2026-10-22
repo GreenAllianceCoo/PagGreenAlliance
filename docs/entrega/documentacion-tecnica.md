@@ -8,7 +8,7 @@ Contrato de prestación de servicios Nº 001-2026 · Cláusula novena y Anexo T�
 | Contratista | SEBASTIÁN SANDOVAL |
 | Sitio en producción | https://www.greenallianceco.com |
 | Repositorio | https://github.com/GreenAllianceCoo/PagGreenAlliance (rama de producción: `main`) |
-| Versión del documento | 1.0 · 2026-10-01 |
+| Versión del documento | 1.2 · 2026-10-18 |
 
 Este documento describe la plataforma tal como está en el repositorio a la fecha. La fuente de verdad siempre es el código: `supabase/migrations/` para la base de datos, `app/` y `lib/` para la aplicación.
 
@@ -46,14 +46,14 @@ Vercel Cron (cada hora) ──> /api/cron/limpiar-fotos (borra fotos huérfanas 
 |---|---|---|
 | Interfaz y servidor web | Next.js 16.3 (App Router, Server Actions), React 19.3, Tailwind CSS 3 | `app/`, `components/` |
 | Lógica de negocio y validaciones | TypeScript + zod 4 | `lib/` (`lib/validaciones/` para los esquemas) |
-| Protección de rutas | `proxy.ts` (exige sesión en `/cuenta`, `/asesor`, `/admin`; el rol lo valida cada página) | `proxy.ts` |
-| Base de datos | Supabase Postgres, 56 migraciones versionadas | `supabase/migrations/` |
+| Protección de rutas | `proxy.ts` (exige sesión en `/cuenta`, `/asesor`, `/admin`; con la pausa activa manda a los asociados de `/cuenta` a `/cuenta-pausada`; el rol lo valida cada página) | `proxy.ts` |
+| Base de datos | Supabase Postgres, 66 migraciones versionadas | `supabase/migrations/` |
 | Autenticación | Supabase Auth, código de 6 dígitos por correo, sin contraseñas | `lib/ingreso/`, `app/ingresar/` |
 | Archivos | Supabase Storage | buckets `afiliacion-documentos` y `convenios-logos` |
 | Correo | Resend (plantillas publicadas; si falta una, texto plano) | `lib/correo/`, `docs/resend-plantillas.md` |
 | PDF y QR del carné | `pdf-lib`, `qrcode` | `lib/carnePdf.ts`, `lib/carneQr.ts` |
 | Hosting y tareas programadas | Vercel (plan Pro), `vercel.json` | `vercel.json` |
-| Pruebas | Vitest (unitarias), pgTAP (base de datos, 28 archivos), Playwright (punta a punta, escritorio y celular) | `tests/`, `supabase/tests/` |
+| Pruebas | Vitest (unitarias), pgTAP (base de datos, 35 archivos), Playwright (punta a punta, escritorio y celular) | `tests/`, `supabase/tests/` |
 
 ### 1.2 Rutas principales
 
@@ -67,7 +67,8 @@ Vercel Cron (cada hora) ──> /api/cron/limpiar-fotos (borra fotos huérfanas 
 | `/ingresar/recuperar` | Público | «¿Ya no tienes acceso a tu correo?»: pide a la cooperativa el cambio del correo de ingreso (no cambia nada por sí sola) |
 | `/cuenta` y subrutas | Asociado | Estado del proceso, crédito, carné, sorteo, perfil (celular y cambio del correo de ingreso con código), retiro y renovación |
 | `/asesor` | Asesor | Resumen, clientes (cédula enmascarada), comisiones, premios |
-| `/admin` y subrutas | Administrador | Tablero, afiliaciones, asociados, créditos, asesores, sorteo, alertas, convenios |
+| `/admin` y subrutas | Administrador | Tablero, afiliaciones, asociados, créditos, asesores, sorteo, alertas, convenios, plataforma (pausa del ingreso de asociados y avisos) |
+| `/cuenta-pausada` | Asociado | Pantalla «Volvemos pronto» mientras un admin tenga pausado el ingreso |
 | `/admin/demo`, `/asesor/demo` | Admin / asesor | Cuenta de demostración que no guarda datos (solo lee la tabla de cupos) |
 | `/api/cron/limpiar-fotos` | Vercel Cron | Limpieza de fotos huérfanas |
 | `/api/cuenta-inactiva` | Interno | Cierra la sesión de una cuenta dada de baja |
@@ -89,7 +90,9 @@ El rol vive en `public.perfiles.rol` (enum `rol_usuario`: `asociado`, `asesor`, 
 | Revisar afiliaciones y ver fotos (URL firmada de corta vida) | No | No | Sí |
 | Aprobar o rechazar créditos, marcar desembolso, habilitar crédito tras rechazo | No | No | Sí |
 | Proceso ejecutivo, baja y reactivación de asociados | No | No | Sí |
+| Editar datos del asociado (nombre, celular, correo institucional, nómina); no los propios ni los de sus clientes | No | No | Sí |
 | Asesores, pagos de comisión, premios, sorteo, alertas, convenios | No | No | Sí |
+| Pausar el ingreso de asociados y publicar avisos para su próximo ingreso | No | No | Sí |
 
 **Cómo se crean los usuarios**
 
@@ -138,7 +141,7 @@ erDiagram
 | Tabla | Propósito | Columnas clave |
 |---|---|---|
 | `perfiles` | Un registro por usuario de Auth (asociado, asesor o admin) | `id` (= `auth.users.id`), `rol`, `cedula` (única), `nombre_completo`, `grado`, `grado_asociado` → `grados.codigo`, `institucion` (`policia`/`ejercito`), `telefono`, `correo_institucional`, `nomina_entidad`, `nomina_tipo`, `nomina_numero`, `asesor_id` → `perfiles`, `activo`, `atiende_asociados`, `avisar_apertura_sorteo` |
-| `solicitudes_afiliacion` | Formulario público de afiliación | `nombres`, `apellidos`, `cedula`, `grado`, `institucion`, `celular`, `email` (correo personal), `correo_institucional` (dominio validado por institución), datos de nómina, `nequi`, `asesor_id`, `foto_cedula_frente`, `foto_cedula_reverso`, `foto_selfie` (rutas en Storage), `acepto_datos_at` y `version_politica_datos` (autorización Ley 1581 de 2012), `estado` (`pendiente`, `contactado`, `aprobada`, `rechazada`), `revisado_por`, `fecha_revision` |
+| `solicitudes_afiliacion` | Formulario público de afiliación | `nombres`, `apellidos`, `cedula`, `grado`, `institucion`, `celular`, `email` (correo personal), `correo_institucional` (dominio validado por institución), datos de nómina, `nequi`, `asesor_id`, `foto_cedula_frente`, `foto_cedula_reverso`, `foto_selfie` (rutas en Storage), `acepto_datos_at` y `version_politica_datos` (autorización Ley 1581 de 2012), `estado` (`pendiente`, `contactado`, `aprobada`, `rechazada`), `revisado_por`, `fecha_revision`. Sin repetidos: una sola pendiente por cédula (índice único parcial) y el trigger `rechazar_afiliacion_repetida` |
 | `historial_estado_asociado` | Bajas y reactivaciones (inmutable) | `asociado_id`, `activo_anterior`, `activo_nuevo`, `motivo` (5–300 caracteres), `admin_id` |
 
 El correo personal del asociado **no** se guarda en `perfiles`: es el correo del usuario en Supabase Auth (una sola fuente).
@@ -192,6 +195,11 @@ Grupos de crédito (enum `grado_policial`): `PP`, `PT`, `SI`, `IT`, `IJ`, `CT`, 
 |---|---|---|
 | `convenios` | Empresas aliadas administrables desde `/admin/convenios` | `nombre_empresa`, `nit`, `sector`, `especialidad`, `descripcion`, `servicios[]`, `sedes[]`, `telefono_contacto`, `logo_path` (bucket `convenios-logos`), `video_url`, `pdf_url`, `orden`, `visible`, `activo` |
 | `carne_tokens` | Código aleatorio del QR del carné (se puede regenerar) | `asociado_id` (PK), `token` (uuid único), `rotado_at` |
+| `configuracion_plataforma` | Una sola fila con la pausa del ingreso de asociados | `cuenta_pausada`, `mensaje_pausa`, `actualizado_por`, `actualizado_at` |
+| `historial_pausa_cuenta` | Cada pausa o reanudación (inmutable) | `pausada`, `mensaje`, `actor_id` |
+| `avisos_asociados` | Avisos que el admin publica para el próximo ingreso de los asociados | `titulo`, `mensaje`, `activo`, `creado_por`, `desactivado_por` |
+| `avisos_vistos` | Qué asociado vio qué aviso | PK (`aviso_id`, `asociado_id`), `visto_at` |
+| `historial_cambio_datos_perfil` | Cambios hechos con «Editar datos» (inmutable, sin valores) | `perfil_id`, `actor_id`, `campos` (`nombre`, `celular`, `correo_institucional`, `nomina`) |
 | `limites_intentos` | Contador de intentos para limitar abuso (clave HMAC, no guarda la cédula ni la IP en claro) | `clave`, `creado_at` |
 
 ### 3.3 Funciones (RPC) relevantes
@@ -205,13 +213,15 @@ Las acciones sensibles pasan por funciones `security definer` que validan el rol
 | Recuperación de acceso | `crear_solicitud_recuperacion` y `registrar_cambio_correo_propio` (solo service role), `admin_registrar_cambio_correo`, `admin_rechazar_recuperacion` |
 | Crédito | `validar_monto_solicitud` (trigger: tope del grado), `exigir_proceso_operando_credito`, `exigir_asociado_activo`, `tabla_credito_con_tasa`, `admin_tasas_solicitudes`, `admin_marcar_desembolsado`, `admin_habilitar_credito`, `mi_habilitacion_credito` |
 | Proceso ejecutivo y bajas | `admin_actualizar_proceso_ejecutivo`, `mi_proceso_ejecutivo`, `admin_cambiar_estado_asociado` |
+| Datos del asociado | `admin_editar_datos_asociado` (trigger `exigir_rpc_datos_perfil`: un UPDATE directo de nombre, celular, correo institucional o nómina de otra persona se rechaza) |
 | Alertas | `crear_alerta_asociado`, `admin_marcar_alerta_atendida`, `correos_admins` |
 | Asesores | `resumen_clientes_asesor`, `buscar_cliente_asesor`, `enmascarar_cedula`, `comisiones_periodo_asesor`, `periodo_comision`, `revelar_acumulado_comision`, `bonos_acumulados_asesor`, `admin_editar_pago_comision`, `admin_anular_pago_comision`, `obtener_asesores_publico` |
 | Premios | `evaluar_premios_asesor`, `mis_premios_asesor`, `admin_premios_asesores`, `registrar_clic_premios` |
 | Sorteo | `participar_sorteo`, `confirmar_boleta_sorteo`, `mi_boleta_sorteo`, `sorteo_ventana_abierta`, `boletas_confirmadas_sorteo`, `admin_inscritos_sorteo`, `admin_realizar_sorteo`, `ganador_sorteo_vigente` |
 | Carné | `mi_carne_token`, `regenerar_carne_token`, `verificar_carne` (pública, devuelve solo datos no sensibles) |
 | Métricas | `admin_metricas_dashboard`, `asesor_metricas_dashboard` |
-| Afiliación y política | `validar_grado_afiliacion`, `validar_dominio_correo_afiliacion`, `dominios_correo_institucional`, `version_politica_datos_vigente`, `fotos_huerfanas_afiliacion` |
+| Pausa y avisos | `estado_pausa_cuenta` (true solo para el rol asociado), `admin_cambiar_pausa_cuenta`, `mis_avisos_pendientes`, `marcar_aviso_visto`, `admin_crear_aviso`, `admin_desactivar_aviso` |
+| Afiliación y política | `validar_grado_afiliacion`, `validar_dominio_correo_afiliacion`, `rechazar_afiliacion_repetida`, `dominios_correo_institucional`, `version_politica_datos_vigente`, `fotos_huerfanas_afiliacion` |
 | Integridad (triggers) | `proteger_campos_perfil`, `sellar_revision_solicitud`, `proteger_topes_con_pendientes`, `bitacora_inmutable`, `historial_estado_inmutable`, `sorteo_inmutable`, `log_historial_*` |
 
 ### 3.4 Storage
@@ -234,9 +244,16 @@ Las acciones sensibles pasan por funciones `security definer` que validan el rol
   - verificación de código: 5 cada 15 min por cédula y 30 por IP;
   - afiliación: 3 por cédula al día, 5 por IP a la hora y 10 subidas de fotos por IP a la hora;
   - asesor: búsquedas y consultas de acumulado limitadas por hora; reenvío de la boleta del sorteo limitado por día;
-  - recuperación de acceso: 2 solicitudes por cédula al día y 5 por IP a la hora; cambio de correo propio: 3 pedidos de código por persona a la hora (20 por IP) y 5 verificaciones cada 15 min; cambio de correo por un admin: 10 por hora.
+  - recuperación de acceso: 2 solicitudes por cédula al día y 5 por IP a la hora; cambio de correo propio: 3 pedidos de código por persona a la hora (20 por IP) y 5 verificaciones cada 15 min; cambio de correo por un admin: 10 por hora;
+  - edición de datos de asociados por un admin: 30 por hora.
 - **Datos mínimos por rol:** el asociado no ve la tasa de interés; el asesor ve cédulas enmascaradas y no ve contacto, nómina ni fotos.
 - **Correo institucional:** solo recibe un aviso sin datos personales.
+- **Afiliación sin repetidos** (migración `20261014000000_afiliacion_sin_repetidos`): el trigger `rechazar_afiliacion_repetida` rechaza con `23505` una solicitud nueva si la cédula ya tiene perfil o una solicitud `pendiente`/`contactado`, si el correo personal ya existe en `auth.users` o en una solicitud abierta, o si el correo institucional ya es de un perfil o de una solicitud abierta. La acción `enviarAfiliacion` responde a `23505` igual que a un envío exitoso (anti-enumeración, S-06). Un candado `pg_advisory_xact_lock` por correo evita que dos envíos simultáneos pasen a la vez.
+- **Pausa del ingreso de asociados** (migración `20261018000000_pausa_cuenta_y_avisos`): `proxy.ts` llama a `estado_pausa_cuenta()` en cada petición a `/cuenta` (páginas, Server Actions y el PDF del carné) y, si está en pausa para el rol asociado, redirige a `/cuenta-pausada`. Si la consulta falla, no se bloquea a nadie (decisión aceptada: falla abierta). `actualizarTelefono`, que también se empaqueta fuera de `/cuenta`, comprueba la pausa por su cuenta (`lib/asociado/pausa.ts`). Solo `admin_cambiar_pausa_cuenta()` cambia la pausa (admin, con historial).
+- **Avisos al entrar:** `app/cuenta/layout.tsx` consulta `mis_avisos_pendientes()` (solo avisos activos, publicados después de que el asociado existía y sin ver) y los muestra en una ventana; «Entendido» llama a `marcar_aviso_visto()`. No hay notificaciones push ni correos.
+- **Botón flotante de WhatsApp** (`components/ui/BotonWhatsappFlotante.tsx`): en las páginas públicas va con el mensaje del pie; en `/cuenta`, con el nombre del asociado (nunca la cédula). No aparece en `/admin`, `/asesor` ni `/verificar`.
+- **Selfie de la afiliación:** el verificador del navegador (`lib/afiliacion/calidadFoto.ts`) usa un perfil «selfie» con umbrales propios (nitidez 12, lado menor 360 px, brillo 45), y la cámara se pide en 1920×1080 ideal. Es un aviso, nunca un bloqueo; el servidor no revisa la cara.
+- **Edición de datos por el admin** (`editarDatosAsociado`, `app/admin/asociados/actions.ts`): solo el rol `admin`, solo perfiles `asociado` no eliminados, nunca el propio ni los de sus clientes (RS-01). No toca cédula, grado, institución ni asesor. Escribe solo por la RPC `admin_editar_datos_asociado` (migración `20261018100000_editar_datos_en_la_base`), que repite esas reglas, exige institución y dominio para el correo institucional y deja `historial_cambio_datos_perfil` (quién, cuándo y qué columnas; sin valores). El trigger `exigir_rpc_datos_perfil` rechaza el UPDATE directo de esas columnas sobre otra persona, y que un admin se cambie a sí mismo nombre, correo institucional o nómina.
 - **Fotos de afiliación:** bucket privado; las huérfanas (más de 3 h sin solicitud) se borran cada hora.
 - **Auditoría:** historiales y bitácoras inmutables (afiliación, crédito, proceso ejecutivo, bajas, pagos de comisión, sorteo) e historial de cambios del correo de ingreso.
 - **Autorización de datos:** cada afiliación guarda fecha de aceptación y versión de la política (`/politica-de-datos`).
@@ -250,7 +267,7 @@ Como no hay contraseñas, no hay nada que «olvidar»: recuperar el acceso es pe
 2. Si el código no llega o venció, usa **«Reenviar código»** (disponible a los 45 s) o **«Cambiar cédula»** para empezar de nuevo.
 3. Si la cuenta está dada de baja, al entrar ve el aviso «Tu cuenta está inactiva» y se le cierra la sesión.
 
-**Cambio del correo de ingreso** (migración `20261002500000_recuperacion_acceso`; en el repositorio, **pendiente de aplicar en producción**):
+**Cambio del correo de ingreso** (migraciones `20261002500000_recuperacion_acceso` y `20261009000000_hallazgos_seguridad_8_oct`, aplicadas en producción):
 
 4. **El asociado no cambia su correo por su cuenta** (decisión SEC-REC-02): `/cuenta/perfil` solo explica cómo pedirlo. El cambio existe únicamente por la vía de recuperación con administrador:
 5. **Solicitud y cambio por admin** (`/ingresar/recuperar`): la persona deja cédula, correo nuevo, celular y motivo. La respuesta es siempre la misma (anti-enumeración) y la solicitud solo se crea para un asociado activo (`crear_solicitud_recuperacion`). Los administradores reciben un aviso por correo; en `/admin/alertas` o en la ficha del asociado verifican la identidad por fuera y usan «Cambiar correo de ingreso» (`auth.admin.updateUserById` con service role, y luego `admin_registrar_cambio_correo`) o «Rechazar» (`admin_rechazar_recuperacion`). Un admin no puede cambiar su propio correo ni el de sus clientes.
@@ -273,6 +290,7 @@ Se configuran en Vercel (**Settings → Environment Variables**). La plantilla c
 | `INGRESO_COOKIE_SECRET` | Solo servidor | Cifra la cookie entre los pasos del ingreso |
 | `LIMITE_HMAC_SECRET` | Solo servidor | Claves de los límites de intentos y ticket de subida de fotos. Obligatoria: sin ella el build falla |
 | `CRON_SECRET` | Solo servidor | Autoriza la tarea programada (32+ caracteres) |
+| `ALERTA_TECNICA_CORREOS` | Solo servidor | Opcional. Correos (separados por coma) que reciben la alerta diaria si el límite de intentos falla. Si falta, va a soporte@greenallianceco.com |
 | `RESEND_API_KEY` | Solo servidor | Envío de correos. Obligatoria |
 | `EMAIL_FROM` | Solo servidor | Remitente verificado en Resend. Obligatoria |
 | `RESEND_TEMPLATE_INGRESO_ACEPTADO`, `RESEND_TEMPLATE_CREDITO_APROBADO`, `RESEND_TEMPLATE_CREDITO_RECHAZADO`, `RESEND_TEMPLATE_SORTEO_BOLETA` | Solo servidor | Plantillas de Resend (la del sorteo es obligatoria) |

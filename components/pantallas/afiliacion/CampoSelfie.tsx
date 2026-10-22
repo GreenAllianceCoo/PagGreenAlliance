@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
 import { cx } from "@/components/ui/cx";
 import { AvisoFotoDudosa, SelloCalidadFoto } from "@/components/ui/SelloCalidadFoto";
-import { MENSAJE_FOTO_DUDOSA, type ResultadoCalidadFoto } from "@/lib/afiliacion/calidadFoto";
+import { MENSAJE_SELFIE_DUDOSA, type ResultadoCalidadFoto } from "@/lib/afiliacion/calidadFoto";
 import { comprimirFoto } from "@/lib/afiliacion/comprimirFoto";
 import { analizarFoto } from "./analizarFoto";
 
@@ -86,7 +86,7 @@ export function CampoSelfie({ id, name, label, error }: CampoSelfieProps) {
       return URL.createObjectURL(final);
     });
     setCalidad(null);
-    void analizarFoto(final).then(setCalidad);
+    void analizarFoto(final, "selfie").then(setCalidad);
     setFase("tomada");
   }
 
@@ -101,7 +101,8 @@ export function CampoSelfie({ id, name, label, error }: CampoSelfieProps) {
     }
     try {
       flujoRef.current = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
+        // Sin tamaño, muchos celulares entregan 640×480 (selfie pixelada y «dudosa»).
+        video: { facingMode: "user", width: { ideal: 1920 }, height: { ideal: 1080 } },
         audio: false,
       });
       setFase("camara");
@@ -229,7 +230,7 @@ export function CampoSelfie({ id, name, label, error }: CampoSelfieProps) {
         <>
           {calidad && !calidad.aceptable ? (
             <AvisoFotoDudosa
-              mensaje={MENSAJE_FOTO_DUDOSA}
+              mensaje={MENSAJE_SELFIE_DUDOSA}
               alRepetir={abrirCamara}
               textoRepetir="Tomar la selfie de nuevo"
             />

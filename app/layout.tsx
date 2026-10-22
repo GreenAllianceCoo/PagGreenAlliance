@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Manrope } from "next/font/google";
+import { BotonWhatsappFlotante } from "@/components/ui/BotonWhatsappFlotante";
 import "./globals.css";
 
 // Manrope (400/600/700/800) para todo el texto.
@@ -40,7 +41,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`${manrope.variable} ${bricolage.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <BotonWhatsappFlotante />
+      </body>
     </html>
   );
 }

@@ -4,7 +4,8 @@ import { formatearFecha } from "@/lib/cuenta";
 import { formatearFechaLarga } from "@/lib/fechas";
 import { esEstadoProceso, ETIQUETA_ESTADO_PROCESO, type EstadoProceso } from "@/lib/procesoEjecutivo";
 import { registrar } from "@/lib/servidor/registro";
-import { nombreInstitucion } from "@/lib/validaciones/instituciones";
+import type { TipoCuentaNomina } from "@/lib/afiliacion/entidades";
+import { esInstitucion, nombreInstitucion, type CodigoInstitucion } from "@/lib/validaciones/instituciones";
 
 /**
  * Loaders de la sección «Asociados» de /admin (spec-requerimientos-ricardo §6,
@@ -171,5 +172,43 @@ export async function cargarDetalleProceso(
       cuando: formatearFecha(h.created_at as string),
       creadoEl: h.created_at as string,
     })),
+  };
+}
+
+/** Datos que el admin puede corregir desde la ficha («Editar datos»). */
+export type DatosEditablesAsociado = {
+  nombre: string;
+  telefono: string | null;
+  /** Código de la institución (define el dominio del correo institucional). */
+  institucion: CodigoInstitucion | null;
+  correoInstitucional: string | null;
+  nominaEntidad: string | null;
+  nominaTipo: TipoCuentaNomina | null;
+  nominaNumero: string | null;
+};
+
+/** Lee los datos editables de un asociado (solo con la sesión del admin: RLS). null si no existe. */
+export async function cargarDatosEditablesAsociado(
+  supabase: SupabaseClient,
+  asociadoId: string,
+): Promise<DatosEditablesAsociado | null> {
+  const { data, error } = await supabase
+    .from("perfiles")
+    .select("nombre_completo, telefono, institucion, correo_institucional, nomina_entidad, nomina_tipo, nomina_numero")
+    .eq("id", asociadoId)
+    .maybeSingle();
+  if (error) {
+    registrar("error", { evento: "admin_datos_asociado_lectura_fallo", codigo: error.code, mensaje: error.message });
+    return null;
+  }
+  if (!data) return null;
+  return {
+    nombre: data.nombre_completo as string,
+    telefono: (data.telefono as string | null) ?? null,
+    institucion: esInstitucion(data.institucion) ? data.institucion : null,
+    correoInstitucional: (data.correo_institucional as string | null) ?? null,
+    nominaEntidad: (data.nomina_entidad as string | null) ?? null,
+    nominaTipo: (data.nomina_tipo as TipoCuentaNomina | null) ?? null,
+    nominaNumero: (data.nomina_numero as string | null) ?? null,
   };
 }

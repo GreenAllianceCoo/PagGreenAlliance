@@ -6,11 +6,12 @@ import { ComprobantesPorBorrar, type ComprobantePorBorrar } from "@/components/a
 import { fechaBogotaDeInstante } from "@/lib/fechas";
 import { CorreoIngresoAsociado } from "@/components/admin/CorreoIngresoAsociado";
 import { DetalleProcesoAsociado } from "@/components/admin/DetalleProcesoAsociado";
+import { EditarDatosAsociado } from "@/components/admin/EditarDatosAsociado";
 import { EliminarAsociado } from "@/components/admin/EliminarAsociado";
 import { IconoVolver } from "@/components/ui/Iconos";
 import { exigirAdminOSecretario } from "@/lib/admin/servidor";
 import { urlFotoCarneDeAsociado } from "@/lib/carneFoto";
-import { cargarDetalleProceso } from "@/lib/admin/asociados";
+import { cargarDatosEditablesAsociado, cargarDetalleProceso } from "@/lib/admin/asociados";
 import { cargarCorreoIngresoAsociado } from "@/lib/admin/recuperaciones";
 
 export const metadata: Metadata = { title: "Asociado · Admin · Green Alliance" };
@@ -30,6 +31,9 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
   const correoIngreso = asociado.eliminado || !esAdmin
     ? { pendientes: [], historial: [] }
     : await cargarCorreoIngresoAsociado(supabase, id, userId);
+  // «Editar datos»: solo el admin y solo para asociados vivos.
+  const datosEditables =
+    esAdmin && !asociado.eliminado && asociado.rol === "asociado" ? await cargarDatosEditablesAsociado(supabase, id) : null;
   // Foto del carné (propia o la selfie de la afiliación): URL firmada corta, solo para el admin.
   const fotoCarne = !esAdmin || asociado.eliminado || asociado.rol !== "asociado" ? null : await urlFotoCarneDeAsociado(asociado.id);
   // Comprobantes de desembolso del eliminado: se guardan 30 días y solo el admin los ve.
@@ -79,6 +83,9 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
       ) : (
         <div className="flex max-w-[640px] flex-col gap-4">
           <DetalleProcesoAsociado detalle={detalle} bloqueado={procesoBloqueado} soloProceso={!esAdmin} />
+          {datosEditables ? (
+            <EditarDatosAsociado asociadoId={asociado.id} datos={datosEditables} bloqueado={correoBloqueado} />
+          ) : null}
           {esAdmin && asociado.rol === "asociado" ? (
             <section aria-labelledby="titulo-foto-carne" className="flex items-center gap-4 rounded-20 bg-admin-superficie p-5.5">
               {fotoCarne ? (
