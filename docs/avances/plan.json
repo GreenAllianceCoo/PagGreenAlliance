@@ -1686,11 +1686,11 @@
       "depende": [
         "6.41"
       ],
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "origen": "Agregado",
       "agente": "Sebas",
       "simultanea": false,
-      "nota": "22-oct: develop ya tiene el merge y el push; gh no está instalado y la API quedó bloqueada por permisos, así que el PR lo abre Sebas desde GitHub."
+      "nota": "22-oct: develop ya tiene el merge y el push; gh no está instalado y la API quedó bloqueada por permisos, así que el PR lo abre Sebas desde GitHub. 23-oct: Hecho, PR #13 fusionado y desplegado en Vercel (commit 10b8b8a, READY)."
     },
     {
       "id": "6.44",
@@ -3309,9 +3309,9 @@
       "tarea": "Abrir y fusionar el PR develop → main en GitHub para desplegar (commit e0cbe5a)",
       "responsable": "Sebas",
       "prioridad": "Alta",
-      "estado": "Pendiente",
+      "estado": "Hecho",
       "gantt": "6.43",
-      "nota": "22-oct: develop ya está actualizado en el remoto; gh no está instalado y la API quedó bloqueada por permisos."
+      "nota": "22-oct: develop ya está actualizado en el remoto; gh no está instalado y la API quedó bloqueada por permisos. 23-oct: Hecho, Sebas fusionó el PR #13 develop → main y Vercel desplegó a producción (commit 10b8b8a, READY)."
     },
     {
       "id": "P-145",
@@ -4228,6 +4228,13 @@
       "tareas": "2.17, 4.26, 4.27, 6.42, 6.44 (P-143, P-145)",
       "cambio": "Selfie probada en celular real; dos funciones nuevas listas pendientes de migrar",
       "detalle": "2.17 y P-143 Hecho (Sebas probó la selfie en celular real). Nuevas En curso: 4.26 aviso al asociado por cambio de datos (migración 20261022000000, pgTAP 35) y 4.27 corregir datos de una solicitud de afiliación antes de aprobar (migración 20261023000000, pgTAP 36, pedido de Ricardo). Nueva 6.44 y P-145 (Sebas): aplicar ambas migraciones y correr pgTAP 35 y 36 cuando tenga Docker. 6.42 suma 4.26 y 4.27: falta su revisión de seguridad y QA. Verificación: vitest 778, tsc, lint y build en verde; entregables y PDF actualizados."
+    },
+    {
+      "fecha": "2026-10-23",
+      "agente": "sesión principal",
+      "tareas": "6.43 (P-144)",
+      "cambio": "PR #13 develop → main fusionado y desplegado en Vercel",
+      "detalle": "Sebas fusionó el PR #13; Vercel desplegó a producción (commit 10b8b8a, estado READY). La corrección de solicitudes de afiliación y el aviso por cambio de datos ya están en producción. Siguen pendientes pgTAP 35 y 36 (6.44, P-145) y la revisión de seguridad y QA (6.42) hasta que haya virtualización."
     }
   ]
 }
