@@ -8,7 +8,7 @@ Contrato de prestación de servicios Nº 001-2026 · Cláusula novena y Anexo T�
 | Contratista | SEBASTIÁN SANDOVAL |
 | Sitio en producción | https://www.greenallianceco.com |
 | Repositorio | https://github.com/GreenAllianceCoo/PagGreenAlliance (rama de producción: `main`) |
-| Versión del documento | 1.2 · 2026-10-18 |
+| Versión del documento | 1.3 · 2026-10-23 |
 
 Este documento describe la plataforma tal como está en el repositorio a la fecha. La fuente de verdad siempre es el código: `supabase/migrations/` para la base de datos, `app/` y `lib/` para la aplicación.
 
@@ -47,13 +47,13 @@ Vercel Cron (cada hora) ──> /api/cron/limpiar-fotos (borra fotos huérfanas 
 | Interfaz y servidor web | Next.js 16.3 (App Router, Server Actions), React 19.3, Tailwind CSS 3 | `app/`, `components/` |
 | Lógica de negocio y validaciones | TypeScript + zod 4 | `lib/` (`lib/validaciones/` para los esquemas) |
 | Protección de rutas | `proxy.ts` (exige sesión en `/cuenta`, `/asesor`, `/admin`; con la pausa activa manda a los asociados de `/cuenta` a `/cuenta-pausada`; el rol lo valida cada página) | `proxy.ts` |
-| Base de datos | Supabase Postgres, 66 migraciones versionadas | `supabase/migrations/` |
+| Base de datos | Supabase Postgres, 68 migraciones versionadas | `supabase/migrations/` |
 | Autenticación | Supabase Auth, código de 6 dígitos por correo, sin contraseñas | `lib/ingreso/`, `app/ingresar/` |
 | Archivos | Supabase Storage | buckets `afiliacion-documentos` y `convenios-logos` |
 | Correo | Resend (plantillas publicadas; si falta una, texto plano) | `lib/correo/`, `docs/resend-plantillas.md` |
 | PDF y QR del carné | `pdf-lib`, `qrcode` | `lib/carnePdf.ts`, `lib/carneQr.ts` |
 | Hosting y tareas programadas | Vercel (plan Pro), `vercel.json` | `vercel.json` |
-| Pruebas | Vitest (unitarias), pgTAP (base de datos, 35 archivos), Playwright (punta a punta, escritorio y celular) | `tests/`, `supabase/tests/` |
+| Pruebas | Vitest (unitarias), pgTAP (base de datos, 37 archivos), Playwright (punta a punta, escritorio y celular) | `tests/`, `supabase/tests/` |
 
 ### 1.2 Rutas principales
 
@@ -213,6 +213,7 @@ Las acciones sensibles pasan por funciones `security definer` que validan el rol
 | Recuperación de acceso | `crear_solicitud_recuperacion` y `registrar_cambio_correo_propio` (solo service role), `admin_registrar_cambio_correo`, `admin_rechazar_recuperacion` |
 | Crédito | `validar_monto_solicitud` (trigger: tope del grado), `exigir_proceso_operando_credito`, `exigir_asociado_activo`, `tabla_credito_con_tasa`, `admin_tasas_solicitudes`, `admin_marcar_desembolsado`, `admin_habilitar_credito`, `mi_habilitacion_credito` |
 | Proceso ejecutivo y bajas | `admin_actualizar_proceso_ejecutivo`, `mi_proceso_ejecutivo`, `admin_cambiar_estado_asociado` |
+| Datos de la solicitud de afiliación | `admin_editar_afiliacion` (solo admin; solicitudes pendientes o contactadas; sin repetidos; historial «datos_editados»). `proteger_solicitud_afiliacion` solo deja corregir datos dentro de esa RPC |
 | Datos del asociado | `admin_editar_datos_asociado` (trigger `exigir_rpc_datos_perfil`: un UPDATE directo de nombre, celular, correo institucional o nómina de otra persona se rechaza) |
 | Alertas | `crear_alerta_asociado`, `admin_marcar_alerta_atendida`, `correos_admins` |
 | Asesores | `resumen_clientes_asesor`, `buscar_cliente_asesor`, `enmascarar_cedula`, `comisiones_periodo_asesor`, `periodo_comision`, `revelar_acumulado_comision`, `bonos_acumulados_asesor`, `admin_editar_pago_comision`, `admin_anular_pago_comision`, `obtener_asesores_publico` |
@@ -250,6 +251,8 @@ Las acciones sensibles pasan por funciones `security definer` que validan el rol
 - **Correo institucional:** solo recibe un aviso sin datos personales.
 - **Afiliación sin repetidos** (migración `20261014000000_afiliacion_sin_repetidos`): el trigger `rechazar_afiliacion_repetida` rechaza con `23505` una solicitud nueva si la cédula ya tiene perfil o una solicitud `pendiente`/`contactado`, si el correo personal ya existe en `auth.users` o en una solicitud abierta, o si el correo institucional ya es de un perfil o de una solicitud abierta. La acción `enviarAfiliacion` responde a `23505` igual que a un envío exitoso (anti-enumeración, S-06). Un candado `pg_advisory_xact_lock` por correo evita que dos envíos simultáneos pasen a la vez.
 - **Pausa del ingreso de asociados** (migración `20261018000000_pausa_cuenta_y_avisos`): `proxy.ts` llama a `estado_pausa_cuenta()` en cada petición a `/cuenta` (páginas, Server Actions y el PDF del carné) y, si está en pausa para el rol asociado, redirige a `/cuenta-pausada`. Si la consulta falla, no se bloquea a nadie (decisión aceptada: falla abierta). `actualizarTelefono`, que también se empaqueta fuera de `/cuenta`, comprueba la pausa por su cuenta (`lib/asociado/pausa.ts`). Solo `admin_cambiar_pausa_cuenta()` cambia la pausa (admin, con historial).
+- **Corrección de solicitudes de afiliación** (migración `20261023000000_editar_solicitud_afiliacion`): `editarAfiliacion` (`app/admin/afiliaciones/actions.ts`) valida con el mismo esquema del formulario y escribe solo por `admin_editar_afiliacion`, que exige admin, estado `pendiente`/`contactado`, dominio del correo institucional y que la cédula y los correos no tengan otra cuenta ni otra solicitud abierta. No cambia fotos, asesor, mensaje ni autorización.
+- **Aviso por cambio de datos** (migración `20261022000000_aviso_cambio_datos`): si `admin_editar_datos_asociado` cambia el correo institucional o la nómina, crea un aviso personal (`avisos_asociados.destinatario_id`) que el asociado ve una vez al entrar, sin los valores nuevos.
 - **Avisos al entrar:** `app/cuenta/layout.tsx` consulta `mis_avisos_pendientes()` (solo avisos activos, publicados después de que el asociado existía y sin ver) y los muestra en una ventana; «Entendido» llama a `marcar_aviso_visto()`. No hay notificaciones push ni correos.
 - **Botón flotante de WhatsApp** (`components/ui/BotonWhatsappFlotante.tsx`): en las páginas públicas va con el mensaje del pie; en `/cuenta`, con el nombre del asociado (nunca la cédula). No aparece en `/admin`, `/asesor` ni `/verificar`.
 - **Selfie de la afiliación:** el verificador del navegador (`lib/afiliacion/calidadFoto.ts`) usa un perfil «selfie» con umbrales propios (nitidez 12, lado menor 360 px, brillo 45), y la cámara se pide en 1920×1080 ideal. Es un aviso, nunca un bloqueo; el servidor no revisa la cara.

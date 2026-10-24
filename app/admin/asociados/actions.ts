@@ -481,5 +481,9 @@ export async function editarDatosAsociado(
 
   revalidatePath("/admin/asociados");
   revalidatePath(`/admin/asociados/${asociadoId}`);
-  return { mensaje: "Datos actualizados." };
+  // Migración 20261022000000: correo institucional o nómina → aviso personal al próximo ingreso.
+  const avisado = Array.isArray(campos) && campos.some((c) => c === "correo_institucional" || c === "nomina");
+  return {
+    mensaje: avisado ? "Datos actualizados. El asociado verá un aviso la próxima vez que entre." : "Datos actualizados.",
+  };
 }

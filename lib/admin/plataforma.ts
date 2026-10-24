@@ -35,6 +35,8 @@ export async function cargarPlataforma(supabase: SupabaseClient): Promise<{
     supabase
       .from("avisos_asociados")
       .select("id, titulo, mensaje, activo, creado_por, created_at")
+      // Solo los avisos generales; los personales (cambio de datos, 20261022000000) no se listan aquí.
+      .is("destinatario_id", null)
       .order("created_at", { ascending: false })
       .limit(20),
   ]);

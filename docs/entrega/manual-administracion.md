@@ -2,7 +2,7 @@
 
 **Para:** Ricardo Varón Penagos (representante legal) y las personas que la Cooperativa Green Alliance designe como administradores de la plataforma.
 **Sitio:** https://www.greenallianceco.com
-**Versión del manual:** 18 de octubre de 2026
+**Versión del manual:** 23 de octubre de 2026
 
 Este manual explica, paso a paso, cómo usar el panel de administración. No hace falta saber de programación.
 
@@ -127,6 +127,8 @@ Si ya habló con la persona pero aún no decide, toque **«Marcar como contactad
 
 ### 4.4 Aprobar
 
+Si algún dato está mal escrito, corríjalo antes de aprobar (sección 4.8).
+
 1. Toque **«Aprobar (crea la cuenta)»**.
 2. Confirme con **«Sí, aprobar»**.
 3. La plataforma:
@@ -167,7 +169,24 @@ Por seguridad, la persona ve el mismo mensaje «¡Solicitud enviada!» que en un
 
 Una persona cuya solicitud fue **rechazada** sí puede volver a enviar el formulario.
 
-Si al aprobar una solicitud antigua aparece «Ese correo personal ya lo usa otra cuenta», rechácela o pida a la persona otro correo.
+Si al aprobar una solicitud antigua aparece «Ese correo personal ya lo usa otra cuenta», corrija el correo (4.8) o rechácela.
+
+### 4.8 Corregir los datos de una solicitud
+
+Si la persona escribió algo mal (un apellido, la cédula, el correo, el grado o la cuenta de nómina), corríjalo **antes de aprobar**: la cuenta se crea con los datos que tenga la solicitud en ese momento.
+
+1. Abra la solicitud (debe estar **Pendiente** o **Contactado**).
+2. Toque **«Editar datos de la solicitud»**.
+3. Corrija lo que haga falta: nombres, apellidos, cédula, institución, grado, celular, Nequi, correo personal, correo institucional y cuenta de nómina.
+4. Toque **«Guardar cambios»**. Verá «Datos de la solicitud actualizados».
+
+Tenga en cuenta:
+
+- El **correo personal** es el de ingreso: ahí le llegará el código para entrar. Confírmelo con la persona antes de cambiarlo.
+- La plataforma no deja poner una cédula o un correo que ya tenga otra cuenta u otra solicitud en curso.
+- Las fotos, el asesor que refirió y el mensaje no se pueden cambiar.
+- Solo el administrador ve este botón; el secretario no. Una solicitud aprobada o rechazada ya no se corrige (para un asociado ya registrado use 5.6).
+- El cambio queda en el historial de la solicitud con los campos que se corrigieron.
 
 ---
 
@@ -252,6 +271,7 @@ Tenga en cuenta:
 - El secretario no ve este bloque.
 - El cambio queda guardado en la base de datos (quién, cuándo y qué campos cambió, sin los valores), pero todavía **no aparece** en la sección «Historial».
 - Estos datos solo se pueden cambiar desde aquí: la base de datos rechaza cualquier otro camino.
+- Si cambia el **correo institucional** o la **cuenta de nómina**, el asociado verá un aviso («Actualizamos tus datos») la próxima vez que entre a su cuenta. El aviso dice qué cambió y cuándo, pero no muestra los datos nuevos. No se envía correo.
 - El asociado puede seguir cambiando su celular desde su perfil.
 
 ---
@@ -543,7 +563,7 @@ El **secretario** es una persona de apoyo que revisa las afiliaciones, consulta 
 ### 14.1 Qué puede hacer
 
 - Ver el **Resumen** (las mismas cifras que el administrador).
-- Ver y **editar las afiliaciones**: revisar la ficha y las fotos, **marcar como contactado**, **aprobar** (crea la cuenta y envía el correo «Ingreso aceptado», igual que el administrador), **rechazar** y **asignar el asesor** a un asociado que todavía no tiene (no puede cambiar un asesor ya asignado). No puede corregir los datos que escribió el solicitante: la plataforma solo permite cambiar el estado.
+- Ver y **editar las afiliaciones**: revisar la ficha y las fotos, **marcar como contactado**, **aprobar** (crea la cuenta y envía el correo «Ingreso aceptado», igual que el administrador), **rechazar** y **asignar el asesor** a un asociado que todavía no tiene (no puede cambiar un asesor ya asignado). No puede corregir los datos que escribió el solicitante: eso lo hace solo el administrador (sección 4.8).
 - Ver la lista de **Asociados** y la **ficha** de cada uno, y **cambiar el estado del proceso ejecutivo** y la **fecha de inicio del embargo**, igual que el administrador (queda en el historial del proceso con su nombre y la fecha). No puede cambiar el proceso de su propia cuenta.
 - Ver la lista de **Créditos** (pendientes, aprobados y rechazados) y el detalle de cada solicitud, **sin** botones de acción y **sin la tasa de interés** (igual que el asociado, que tampoco la ve).
 
