@@ -352,6 +352,38 @@ export function crearEsquemaAfiliacion(ctx: ContextoAfiliacion) {
     .transform((datos) => resolverNomina(datos as typeof datos & SalidaTexto));
 }
 
+/**
+ * «Editar datos de la solicitud» del admin (pedido de Ricardo, 23-oct): los
+ * mismos campos y reglas del formulario, sin asesor, mensaje, autorización ni
+ * fotos (eso no se corrige). La base repite las reglas en admin_editar_afiliacion().
+ */
+const camposEditarAfiliacion = {
+  id: z.uuid({ error: "Falta la solicitud." }),
+  nombres: camposTexto.nombres,
+  apellidos: camposTexto.apellidos,
+  cedula: camposTexto.cedula,
+  institucion: camposTexto.institucion,
+  grado_id: camposTexto.grado_id,
+  nequi: camposTexto.nequi,
+  nomina_entidad: camposTexto.nomina_entidad,
+  nomina_entidad_otra: camposTexto.nomina_entidad_otra,
+  nomina_tipo: camposTexto.nomina_tipo,
+  nomina_numero: camposTexto.nomina_numero,
+  celular: camposTexto.celular,
+  correo_institucional: camposTexto.correo_institucional,
+  email: camposTexto.email,
+};
+
+export function crearEsquemaEditarAfiliacion(ctx: Pick<ContextoAfiliacion, "grados">) {
+  const reglas = reglasCruzadas({ grados: ctx.grados, asesores: [] }) as (datos: unknown, z4: unknown) => void;
+  return z
+    .object(camposEditarAfiliacion)
+    .superRefine((datos, z4) => reglas({ ...datos, asesor_id: null }, z4), SIEMPRE)
+    .transform((datos) => ({ ...datos, nomina: cuentaNominaResuelta(datos) }));
+}
+
+export type CampoEditarAfiliacion = keyof typeof camposEditarAfiliacion;
+
 export type DatosAfiliacion = z.output<ReturnType<typeof crearEsquemaAfiliacion>>;
 export type CampoAfiliacion = keyof typeof camposTexto | keyof typeof camposFotos;
 

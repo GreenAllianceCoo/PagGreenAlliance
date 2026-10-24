@@ -7,6 +7,7 @@ import { IconoVolver } from "@/components/ui/Iconos";
 import { exigirAdminOSecretario } from "@/lib/admin/servidor";
 import { urlsFirmadasAfiliacion } from "@/lib/admin/fotos";
 import { FILTRO_ATIENDEN, nombreGradoEmbebido, textoCuentaNomina } from "@/lib/admin/afiliacion";
+import { cargarCatalogoGrados } from "@/lib/grados";
 import { enmascararCedula } from "@/lib/mascara";
 import { esEstadoAfiliacionValido, listarSolicitudesAfiliacion } from "../_datos";
 
@@ -20,7 +21,7 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
   const { data: solicitud } = await supabase
     .from("solicitudes_afiliacion")
     .select(
-      "id, nombre, cedula, grado, grados(nombre), institucion, celular, nequi, email, correo_institucional, nomina_entidad, nomina_tipo, nomina_numero, mensaje, asesor_id, estado, foto_cedula_frente, foto_cedula_reverso, foto_selfie, created_at",
+      "id, nombre, nombres, apellidos, cedula, grado, grados(nombre), institucion, celular, nequi, email, correo_institucional, nomina_entidad, nomina_tipo, nomina_numero, mensaje, asesor_id, estado, foto_cedula_frente, foto_cedula_reverso, foto_selfie, created_at",
     )
     .eq("id", id)
     .single();
@@ -72,6 +73,29 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
     }
   }
 
+  // «Editar datos de la solicitud» (pedido de Ricardo, 23-oct): solo admin y antes de aprobar.
+  const editable = rol === "admin" && (solicitud.estado === "pendiente" || solicitud.estado === "contactado");
+  const edicion = editable
+    ? {
+        grados: await cargarCatalogoGrados(),
+        datos: {
+          id: solicitud.id,
+          nombres: solicitud.nombres ?? "",
+          apellidos: solicitud.apellidos ?? "",
+          cedula: solicitud.cedula,
+          institucion: solicitud.institucion,
+          grado: solicitud.grado,
+          celular: solicitud.celular,
+          nequi: solicitud.nequi,
+          email: solicitud.email,
+          correoInstitucional: solicitud.correo_institucional,
+          nominaEntidad: solicitud.nomina_entidad,
+          nominaTipo: solicitud.nomina_tipo,
+          nominaNumero: solicitud.nomina_numero,
+        },
+      }
+    : null;
+
   return (
     <AdminShell nombre={nombreAdmin} rol={rol} seccion="afiliaciones">
       <div className="flex items-center gap-3">
@@ -111,6 +135,7 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
         hermanas={hermanas.map((h) => ({ ...h, cedula: enmascararCedula(h.cedula) }))}
         perfilAsociado={perfilAsociado}
         asesores={asesores}
+        edicion={edicion}
       />
     </AdminShell>
   );

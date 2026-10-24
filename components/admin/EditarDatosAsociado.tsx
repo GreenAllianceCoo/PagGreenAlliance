@@ -3,23 +3,13 @@
 import { startTransition, useActionState, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { editarDatosAsociado, type EstadoEditarDatosAsociado } from "@/app/admin/asociados/actions";
 import { Modal } from "@/components/ui/Modal";
-import {
-  BANCOS,
-  BILLETERAS,
-  ETIQUETA_OTRA_ENTIDAD,
-  esEntidadDeLista,
-  NOMBRE_TIPO_CUENTA,
-  OPCION_OTRA_ENTIDAD,
-  pasosCuentaNomina,
-  TIPOS_CUENTA_BANCO,
-} from "@/lib/afiliacion/entidades";
+import { NOMBRE_TIPO_CUENTA } from "@/lib/afiliacion/entidades";
 import type { DatosEditablesAsociado } from "@/lib/admin/asociados";
 import { DOMINIOS_INSTITUCIONALES } from "@/lib/validaciones/dominiosInstitucionales";
 import { Button } from "@/components/ui/Button";
+import { CampoModal, CamposCuentaNomina, CLASE_CAMPO_MODAL, entidadInicial } from "./CamposModal";
 
 const INICIAL: EstadoEditarDatosAsociado = {};
-const CLASE_CAMPO =
-  "h-12 w-full min-w-0 rounded-12 bg-ga-fondo-suave px-3.5 text-16 text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)] outline-none focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-verde)] aria-[invalid=true]:shadow-[inset_0_0_0_1.5px_var(--ga-error)]";
 
 type Props = {
   asociadoId: string;
@@ -103,12 +93,6 @@ function Dato({ termino, children }: { termino: string; children: ReactNode }) {
   );
 }
 
-/** Entidad guardada → valor del desplegable («otra» + nombre si no está en la lista). */
-function entidadInicial(entidad: string | null) {
-  if (!entidad) return { entidad: "", otra: "" };
-  return esEntidadDeLista(entidad) ? { entidad, otra: "" } : { entidad: OPCION_OTRA_ENTIDAD, otra: entidad };
-}
-
 function FormularioDatos({
   asociadoId,
   datos,
@@ -139,9 +123,7 @@ function FormularioDatos({
     value: valores[nombre],
     onChange: (e: { target: { value: string } }) => setValores((v) => ({ ...v, [nombre]: e.target.value })),
   });
-  const entidad = valores.nomina_entidad;
   const formRef = useRef<HTMLFormElement>(null);
-  const pasos = pasosCuentaNomina(entidad);
   const tituloId = `editar-datos-${asociadoId}`;
   const errores = estado.errores ?? {};
 
@@ -180,10 +162,10 @@ function FormularioDatos({
           La cédula, el grado, la institución y el asesor no se cambian aquí.
         </p>
 
-        <Campo id={`${tituloId}-nombre`} etiqueta="Nombre completo" error={errores.nombre}>
-          {(p) => <input {...p} {...campo("nombre")} maxLength={120} autoComplete="off" className={CLASE_CAMPO} />}
-        </Campo>
-        <Campo id={`${tituloId}-telefono`} etiqueta="Celular" error={errores.telefono}>
+        <CampoModal id={`${tituloId}-nombre`} etiqueta="Nombre completo" error={errores.nombre}>
+          {(p) => <input {...p} {...campo("nombre")} maxLength={120} autoComplete="off" className={CLASE_CAMPO_MODAL} />}
+        </CampoModal>
+        <CampoModal id={`${tituloId}-telefono`} etiqueta="Celular" error={errores.telefono}>
           {(p) => (
             <input
               {...p}
@@ -192,11 +174,11 @@ function FormularioDatos({
               inputMode="numeric"
               maxLength={16}
               autoComplete="off"
-              className={CLASE_CAMPO}
+              className={CLASE_CAMPO_MODAL}
             />
           )}
-        </Campo>
-        <Campo
+        </CampoModal>
+        <CampoModal
           id={`${tituloId}-correo`}
           etiqueta="Correo institucional"
           ayuda={dominios ? `Debe terminar en ${dominios}. Vacío = sin correo institucional.` : undefined}
@@ -209,73 +191,17 @@ function FormularioDatos({
               type="email"
               maxLength={254}
               autoComplete="off"
-              className={CLASE_CAMPO}
+              className={CLASE_CAMPO_MODAL}
             />
           )}
-        </Campo>
+        </CampoModal>
 
-        <fieldset className="m-0 flex flex-col gap-4 border-0 p-0">
-          <legend className="mb-2 p-0 text-14 font-bold">Cuenta de nómina</legend>
-          <Campo id={`${tituloId}-entidad`} etiqueta="Entidad" error={errores.nomina_entidad}>
-            {(p) => (
-              <select {...p} {...campo("nomina_entidad")} className={CLASE_CAMPO}>
-                <option value="">Sin cuenta de nómina</option>
-                <optgroup label="Bancos">
-                  {BANCOS.map((b) => (
-                    <option key={b} value={b}>
-                      {b}
-                    </option>
-                  ))}
-                </optgroup>
-                <optgroup label="Billeteras">
-                  {BILLETERAS.map((b) => (
-                    <option key={b} value={b}>
-                      {b}
-                    </option>
-                  ))}
-                </optgroup>
-                <option value={OPCION_OTRA_ENTIDAD}>{ETIQUETA_OTRA_ENTIDAD}</option>
-              </select>
-            )}
-          </Campo>
-          {pasos.pideNombreOtra ? (
-            <Campo id={`${tituloId}-otra`} etiqueta="Nombre de la entidad" error={errores.nomina_entidad_otra}>
-              {(p) => <input {...p} {...campo("nomina_entidad_otra")} maxLength={60} autoComplete="off" className={CLASE_CAMPO} />}
-            </Campo>
-          ) : null}
-          {pasos.pideTipo ? (
-            <Campo id={`${tituloId}-tipo`} etiqueta="Tipo de cuenta" error={errores.nomina_tipo}>
-              {(p) => (
-                <select {...p} {...campo("nomina_tipo")} className={CLASE_CAMPO}>
-                  <option value="">Elige el tipo</option>
-                  {TIPOS_CUENTA_BANCO.map((t) => (
-                    <option key={t} value={t}>
-                      {NOMBRE_TIPO_CUENTA[t]}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </Campo>
-          ) : null}
-          {pasos.pideNumero ? (
-            <Campo
-              id={`${tituloId}-numero`}
-              etiqueta={pasos.pideTipo ? "Número de cuenta" : "Número (celular de la billetera)"}
-              error={errores.nomina_numero}
-            >
-              {(p) => (
-                <input
-                  {...p}
-                  {...campo("nomina_numero")}
-                  inputMode="numeric"
-                  maxLength={24}
-                  autoComplete="off"
-                  className={CLASE_CAMPO}
-                />
-              )}
-            </Campo>
-          ) : null}
-        </fieldset>
+        <CamposCuentaNomina
+          idBase={tituloId}
+          control={campo}
+          errores={errores}
+          opcionVacia="Sin cuenta de nómina"
+        />
 
         {estado.error ? (
           <p role="alert" tabIndex={-1} data-error-general className="m-0 text-14 font-semibold text-ga-error">
@@ -296,39 +222,5 @@ function FormularioDatos({
         </div>
       </form>
     </Modal>
-  );
-}
-
-function Campo({
-  id,
-  etiqueta,
-  ayuda,
-  error,
-  children,
-}: {
-  id: string;
-  etiqueta: string;
-  ayuda?: string;
-  error?: string;
-  children: (p: { id: string; "aria-invalid"?: true; "aria-describedby"?: string }) => ReactNode;
-}) {
-  const desc = [ayuda ? `${id}-ayuda` : "", error ? `${id}-error` : ""].filter(Boolean).join(" ") || undefined;
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-14 font-bold">
-        {etiqueta}
-      </label>
-      {children({ id, "aria-invalid": error ? true : undefined, "aria-describedby": desc })}
-      {ayuda ? (
-        <span id={`${id}-ayuda`} className="text-13 text-ga-texto-3">
-          {ayuda}
-        </span>
-      ) : null}
-      {error ? (
-        <span id={`${id}-error`} className="text-13 font-semibold text-ga-error">
-          {error}
-        </span>
-      ) : null}
-    </div>
   );
 }

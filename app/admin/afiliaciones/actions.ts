@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { registrar } from "@/lib/servidor/registro";
-import { exigirAdminOSecretario } from "@/lib/admin/servidor";
+import { exigirAdmin, exigirAdminOSecretario } from "@/lib/admin/servidor";
+import { cargarCatalogoGrados } from "@/lib/grados";
+import { dentroDelLimite } from "@/lib/servidor/limite";
+import { erroresPorCampo, textoDe } from "@/lib/validaciones/comunes";
+import { crearEsquemaEditarAfiliacion, type CampoEditarAfiliacion } from "@/lib/validaciones/afiliacion";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { enviarIngresoAceptado } from "@/lib/correo/ingreso";
 import { destinatariosAviso } from "@/lib/correo/destinatarios";
@@ -298,4 +302,79 @@ export async function asignarAsesor(
 
   revalidatePath(`/admin/afiliaciones/${id}`);
   return { mensaje: "Asesor asignado." };
+}
+
+export type EstadoEditarAfiliacion = {
+  errores?: Partial<Record<CampoEditarAfiliacion, string>>;
+  error?: string;
+  mensaje?: string;
+};
+
+/** Textos de admin_editar_afiliacion() listos para mostrar, con el campo al que pertenecen. */
+const MENSAJES_EDITAR_AFILIACION: { texto: string; campo?: CampoEditarAfiliacion }[] = [
+  { texto: "Esa cédula ya tiene cuenta u otra solicitud en curso", campo: "cedula" },
+  { texto: "Ese correo personal ya lo usa otra cuenta u otra solicitud en curso", campo: "email" },
+  { texto: "Ese correo institucional ya lo usa otra cuenta u otra solicitud en curso", campo: "correo_institucional" },
+  { texto: "El correo institucional no es del dominio de su institución", campo: "correo_institucional" },
+  { texto: "Solo se corrigen solicitudes pendientes o contactadas" },
+  { texto: "No encontramos la solicitud" },
+  { texto: "No hay cambios para guardar" },
+];
+
+/**
+ * «Editar datos de la solicitud» (pedido de Ricardo, 23-oct): el admin corrige
+ * lo que escribió el solicitante ANTES de aprobar (pendiente o contactado), para
+ * que la cuenta se cree con los datos buenos. Solo admin; escribe SOLO por la RPC
+ * admin_editar_afiliacion (migración 20261023000000), que repite las reglas,
+ * revisa repetidos y deja «datos_editados» en el historial de la solicitud.
+ */
+export async function editarAfiliacion(
+  _previo: EstadoEditarAfiliacion,
+  formData: FormData,
+): Promise<EstadoEditarAfiliacion> {
+  const { supabase, userId } = await exigirAdmin();
+  if (!(await dentroDelLimite("admin-editar-afiliacion", userId, 30, 60 * 60))) {
+    return { error: "Hiciste muchos cambios seguidos. Intenta de nuevo en una hora." };
+  }
+
+  const grados = await cargarCatalogoGrados();
+  const campos: CampoEditarAfiliacion[] = [
+    "id", "nombres", "apellidos", "cedula", "institucion", "grado_id", "nequi", "celular", "email",
+    "correo_institucional", "nomina_entidad", "nomina_entidad_otra", "nomina_tipo", "nomina_numero",
+  ];
+  const entrada = Object.fromEntries(campos.map((c) => [c, textoDe(formData, c)]));
+  const resultado = crearEsquemaEditarAfiliacion({ grados }).safeParse(entrada);
+  if (!resultado.success) {
+    return { errores: erroresPorCampo<CampoEditarAfiliacion>(resultado.error) };
+  }
+  const d = resultado.data;
+
+  const { data: cambiados, error } = await supabase.rpc("admin_editar_afiliacion", {
+    p_solicitud_id: d.id,
+    p_nombres: d.nombres,
+    p_apellidos: d.apellidos,
+    p_cedula: d.cedula,
+    p_institucion: d.institucion,
+    p_grado: d.grado_id,
+    p_celular: d.celular,
+    p_nequi: d.nequi,
+    p_email: d.email,
+    p_correo_institucional: d.correo_institucional,
+    p_nomina_entidad: d.nomina.entidad,
+    p_nomina_tipo: d.nomina.tipo,
+    p_nomina_numero: d.nomina.numero,
+  });
+  if (error) {
+    const conocido = MENSAJES_EDITAR_AFILIACION.find((m) => error.message?.includes(m.texto));
+    if (!conocido) {
+      registrar("error", { evento: "admin_editar_afiliacion_fallo", codigo: error.code, mensaje: error.message });
+      return { error: "No pudimos guardar los cambios. Intenta de nuevo." };
+    }
+    return conocido.campo ? { errores: { [conocido.campo]: `${conocido.texto}.` } } : { error: `${conocido.texto}.` };
+  }
+
+  registrar("info", { evento: "admin_editar_afiliacion", actor_id: userId, solicitud_id: d.id, campos: cambiados });
+  revalidatePath("/admin/afiliaciones");
+  revalidatePath(`/admin/afiliaciones/${d.id}`);
+  return { mensaje: "Datos de la solicitud actualizados." };
 }

@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 22-oct-2026 (migración 20261018100000 aplicada; respaldos y logos.rar fuera del repo; faltan abrir y fusionar el PR develop → main y probar la selfie en un celular real).
+Actualizado: 23-oct-2026 (selfie probada en celular real; nuevas migraciones 20261022000000 y 20261023000000 por aplicar y pgTAP 35 y 36 por correr cuando haya Docker; falta abrir y fusionar el PR develop → main).
 
 ## Dónde quedamos
 
