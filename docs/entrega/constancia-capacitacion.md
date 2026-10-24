@@ -4,7 +4,7 @@
 **Representante legal:** Ricardo Varón Penagos
 **Plataforma:** https://www.greenallianceco.com
 **Contrato:** Contrato de prestación de servicios Nº 001-2026 (cláusulas tercera y vigésima: capacitación básica al personal designado)
-**Material de apoyo entregado:** «Manual de administración · Plataforma Green Alliance» (versión del 18 de octubre de 2026)
+**Material de apoyo entregado:** «Manual de administración · Plataforma Green Alliance» (versión del 23 de octubre de 2026)
 
 ---
 
@@ -26,7 +26,7 @@ Marque con una **X** los temas vistos y anote en qué sesión.
 | ☐ | Ingreso con cédula y código al correo; salir de la cuenta | 2 | ____ |
 | ☐ | Reglas generales: nadie se aprueba a sí mismo, motivos e historial, correos personal e institucional | 1 | ____ |
 | ☐ | Tablero «Resumen» y sus cifras | 3 | ____ |
-| ☐ | Afiliaciones: revisar datos y fotos, contactar por WhatsApp, aprobar, rechazar y asignar asesor; solicitudes repetidas | 4 | ____ |
+| ☐ | Afiliaciones: revisar datos y fotos, contactar por WhatsApp, aprobar, rechazar y asignar asesor; solicitudes repetidas; corregir los datos de una solicitud | 4 | ____ |
 | ☐ | Asociados: búsqueda y los 8 pasos del proceso ejecutivo; fecha de inicio del embargo | 5.1 – 5.2 | ____ |
 | ☐ | Asociados: dar de baja y reactivar | 5.3 – 5.4 | ____ |
 | ☐ | Asociados: habilitar un nuevo crédito después de un rechazo | 5.5 | ____ |

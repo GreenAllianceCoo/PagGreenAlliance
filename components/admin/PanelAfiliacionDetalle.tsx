@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AccionesAfiliacion } from "./AccionesAfiliacion";
 import { AsignarAsesor } from "./AsignarAsesor";
+import { EditarSolicitudAfiliacion, type DatosSolicitudEditable } from "./EditarSolicitudAfiliacion";
+import type { GradoCatalogo } from "@/lib/gradosCatalogo";
 import { ChipEstado, type EstadoAdmin } from "./ChipEstado";
 import { FotoAfiliacion } from "./FotoAfiliacion";
 import { ToastAdmin } from "./ToastAdmin";
@@ -52,6 +54,8 @@ type Props = {
    */
   perfilAsociado?: { id: string; asesorNombre: string | null } | null;
   asesores?: { id: string; nombre: string }[];
+  /** «Editar datos de la solicitud»: solo llega para el admin con la solicitud pendiente o contactada. */
+  edicion?: { datos: DatosSolicitudEditable; grados: GradoCatalogo[] } | null;
 };
 
 /**
@@ -61,7 +65,7 @@ type Props = {
  * propia URL (cada una es una página de servidor distinta, a diferencia de
  * créditos que no cambia de ruta).
  */
-export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas, perfilAsociado, asesores = [] }: Props) {
+export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas, perfilAsociado, asesores = [], edicion = null }: Props) {
   const router = useRouter();
   const [toast, setToast] = useState<string | null>(null);
   const enlaceWhatsapp = enlaceWhatsappAfiliacion(solicitud.celular, solicitud.nombre);
@@ -185,6 +189,10 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas, perfilAsoci
             selfie son de la misma persona. Si tienes dudas, contáctala por WhatsApp antes de aprobar.
           </span>
         </div>
+
+        {edicion ? (
+          <EditarSolicitudAfiliacion solicitud={edicion.datos} grados={edicion.grados} onGuardado={setToast} />
+        ) : null}
 
         <AccionesAfiliacion id={solicitud.id} estado={solicitud.estado} nombre={solicitud.nombre} onResuelto={setToast} />
 

@@ -101,7 +101,7 @@ select is_empty(
                               -- Pausa del ingreso y avisos (20261018000000): se validan solas.
                               'estado_pausa_cuenta', 'admin_cambiar_pausa_cuenta', 'mis_avisos_pendientes',
                               'marcar_aviso_visto', 'admin_crear_aviso', 'admin_desactivar_aviso',
-                              'admin_editar_datos_asociado')
+                              'admin_editar_datos_asociado', 'admin_editar_afiliacion')
         and (has_function_privilege('authenticated', p.oid, 'execute')
              or has_function_privilege('anon', p.oid, 'execute')) $$,
   'ninguna función security definer fuera de la lista blanca (las que se validan solas) es ejecutable por anon o authenticated'
