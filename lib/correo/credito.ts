@@ -65,8 +65,10 @@ export async function enviarDesembolsoCredito(datos: {
   fechaTexto: string;
   /** El admin subió el comprobante de la transferencia: el correo avisa que está en su cuenta. */
   conComprobante?: boolean;
+  plazoMeses: number;
 }) {
   const monto = Math.round(datos.monto).toLocaleString("es-CO");
+  const plazo = `${datos.plazoMeses} ${datos.plazoMeses === 1 ? "mes" : "meses"}`;
   const textoComprobante = datos.conComprobante ? "El comprobante de la transferencia ya está disponible en tu cuenta." : "";
   try {
     await enviarConRespaldo({
@@ -83,7 +85,7 @@ export async function enviarDesembolsoCredito(datos: {
       texto: [
         `Hola ${datos.nombre},`,
         "",
-        `Tu crédito por $ ${monto} fue desembolsado el ${datos.fechaTexto}. Desde esa fecha empieza a contar tu plazo de 3 meses.`,
+        `Tu crédito por $ ${monto} fue desembolsado el ${datos.fechaTexto}. Desde esa fecha empieza a contar tu plazo de ${plazo}.`,
         ...(textoComprobante ? ["", textoComprobante] : []),
         "",
         "Cooperativa Green Alliance",
@@ -92,6 +94,51 @@ export async function enviarDesembolsoCredito(datos: {
   } catch (error) {
     registrar("error", {
       evento: "credito_desembolso_correo_fallo",
+      solicitud_id: datos.id,
+      mensaje: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
+/**
+ * El admin cambió las condiciones del crédito. Solo al correo PERSONAL. NUNCA
+ * lleva el motivo (nota interna) ni lo que devuelve (revela la tasa). Plantilla
+ * opcional `RESEND_TEMPLATE_CREDITO_CONDICIONES` con respaldo en texto plano.
+ */
+export async function enviarCondicionesCredito(datos: {
+  id: string;
+  nombre: string;
+  correo: string[];
+  monto: number;
+  plazoMeses: number;
+  porcentaje: number;
+  tipo: string;
+}) {
+  const monto = Math.round(datos.monto).toLocaleString("es-CO");
+  const plazo = `${datos.plazoMeses} ${datos.plazoMeses === 1 ? "mes" : "meses"}`;
+  try {
+    await enviarConRespaldo({
+      para: datos.correo,
+      variablePlantilla: "RESEND_TEMPLATE_CREDITO_CONDICIONES",
+      variables: { NOMBRE: datos.nombre, MONTO: monto, PLAZO: plazo, PORCENTAJE: String(datos.porcentaje), TIPO: datos.tipo },
+      asunto: "Cambiaron las condiciones de tu crédito de Green Alliance",
+      texto: [
+        `Hola ${datos.nombre},`,
+        "",
+        "La cooperativa actualizó las condiciones de tu crédito:",
+        `Monto: $ ${monto}`,
+        `Plazo: ${plazo}`,
+        `Porcentaje: ${datos.porcentaje} %`,
+        `Tipo: ${datos.tipo}`,
+        "",
+        "Ingresa a tu cuenta para ver el detalle.",
+        "",
+        "Cooperativa Green Alliance",
+      ].join("\n"),
+    });
+  } catch (error) {
+    registrar("error", {
+      evento: "credito_condiciones_correo_fallo",
       solicitud_id: datos.id,
       mensaje: error instanceof Error ? error.message : String(error),
     });

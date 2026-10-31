@@ -31,6 +31,8 @@ import { correoDeCedula } from "@/lib/ingreso/servidor";
 import { enviarResultadoCredito } from "@/lib/correo/credito";
 import { avisarCorreoInstitucional } from "@/lib/correo/institucional";
 import { resolverCredito } from "@/app/admin/creditos/actions";
+import { esquemaEditarCondicionesCredito } from "@/lib/validaciones/admin";
+import { interpolarPorcentaje, totalSugerido } from "@/lib/credito";
 
 const ID_ADMIN = "00000000-0000-4000-a000-000000000010";
 const ID_ASOCIADO = "00000000-0000-4000-a000-000000000011";
@@ -188,6 +190,60 @@ describe("resolverCredito · aprobar", () => {
     const { resultado } = await enviar({ id: ID_SOLICITUD, decision: "aprobado" });
     expect(resultado?.mensaje).toBeTruthy();
     expect(actualizaciones[0]).toMatchObject({ estado: "aprobado", motivo_rechazo: null });
+  });
+});
+
+describe("esquemaEditarCondicionesCredito", () => {
+  const base = {
+    id: ID_SOLICITUD,
+    monto: "1.500.000",
+    totalAPagar: "1800000",
+    plazoMeses: "6",
+    porcentaje: "73",
+    tipoCredito: "cooperativa",
+    convenioId: "",
+    motivo: "Ajuste acordado",
+  };
+
+  it("acepta enteros y lee los pesos con puntos", () => {
+    expect(esquemaEditarCondicionesCredito.parse(base)).toMatchObject({ monto: 1500000, totalAPagar: 1800000, plazoMeses: 6, porcentaje: 73 });
+  });
+
+  it.each(["49", "101", "73.5", "73,5", ""])("rechaza el porcentaje %j", (porcentaje) => {
+    expect(esquemaEditarCondicionesCredito.safeParse({ ...base, porcentaje }).success).toBe(false);
+  });
+
+  it.each(["50", "100"])("acepta el extremo %s", (porcentaje) => {
+    expect(esquemaEditarCondicionesCredito.safeParse({ ...base, porcentaje }).success).toBe(true);
+  });
+
+  it.each(["0", "61", "2.5"])("rechaza el plazo %j", (plazoMeses) => {
+    expect(esquemaEditarCondicionesCredito.safeParse({ ...base, plazoMeses }).success).toBe(false);
+  });
+
+  it("no deja devolver menos de lo que recibe", () => {
+    expect(esquemaEditarCondicionesCredito.safeParse({ ...base, totalAPagar: "1000000" }).success).toBe(false);
+  });
+
+  it("un convenio exige la empresa; cooperativa la descarta", () => {
+    expect(esquemaEditarCondicionesCredito.safeParse({ ...base, tipoCredito: "convenio" }).success).toBe(false);
+    expect(esquemaEditarCondicionesCredito.parse({ ...base, convenioId: ID_ASOCIADO }).convenioId).toBeNull();
+  });
+
+  it("no exige el cupo: lo decide el admin con su motivo", () => {
+    expect(esquemaEditarCondicionesCredito.safeParse({ ...base, monto: "90000000", totalAPagar: "95000000" }).success).toBe(true);
+  });
+});
+
+describe("cálculos de condiciones", () => {
+  it("interpola entre 50 % y 100 %", () => {
+    expect(interpolarPorcentaje(1000000, 2100000, 50)).toBe(1000000);
+    expect(interpolarPorcentaje(1000000, 2100000, 100)).toBe(2100000);
+    expect(interpolarPorcentaje(1000000, 2000000, 75)).toBe(1500000);
+  });
+
+  it("sugiere el total con el interés a miles", () => {
+    expect(totalSugerido(1000000, 0.079, 3)).toBe(1237000);
   });
 });
 

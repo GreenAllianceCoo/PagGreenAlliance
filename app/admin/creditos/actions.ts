@@ -4,12 +4,18 @@ import { revalidatePath } from "next/cache";
 import { registrar } from "@/lib/servidor/registro";
 import { exigirAdmin } from "@/lib/admin/servidor";
 import { correoDeCedula } from "@/lib/ingreso/servidor";
-import { enviarDesembolsoCredito, enviarResultadoCredito } from "@/lib/correo/credito";
+import { enviarCondicionesCredito, enviarDesembolsoCredito, enviarResultadoCredito } from "@/lib/correo/credito";
 import { formatearFechaLarga } from "@/lib/fechas";
 import { destinatariosAviso } from "@/lib/correo/destinatarios";
 import { avisarCorreoInstitucional } from "@/lib/correo/institucional";
 import { textoDe } from "@/lib/validaciones/comunes";
-import { esquemaMarcarDesembolso, esquemaResolverCredito } from "@/lib/validaciones/admin";
+import {
+  esquemaEditarCondicionesCredito,
+  esquemaMarcarDesembolso,
+  esquemaResolverCredito,
+  leerFormularioCondiciones,
+  type CampoEditarCondiciones,
+} from "@/lib/validaciones/admin";
 import { crearSubidaComprobante, firmarComprobante, registrarComprobanteSubido, rutaDeComprobante } from "@/lib/admin/comprobantes";
 import { esquemaPrepararComprobante, esquemaRegistrarComprobante, esquemaVerComprobante } from "@/lib/validaciones/comprobante";
 
@@ -170,7 +176,7 @@ export async function marcarDesembolsado(
   // Aviso al asociado (no bloquea la respuesta si algo falla).
   const { data: solicitud } = await supabase
     .from("solicitudes_credito")
-    .select("asociado_id, monto_solicitado")
+    .select("asociado_id, monto_solicitado, plazo_meses")
     .eq("id", datos.id)
     .single();
   if (solicitud) {
@@ -192,6 +198,7 @@ export async function marcarDesembolsado(
           fecha,
           fechaTexto: formatearFechaLarga(fecha),
           conComprobante,
+          plazoMeses: Number(solicitud.plazo_meses),
         });
       }
     }
@@ -200,6 +207,101 @@ export async function marcarDesembolsado(
   revalidatePath("/admin/creditos");
   revalidatePath("/cuenta");
   return { mensaje: conComprobante ? "Desembolso registrado con su comprobante." : `Desembolso registrado.${avisoComprobante}` };
+}
+
+export type EstadoEditarCondiciones = EstadoAccionCredito & {
+  errores?: Partial<Record<CampoEditarCondiciones, string>>;
+};
+
+/** Textos de admin_editar_condiciones_credito() listos para mostrar (los demás errores se ocultan). */
+const MENSAJES_CONDICIONES = [
+  "No puedes editar tu propio crédito; debe hacerlo otro administrador",
+  "Un crédito rechazado no se puede editar",
+  "Un crédito desembolsado no se puede editar",
+  "Ese convenio no está disponible",
+  "No hay tasas configuradas para este grado",
+  "No hay cambios para guardar",
+  "La solicitud no existe",
+];
+
+/**
+ * «Editar condiciones» de /admin/creditos: lo que recibe, lo que devuelve, plazo,
+ * porcentaje y tipo. Solo admin, por la RPC (la base exige que no esté desembolsado
+ * y deja el historial con el motivo). El asociado recibe un aviso solo si cambió
+ * algo que él ve: lo que devuelve no se le muestra (revela la tasa).
+ */
+export async function editarCondicionesCredito(
+  _previo: EstadoEditarCondiciones,
+  formData: FormData,
+): Promise<EstadoEditarCondiciones> {
+  const { supabase } = await exigirAdmin();
+
+  const resultado = esquemaEditarCondicionesCredito.safeParse(leerFormularioCondiciones(formData));
+  if (!resultado.success) {
+    const errores: Partial<Record<CampoEditarCondiciones, string>> = {};
+    for (const problema of resultado.error.issues) {
+      const campo = problema.path[0] as CampoEditarCondiciones | undefined;
+      if (campo && !errores[campo]) errores[campo] = problema.message;
+    }
+    return { errores };
+  }
+  const datos = resultado.data;
+
+  const { data: campos, error } = await supabase.rpc("admin_editar_condiciones_credito", {
+    p_solicitud_id: datos.id,
+    p_monto: datos.monto,
+    p_total_a_pagar: datos.totalAPagar,
+    p_plazo_meses: datos.plazoMeses,
+    p_porcentaje: datos.porcentaje,
+    p_tipo: datos.tipoCredito,
+    p_convenio_id: datos.convenioId,
+    p_motivo: datos.motivo,
+  });
+  if (error) {
+    const conocido = MENSAJES_CONDICIONES.find((m) => error.message?.includes(m));
+    if (!conocido) {
+      registrar("error", { evento: "credito_condiciones_fallo", codigo: error.code, mensaje: error.message, solicitud_id: datos.id });
+    }
+    return { error: conocido ? `${conocido}.` : "No pudimos guardar los cambios. Intenta de nuevo." };
+  }
+
+  const cambiados = (campos ?? []) as string[];
+  if (cambiados.some((c) => c !== "total")) {
+    const { data: solicitud } = await supabase
+      .from("solicitudes_credito")
+      .select("asociado_id, convenios:convenio_id(nombre_empresa)")
+      .eq("id", datos.id)
+      .single();
+    const { data: perfil } = solicitud
+      ? await supabase
+          .from("perfiles")
+          .select("nombre_completo, cedula, correo_institucional")
+          .eq("id", solicitud.asociado_id)
+          .single()
+      : { data: null };
+    if (solicitud && perfil) {
+      const correoPersonal = await correoDeCedula(perfil.cedula);
+      const correo = destinatariosAviso(correoPersonal);
+      await avisarCorreoInstitucional(correoPersonal, perfil.correo_institucional);
+      if (correo.length > 0) {
+        const convenio = solicitud.convenios as unknown as { nombre_empresa: string } | null;
+        await enviarCondicionesCredito({
+          id: datos.id,
+          nombre: perfil.nombre_completo,
+          correo,
+          monto: datos.monto,
+          plazoMeses: datos.plazoMeses,
+          porcentaje: datos.porcentaje,
+          tipo: datos.tipoCredito === "convenio" ? `Convenio ${convenio?.nombre_empresa ?? ""}`.trim() : "Cooperativa",
+        });
+      }
+    }
+  }
+
+  revalidatePath("/admin/creditos");
+  revalidatePath("/cuenta");
+  revalidatePath("/cuenta/perfil");
+  return { mensaje: "Condiciones actualizadas." };
 }
 
 // ---------------------------------------------------------------------------

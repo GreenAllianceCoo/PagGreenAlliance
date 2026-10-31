@@ -10,7 +10,8 @@ import { ToastAdmin } from "./ToastAdmin";
 import { TarjetaKpi } from "./TarjetaKpi";
 import { coincideBusqueda } from "@/lib/admin/busqueda";
 import { formatearFecha, formatearPesos } from "@/lib/cuenta";
-import { formatTasa } from "@/lib/credito";
+import { formatTasa, interpolarPorcentaje } from "@/lib/credito";
+import { EditarCondicionesCredito, type OpcionConvenio } from "./EditarCondicionesCredito";
 import { enmascararCedula } from "@/lib/mascara";
 import type { PaqueteDemo } from "@/lib/asesor/datosDemo";
 import type { CodigoGrado } from "@/lib/asesor/datosDemo";
@@ -22,7 +23,16 @@ export type FilaCreditoPanel = {
   id: string;
   estado: EstadoCredito;
   monto_solicitado: number;
-  porcentaje_devolucion: "50" | "100";
+  /** Entero de 50 a 100: el que eligió el asociado o el que puso el admin. */
+  porcentaje_credito: number;
+  /** null = sin definir, o no se muestra (el secretario no lo ve: revela la tasa). */
+  total_a_pagar: number | null;
+  plazo_meses: number;
+  tipo_credito: "cooperativa" | "convenio";
+  convenio_id: string | null;
+  convenio_nombre: string | null;
+  /** Si el admin ya editó las condiciones (entonces puede aprobar aunque supere el tope). */
+  condiciones_editadas_at: string | null;
   /** null = no se muestra (el secretario no ve la tasa). */
   tasa_interes_mensual: number | null;
   grado: string;
@@ -55,10 +65,14 @@ const ESTADOS = ["pendiente", "aprobado", "rechazado"] as const;
 function topeDelPaquete(
   paquetesPorGrado: Partial<Record<CodigoGrado, PaqueteDemo[]>>,
   grado: string,
-  porcentaje: "50" | "100",
+  porcentaje: number,
 ): number | undefined {
   const paquetes = paquetesPorGrado[grado as CodigoGrado];
-  return paquetes?.find((p) => p.porcentaje === porcentaje)?.capacidad_maxima;
+  const cupo50 = paquetes?.find((p) => p.porcentaje === "50")?.capacidad_maxima;
+  const cupo100 = paquetes?.find((p) => p.porcentaje === "100")?.capacidad_maxima;
+  if (cupo50 === undefined || cupo100 === undefined) return undefined;
+  // Entre 50 % y 100 % el cupo se interpola; solo es un aviso (el admin puede superarlo).
+  return Math.round(interpolarPorcentaje(cupo50, cupo100, porcentaje));
 }
 
 type Props = {
@@ -68,6 +82,8 @@ type Props = {
   conteoFiltroActual: number;
   /** Topes reales de `grados_credito` (vacío si no se pudieron leer: sin aviso de tope; RS-08: sin copia de respaldo). */
   paquetesPorGrado: Partial<Record<CodigoGrado, PaqueteDemo[]>>;
+  /** Opciones de «Editar condiciones» (vacío para el secretario). */
+  convenios: OpcionConvenio[];
   /** Secretario: solo mira. Sin aprobar, rechazar, desembolsar, comprobantes ni atajos A/R. */
   soloLectura?: boolean;
   kpis: {
@@ -83,7 +99,7 @@ type Props = {
  * estado, lista + detalle en la misma vista, aprobar en 2 pasos, rechazar
  * con motivo obligatorio, toast y atajos J/K/A/R/Esc.
  */
-export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquetesPorGrado, soloLectura = false, kpis }: Props) {
+export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquetesPorGrado, convenios, soloLectura = false, kpis }: Props) {
   const [busqueda, setBusqueda] = useState("");
   const filtradas = useMemo(() => filas.filter((f) => coincideBusqueda(busqueda, f.nombre, f.cedula)), [filas, busqueda]);
 
@@ -203,6 +219,7 @@ export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquete
             key={seleccionado.id}
             fila={seleccionado}
             paquetesPorGrado={paquetesPorGrado}
+            convenios={convenios}
             soloLectura={soloLectura}
             onResuelto={(mensaje) => setToast(mensaje)}
           />
@@ -223,11 +240,13 @@ export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquete
 function DetalleCredito({
   fila,
   paquetesPorGrado,
+  convenios,
   soloLectura,
   onResuelto,
 }: {
   fila: FilaCreditoPanel;
   paquetesPorGrado: Partial<Record<CodigoGrado, PaqueteDemo[]>>;
+  convenios: OpcionConvenio[];
   soloLectura: boolean;
   onResuelto: (mensaje: string) => void;
 }) {
@@ -258,8 +277,11 @@ function DetalleCredito({
     return () => window.removeEventListener("keydown", alTeclado);
   }, [fila.estado, soloLectura]);
 
-  const tope = topeDelPaquete(paquetesPorGrado, fila.grado, fila.porcentaje_devolucion);
+  const tope = topeDelPaquete(paquetesPorGrado, fila.grado, fila.porcentaje_credito);
   const dentroDelTope = tope !== undefined ? fila.monto_solicitado <= tope : undefined;
+  // Superar el tope solo bloquea si nadie lo decidió: al editar, el admin lo autoriza con su motivo.
+  const autorizadoSobreTope = dentroDelTope === false && Boolean(fila.condiciones_editadas_at);
+  const editable = !soloLectura && fila.estado !== "rechazado" && !fila.fecha_desembolso;
 
   return (
     <section className="flex flex-col gap-4.5 rounded-20 bg-admin-superficie p-5.5">
@@ -292,25 +314,71 @@ function DetalleCredito({
         </span>
         <div className="flex gap-1.5">
           <span className="rounded-full bg-admin-superficie-2 px-[11px] py-1.5 text-13 font-bold">
-            {fila.porcentaje_devolucion}%
+            {fila.porcentaje_credito}%
           </span>
           {fila.tasa_interes_mensual === null ? null : (
             <span className="rounded-full bg-admin-superficie-2 px-[11px] py-1.5 text-13 font-bold">
               {formatTasa(Number(fila.tasa_interes_mensual))} mensual
             </span>
           )}
+          <span className="rounded-full bg-admin-superficie-2 px-[11px] py-1.5 text-13 font-bold">
+            {fila.plazo_meses} {fila.plazo_meses === 1 ? "mes" : "meses"}
+          </span>
+          <span className="rounded-full bg-admin-superficie-2 px-[11px] py-1.5 text-13 font-bold">
+            {fila.tipo_credito === "convenio" ? `Convenio${fila.convenio_nombre ? ` · ${fila.convenio_nombre}` : ""}` : "Cooperativa"}
+          </span>
         </div>
       </div>
+
+      {soloLectura ? null : (
+        <dl className="m-0 grid grid-cols-2 gap-2.5 text-14">
+          <div className="rounded-12 bg-admin-superficie-2 px-3 py-2.5">
+            <dt className="text-admin-texto-3">Recibe</dt>
+            <dd className="m-0 font-bold">{formatearPesos(fila.monto_solicitado)}</dd>
+          </div>
+          <div className="rounded-12 bg-admin-superficie-2 px-3 py-2.5">
+            <dt className="text-admin-texto-3">Devuelve en total</dt>
+            <dd className="m-0 font-bold">
+              {fila.total_a_pagar === null ? "Sin definir" : formatearPesos(fila.total_a_pagar)}
+              {fila.total_a_pagar === null ? null : (
+                <span className="block text-13 font-medium text-admin-texto-3">
+                  Cuota aprox. {formatearPesos(fila.total_a_pagar / fila.plazo_meses)} al mes
+                </span>
+              )}
+            </dd>
+          </div>
+        </dl>
+      )}
 
       {dentroDelTope === true ? (
         <div className="rounded-14 bg-admin-verde-fondo p-3.5 text-14 leading-145 text-admin-verde-claro">
           <strong className="text-admin-verde-2">Dentro del tope.</strong> Tope del grado: {formatearPesos(tope!)}.
         </div>
+      ) : autorizadoSobreTope ? (
+        <div className="rounded-14 bg-admin-ambar-fondo p-3.5 text-14 leading-145 text-admin-ambar">
+          <strong>Supera el tope por {formatearPesos(fila.monto_solicitado - tope!)}.</strong> Tope del grado:{" "}
+          {formatearPesos(tope!)}. Lo autorizó un administrador al editar las condiciones.
+        </div>
       ) : dentroDelTope === false ? (
         <div className="rounded-14 bg-admin-rojo-fondo p-3.5 text-14 leading-145 text-admin-rojo-claro">
           <strong className="text-admin-rojo-2">Supera el tope por {formatearPesos(fila.monto_solicitado - tope!)}.</strong>{" "}
-          Tope del grado: {formatearPesos(tope!)}.{soloLectura ? "" : " No se puede aprobar; recházala con el motivo."}
+          Tope del grado: {formatearPesos(tope!)}.{soloLectura ? "" : " Para aprobarla, edita sus condiciones; si no, recházala con el motivo."}
         </div>
+      ) : null}
+
+      {editable ? (
+        <EditarCondicionesCredito
+          solicitudId={fila.id}
+          monto={fila.monto_solicitado}
+          totalAPagar={fila.total_a_pagar}
+          plazoMeses={fila.plazo_meses}
+          porcentaje={fila.porcentaje_credito}
+          tasaMensual={fila.tasa_interes_mensual ?? 0}
+          tipoCredito={fila.tipo_credito}
+          convenioId={fila.convenio_id}
+          convenios={convenios}
+          onResuelto={onResuelto}
+        />
       ) : null}
 
       {fila.estado !== "pendiente" ? (
@@ -327,6 +395,7 @@ function DetalleCredito({
             <MarcarDesembolsado
               solicitudId={fila.id}
               fechaDesembolso={fila.fecha_desembolso}
+              plazoMeses={fila.plazo_meses}
               tieneComprobante={Boolean(fila.comprobante_subido_at)}
               onResuelto={onResuelto}
             />
@@ -341,8 +410,8 @@ function DetalleCredito({
           <button
             type="button"
             onClick={() => setPaso("aprobar")}
-            disabled={dentroDelTope === false}
-            title={dentroDelTope === false ? "Supera el tope: no se puede aprobar" : "Aprobar (A)"}
+            disabled={dentroDelTope === false && !autorizadoSobreTope}
+            title={dentroDelTope === false && !autorizadoSobreTope ? "Supera el tope: edita las condiciones para aprobar" : "Aprobar (A)"}
             className="flex h-12.5 items-center justify-center rounded-full bg-admin-verde text-16 font-extrabold text-admin-fondo disabled:cursor-not-allowed disabled:opacity-40"
           >
             Aprobar
@@ -414,6 +483,9 @@ function DetalleCredito({
         <ItemHistorial titulo="Envió la solicitud" fecha={fila.fecha_solicitud} />
         {fila.estado !== "pendiente" && fila.fecha_respuesta ? (
           <ItemHistorial titulo={fila.estado === "aprobado" ? "Aprobada" : "Rechazada"} fecha={fila.fecha_respuesta} />
+        ) : null}
+        {fila.condiciones_editadas_at ? (
+          <ItemHistorial titulo="Última edición de condiciones" fecha={fila.condiciones_editadas_at} />
         ) : null}
       </div>
     </section>

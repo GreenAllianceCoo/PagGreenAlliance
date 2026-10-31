@@ -1,6 +1,6 @@
 # Green Alliance — pendientes
 
-Actualizado: 23-oct-2026 (selfie probada en celular real; nuevas migraciones 20261022000000 y 20261023000000 por aplicar y pgTAP 35 y 36 por correr cuando haya Docker; falta abrir y fusionar el PR develop → main).
+Actualizado: 23-oct-2026 (PR #13 develop → main fusionado y desplegado en Vercel; migraciones 20261022000000 y 20261023000000 aplicadas, falta correr pgTAP 35 y 36 cuando haya Docker).
 
 ## Dónde quedamos
 

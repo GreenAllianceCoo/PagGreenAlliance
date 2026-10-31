@@ -325,9 +325,17 @@ Límites:
 3. Filtre por **Pendiente**, **Aprobado** o **Rechazado**, o busque por nombre o cédula.
 4. Toque una solicitud para ver su ficha a la derecha (en computador puede moverse con **J** y **K**).
 
-La ficha muestra el nombre, la cédula, el grado, el celular, el **monto**, el **porcentaje de devolución** (50 % o 100 %) y la **tasa mensual**.
+La ficha muestra el nombre, la cédula, el grado, el celular, lo que **recibe**, lo que **devuelve en total**, el **plazo**, el **porcentaje**, la **tasa mensual** y el **tipo de crédito**.
 
-También avisa si el monto está **«Dentro del tope»** del grado o si lo **supera**. Si lo supera, el botón «Aprobar» queda apagado y hay que rechazarla.
+También avisa si el monto está **«Dentro del tope»** del grado o si lo **supera**. Si lo supera, el botón «Aprobar» queda apagado hasta que un administrador edite las condiciones (y así autorice superarlo) o se rechace la solicitud.
+
+**Editar condiciones** (hasta el desembolso; un crédito rechazado no se edita):
+
+1. Toque **«Editar condiciones»**.
+2. Cambie lo que necesite: lo que recibe, lo que devuelve en total, el plazo (1 a 60 meses), el porcentaje (número entero de 50 a 100) o el tipo (préstamo de la cooperativa o crédito en un convenio, eligiendo la empresa).
+3. Escriba el **motivo** y guarde. El cambio queda en el historial; el asociado recibe un correo con el monto, el plazo, el porcentaje y el tipo. No ve el motivo ni lo que devuelve en total, porque revela la tasa.
+
+Si cambia el porcentaje, la tasa se recalcula entre las de 50 % y 100 % del grado, pero **lo que devuelve no se recalcula solo**: revíselo antes de guardar.
 
 ### 7.2 Aprobar
 

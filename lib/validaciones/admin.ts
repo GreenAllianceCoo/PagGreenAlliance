@@ -2,12 +2,15 @@ import { z } from "zod";
 import { CONCEPTOS_COMISION, esDiaDeCorte, leerMontoPesos, MONTO_MAXIMO_PAGO } from "@/lib/asesor/comisiones";
 
 const MENSAJE_MONTO_TOPE = `El monto no puede pasar de $ ${MONTO_MAXIMO_PAGO.toLocaleString("es-CO")}.`;
+import { MONTO_MAXIMO_EDICION, MONTO_MINIMO, PLAZO_MAXIMO_MESES, TOTAL_MAXIMO_EDICION } from "@/lib/credito";
 import { diasEntre, esFechaISO, hoyBogota } from "@/lib/fechas";
 import { ESTADOS_PROCESO } from "@/lib/procesoEjecutivo";
 import { cuentaNominaResuelta, reglasCuentaNomina } from "./afiliacion";
 import { esquemaCedula, esquemaCorreo, MENSAJES, normalizarCelular, textoDe } from "./comunes";
 import { correoInstitucionalValido, MENSAJE_DOMINIO_INSTITUCIONAL } from "./dominiosInstitucionales";
 import type { CodigoInstitucion } from "./instituciones";
+
+export const TIPOS_CREDITO = ["cooperativa", "convenio"] as const;
 
 /**
  * Esquemas del panel /admin. Mismo patrón que el resto del proyecto: un solo
@@ -83,6 +86,82 @@ export const esquemaMarcarDesembolso = z.object({
         .optional(),
     ),
 });
+
+/** Pesos enteros de un campo de texto («1.500.000»): null si no es un entero positivo. */
+const esquemaPesos = (mensaje: string) =>
+  z.string({ error: mensaje }).transform((v, ctx) => {
+    const valor = leerMontoPesos(v);
+    if (valor === null || valor <= 0) {
+      ctx.addIssue({ code: "custom", message: mensaje });
+      return z.NEVER;
+    }
+    return valor;
+  });
+
+/** Entero de un campo de texto, sin decimales (`Number("73.5")` no pasaría el regex). */
+const esquemaEntero = (mensaje: string, minimo: number, maximo: number) =>
+  z
+    .string({ error: mensaje })
+    .trim()
+    .regex(/^[0-9]{1,3}$/, { error: mensaje })
+    .transform(Number)
+    .refine((v) => v >= minimo && v <= maximo, { error: mensaje });
+
+/**
+ * «Editar condiciones» de /admin/creditos (admin_editar_condiciones_credito).
+ * El cupo NO se exige aquí: el admin puede superarlo con su motivo.
+ */
+export const esquemaEditarCondicionesCredito = z
+  .object({
+    id: z.uuid({ error: "Falta el id de la solicitud." }),
+    monto: esquemaPesos("Escribe en pesos, sin decimales, lo que recibe.").refine(
+      (v) => v >= MONTO_MINIMO && v <= MONTO_MAXIMO_EDICION,
+      { error: "Lo que recibe debe estar entre $ 100.000 y $ 1.000.000.000." },
+    ),
+    totalAPagar: esquemaPesos("Escribe en pesos, sin decimales, lo que devuelve.").refine((v) => v <= TOTAL_MAXIMO_EDICION, {
+      error: "Lo que devuelve no puede pasar de $ 2.000.000.000.",
+    }),
+    plazoMeses: esquemaEntero(`El plazo debe ser un número entero de 1 a ${PLAZO_MAXIMO_MESES} meses.`, 1, PLAZO_MAXIMO_MESES),
+    porcentaje: esquemaEntero("El porcentaje debe ser un número entero entre 50 y 100.", 50, 100),
+    tipoCredito: z.enum(TIPOS_CREDITO, { error: "Elige el tipo de crédito." }),
+    convenioId: z
+      .string()
+      .trim()
+      .transform((v) => (v === "" ? null : v))
+      .pipe(z.union([z.null(), z.uuid({ error: "Elige el convenio." })])),
+    motivo: z
+      .string({ error: "Escribe el motivo." })
+      .transform((v) => v.trim().replace(/\s+/g, " "))
+      .pipe(
+        z
+          .string()
+          .min(5, { error: "El motivo debe tener entre 5 y 300 caracteres." })
+          .max(300, { error: "El motivo debe tener entre 5 y 300 caracteres." }),
+      ),
+  })
+  .superRefine((datos, ctx) => {
+    if (datos.totalAPagar < datos.monto) {
+      ctx.addIssue({ code: "custom", path: ["totalAPagar"], message: "Lo que devuelve no puede ser menor que lo que recibe." });
+    }
+    if (datos.tipoCredito === "convenio" && !datos.convenioId) {
+      ctx.addIssue({ code: "custom", path: ["convenioId"], message: "Elige el convenio." });
+    }
+  })
+  .transform((datos) => ({ ...datos, convenioId: datos.tipoCredito === "convenio" ? datos.convenioId : null }));
+export type CampoEditarCondiciones = "monto" | "totalAPagar" | "plazoMeses" | "porcentaje" | "tipoCredito" | "convenioId" | "motivo";
+
+export function leerFormularioCondiciones(formData: FormData) {
+  return {
+    id: textoDe(formData, "id"),
+    monto: textoDe(formData, "monto"),
+    totalAPagar: textoDe(formData, "totalAPagar"),
+    plazoMeses: textoDe(formData, "plazoMeses"),
+    porcentaje: textoDe(formData, "porcentaje"),
+    tipoCredito: textoDe(formData, "tipoCredito"),
+    convenioId: textoDe(formData, "convenioId"),
+    motivo: textoDe(formData, "motivo"),
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Baja / reactivación de asociados (§12.6)
