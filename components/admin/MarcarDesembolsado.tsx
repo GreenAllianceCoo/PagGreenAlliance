@@ -14,6 +14,7 @@ type Props = {
   solicitudId: string;
   /** AAAA-MM-DD si ya se desembolsó; null = pendiente de desembolso. */
   fechaDesembolso: string | null;
+  plazoMeses: number;
   /** true si el crédito ya tiene comprobante de la transferencia. */
   tieneComprobante?: boolean;
   onResuelto: (mensaje: string) => void;
@@ -27,7 +28,8 @@ type Props = {
  * El comprobante se sube directo a Storage antes de enviar; el servidor lo verifica
  * DESPUÉS de marcar el desembolso. Movimiento: solo opacity (motion-safe).
  */
-export function MarcarDesembolsado({ solicitudId, fechaDesembolso, tieneComprobante = false, onResuelto }: Props) {
+export function MarcarDesembolsado({ solicitudId, fechaDesembolso, plazoMeses, tieneComprobante = false, onResuelto }: Props) {
+  const plazo = `${plazoMeses} ${plazoMeses === 1 ? "mes" : "meses"}`;
   const [abierto, setAbierto] = useState(false);
   const [estado, accion, enviando] = useActionState(marcarDesembolsado, VACIO);
   const [, iniciar] = useTransition();
@@ -72,7 +74,7 @@ export function MarcarDesembolsado({ solicitudId, fechaDesembolso, tieneComproba
       <div className="flex flex-col gap-3">
         <p className="m-0 rounded-14 bg-admin-verde-fondo p-3.5 text-14 leading-145 text-admin-verde-claro">
           <strong className="text-admin-verde-2">Desembolsado</strong> el {formatearFechaLarga(fechaDesembolso.slice(0, 10))}. El
-          conteo de 3 meses ya corre.
+          conteo de {plazo} ya corre.
         </p>
         <ComprobanteDesembolsoAdmin solicitudId={solicitudId} tieneComprobante={tieneComprobante} onResuelto={onResuelto} />
       </div>
@@ -83,7 +85,7 @@ export function MarcarDesembolsado({ solicitudId, fechaDesembolso, tieneComproba
     return (
       <div className="flex flex-col gap-2.5">
         <p className="m-0 rounded-14 bg-admin-ambar-fondo p-3.5 text-14 leading-145 text-admin-ambar">
-          Aprobado · pendiente de desembolso. Los 3 meses empiezan a contar cuando lo marques.
+          Aprobado · pendiente de desembolso. El plazo de {plazo} empieza a contar cuando lo marques.
         </p>
         <button
           type="button"

@@ -12,3 +12,9 @@ Formato (copiar debajo de la línea, uno por tarea):
 - Bloqueos o trabajo nuevo: qué falta, de quién, o «ninguno».
 ```
 
+
+## 2026-10-30 · sesion-principal
+- Actividades: P-nuevo (editar condiciones del crédito)
+- Estado: En curso
+- Qué se hizo: «Editar condiciones» en /admin/creditos hasta el desembolso: lo que recibe y devuelve, plazo, porcentaje entero de 50 a 100 y tipo cooperativa/convenio, con motivo e historial. Migración 20261030000000 y pgTAP 37 escritos.
+- Bloqueos o trabajo nuevo: migración 20261030000000 aplicada en producción el 2026-10-31 (verificado: columnas y RPC existen; anon sin permiso). Falta pgTAP 37 (sin Docker en el equipo), commit y despliegue del código.

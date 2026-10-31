@@ -154,21 +154,21 @@ set local request.jwt.claims = '{"sub":"00000000-0000-4000-a000-0000000000ad","r
 select throws_ok(
   $$ update public.solicitudes_credito set monto_solicitado = 1000000
       where asociado_id = '00000000-0000-4000-a000-00000000000a' $$,
-  'P0001', 'Las condiciones de una solicitud no se pueden modificar; recházela y cree una nueva',
+  'P0001', 'Las condiciones de una solicitud solo se cambian con «Editar condiciones»',
   'el admin no puede cambiar el monto de una pendiente'
 );
 
 select throws_ok(
   $$ update public.solicitudes_credito set cuota_mensual = 1
       where asociado_id = '00000000-0000-4000-a000-00000000000a' $$,
-  'P0001', 'Las condiciones de una solicitud no se pueden modificar; recházela y cree una nueva',
+  'P0001', 'Las condiciones de una solicitud solo se cambian con «Editar condiciones»',
   'el admin no puede cambiar la cuota de una pendiente'
 );
 
 select throws_ok(
   $$ update public.solicitudes_credito set plazo_meses = 12
       where asociado_id = '00000000-0000-4000-a000-00000000000a' $$,
-  'P0001', 'Las condiciones de una solicitud no se pueden modificar; recházela y cree una nueva',
+  'P0001', 'Las condiciones de una solicitud solo se cambian con «Editar condiciones»',
   'el admin no puede cambiar el plazo de una pendiente'
 );
 

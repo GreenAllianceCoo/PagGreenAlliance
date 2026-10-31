@@ -4,6 +4,21 @@ import { MENSAJE_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 
 export const MONTO_MINIMO = 100000;
 
+/** Límites de «Editar condiciones» (los mismos de admin_editar_condiciones_credito). */
+export const MONTO_MAXIMO_EDICION = 1_000_000_000;
+export const TOTAL_MAXIMO_EDICION = 2_000_000_000;
+export const PLAZO_MAXIMO_MESES = 60;
+
+/** Valor de un porcentaje entero entre los de 50 % y 100 % (cupo o tasa), en línea recta. */
+export function interpolarPorcentaje(valor50: number, valor100: number, porcentaje: number) {
+  return valor50 + ((valor100 - valor50) * (porcentaje - 50)) / 50;
+}
+
+/** Total sugerido: monto + plazo × interés mensual a miles (misma fórmula de los cupos de `grados_credito`). */
+export function totalSugerido(monto: number, tasaMensual: number, plazoMeses: number) {
+  return monto + plazoMeses * Math.round((monto * tasaMensual) / 1000) * 1000;
+}
+
 /** Tasa de interés mensual guardada como fracción: 0.0505 → "5,05 %" */
 export function formatTasa(tasa: number) {
   return `${(Number(tasa) * 100).toLocaleString("es-CO", { maximumFractionDigits: 2 })} %`;

@@ -46,7 +46,7 @@ export default async function CuentaPage({
     supabase
       .from("solicitudes_credito")
       .select(
-        "id, estado, monto_solicitado, porcentaje_devolucion, plazo_meses, fecha_solicitud, fecha_respuesta, fecha_desembolso, comprobante_subido_at",
+        "id, estado, monto_solicitado, porcentaje_devolucion, porcentaje_credito, tipo_credito, plazo_meses, fecha_solicitud, fecha_respuesta, fecha_desembolso, comprobante_subido_at",
       )
       .eq("asociado_id", user.id)
       .order("fecha_solicitud", { ascending: false })

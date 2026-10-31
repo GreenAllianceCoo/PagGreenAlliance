@@ -34,6 +34,9 @@ export type FilaSolicitud = {
   estado: "pendiente" | "aprobado" | "rechazado";
   monto_solicitado: number | string;
   porcentaje_devolucion: "50" | "100";
+  /** Porcentaje vigente (entero de 50 a 100); el admin puede cambiarlo. Sin él, el que eligió el asociado. */
+  porcentaje_credito?: number | null;
+  tipo_credito?: "cooperativa" | "convenio" | null;
   plazo_meses: number;
   fecha_solicitud: string;
   fecha_respuesta: string | null;
@@ -128,7 +131,7 @@ export function vistaSolicitud(fila: FilaSolicitud, hoy: FechaISO = hoyBogota())
   return {
     estadoTexto,
     monto: formatearPesos(fila.monto_solicitado),
-    modalidad: `${fila.porcentaje_devolucion}%`,
+    modalidad: `${fila.porcentaje_credito ?? fila.porcentaje_devolucion}%${fila.tipo_credito === "convenio" ? " · Convenio" : ""}`,
     plazo: `${fila.plazo_meses} ${fila.plazo_meses === 1 ? "mes" : "meses"}`,
     pasos,
     conteo: conteoCredito(fila, hoy),

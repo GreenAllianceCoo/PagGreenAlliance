@@ -30,7 +30,7 @@ export default async function PerfilPage() {
   // Con la sesión del usuario (RLS): solo ve lo suyo. Nunca la tasa.
   const { data: solicitudes } = await supabase
     .from("solicitudes_credito")
-    .select("estado, monto_solicitado, porcentaje_devolucion, plazo_meses, fecha_solicitud, fecha_respuesta, fecha_desembolso")
+    .select("estado, monto_solicitado, porcentaje_devolucion, porcentaje_credito, tipo_credito, plazo_meses, fecha_solicitud, fecha_respuesta, fecha_desembolso")
     .eq("asociado_id", user.id)
     .order("fecha_solicitud", { ascending: false })
     .limit(1);
