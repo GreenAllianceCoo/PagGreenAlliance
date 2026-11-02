@@ -2,11 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { MONTO_MINIMO } from "@/lib/credito";
+import { MONTO_MINIMO, PASO_MONTO, cupoParaPorcentaje, esPorcentajeCredito } from "@/lib/credito";
 import { reglaCreditoDe } from "@/lib/asociado/servidor";
-
-/** F-06: el deslizador de SolicitudForm.tsx avanza en pasos de $50.000. */
-const PASO_MONTO = 50000;
 
 export type EstadoSolicitud = {
   error?: string;
@@ -26,10 +23,12 @@ export async function crearSolicitud(
   _prevState: EstadoSolicitud,
   formData: FormData
 ): Promise<EstadoSolicitud> {
-  const porcentaje = formData.get("porcentaje");
-  if (porcentaje !== "50" && porcentaje !== "100") {
-    return { error: "Elige el porcentaje de devolución.", campo: "porcentaje" };
+  // 50, 60, 70, 80, 90 o 100 (texto exacto del radio; «65», «50 » o «50%» no valen).
+  const porcentajeTexto = formData.get("porcentaje");
+  if (typeof porcentajeTexto !== "string" || !esPorcentajeCredito(porcentajeTexto)) {
+    return { error: "Elige el porcentaje de tu cupo.", campo: "porcentaje" };
   }
+  const porcentaje = Number(porcentajeTexto);
 
   const monto = Number(formData.get("monto"));
   if (!Number.isInteger(monto) || monto <= 0) {
@@ -80,19 +79,22 @@ export async function crearSolicitud(
     return { error: regla.mensaje };
   }
 
-  const paquete = cupo.estado === "con_cupo" ? cupo.paquetes.find((p) => p.porcentaje === porcentaje) : undefined;
-  if (!paquete) {
+  // Tope del porcentaje elegido: el de su fila (50/100) o interpolado entre las dos
+  // y redondeado al peso, la misma cuenta del trigger chk_monto_solicitud.
+  const tope = cupo.estado === "con_cupo" ? cupoParaPorcentaje(cupo.paquetes, porcentaje) : undefined;
+  if (tope === undefined) {
     return { error: "No hay un tope de crédito configurado para tu grado." };
   }
 
-  if (monto > paquete.capacidad_maxima) {
+  if (monto > tope) {
     return { error: "El monto supera el tope permitido para tu grado.", campo: "monto" };
   }
 
-  // Tasa, interés, cuota, total y plazo los calcula la base (trigger chk_monto_solicitud).
+  // Tasa, interés, cuota, total, plazo y porcentaje_devolucion los calcula la
+  // base (trigger chk_monto_solicitud); el asociado solo manda porcentaje_credito y monto.
   const { error } = await supabase.from("solicitudes_credito").insert({
     asociado_id: user.id,
-    porcentaje_devolucion: porcentaje,
+    porcentaje_credito: porcentaje,
     monto_solicitado: monto,
   });
 

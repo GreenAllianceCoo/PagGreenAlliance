@@ -173,3 +173,49 @@ export async function enviarCreditoHabilitado(datos: { id: string; nombre: strin
     });
   }
 }
+
+/**
+ * «Nuevo crédito» de /admin/creditos: la cooperativa le creó al asociado un crédito
+ * ya aprobado (sin que él lo pidiera). Solo al correo PERSONAL. NUNCA lleva el
+ * motivo (nota interna) ni lo que devuelve (revela la tasa). Plantilla opcional
+ * `RESEND_TEMPLATE_CREDITO_ASIGNADO` con respaldo en texto plano. No bloquea ni lanza.
+ */
+export async function enviarCreditoAsignado(datos: {
+  id: string;
+  nombre: string;
+  correo: string[];
+  monto: number;
+  plazoMeses: number;
+  porcentaje: number;
+  tipo: string;
+}) {
+  const monto = Math.round(datos.monto).toLocaleString("es-CO");
+  const plazo = `${datos.plazoMeses} ${datos.plazoMeses === 1 ? "mes" : "meses"}`;
+  try {
+    await enviarConRespaldo({
+      para: datos.correo,
+      variablePlantilla: "RESEND_TEMPLATE_CREDITO_ASIGNADO",
+      variables: { NOMBRE: datos.nombre, MONTO: monto, PLAZO: plazo, PORCENTAJE: String(datos.porcentaje), TIPO: datos.tipo },
+      asunto: "Tienes un crédito aprobado en Green Alliance",
+      texto: [
+        `Hola ${datos.nombre},`,
+        "",
+        "La cooperativa te aprobó un crédito con estas condiciones:",
+        `Monto: $ ${monto}`,
+        `Plazo: ${plazo}`,
+        `Porcentaje: ${datos.porcentaje} %`,
+        `Tipo: ${datos.tipo}`,
+        "",
+        "Te avisaremos cuando se haga el desembolso. Ingresa a tu cuenta para ver el detalle.",
+        "",
+        "Cooperativa Green Alliance",
+      ].join("\n"),
+    });
+  } catch (error) {
+    registrar("error", {
+      evento: "credito_asignado_correo_fallo",
+      solicitud_id: datos.id,
+      mensaje: error instanceof Error ? error.message : String(error),
+    });
+  }
+}

@@ -107,47 +107,68 @@ const esquemaEntero = (mensaje: string, minimo: number, maximo: number) =>
     .transform(Number)
     .refine((v) => v >= minimo && v <= maximo, { error: mensaje });
 
+/** Motivo de una acción del admin: 5 a 300 caracteres, espacios repetidos colapsados (igual que la base). */
+const esquemaMotivoAdmin = z
+  .string({ error: "Escribe el motivo." })
+  .transform((v) => v.trim().replace(/\s+/g, " "))
+  .pipe(
+    z
+      .string()
+      .min(5, { error: "El motivo debe tener entre 5 y 300 caracteres." })
+      .max(300, { error: "El motivo debe tener entre 5 y 300 caracteres." }),
+  );
+
 /**
- * «Editar condiciones» de /admin/creditos (admin_editar_condiciones_credito).
+ * Campos de las condiciones de un crédito, compartidos por «Editar condiciones» y
+ * «Nuevo crédito» (mismo formulario: components/admin/EditarCondicionesCredito.tsx).
  * El cupo NO se exige aquí: el admin puede superarlo con su motivo.
  */
+const camposCondiciones = {
+  monto: esquemaPesos("Escribe en pesos, sin decimales, lo que recibe.").refine(
+    (v) => v >= MONTO_MINIMO && v <= MONTO_MAXIMO_EDICION,
+    { error: "Lo que recibe debe estar entre $ 100.000 y $ 1.000.000.000." },
+  ),
+  totalAPagar: esquemaPesos("Escribe en pesos, sin decimales, lo que devuelve.").refine((v) => v <= TOTAL_MAXIMO_EDICION, {
+    error: "Lo que devuelve no puede pasar de $ 2.000.000.000.",
+  }),
+  plazoMeses: esquemaEntero(`El plazo debe ser un número entero de 1 a ${PLAZO_MAXIMO_MESES} meses.`, 1, PLAZO_MAXIMO_MESES),
+  porcentaje: esquemaEntero("El porcentaje debe ser un número entero entre 50 y 100.", 50, 100),
+  tipoCredito: z.enum(TIPOS_CREDITO, { error: "Elige el tipo de crédito." }),
+  convenioId: z
+    .string()
+    .trim()
+    .transform((v) => (v === "" ? null : v))
+    .pipe(z.union([z.null(), z.uuid({ error: "Elige el convenio." })])),
+  motivo: esquemaMotivoAdmin,
+};
+
+type DatosCondiciones = {
+  monto: number;
+  totalAPagar: number;
+  tipoCredito: (typeof TIPOS_CREDITO)[number];
+  convenioId: string | null;
+};
+
+/** Reglas entre campos: lo que devuelve ≥ lo que recibe y, si es convenio, cuál. */
+function revisarCondiciones(datos: DatosCondiciones, ctx: z.RefinementCtx) {
+  if (datos.totalAPagar < datos.monto) {
+    ctx.addIssue({ code: "custom", path: ["totalAPagar"], message: "Lo que devuelve no puede ser menor que lo que recibe." });
+  }
+  if (datos.tipoCredito === "convenio" && !datos.convenioId) {
+    ctx.addIssue({ code: "custom", path: ["convenioId"], message: "Elige el convenio." });
+  }
+}
+
+/** Un crédito de cooperativa no lleva convenio aunque el formulario lo haya mandado. */
+function limpiarConvenio<T extends DatosCondiciones>(datos: T): T {
+  return { ...datos, convenioId: datos.tipoCredito === "convenio" ? datos.convenioId : null };
+}
+
+/** «Editar condiciones» de /admin/creditos (admin_editar_condiciones_credito). */
 export const esquemaEditarCondicionesCredito = z
-  .object({
-    id: z.uuid({ error: "Falta el id de la solicitud." }),
-    monto: esquemaPesos("Escribe en pesos, sin decimales, lo que recibe.").refine(
-      (v) => v >= MONTO_MINIMO && v <= MONTO_MAXIMO_EDICION,
-      { error: "Lo que recibe debe estar entre $ 100.000 y $ 1.000.000.000." },
-    ),
-    totalAPagar: esquemaPesos("Escribe en pesos, sin decimales, lo que devuelve.").refine((v) => v <= TOTAL_MAXIMO_EDICION, {
-      error: "Lo que devuelve no puede pasar de $ 2.000.000.000.",
-    }),
-    plazoMeses: esquemaEntero(`El plazo debe ser un número entero de 1 a ${PLAZO_MAXIMO_MESES} meses.`, 1, PLAZO_MAXIMO_MESES),
-    porcentaje: esquemaEntero("El porcentaje debe ser un número entero entre 50 y 100.", 50, 100),
-    tipoCredito: z.enum(TIPOS_CREDITO, { error: "Elige el tipo de crédito." }),
-    convenioId: z
-      .string()
-      .trim()
-      .transform((v) => (v === "" ? null : v))
-      .pipe(z.union([z.null(), z.uuid({ error: "Elige el convenio." })])),
-    motivo: z
-      .string({ error: "Escribe el motivo." })
-      .transform((v) => v.trim().replace(/\s+/g, " "))
-      .pipe(
-        z
-          .string()
-          .min(5, { error: "El motivo debe tener entre 5 y 300 caracteres." })
-          .max(300, { error: "El motivo debe tener entre 5 y 300 caracteres." }),
-      ),
-  })
-  .superRefine((datos, ctx) => {
-    if (datos.totalAPagar < datos.monto) {
-      ctx.addIssue({ code: "custom", path: ["totalAPagar"], message: "Lo que devuelve no puede ser menor que lo que recibe." });
-    }
-    if (datos.tipoCredito === "convenio" && !datos.convenioId) {
-      ctx.addIssue({ code: "custom", path: ["convenioId"], message: "Elige el convenio." });
-    }
-  })
-  .transform((datos) => ({ ...datos, convenioId: datos.tipoCredito === "convenio" ? datos.convenioId : null }));
+  .object({ id: z.uuid({ error: "Falta el id de la solicitud." }), ...camposCondiciones })
+  .superRefine(revisarCondiciones)
+  .transform(limpiarConvenio);
 export type CampoEditarCondiciones = "monto" | "totalAPagar" | "plazoMeses" | "porcentaje" | "tipoCredito" | "convenioId" | "motivo";
 
 export function leerFormularioCondiciones(formData: FormData) {
@@ -162,6 +183,36 @@ export function leerFormularioCondiciones(formData: FormData) {
     motivo: textoDe(formData, "motivo"),
   };
 }
+
+/**
+ * «Nuevo crédito» de /admin/creditos (admin_crear_credito): el admin le crea a un
+ * asociado un crédito ya aprobado, con las mismas condiciones de «Editar condiciones».
+ */
+export const esquemaCrearCreditoAdmin = z
+  .object({ asociadoId: z.uuid({ error: "Busca primero al asociado por su cédula." }), ...camposCondiciones })
+  .superRefine(revisarCondiciones)
+  .transform(limpiarConvenio);
+export type CampoCrearCreditoAdmin = CampoEditarCondiciones | "asociadoId";
+
+export function leerFormularioCrearCredito(formData: FormData) {
+  // Lleva también `id` (vacío): z.object lo descarta.
+  return { ...leerFormularioCondiciones(formData), asociadoId: textoDe(formData, "asociadoId") };
+}
+
+/** Búsqueda del asociado por cédula en «Nuevo crédito». */
+export const esquemaBuscarCedula = z.object({ cedula: esquemaCedula });
+
+/**
+ * «Corregir cédula» (admin_cambiar_cedula). La cédula es con lo que la persona
+ * ingresa: el formulario lo advierte y la base deja el historial con el motivo.
+ */
+export const esquemaCambiarCedula = z.object({
+  asociadoId: z.uuid({ error: "Falta el asociado." }),
+  cedula: esquemaCedula,
+  // La base guarda el motivo en el historial, que no guarda cédulas: rechaza 6+ dígitos seguidos.
+  motivo: esquemaMotivoAdmin.refine((v) => !/[0-9]{6,}/.test(v), { error: "El motivo no debe incluir números de cédula." }),
+});
+export type CampoCambiarCedula = keyof z.input<typeof esquemaCambiarCedula>;
 
 // ---------------------------------------------------------------------------
 // Baja / reactivación de asociados (§12.6)
@@ -206,6 +257,24 @@ const esquemaCorreoOpcional = z
   .pipe(z.union([z.literal(""), z.email({ error: "Revisa el correo: no es válido." }).max(254)]))
   .transform((v) => (v === "" ? null : v));
 
+/** Nombre del asociado en «Editar datos» (y en la vista de tabla de créditos): solo letras y espacios. */
+export const esquemaNombreAsociado = z
+  .string({ error: "Escribe el nombre." })
+  .transform((v) => v.trim().replace(/\s+/g, " "))
+  .pipe(
+    z
+      .string()
+      .min(2, { error: "El nombre debe tener al menos 2 caracteres." })
+      .max(120, { error: "El nombre puede tener máximo 120 caracteres." })
+      .regex(/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$/, { error: "El nombre solo puede tener letras y espacios." }),
+  );
+
+/** Celular del asociado en «Editar datos»: vacío = sin celular (null); si viene, 10 dígitos que empiezan por 3. */
+export const esquemaTelefonoAsociado = z
+  .string()
+  .transform((v) => (v.trim() === "" ? null : normalizarCelular(v)))
+  .pipe(z.union([z.null(), z.string().regex(/^3[0-9]{9}$/, { error: MENSAJES.celularFormato })]));
+
 /**
  * «Editar datos» de la ficha del asociado (solo admin). Cédula, grado,
  * institución y asesor NO se editan aquí (cambian el ingreso, el cupo o las
@@ -216,20 +285,8 @@ export function crearEsquemaEditarDatosAsociado(institucion: CodigoInstitucion |
   return z
     .object({
       asociadoId: z.uuid({ error: "Falta el asociado." }),
-      nombre: z
-        .string({ error: "Escribe el nombre." })
-        .transform((v) => v.trim().replace(/\s+/g, " "))
-        .pipe(
-          z
-            .string()
-            .min(2, { error: "El nombre debe tener al menos 2 caracteres." })
-            .max(120, { error: "El nombre puede tener máximo 120 caracteres." })
-            .regex(/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$/, { error: "El nombre solo puede tener letras y espacios." }),
-        ),
-      telefono: z
-        .string()
-        .transform((v) => (v.trim() === "" ? null : normalizarCelular(v)))
-        .pipe(z.union([z.null(), z.string().regex(/^3[0-9]{9}$/, { error: MENSAJES.celularFormato })])),
+      nombre: esquemaNombreAsociado,
+      telefono: esquemaTelefonoAsociado,
       correoInstitucional: esquemaCorreoOpcional,
       nomina_entidad: z.string().trim(),
       nomina_entidad_otra: z.string().transform((v) => v.trim().replace(/\s+/g, " ")),
@@ -263,6 +320,77 @@ export function crearEsquemaEditarDatosAsociado(institucion: CodigoInstitucion |
 }
 
 export type DatosEditadosAsociado = z.output<ReturnType<typeof crearEsquemaEditarDatosAsociado>>;
+
+// ---------------------------------------------------------------------------
+// Vista de tabla de /admin/creditos: varios cambios con UN solo motivo
+// ---------------------------------------------------------------------------
+
+/** Máximo de celdas cambiadas que se guardan en un solo envío de la tabla. */
+export const MAX_CAMBIOS_TABLA_CREDITOS = 50;
+
+/**
+ * «Guardar cambios» de la vista de tabla (solo admin). Los datos de la persona van
+ * UNA vez por asociado (aunque tenga varios créditos en la tabla) y la decisión, una
+ * vez por solicitud. Campo ausente = sin cambio; celular vacío = quitar el celular.
+ * Mismas reglas que «Editar datos», «Corregir cédula» y «Rechazar»: el motivo (5 a
+ * 300 caracteres) sirve para todos y es el motivo del rechazo que verá el asociado.
+ */
+export const esquemaGuardarCambiosTablaCreditos = z
+  .object({
+    motivo: esquemaMotivoAdmin,
+    personas: z
+      .array(
+        z.object({
+          asociadoId: z.uuid({ error: "Falta el asociado." }),
+          nombre: esquemaNombreAsociado.optional(),
+          telefono: esquemaTelefonoAsociado.optional(),
+          cedula: esquemaCedula.optional(),
+        }),
+      )
+      .max(MAX_CAMBIOS_TABLA_CREDITOS),
+    estados: z
+      .array(
+        z.object({
+          solicitudId: z.uuid({ error: "Falta la solicitud." }),
+          decision: z.enum(["aprobado", "rechazado"], { error: "Elige aprobar o rechazar." }),
+        }),
+      )
+      .max(MAX_CAMBIOS_TABLA_CREDITOS),
+  })
+  .superRefine((datos, ctx) => {
+    const total = contarCambiosTabla(datos);
+    if (total === 0) ctx.addIssue({ code: "custom", path: ["personas"], message: "No hay cambios para guardar." });
+    if (total > MAX_CAMBIOS_TABLA_CREDITOS) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["personas"],
+        message: `Puedes guardar máximo ${MAX_CAMBIOS_TABLA_CREDITOS} cambios a la vez.`,
+      });
+    }
+    if (new Set(datos.personas.map((p) => p.asociadoId)).size !== datos.personas.length) {
+      ctx.addIssue({ code: "custom", path: ["personas"], message: "Hay una persona repetida en los cambios." });
+    }
+    if (new Set(datos.estados.map((e) => e.solicitudId)).size !== datos.estados.length) {
+      ctx.addIssue({ code: "custom", path: ["estados"], message: "Hay una solicitud repetida en los cambios." });
+    }
+    // Mismo freno de «Corregir cédula»: el historial de la cédula no guarda números de cédula.
+    if (datos.personas.some((p) => p.cedula !== undefined) && /[0-9]{6,}/.test(datos.motivo)) {
+      ctx.addIssue({ code: "custom", path: ["motivo"], message: "El motivo no debe incluir números de cédula." });
+    }
+  });
+export type EntradaCambiosTablaCreditos = z.input<typeof esquemaGuardarCambiosTablaCreditos>;
+
+/** Celdas cambiadas de un envío de la tabla (cada dato de persona y cada decisión cuenta uno). */
+export function contarCambiosTabla(datos: {
+  personas: { nombre?: unknown; telefono?: unknown; cedula?: unknown }[];
+  estados: unknown[];
+}): number {
+  const dePersonas = datos.personas.reduce(
+    (suma, p) => suma + [p.nombre, p.telefono, p.cedula].filter((v) => v !== undefined).length,
+    0,
+  );
+  return dePersonas + datos.estados.length;
+}
 
 // ---------------------------------------------------------------------------
 // Equipo: cambiar el rol de un secretario / asesor

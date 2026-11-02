@@ -10,12 +10,16 @@ import { ToastAdmin } from "./ToastAdmin";
 import { TarjetaKpi } from "./TarjetaKpi";
 import { coincideBusqueda } from "@/lib/admin/busqueda";
 import { formatearFecha, formatearPesos } from "@/lib/cuenta";
-import { formatTasa, interpolarPorcentaje } from "@/lib/credito";
+import { formatTasa } from "@/lib/credito";
+import { situacionTope } from "@/lib/admin/topeCredito";
 import { EditarCondicionesCredito, type OpcionConvenio } from "./EditarCondicionesCredito";
+import { NuevoCreditoAdmin } from "./NuevoCreditoAdmin";
+import { CorregirCedula } from "./CorregirCedula";
 import { enmascararCedula } from "@/lib/mascara";
 import type { PaqueteDemo } from "@/lib/asesor/datosDemo";
 import type { CodigoGrado } from "@/lib/asesor/datosDemo";
 import { HISTORIAL_NOTAS_INTERNAS_HABILITADO } from "@/lib/admin/flags";
+import { TablaCreditos } from "./TablaCreditos";
 
 export type EstadoCredito = "pendiente" | "aprobado" | "rechazado";
 
@@ -43,6 +47,12 @@ export type FilaCreditoPanel = {
   /** Pedido de Sebas (1-oct): cuándo se subió el comprobante de la transferencia; null = sin comprobante. */
   comprobante_subido_at: string | null;
   motivo_rechazo: string | null;
+  /** Para «Corregir cédula». */
+  asociado_id: string;
+  /** RS-01: el admin es el asesor de este asociado (otro admin debe corregir su cédula). */
+  es_cliente_propio: boolean;
+  /** El crédito es del propio admin (otro admin debe resolverlo). */
+  es_propia: boolean;
   nombre: string;
   cedula: string;
   /** `perfiles.telefono` (widening mínimo de la consulta existente; no hay «correo» disponible aquí, ver nota abajo). */
@@ -52,32 +62,19 @@ export type FilaCreditoPanel = {
 const VACIO: EstadoAccionCredito = {};
 const ESTADOS = ["pendiente", "aprobado", "rechazado"] as const;
 
-/**
- * Tope del paquete (grado + porcentaje) para el aviso «Dentro/Supera el
- * tope». `paquetesPorGrado` viene de `cargarPaquetesDemo` (la página de
- * servidor), que lee los topes reales de `grados_credito`; si esa consulta
- * falla no hay copia de respaldo (RS-08) y el aviso no se muestra. Así el aviso —y el bloqueo de «Aprobar» que depende de
- * él— usa el tope vigente de verdad, no una copia que puede desactualizarse.
- * De todos modos, aunque la UI se equivocara, el servidor (trigger
- * `chk_monto_solicitud` + `validar_monto_solicitud`) es quien de verdad
- * impide guardar un monto sobre el tope: esto es solo el aviso visual.
- */
-function topeDelPaquete(
-  paquetesPorGrado: Partial<Record<CodigoGrado, PaqueteDemo[]>>,
-  grado: string,
-  porcentaje: number,
-): number | undefined {
-  const paquetes = paquetesPorGrado[grado as CodigoGrado];
-  const cupo50 = paquetes?.find((p) => p.porcentaje === "50")?.capacidad_maxima;
-  const cupo100 = paquetes?.find((p) => p.porcentaje === "100")?.capacidad_maxima;
-  if (cupo50 === undefined || cupo100 === undefined) return undefined;
-  // Entre 50 % y 100 % el cupo se interpola; solo es un aviso (el admin puede superarlo).
-  return Math.round(interpolarPorcentaje(cupo50, cupo100, porcentaje));
+/** «Lista» (lista + ficha, la de siempre) o «Tabla» (todas las columnas, editable por el admin). */
+export type VistaCreditos = "lista" | "tabla";
+
+/** Enlace de la página conservando el estado y la vista (`?estado=` y `?vista=tabla` conviven). */
+function enlaceCreditos(estado: EstadoCredito, vista: VistaCreditos) {
+  return `/admin/creditos?estado=${estado}${vista === "tabla" ? "&vista=tabla" : ""}`;
 }
 
 type Props = {
   filas: FilaCreditoPanel[];
   estadoFiltro: EstadoCredito;
+  /** `?vista=tabla` de la URL; por omisión, la lista. */
+  vista?: VistaCreditos;
   /** Conteos de las 3 pestañas: solo la activa es exacta (viene de esta misma consulta); las otras 2 quedan sin número. */
   conteoFiltroActual: number;
   /** Topes reales de `grados_credito` (vacío si no se pudieron leer: sin aviso de tope; RS-08: sin copia de respaldo). */
@@ -99,7 +96,16 @@ type Props = {
  * estado, lista + detalle en la misma vista, aprobar en 2 pasos, rechazar
  * con motivo obligatorio, toast y atajos J/K/A/R/Esc.
  */
-export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquetesPorGrado, convenios, soloLectura = false, kpis }: Props) {
+export function PanelCreditos({
+  filas,
+  estadoFiltro,
+  vista = "lista",
+  conteoFiltroActual,
+  paquetesPorGrado,
+  convenios,
+  soloLectura = false,
+  kpis,
+}: Props) {
   const [busqueda, setBusqueda] = useState("");
   const filtradas = useMemo(() => filas.filter((f) => coincideBusqueda(busqueda, f.nombre, f.cedula)), [filas, busqueda]);
 
@@ -110,10 +116,22 @@ export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquete
   const seleccionado = filtradas.find((f) => f.id === idEfectivo) ?? null;
 
   const [toast, setToast] = useState<string | null>(null);
+  // «Nuevo crédito» (solo admin): panel bajo el encabezado.
+  const [nuevoAbierto, setNuevoAbierto] = useState(false);
+  const [vueltaNuevo, setVueltaNuevo] = useState(0);
+  // Celdas sin guardar de la vista de tabla: al cambiar de pestaña o de vista se perderían.
+  const [cambiosSinGuardar, setCambiosSinGuardar] = useState(0);
+  function confirmarSalida(e: React.MouseEvent) {
+    if (cambiosSinGuardar > 0 && !window.confirm(`Tienes ${cambiosSinGuardar} cambios sin guardar. ¿Salir sin guardarlos?`)) {
+      e.preventDefault();
+    }
+  }
 
   // Atajos J/K (mover la selección): A/R/Esc viven en <DetalleCredito>, que
   // es quien conoce el paso de confirmación de la fila actual.
+  // En la vista de tabla no hay selección: los atajos no se registran.
   useEffect(() => {
+    if (vista === "tabla") return;
     function alTeclado(e: KeyboardEvent) {
       const enCampo = ["INPUT", "TEXTAREA", "SELECT"].includes((e.target as HTMLElement)?.tagName ?? "");
       if (enCampo) return;
@@ -130,12 +148,27 @@ export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquete
     }
     window.addEventListener("keydown", alTeclado);
     return () => window.removeEventListener("keydown", alTeclado);
-  }, [filtradas, idEfectivo]);
+  }, [filtradas, idEfectivo, vista]);
 
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Créditos</h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Créditos</h1>
+          {/* Solo admin: el secretario no crea créditos. */}
+          {soloLectura || nuevoAbierto ? null : (
+            <button
+              type="button"
+              onClick={() => {
+                setVueltaNuevo((v) => v + 1);
+                setNuevoAbierto(true);
+              }}
+              className="flex h-11.5 items-center justify-center rounded-full bg-admin-verde px-5 text-14 font-extrabold text-admin-fondo"
+            >
+              Nuevo crédito
+            </button>
+          )}
+        </div>
         <input
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
@@ -145,6 +178,20 @@ export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquete
         />
       </div>
 
+      {!soloLectura && nuevoAbierto ? (
+        <NuevoCreditoAdmin
+          // Cada apertura arranca limpia (búsqueda y formulario nuevos).
+          key={vueltaNuevo}
+          paquetesPorGrado={paquetesPorGrado}
+          convenios={convenios}
+          onCerrar={() => setNuevoAbierto(false)}
+          onCreado={(mensaje) => {
+            setNuevoAbierto(false);
+            setToast(mensaje);
+          }}
+        />
+      ) : null}
+
       <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
         <TarjetaKpi etiqueta="Créditos pendientes" valor={kpis.creditosPendientes} tono="ambar" />
         <TarjetaKpi etiqueta="Afiliaciones pendientes" valor={kpis.afiliacionesPendientes} />
@@ -152,83 +199,116 @@ export function PanelCreditos({ filas, estadoFiltro, conteoFiltroActual, paquete
         <TarjetaKpi etiqueta="Monto aprobado este mes" valor={kpis.montoAprobadoEsteMes} tono="verde" />
       </div>
 
-      <nav aria-label="Filtrar por estado" className="flex flex-wrap gap-2">
-        {ESTADOS.map((e) => (
-          <Link
-            key={e}
-            href={`/admin/creditos?estado=${e}`}
-            aria-current={estadoFiltro === e ? "page" : undefined}
-            className={
-              "flex h-11 items-center gap-1.5 rounded-full px-4.5 text-14 font-bold no-underline " +
-              (estadoFiltro === e ? "bg-admin-texto text-admin-fondo" : "text-admin-texto-2 hover:bg-admin-superficie")
-            }
-          >
-            {e[0].toUpperCase() + e.slice(1)}
-            {estadoFiltro === e ? <span className="opacity-70">{conteoFiltroActual}</span> : null}
-          </Link>
-        ))}
-      </nav>
-
-      <div className="grid grid-cols-1 items-start gap-4.5 lg:grid-cols-[minmax(0,1fr)_460px]">
-        <section className="overflow-hidden rounded-20 bg-admin-superficie">
-          <div className="grid grid-cols-[2fr_1fr_1fr] gap-2.5 border-b border-admin-borde-sutil px-4.5 py-3.5 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3 lg:grid-cols-[2fr_1.1fr_1fr_1fr_.9fr]">
-            <span>Asociado</span>
-            <span className="hidden lg:block">Grado</span>
-            <span>Monto</span>
-            <span className="hidden lg:block">Recibida</span>
-            <span>Estado</span>
-          </div>
-          {filtradas.length === 0 ? (
-            <p className="m-0 p-9 text-center text-15 text-admin-texto-3">
-              Nada por aquí. Cuando llegue una solicitud la verás aparecer resaltada.
-            </p>
-          ) : (
-            filtradas.map((f, indice) => (
-              <button
-                key={f.id}
-                type="button"
-                onClick={() => setSeleccionadoId(f.id)}
-                style={{ animationDelay: `${indice * 70}ms` }}
-                className={
-                  "grid w-full grid-cols-[2fr_1fr_1fr] items-center gap-2.5 border-b border-admin-borde-sutil px-4.5 py-3.5 text-left transition-colors duration-200 last:border-0 motion-safe:animate-ga-fila-entra lg:grid-cols-[2fr_1.1fr_1fr_1fr_.9fr] " +
-                  (f.id === idEfectivo ? "bg-admin-superficie-2" : "hover:bg-admin-superficie-2/60")
-                }
-              >
-                <span className="flex flex-col gap-0.5 truncate">
-                  <span className="truncate text-15 font-extrabold text-white">{f.nombre}</span>
-                  <span className="text-13 tracking-cedula text-admin-texto-3">{enmascararCedula(f.cedula)}</span>
-                </span>
-                <span className="hidden text-14 text-admin-texto-2 lg:block">{f.grado}</span>
-                <span className="flex flex-col gap-0.5">
-                  <span className="font-mono text-15 font-bold tabular-nums">{formatearPesos(f.monto_solicitado)}</span>
-                </span>
-                <span className="hidden text-14 text-admin-texto-2 lg:block">{formatearFecha(f.fecha_solicitud)}</span>
-                <span className="justify-self-start">
-                  <ChipEstado estado={f.estado} />
-                </span>
-              </button>
-            ))
-          )}
-        </section>
-
-        {seleccionado ? (
-          <DetalleCredito
-            // `key`: al cambiar de fila se remonta y su estado local (paso de
-            // confirmación, resultado de la Server Action) arranca de nuevo,
-            // sin necesitar un efecto que lo reinicie.
-            key={seleccionado.id}
-            fila={seleccionado}
-            paquetesPorGrado={paquetesPorGrado}
-            convenios={convenios}
-            soloLectura={soloLectura}
-            onResuelto={(mensaje) => setToast(mensaje)}
-          />
-        ) : (
-          <section className="flex flex-col gap-4.5 rounded-20 bg-admin-superficie p-5.5">
-            <p className="m-0 p-6 text-center text-15 text-admin-texto-3">Elige una solicitud de la lista.</p>
-          </section>
-        )}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <nav aria-label="Filtrar por estado" className="flex flex-wrap gap-2">
+          {ESTADOS.map((e) => (
+            <Link
+              key={e}
+              href={enlaceCreditos(e, vista)}
+              onClick={confirmarSalida}
+              aria-current={estadoFiltro === e ? "page" : undefined}
+              className={
+                "flex h-11 items-center gap-1.5 rounded-full px-4.5 text-14 font-bold no-underline " +
+                (estadoFiltro === e ? "bg-admin-texto text-admin-fondo" : "text-admin-texto-2 hover:bg-admin-superficie")
+              }
+            >
+              {e[0].toUpperCase() + e.slice(1)}
+              {estadoFiltro === e ? <span className="opacity-70">{conteoFiltroActual}</span> : null}
+            </Link>
+          ))}
+        </nav>
+        <nav aria-label="Vista" className="flex gap-1 rounded-full bg-admin-superficie p-1">
+          {(["lista", "tabla"] as const).map((v) => (
+            <Link
+              key={v}
+              href={enlaceCreditos(estadoFiltro, v)}
+              onClick={confirmarSalida}
+              aria-current={vista === v ? "page" : undefined}
+              className={
+                "flex h-10 items-center rounded-full px-4 text-14 font-bold no-underline " +
+                (vista === v ? "bg-admin-superficie-2 text-admin-texto" : "text-admin-texto-2 hover:text-admin-texto")
+              }
+            >
+              {v === "lista" ? "Lista" : "Tabla"}
+            </Link>
+          ))}
+        </nav>
       </div>
+
+      {vista === "tabla" ? (
+        <TablaCreditos
+          // Al cambiar de pestaña, la tabla arranca limpia.
+          key={estadoFiltro}
+          filas={filas}
+          busqueda={busqueda}
+          estadoFiltro={estadoFiltro}
+          paquetesPorGrado={paquetesPorGrado}
+          soloLectura={soloLectura}
+          onCambiosSinGuardar={setCambiosSinGuardar}
+          onAviso={setToast}
+        />
+      ) : (
+        <div className="grid grid-cols-1 items-start gap-4.5 lg:grid-cols-[minmax(0,1fr)_460px]">
+          <section className="overflow-hidden rounded-20 bg-admin-superficie">
+            <div className="grid grid-cols-[2fr_1fr_1fr] gap-2.5 border-b border-admin-borde-sutil px-4.5 py-3.5 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3 lg:grid-cols-[2fr_1.1fr_1fr_1fr_.9fr]">
+              <span>Asociado</span>
+              <span className="hidden lg:block">Grado</span>
+              <span>Monto</span>
+              <span className="hidden lg:block">Recibida</span>
+              <span>Estado</span>
+            </div>
+            {filtradas.length === 0 ? (
+              <p className="m-0 p-9 text-center text-15 text-admin-texto-3">
+                Nada por aquí. Cuando llegue una solicitud la verás aparecer resaltada.
+              </p>
+            ) : (
+              filtradas.map((f, indice) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setSeleccionadoId(f.id)}
+                  style={{ animationDelay: `${indice * 70}ms` }}
+                  className={
+                    "grid w-full grid-cols-[2fr_1fr_1fr] items-center gap-2.5 border-b border-admin-borde-sutil px-4.5 py-3.5 text-left transition-colors duration-200 last:border-0 motion-safe:animate-ga-fila-entra lg:grid-cols-[2fr_1.1fr_1fr_1fr_.9fr] " +
+                    (f.id === idEfectivo ? "bg-admin-superficie-2" : "hover:bg-admin-superficie-2/60")
+                  }
+                >
+                  <span className="flex flex-col gap-0.5 truncate">
+                    <span className="truncate text-15 font-extrabold text-white">{f.nombre}</span>
+                    <span className="text-13 tracking-cedula text-admin-texto-3">{enmascararCedula(f.cedula)}</span>
+                  </span>
+                  <span className="hidden text-14 text-admin-texto-2 lg:block">{f.grado}</span>
+                  <span className="flex flex-col gap-0.5">
+                    <span className="font-mono text-15 font-bold tabular-nums">{formatearPesos(f.monto_solicitado)}</span>
+                  </span>
+                  <span className="hidden text-14 text-admin-texto-2 lg:block">{formatearFecha(f.fecha_solicitud)}</span>
+                  <span className="justify-self-start">
+                    <ChipEstado estado={f.estado} />
+                  </span>
+                </button>
+              ))
+            )}
+          </section>
+
+          {seleccionado ? (
+            <DetalleCredito
+              // `key`: al cambiar de fila se remonta y su estado local (paso de
+              // confirmación, resultado de la Server Action) arranca de nuevo,
+              // sin necesitar un efecto que lo reinicie.
+              key={seleccionado.id}
+              fila={seleccionado}
+              paquetesPorGrado={paquetesPorGrado}
+              convenios={convenios}
+              soloLectura={soloLectura}
+              onResuelto={(mensaje) => setToast(mensaje)}
+            />
+          ) : (
+            <section className="flex flex-col gap-4.5 rounded-20 bg-admin-superficie p-5.5">
+              <p className="m-0 p-6 text-center text-15 text-admin-texto-3">Elige una solicitud de la lista.</p>
+            </section>
+          )}
+        </div>
+      )}
 
       <ToastAdmin mensaje={toast} onCerrar={() => setToast(null)} />
     </div>
@@ -277,10 +357,8 @@ function DetalleCredito({
     return () => window.removeEventListener("keydown", alTeclado);
   }, [fila.estado, soloLectura]);
 
-  const tope = topeDelPaquete(paquetesPorGrado, fila.grado, fila.porcentaje_credito);
-  const dentroDelTope = tope !== undefined ? fila.monto_solicitado <= tope : undefined;
   // Superar el tope solo bloquea si nadie lo decidió: al editar, el admin lo autoriza con su motivo.
-  const autorizadoSobreTope = dentroDelTope === false && Boolean(fila.condiciones_editadas_at);
+  const { tope, dentroDelTope, autorizadoSobreTope } = situacionTope(paquetesPorGrado, fila);
   const editable = !soloLectura && fila.estado !== "rechazado" && !fila.fecha_desembolso;
 
   return (
@@ -295,6 +373,14 @@ function DetalleCredito({
           C.C. {fila.cedula} · {fila.grado}
         </span>
       </div>
+      {soloLectura ? null : (
+        <CorregirCedula
+          asociadoId={fila.asociado_id}
+          cedulaActual={fila.cedula}
+          bloqueado={fila.es_cliente_propio}
+          onResuelto={onResuelto}
+        />
+      )}
 
       {/* «Correo» no está en esta consulta (vive en auth.users, no en
           perfiles): traerlo requeriría el cliente admin (service role)
