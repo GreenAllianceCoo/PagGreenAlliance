@@ -10,7 +10,7 @@ import { CarneVirtual } from "@/components/ui/CarneVirtual";
 import { CamposSolicitud, formatoCOP } from "@/components/cuenta/CamposSolicitud";
 import { TarjetaTope } from "@/components/cuenta/TarjetaTope";
 import { EncabezadoAsesor } from "@/components/asesor/EncabezadoAsesor";
-import { MONTO_MINIMO } from "@/lib/credito";
+import { MONTO_MINIMO, opcionesCredito, type OpcionCredito, type PorcentajeCredito } from "@/lib/credito";
 import type { Convenio } from "@/lib/convenios";
 import {
   CLIENTE_DEMO,
@@ -80,17 +80,15 @@ export function CuentaDemo({
     () => paquetesDeGradoDemo(catalogoGrados, paquetesPorGrado, grado),
     [catalogoGrados, paquetesPorGrado, grado],
   );
-  const sinCupo = !sinDatos && paquetes.length === 0;
+  // Sin la fila de 50 % o la de 100 % no se pueden calcular los 6 porcentajes: se trata como sin cupo.
+  const sinCupo = !sinDatos && opcionesCredito(paquetes).length === 0;
   const tope = topeMaximoDemo(paquetes);
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   // Pieza 3t: sin porcentaje elegido de entrada; «Enviar solicitud de ejemplo» queda apagado hasta elegirlo.
-  const [porcentaje, setPorcentaje] = useState<"" | "50" | "100">("");
-  const paquete = useMemo(
-    () => paquetes.find((p) => p.porcentaje === porcentaje) ?? paquetes[0],
-    [paquetes, porcentaje],
-  );
-  const [monto, setMonto] = useState(paquete?.capacidad_maxima ?? MONTO_MINIMO);
+  // Mismos 6 porcentajes (50 a 100 %, de 10 en 10) que ve el asociado en /cuenta/solicitar.
+  const [porcentaje, setPorcentaje] = useState<PorcentajeCredito | null>(null);
+  const [monto, setMonto] = useState(() => opcionesCredito(paquetes)[0]?.montoMaximo ?? MONTO_MINIMO);
   const [enviando, setEnviando] = useState(false);
   const [confirmada, setConfirmada] = useState(false);
 
@@ -104,14 +102,14 @@ export function CuentaDemo({
   function cambiarGrado(nuevo: string) {
     setGrado(nuevo);
     const nuevosPaquetes = paquetesDeGradoDemo(catalogoGrados, paquetesPorGrado, nuevo);
-    setPorcentaje("");
-    setMonto(nuevosPaquetes[0]?.capacidad_maxima ?? MONTO_MINIMO);
+    setPorcentaje(null);
+    setMonto(opcionesCredito(nuevosPaquetes)[0]?.montoMaximo ?? MONTO_MINIMO);
     setConfirmada(false);
   }
 
-  function elegirPorcentaje(p: Pick<PaqueteDemo, "porcentaje" | "capacidad_maxima">) {
-    setPorcentaje(p.porcentaje);
-    setMonto(p.capacidad_maxima);
+  function elegirPorcentaje(opcion: OpcionCredito) {
+    setPorcentaje(opcion.porcentaje);
+    setMonto(opcion.montoMaximo);
   }
 
   // Nada de esto llama a Supabase ni inserta: es una confirmación simulada.
@@ -271,7 +269,7 @@ export function CuentaDemo({
                 />
 
                 <div className="flex flex-col gap-3 sm:flex-row">
-                  <Button disabled={porcentaje === ""} cargando={enviando} textoCargando="Enviando…" className="lg:self-start lg:px-9">
+                  <Button disabled={porcentaje === null} cargando={enviando} textoCargando="Enviando…" className="lg:self-start lg:px-9">
                     Enviar solicitud de ejemplo
                   </Button>
                   <Button

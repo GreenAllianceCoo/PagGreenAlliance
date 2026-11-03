@@ -5,7 +5,7 @@ import { EncabezadoCuenta } from "@/components/pantallas/EncabezadoCuenta";
 import { AvisoCreditoBloqueado } from "@/components/ui/AvisoCreditoBloqueado";
 import { ButtonLink } from "@/components/ui/Button";
 import { IconoSalir, IconoVolver } from "@/components/ui/Iconos";
-import { MENSAJE_CREDITO_SIN_TOPES } from "@/lib/credito";
+import { MENSAJE_CREDITO_SIN_TOPES, opcionesCredito } from "@/lib/credito";
 import { RUTA_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 import { reglaCreditoDe } from "@/lib/asociado/servidor";
 import { createClient } from "@/lib/supabase/server";
@@ -55,7 +55,10 @@ export default async function SolicitarPage() {
   /** Para la pantalla (3k): si puede solicitar y, si no, por qué. */
   const puedeSolicitar = regla.puedeSolicitar;
   const aviso = regla.mensaje;
-  const paquetes = cupo.estado === "con_cupo" ? cupo.paquetes : null;
+  // Sin la fila de 50 % o la de 100 % no se pueden calcular los porcentajes de en medio:
+  // se trata como «sin topes» (no se ofrece un formulario a medias).
+  const paquetes =
+    cupo.estado === "con_cupo" && opcionesCredito(cupo.paquetes).length > 0 ? cupo.paquetes : null;
 
   return (
     <div className="min-h-dvh bg-ga-fondo-suave">

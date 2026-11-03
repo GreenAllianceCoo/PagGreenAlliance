@@ -16,7 +16,7 @@ Este manual explica, paso a paso, cómo usar el panel de administración. No hac
 4. Afiliaciones: revisar y aprobar o rechazar
 5. Asociados: datos, proceso ejecutivo, baja, reactivación y crédito
 6. Cambiar el correo de ingreso de un asociado (recuperación de acceso)
-7. Créditos: aprobar, rechazar y marcar el desembolso
+7. Créditos: aprobar, rechazar, crear y marcar el desembolso
 8. Asesores: registro, comisiones, pagos y premios
 9. Sorteo mensual
 10. Alertas
@@ -265,7 +265,7 @@ En la ficha del asociado, el bloque **«Datos del asociado»** muestra su nombre
 
 Tenga en cuenta:
 
-- La **cédula**, el **grado**, la **institución** y el **asesor** no se cambian aquí, porque afectan el ingreso, el cupo de crédito y las comisiones. Si hace falta, pídalo al equipo técnico.
+- La **cédula** se corrige en su propio bloque (ver 5.7). El **grado**, la **institución** y el **asesor** no se cambian aquí, porque afectan el cupo de crédito y las comisiones. Si hace falta, pídalo al equipo técnico.
 - El **correo de ingreso** (el personal) tampoco se cambia aquí: se usa la sección 6.
 - No puede editar sus propios datos ni los de sus propios clientes; debe hacerlo otro administrador.
 - El secretario no ve este bloque.
@@ -273,6 +273,16 @@ Tenga en cuenta:
 - Estos datos solo se pueden cambiar desde aquí: la base de datos rechaza cualquier otro camino.
 - Si cambia el **correo institucional** o la **cuenta de nómina**, el asociado verá un aviso («Actualizamos tus datos») la próxima vez que entre a su cuenta. El aviso dice qué cambió y cuándo, pero no muestra los datos nuevos. No se envía correo.
 - El asociado puede seguir cambiando su celular desde su perfil.
+
+### 5.7 Corregir la cédula
+
+La cédula es **con lo que el asociado ingresa** a su cuenta. Si quedó mal escrita:
+
+1. En la ficha del asociado, bloque **«Cédula de ingreso»** (o en la ficha del crédito, en Créditos), toque **«Corregir cédula»**.
+2. Escriba la **cédula nueva** (solo números, 6 a 10 dígitos; los puntos y espacios se quitan solos) y el **motivo**. Revísela con el documento: desde que la guarde, el asociado solo podrá entrar con la nueva.
+3. Toque **«Guardar cédula»**.
+
+El cambio queda en el historial con el motivo. El asociado recibe un correo en su correo personal con la cédula nueva (sin el motivo); al institucional solo le llega el aviso genérico. No puede corregir su propia cédula ni la de sus propios clientes, y no puede usar una cédula que ya tenga otra cuenta. El secretario no ve este botón.
 
 ---
 
@@ -316,7 +326,7 @@ Límites:
 
 ---
 
-## 7. Créditos: aprobar, rechazar y marcar el desembolso
+## 7. Créditos: aprobar, rechazar, crear y marcar el desembolso
 
 ### 7.1 Ver las solicitudes
 
@@ -336,6 +346,15 @@ También avisa si el monto está **«Dentro del tope»** del grado o si lo **sup
 3. Escriba el **motivo** y guarde. El cambio queda en el historial; el asociado recibe un correo con el monto, el plazo, el porcentaje y el tipo. No ve el motivo ni lo que devuelve en total, porque revela la tasa.
 
 Si cambia el porcentaje, la tasa se recalcula entre las de 50 % y 100 % del grado, pero **lo que devuelve no se recalcula solo**: revíselo antes de guardar.
+
+**Nuevo crédito** (crear un crédito sin que el asociado lo solicite; solo administrador):
+
+1. Toque **«Nuevo crédito»**, junto al título de Créditos.
+2. Escriba la **cédula** del asociado y toque **«Buscar»**. Verá su nombre, grado, estado del proceso y el cupo del grado al 50 % y al 100 %.
+3. Llene las mismas condiciones de «Editar condiciones» (lo que recibe, lo que devuelve en total, plazo, porcentaje, tipo y motivo). Debajo verá el total sugerido con la tasa del grado y la cuota aproximada.
+4. Toque **«Revisar y confirmar»** y luego **«Sí, crear y aprobar»**.
+
+El crédito queda **aprobado de una vez** y aparece en el filtro **Aprobado**, listo para «Marcar desembolsado». Puede superar el cupo del grado (queda autorizado con su motivo). El asociado recibe un correo con el monto, el plazo, el porcentaje y el tipo; no ve el motivo ni lo que devuelve en total. No se puede crear si el asociado está inactivo, no tiene grado o cupo, su proceso no está en «Operando» o ya tiene una solicitud pendiente; la búsqueda lo avisa antes de llenar el formulario. Tampoco puede crearse un crédito a sí mismo.
 
 ### 7.2 Aprobar
 
@@ -371,6 +390,24 @@ Si usted **elimina definitivamente a un asociado** (ficha del asociado, solo si 
 - En la ficha del asociado eliminado aparece **«Comprobantes que se borrarán el DD/MM/AAAA»** con un botón **«Ver»** por cada comprobante. Solo usted (administrador) puede abrirlos en ese plazo; ya no se pueden reemplazar.
 - Pasados los 30 días, la plataforma los borra sola (la tarea programada corre cada hora). No hay que hacer nada y no se puede deshacer. Si necesita conservar un comprobante, descárguelo antes de esa fecha.
 - La plataforma también borra sola los comprobantes subidos que nunca quedaron ligados a un crédito (a las 24 horas).
+
+### 7.6 Vista de tabla
+
+Junto a los filtros de estado está el selector **Lista / Tabla**. «Lista» es la vista de siempre (lista + ficha). **«Tabla»** muestra todos los créditos del filtro elegido en una sola tabla con: asociado, cédula, celular, grado, lo que recibe, lo que devuelve en total (solo administrador), plazo, porcentaje, tipo, fecha de la solicitud, estado y desembolso. Funciona la búsqueda por nombre o cédula, y al tocar un encabezado se ordena por esa columna (otro toque invierte el orden). En el celular la tabla se desplaza de lado y el nombre queda fijo a la izquierda.
+
+**Corregir varias cosas a la vez** (solo administrador; el secretario la ve en solo lectura):
+
+1. Escriba directamente en las celdas de **nombre**, **cédula** o **celular**, o cambie el **estado** de una pendiente a **Aprobar** o **Rechazar**. Las celdas cambiadas quedan con borde ámbar y arriba aparece «N cambios sin guardar». **«Descartar»** deshace todo.
+2. Toque **«Guardar cambios»** y escriba **un solo motivo** (5 a 300 caracteres) para todos los cambios.
+3. Toque **«Confirmar y guardar»**. Al final aparece un resumen, por ejemplo «5 guardados, 1 con error».
+
+Tenga en cuenta:
+
+- Si rechaza alguna, **ese mismo motivo es el motivo del rechazo y el asociado lo verá**. Si mezcla rechazos con otros cambios, escríbalo pensando en él.
+- Si una persona tiene varios créditos en la tabla, al corregir su nombre, cédula o celular se corrige en todas sus filas (es un solo cambio).
+- Cada cambio sigue las mismas reglas de la ficha: no puede corregir sus propios datos ni los de sus clientes, ni resolver su propio crédito; «Aprobar» queda apagado si el monto supera el tope y nadie editó las condiciones; al cambiar una cédula, la persona solo podrá entrar con la nueva y el motivo no debe llevar números de cédula.
+- Se guarda fila por fila: las que fallan quedan marcadas en rojo con la razón y conservan su cambio para que lo corrija y vuelva a guardar; las demás quedan guardadas. Máximo 50 cambios por envío.
+- Lo que recibe, lo que devuelve, plazo, porcentaje, tipo y desembolso **no se editan en la tabla**: para eso use la ficha (vista «Lista»). Los atajos J/K/A/R solo funcionan en la vista de lista.
 
 ---
 
@@ -543,7 +580,7 @@ En **«Empresas en convenio»**, cada convenio tiene:
 **Demostración** abre una cuenta de asociado **de ejemplo**, para mostrar la plataforma en una reunión o capacitar a un asesor sin usar datos reales.
 
 - Arriba siempre se ve la franja **«Modo demostración»**: **nada de lo que se haga ahí se guarda**.
-- Tiene un selector **Policía / Ejército**, que cambia los grados disponibles, y un selector de **grado**, que cambia el cupo de crédito al 50 % y al 100 %.
+- Tiene un selector **Policía / Ejército**, que cambia los grados disponibles, y un selector de **grado**, que cambia el cupo de crédito (las mismas 6 opciones que ve el asociado, del 50 % al 100 %).
 - Puede «enviar» una solicitud de ejemplo: solo muestra una confirmación de muestra.
 - Para salir, toque **«Volver al panel»**.
 
@@ -605,7 +642,7 @@ Todo cambio de estado de una afiliación guarda **quién lo hizo, con qué rol y
 Al entrar con su cédula y su código, el asociado ve:
 
 - **Inicio:** el estado de su última solicitud de crédito, el botón **«Nueva solicitud»**, el **sorteo del mes** (del 1 al 5), el ganador del último sorteo y sus **convenios** (al tocar uno ve el detalle y el botón de WhatsApp).
-- **Solicitar crédito:** elige 50 % o 100 % de devolución y el monto (mínimo $100.000, en pasos de $50.000, hasta el tope de su grado). El plazo es de 3 meses. **No ve la tasa.** Solo puede pedir si está activo, si su proceso está en «Operando» y si no tiene otra solicitud pendiente.
+- **Solicitar crédito:** elige qué porcentaje de su cupo quiere —50, 60, 70, 80, 90 o 100 %— y el monto (mínimo $100.000, en pasos de $50.000). El 50 % y el 100 % tienen el cupo de su grado; los de en medio quedan en línea recta entre esos dos, y el monto máximo es ese cupo redondeado hacia abajo a $50.000. El plazo es de 3 meses. **No ve la tasa.** Solo puede pedir si está activo, si su proceso está en «Operando» y si no tiene otra solicitud pendiente.
 - **Perfil:** su nombre, asesor, grado e institución; la **línea de 8 pasos** del proceso ejecutivo; el **conteo de 36 meses** (empieza en «Operando»); los botones **«Retiro anticipado»** y **«Renovar los 36 meses»** (este se activa a los 24 meses); el **conteo de 3 meses** de su crédito (desde el desembolso), y su **celular** (editable). El correo de ingreso no se cambia desde el perfil: el perfil explica que, para cambiarlo, use «¿Ya no tienes acceso a tu correo?» en la pantalla de ingreso o escriba por WhatsApp (sección 6).
 - **Avisos y WhatsApp:** si la cooperativa publicó un aviso (sección 18), lo ve en una ventana al entrar. En todas las pantallas tiene un botón pequeño de WhatsApp abajo a la derecha que abre un mensaje con su nombre, dirigido al número de la cooperativa. El botón también aparece en la página pública, con un mensaje general.
 - **Carné con QR:** un carné virtual de «Afiliado Titular» que puede **descargar en PDF**. Quien escanee el QR ve su nombre, grado, institución y si está activo, pero no su cédula, celular ni datos de crédito. Si lo compartió por error, puede tocar **«Regenerar código»** y el QR anterior deja de servir.

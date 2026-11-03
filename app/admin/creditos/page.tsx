@@ -33,7 +33,8 @@ type FilaCruda = {
   fecha_desembolso: string | null;
   comprobante_subido_at: string | null;
   motivo_rechazo: string | null;
-  perfiles: { nombre_completo: string; cedula: string; telefono: string | null } | null;
+  asociado_id: string;
+  perfiles: { nombre_completo: string; cedula: string; telefono: string | null; asesor_id: string | null } | null;
 };
 
 /**
@@ -41,11 +42,13 @@ type FilaCruda = {
  * El secretario la ve en SOLO LECTURA: sin aprobar, rechazar, desembolsar ni comprobantes,
  * y sin la tasa de interés (ni se le pide a la base: la RPC de tasas es solo admin).
  */
-export default async function CreditosPage({ searchParams }: { searchParams: Promise<{ estado?: string }> }) {
-  const { supabase, nombre, rol } = await exigirAdminOSecretario();
+export default async function CreditosPage({ searchParams }: { searchParams: Promise<{ estado?: string; vista?: string }> }) {
+  const { supabase, nombre, rol, userId } = await exigirAdminOSecretario();
   const soloLectura = rol === "secretario";
-  const { estado: estadoCrudo } = await searchParams;
+  const { estado: estadoCrudo, vista: vistaCruda } = await searchParams;
   const estado: Estado = esEstadoValido(estadoCrudo) ? estadoCrudo : "pendiente";
+  // «Lista» (lista + ficha) o «Tabla» (?vista=tabla). Cualquier otro valor = lista.
+  const vista = vistaCruda === "tabla" ? "tabla" : "lista";
 
   // Se agregan `fecha_respuesta` y `perfiles.telefono` a la consulta que ya
   // existía (antes solo pedía nombre_completo y cedula): son columnas que ya
@@ -61,7 +64,7 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
     supabase
       .from("solicitudes_credito")
       .select(
-        "id, estado, monto_solicitado, porcentaje_credito, plazo_meses, tipo_credito, convenio_id, condiciones_editadas_at, convenios:convenio_id(nombre_empresa), grado, fecha_solicitud, fecha_respuesta, fecha_desembolso, comprobante_subido_at, motivo_rechazo, perfiles:asociado_id(nombre_completo, cedula, telefono)",
+        "id, estado, monto_solicitado, porcentaje_credito, plazo_meses, tipo_credito, convenio_id, condiciones_editadas_at, convenios:convenio_id(nombre_empresa), grado, fecha_solicitud, fecha_respuesta, fecha_desembolso, comprobante_subido_at, motivo_rechazo, asociado_id, perfiles:asociado_id(nombre_completo, cedula, telefono, asesor_id)",
       )
       .eq("estado", estado)
       .order("fecha_solicitud", { ascending: false }),
@@ -117,6 +120,11 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
     fecha_desembolso: f.fecha_desembolso ? String(f.fecha_desembolso).slice(0, 10) : null,
     comprobante_subido_at: f.comprobante_subido_at,
     motivo_rechazo: f.motivo_rechazo,
+    asociado_id: f.asociado_id,
+    // RS-01: el propio admin o uno de sus clientes (para «Corregir cédula»).
+    es_cliente_propio: f.asociado_id === userId || f.perfiles?.asesor_id === userId,
+    // Nadie resuelve su propio crédito (la vista de tabla no le ofrece aprobar ni rechazar).
+    es_propia: f.asociado_id === userId,
     nombre: f.perfiles?.nombre_completo ?? "—",
     cedula: f.perfiles?.cedula ?? "—",
     telefono: f.perfiles?.telefono ?? null,
@@ -132,6 +140,7 @@ export default async function CreditosPage({ searchParams }: { searchParams: Pro
         <PanelCreditos
           filas={filas}
           estadoFiltro={estado}
+          vista={vista}
           conteoFiltroActual={filas.length}
           soloLectura={soloLectura}
           paquetesPorGrado={paquetesPorGrado ?? {}}

@@ -4,28 +4,38 @@ import { revalidatePath } from "next/cache";
 import { registrar } from "@/lib/servidor/registro";
 import { exigirAdmin } from "@/lib/admin/servidor";
 import { correoDeCedula } from "@/lib/ingreso/servidor";
-import { enviarCondicionesCredito, enviarDesembolsoCredito, enviarResultadoCredito } from "@/lib/correo/credito";
+import {
+  enviarCondicionesCredito,
+  enviarCreditoAsignado,
+  enviarDesembolsoCredito,
+} from "@/lib/correo/credito";
+import { aplicarResolucionCredito } from "@/lib/admin/resolucionCredito";
 import { formatearFechaLarga } from "@/lib/fechas";
 import { destinatariosAviso } from "@/lib/correo/destinatarios";
 import { avisarCorreoInstitucional } from "@/lib/correo/institucional";
 import { textoDe } from "@/lib/validaciones/comunes";
 import {
+  esquemaBuscarCedula,
+  esquemaCrearCreditoAdmin,
   esquemaEditarCondicionesCredito,
   esquemaMarcarDesembolso,
   esquemaResolverCredito,
   leerFormularioCondiciones,
+  leerFormularioCrearCredito,
+  type CampoCrearCreditoAdmin,
   type CampoEditarCondiciones,
 } from "@/lib/validaciones/admin";
+import { cupoCreditoDelGrado } from "@/lib/grados";
+import { esEstadoProceso, ETIQUETA_ESTADO_PROCESO } from "@/lib/procesoEjecutivo";
 import { crearSubidaComprobante, firmarComprobante, registrarComprobanteSubido, rutaDeComprobante } from "@/lib/admin/comprobantes";
 import { esquemaPrepararComprobante, esquemaRegistrarComprobante, esquemaVerComprobante } from "@/lib/validaciones/comprobante";
 
 export type EstadoAccionCredito = { error?: string; mensaje?: string };
 
 /**
- * «Aprobar» / «Rechazar» de /admin/creditos. La base es la última barrera
- * real (trigger sellar_revision_solicitud): nadie resuelve su propia
- * solicitud y una ya resuelta no cambia; aquí solo se traduce el error de
- * Postgres a un mensaje genérico.
+ * «Aprobar» / «Rechazar» de /admin/creditos. La lógica (no resolver la propia,
+ * solo pendientes, carrera S-11 y correo del resultado) vive en
+ * lib/admin/resolucionCredito.ts, compartida con la vista de tabla.
  */
 export async function resolverCredito(
   _previo: EstadoAccionCredito,
@@ -41,79 +51,13 @@ export async function resolverCredito(
   if (!resultado.success) {
     return { error: resultado.error.issues[0]?.message ?? "Datos inválidos." };
   }
-  const datos = resultado.data;
 
-  const { data: solicitud, error: errorConsulta } = await supabase
-    .from("solicitudes_credito")
-    .select("id, estado, asociado_id, monto_solicitado")
-    .eq("id", datos.id)
-    .single();
-  if (errorConsulta || !solicitud) {
-    return { error: "No encontramos la solicitud." };
-  }
-  if (solicitud.estado !== "pendiente") {
-    return { error: "Esta solicitud ya fue resuelta." };
-  }
-  if (solicitud.asociado_id === userId) {
-    return { error: "No puedes resolver tu propia solicitud; debe hacerlo otro administrador." };
-  }
-
-  const cambios =
-    datos.decision === "aprobado"
-      ? { estado: "aprobado" as const, motivo_rechazo: null }
-      : { estado: "rechazado" as const, motivo_rechazo: datos.motivo };
-
-  // S-11 (revisión de seguridad 2026-09-24): el `select` de arriba ya
-  // comprobó `estado === 'pendiente'`, pero entre ese select y este update
-  // otro admin podría haberla resuelto (carrera). El trigger
-  // sellar_revision_solicitud también lo bloquea, pero aquí se filtra
-  // ADEMÁS por estado en el propio update: si otra transacción ganó la
-  // carrera, este update afecta 0 filas (`.select()` lo confirma) y no se
-  // manda el correo de un resultado que ya se había resuelto distinto.
-  const { data: actualizada, error } = await supabase
-    .from("solicitudes_credito")
-    .update(cambios)
-    .eq("id", datos.id)
-    .eq("estado", "pendiente")
-    .select("id")
-    .maybeSingle();
-  if (error) {
-    // No exponemos el texto de Postgres (puede traer montos o nombres de constraint).
-    registrar("error", { evento: "credito_resolver_fallo", codigo: error.code, mensaje: error.message, solicitud_id: datos.id });
-    return { error: "No pudimos guardar la decisión. Intenta de nuevo." };
-  }
-  if (!actualizada) {
-    return { error: "Esta solicitud ya fue resuelta." };
-  }
-
-  // Correo del resultado (lib/correo/credito.ts, ya existente): busca nombre y
-  // correo del asociado y no bloquea la respuesta si Resend falla.
-  const { data: perfil } = await supabase
-    .from("perfiles")
-    .select("nombre_completo, cedula, correo_institucional")
-    .eq("id", solicitud.asociado_id)
-    .single();
-  if (perfil) {
-    // RS-02: montos y motivo SOLO al correo personal (Auth); al institucional,
-    // un aviso genérico sin datos.
-    const correoPersonal = await correoDeCedula(perfil.cedula);
-    const correo = destinatariosAviso(correoPersonal);
-    await avisarCorreoInstitucional(correoPersonal, perfil.correo_institucional);
-    if (correo.length > 0) {
-      await enviarResultadoCredito({
-        id: datos.id,
-        nombre: perfil.nombre_completo,
-        correo,
-        resultado: datos.decision,
-        monto: Number(solicitud.monto_solicitado),
-        motivo: datos.decision === "rechazado" ? datos.motivo : undefined,
-      });
-    }
-  }
+  const respuesta = await aplicarResolucionCredito(supabase, userId, resultado.data);
+  if (respuesta.error) return { error: respuesta.error };
 
   revalidatePath("/admin/creditos");
   revalidatePath("/cuenta"); // el asociado ve el estado nuevo en su pantalla
-  return { mensaje: datos.decision === "aprobado" ? "Crédito aprobado." : "Crédito rechazado." };
+  return { mensaje: respuesta.mensaje };
 }
 
 /** Textos de admin_marcar_desembolsado() listos para mostrar (los demás errores se ocultan). */
@@ -302,6 +246,194 @@ export async function editarCondicionesCredito(
   revalidatePath("/cuenta");
   revalidatePath("/cuenta/perfil");
   return { mensaje: "Condiciones actualizadas." };
+}
+
+// ---------------------------------------------------------------------------
+// «Nuevo crédito»: el admin crea un crédito ya aprobado sin solicitud del asociado
+// ---------------------------------------------------------------------------
+
+/** Lo que el admin ve del asociado antes de crearle el crédito. */
+export type AsociadoParaCredito = {
+  id: string;
+  nombre: string;
+  cedula: string;
+  /** Nombre del grado (o el código si no está en el catálogo); null = sin grado. */
+  grado: string | null;
+  /** Grupo de `grados_credito` (clave de los topes del panel); null = sin cupo. */
+  grupo: string | null;
+  /** Cupo del grado al 50 % y al 100 %; null = no se pudo leer o no tiene. */
+  cupo50: number | null;
+  cupo100: number | null;
+  /** Plazo de la tabla del grado (100 %), para proponerlo en el formulario. */
+  plazoSugerido: number | null;
+  /** Etiqueta del paso del proceso ejecutivo; null = sin proceso. */
+  proceso: string | null;
+  /** Razones por las que la base no dejaría crearlo (vacío = se puede). */
+  bloqueos: string[];
+};
+
+export type EstadoBuscarAsociado = { error?: string; asociado?: AsociadoParaCredito };
+
+/**
+ * Paso 1 de «Nuevo crédito»: busca al asociado por cédula con la sesión del admin
+ * (RLS). Devuelve nombre, grado, proceso y cupo, y avisa de antemano lo que la
+ * base rechazaría (la base lo vuelve a exigir en admin_crear_credito).
+ */
+export async function buscarAsociadoPorCedula(
+  _previo: EstadoBuscarAsociado,
+  formData: FormData,
+): Promise<EstadoBuscarAsociado> {
+  const { supabase, userId } = await exigirAdmin();
+
+  const resultado = esquemaBuscarCedula.safeParse({ cedula: textoDe(formData, "cedula") });
+  if (!resultado.success) {
+    return { error: resultado.error.issues[0]?.message ?? "Revisa la cédula." };
+  }
+  const { cedula } = resultado.data;
+
+  const { data: perfil, error } = await supabase
+    .from("perfiles")
+    .select("id, nombre_completo, cedula, grado, rol, activo, eliminado_at")
+    .eq("cedula", cedula)
+    .maybeSingle();
+  if (error) {
+    registrar("error", { evento: "admin_buscar_cedula_fallo", codigo: error.code, mensaje: error.message });
+    return { error: "No pudimos buscar la cédula. Intenta de nuevo." };
+  }
+  if (!perfil || perfil.rol !== "asociado" || perfil.eliminado_at) {
+    return { error: "No encontramos un asociado con esa cédula." };
+  }
+
+  const id = perfil.id as string;
+  const [cupo, { data: proceso }, { data: pendientes }] = await Promise.all([
+    cupoCreditoDelGrado(supabase, perfil.grado as string | null),
+    supabase.from("procesos_ejecutivos").select("estado").eq("asociado_id", id).maybeSingle(),
+    supabase.from("solicitudes_credito").select("id").eq("asociado_id", id).eq("estado", "pendiente").limit(1),
+  ]);
+
+  const estadoProceso = esEstadoProceso(proceso?.estado) ? proceso.estado : null;
+  const paquetes = cupo.estado === "con_cupo" ? cupo.paquetes : [];
+  const cupo50 = paquetes.find((p) => p.porcentaje === "50")?.capacidad_maxima ?? null;
+  const paquete100 = paquetes.find((p) => p.porcentaje === "100");
+
+  // Mismo orden de reglaSolicitarCredito (lib/credito.ts), con textos para el admin.
+  const bloqueos: string[] = [];
+  if (id === userId) bloqueos.push("Es tu propia cuenta: otro administrador debe crearte el crédito.");
+  if (perfil.activo === false) bloqueos.push("El asociado está inactivo.");
+  if (cupo.estado === "sin_grado") bloqueos.push("El asociado no tiene grado asignado.");
+  if (cupo.estado === "sin_cupo") bloqueos.push("Su grado no tiene cupo de crédito configurado.");
+  if (estadoProceso !== "operando") bloqueos.push("Su proceso ejecutivo no está en «Operando».");
+  if ((pendientes ?? []).length > 0) bloqueos.push("Tiene una solicitud pendiente: resuélvela primero.");
+
+  return {
+    asociado: {
+      id,
+      nombre: perfil.nombre_completo as string,
+      cedula: perfil.cedula as string,
+      grado: cupo.estado === "sin_grado" ? null : cupo.nombre,
+      grupo: cupo.estado === "con_cupo" ? cupo.grupo : null,
+      cupo50,
+      cupo100: paquete100?.capacidad_maxima ?? null,
+      plazoSugerido: paquete100?.plazo_meses ?? null,
+      proceso: estadoProceso ? ETIQUETA_ESTADO_PROCESO[estadoProceso] : null,
+      bloqueos,
+    },
+  };
+}
+
+export type EstadoCrearCredito = EstadoAccionCredito & {
+  errores?: Partial<Record<CampoCrearCreditoAdmin, string>>;
+};
+
+/**
+ * Textos de admin_crear_credito() listos para mostrar (los demás errores se ocultan).
+ * Una sola lista para alinearla con la migración: se compara con `includes`.
+ */
+const MENSAJES_CREAR_CREDITO = [
+  "No puedes crearte un crédito a ti mismo; debe hacerlo otro administrador",
+  "No encontramos al asociado",
+  "El asociado está inactivo; no se le puede crear un crédito",
+  "El asociado no tiene un grado con cupo de crédito configurado",
+  "El proceso ejecutivo del asociado no está en «operando»",
+  "El asociado ya tiene una solicitud de crédito pendiente; resuélvela primero",
+  "Ese convenio no está disponible",
+  "No hay un tope configurado para el grado",
+];
+
+/**
+ * «Nuevo crédito» de /admin/creditos (solo admin): crea el crédito ya APROBADO, listo
+ * para «Marcar desembolsado». Escribe solo por la RPC admin_crear_credito, que exige
+ * admin, no a sí mismo, asociado activo con grado y cupo, proceso «operando» y sin
+ * solicitud pendiente; puede superar el cupo (el motivo queda en el historial).
+ * El aviso al asociado nunca lleva el motivo ni lo que devuelve (revela la tasa).
+ */
+export async function crearCreditoAdmin(_previo: EstadoCrearCredito, formData: FormData): Promise<EstadoCrearCredito> {
+  const { supabase, userId } = await exigirAdmin();
+
+  const resultado = esquemaCrearCreditoAdmin.safeParse(leerFormularioCrearCredito(formData));
+  if (!resultado.success) {
+    const errores: Partial<Record<CampoCrearCreditoAdmin, string>> = {};
+    for (const problema of resultado.error.issues) {
+      const campo = problema.path[0] as CampoCrearCreditoAdmin | undefined;
+      if (campo && !errores[campo]) errores[campo] = problema.message;
+    }
+    // El asociado no es un campo visible del formulario: va como error general.
+    if (errores.asociadoId) return { error: errores.asociadoId };
+    return { errores };
+  }
+  const datos = resultado.data;
+  if (datos.asociadoId === userId) {
+    return { error: "No puedes crearte un crédito a ti mismo; debe hacerlo otro administrador." };
+  }
+
+  const { data: solicitudId, error } = await supabase.rpc("admin_crear_credito", {
+    p_asociado_id: datos.asociadoId,
+    p_monto: datos.monto,
+    p_total_a_pagar: datos.totalAPagar,
+    p_plazo_meses: datos.plazoMeses,
+    p_porcentaje: datos.porcentaje,
+    p_tipo: datos.tipoCredito,
+    p_convenio_id: datos.convenioId,
+    p_motivo: datos.motivo,
+  });
+  if (error) {
+    const conocido = MENSAJES_CREAR_CREDITO.find((m) => error.message?.includes(m));
+    if (!conocido) {
+      registrar("error", { evento: "credito_admin_crear_fallo", codigo: error.code, mensaje: error.message, asociado_id: datos.asociadoId });
+    }
+    return { error: conocido ? `${conocido}.` : "No pudimos crear el crédito. Intenta de nuevo." };
+  }
+  registrar("info", { evento: "credito_admin_creado", actor_id: userId, asociado_id: datos.asociadoId, solicitud_id: solicitudId });
+
+  // Aviso al asociado (no bloquea la respuesta si algo falla).
+  const [{ data: perfil }, { data: convenio }] = await Promise.all([
+    supabase.from("perfiles").select("nombre_completo, cedula, correo_institucional").eq("id", datos.asociadoId).single(),
+    datos.convenioId
+      ? supabase.from("convenios").select("nombre_empresa").eq("id", datos.convenioId).maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+  if (perfil) {
+    const correoPersonal = await correoDeCedula(perfil.cedula);
+    const correo = destinatariosAviso(correoPersonal);
+    await avisarCorreoInstitucional(correoPersonal, perfil.correo_institucional);
+    if (correo.length > 0) {
+      const empresa = (convenio as { nombre_empresa?: string } | null)?.nombre_empresa ?? "";
+      await enviarCreditoAsignado({
+        id: String(solicitudId ?? ""),
+        nombre: perfil.nombre_completo,
+        correo,
+        monto: datos.monto,
+        plazoMeses: datos.plazoMeses,
+        porcentaje: datos.porcentaje,
+        tipo: datos.tipoCredito === "convenio" ? `Convenio ${empresa}`.trim() : "Cooperativa",
+      });
+    }
+  }
+
+  revalidatePath("/admin/creditos");
+  revalidatePath("/cuenta");
+  revalidatePath("/cuenta/perfil");
+  return { mensaje: "Crédito creado y aprobado. Ya puedes marcarlo como desembolsado." };
 }
 
 // ---------------------------------------------------------------------------

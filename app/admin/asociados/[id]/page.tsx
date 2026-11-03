@@ -5,6 +5,7 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { ComprobantesPorBorrar, type ComprobantePorBorrar } from "@/components/admin/ComprobantesPorBorrar";
 import { fechaBogotaDeInstante } from "@/lib/fechas";
 import { CorreoIngresoAsociado } from "@/components/admin/CorreoIngresoAsociado";
+import { CorregirCedula } from "@/components/admin/CorregirCedula";
 import { DetalleProcesoAsociado } from "@/components/admin/DetalleProcesoAsociado";
 import { EditarDatosAsociado } from "@/components/admin/EditarDatosAsociado";
 import { EliminarAsociado } from "@/components/admin/EliminarAsociado";
@@ -85,6 +86,16 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
           <DetalleProcesoAsociado detalle={detalle} bloqueado={procesoBloqueado} soloProceso={!esAdmin} />
           {datosEditables ? (
             <EditarDatosAsociado asociadoId={asociado.id} datos={datosEditables} bloqueado={correoBloqueado} />
+          ) : null}
+          {/* «Corregir cédula»: mismo componente de /admin/creditos; mismas condiciones que «Editar datos». */}
+          {datosEditables ? (
+            <section aria-labelledby="titulo-cedula-ingreso" className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5.5">
+              <h2 id="titulo-cedula-ingreso" className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+                Cédula de ingreso
+              </h2>
+              <p className="m-0 text-15 font-bold text-admin-texto">C.C. {asociado.cedula}</p>
+              <CorregirCedula asociadoId={asociado.id} cedulaActual={asociado.cedula} bloqueado={correoBloqueado} />
+            </section>
           ) : null}
           {esAdmin && asociado.rol === "asociado" ? (
             <section aria-labelledby="titulo-foto-carne" className="flex items-center gap-4 rounded-20 bg-admin-superficie p-5.5">

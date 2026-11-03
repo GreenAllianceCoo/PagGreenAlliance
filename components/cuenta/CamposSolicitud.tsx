@@ -1,4 +1,10 @@
-import { MONTO_MINIMO } from "@/lib/credito";
+import {
+  MONTO_MINIMO,
+  PASO_MONTO,
+  opcionesCredito,
+  type OpcionCredito,
+  type PorcentajeCredito,
+} from "@/lib/credito";
 
 /** Un paquete de crédito (50 % / 100 %) del grado. Nunca lleva la tasa: el asociado no la ve. */
 export type PaqueteCampos = {
@@ -7,8 +13,8 @@ export type PaqueteCampos = {
   plazo_meses: number;
 };
 
-/** Paso del deslizador de monto (COP). */
-export const PASO_MONTO = 50000;
+/** Paso del deslizador de monto (COP); el mismo que exige el servidor (lib/credito.ts). */
+export { PASO_MONTO };
 
 export function formatoCOP(valor: number) {
   return `$${Math.round(valor).toLocaleString("es-CO")}`;
@@ -17,10 +23,11 @@ export function formatoCOP(valor: number) {
 type CamposSolicitudProps = {
   paquetes: PaqueteCampos[];
   gradoNombre: string;
-  /** "" = todavía no eligió (pieza 3t). */
-  porcentaje: "" | "50" | "100";
+  /** null = todavía no eligió (pieza 3t). */
+  porcentaje: PorcentajeCredito | null;
   monto: number;
-  onPorcentaje: (p: PaqueteCampos) => void;
+  /** Recibe la opción elegida con su cupo y el máximo del deslizador (para poner el monto en el tope). */
+  onPorcentaje: (opcion: OpcionCredito) => void;
   onMonto: (monto: number) => void;
   /** Errores por campo (solo la solicitud real los usa). */
   errorPorcentaje?: string;
@@ -29,6 +36,9 @@ type CamposSolicitudProps = {
 
 /**
  * Campos de «Solicita tu crédito» (pieza 3t): cupo del grado, porcentaje, monto y plazo.
+ * Porcentajes 50, 60, 70, 80, 90 y 100 % (nov-2026): 50 % y 100 % usan el cupo de su
+ * fila; los de en medio se interpolan en línea recta (`opcionesCredito`, lib/credito.ts,
+ * la misma cuenta que hace `crearSolicitud` en el servidor y el trigger de la base).
  * Compartido por /cuenta/solicitar (real, con Server Action) y la cuenta de demostración
  * (/admin/demo y /asesor/demo), para que se vean idénticos. Solo presentación: el estado
  * y el envío los pone quien lo usa. Sin tasa, cuota ni total.
@@ -43,10 +53,16 @@ export function CamposSolicitud({
   errorPorcentaje,
   errorMonto,
 }: CamposSolicitudProps) {
-  const paquete = paquetes.find((p) => p.porcentaje === porcentaje) ?? paquetes[0];
-  const montoMinimo = Math.min(MONTO_MINIMO, paquete.capacidad_maxima);
+  const opciones = opcionesCredito(paquetes);
+  const opcion = opciones.find((o) => o.porcentaje === porcentaje) ?? opciones[0];
+  // Plazo: el del paquete de 50 % para cualquier porcentaje (hoy 3 meses).
+  const plazoMeses = (paquetes.find((p) => p.porcentaje === "50") ?? paquetes[0])?.plazo_meses;
+  // Máximo del deslizador = cupo redondeado HACIA ABAJO al múltiplo de $50.000
+  // (p. ej. cupo $1.220.000 → máximo $1.200.000); el servidor acepta ese mismo valor.
+  const montoMaximo = opcion?.montoMaximo ?? 0;
+  const montoMinimo = Math.min(MONTO_MINIMO, montoMaximo);
   // Solo para dibujar el relleno verde debajo del slider (pieza 3d).
-  const rangoMonto = paquete.capacidad_maxima - montoMinimo;
+  const rangoMonto = montoMaximo - montoMinimo;
   const porcentajeMonto = rangoMonto > 0 ? ((monto - montoMinimo) / rangoMonto) * 100 : 100;
 
   return (
@@ -69,23 +85,25 @@ export function CamposSolicitud({
         aria-describedby={errorPorcentaje ? "porcentaje-error" : undefined}
       >
         <legend className="mb-1.5 p-0 text-15 font-bold">¿Qué porcentaje de tu cupo quieres?</legend>
-        <div className="grid grid-cols-2 gap-3">
-          {paquetes.map((p) => (
-            <label key={p.porcentaje} className="cursor-pointer">
+        {/* 6 opciones: 3 columnas también en celular (2 filas); cada tarjeta muestra su cupo. */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          {opciones.map((o) => (
+            <label key={o.porcentaje} className="cursor-pointer">
               <input
                 type="radio"
                 name="porcentaje"
-                value={p.porcentaje}
-                checked={porcentaje === p.porcentaje}
-                onChange={() => onPorcentaje(p)}
+                value={o.porcentaje}
+                checked={porcentaje === o.porcentaje}
+                onChange={() => onPorcentaje(o)}
                 // aria-invalid no aplica a radios: el error se enlaza desde el fieldset.
                 aria-describedby={errorPorcentaje ? "porcentaje-error" : undefined}
                 className="peer sr-only"
               />
-              <span className="flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-12 border-1.5 border-ga-borde bg-white px-3 py-2 text-center text-16 font-extrabold leading-tight text-ga-texto transition-colors peer-checked:border-ga-verde peer-checked:bg-ga-verde-tint peer-checked:text-ga-verde peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ga-verde">
-                <span>{p.porcentaje} %</span>
+              <span className="flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-12 border-1.5 border-ga-borde bg-white px-1.5 py-2 text-center text-16 font-extrabold leading-tight text-ga-texto transition-colors peer-checked:border-ga-verde peer-checked:bg-ga-verde-tint peer-checked:text-ga-verde peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ga-verde">
+                <span>{o.porcentaje} %</span>
                 <span className="text-13 font-semibold text-ga-texto-3">
-                  Hasta {formatoCOP(p.capacidad_maxima)}
+                  <span className="sr-only">Hasta </span>
+                  {formatoCOP(o.cupo)}
                 </span>
               </span>
             </label>
@@ -98,7 +116,7 @@ export function CamposSolicitud({
         ) : null}
       </fieldset>
 
-      {porcentaje === "" ? (
+      {porcentaje === null ? (
         <p className="m-0 text-14 text-ga-texto-3">Elige un porcentaje para escoger el monto.</p>
       ) : (
         <div className="flex flex-col gap-1.5">
@@ -124,7 +142,7 @@ export function CamposSolicitud({
               name="monto"
               type="range"
               min={montoMinimo}
-              max={paquete.capacidad_maxima}
+              max={montoMaximo}
               step={PASO_MONTO}
               value={monto}
               onChange={(e) => onMonto(Number(e.target.value))}
@@ -137,7 +155,7 @@ export function CamposSolicitud({
           </div>
           <div id="monto-ayuda" className="flex justify-between text-13 text-ga-texto-3">
             <span>Mínimo {formatoCOP(montoMinimo)}</span>
-            <span>Tope {formatoCOP(paquete.capacidad_maxima)}</span>
+            <span>Tope {formatoCOP(montoMaximo)}</span>
           </div>
           {errorMonto ? (
             <span id="monto-error" className="text-14 font-semibold text-ga-error">
@@ -148,11 +166,11 @@ export function CamposSolicitud({
       )}
 
       {/* Mismos cuadros grises que «Mis datos» en /cuenta. Sin tasa (25-sep); la cuota no se calcula. */}
-      {porcentaje !== "" ? (
+      {porcentaje !== null ? (
         <dl className="m-0 grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-0.5 rounded-12 bg-ga-fondo-suave p-3.5">
             <dt className="text-14 text-ga-texto-3">Plazo</dt>
-            <dd className="m-0 text-16 font-bold text-ga-texto">{paquete.plazo_meses} meses</dd>
+            <dd className="m-0 text-16 font-bold text-ga-texto">{plazoMeses} meses</dd>
           </div>
         </dl>
       ) : null}

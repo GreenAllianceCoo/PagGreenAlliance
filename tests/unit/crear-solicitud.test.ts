@@ -45,6 +45,13 @@ vi.mock("@/lib/servidor/registro", () => ({ registrar: vi.fn() }));
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { crearSolicitud } from "@/app/cuenta/solicitar/actions";
+import {
+  PORCENTAJES_CREDITO,
+  cupoParaPorcentaje,
+  esPorcentajeCredito,
+  montoMaximoParaCupo,
+  opcionesCredito,
+} from "@/lib/credito";
 
 // Copia de los datos de grados_credito de la migración 20260922000000 (la acción solo usa el tope).
 const GRADOS: Record<string, Record<string, { capacidad_maxima: number; cuota_mensual: number; plazo_meses: number }>> = {
@@ -193,8 +200,8 @@ beforeEach(() => {
 // Pruebas
 // ---------------------------------------------------------------------------
 
-describe("crearSolicitud · porcentaje de devolución", () => {
-  it.each(["", "0", "25", "75", "150", "50 ", " 100", "50%", "cien"])(
+describe("crearSolicitud · porcentaje del cupo (50 a 100, de 10 en 10)", () => {
+  it.each(["", "0", "25", "40", "55", "65", "75", "95", "110", "150", "50 ", " 100", "50%", "60.0", "cien"])(
     "rechaza el porcentaje %j y no inserta",
     async (porcentaje) => {
       const { insertados } = crearSupabaseFalso();
@@ -211,11 +218,57 @@ describe("crearSolicitud · porcentaje de devolución", () => {
     expect(insertados).toHaveLength(0);
   });
 
-  it.each(["50", "100"])("acepta el porcentaje %s", async (porcentaje) => {
+  it.each(["50", "60", "70", "80", "90", "100"])("acepta el porcentaje %s", async (porcentaje) => {
     const { insertados } = crearSupabaseFalso();
     const { redirigeA } = await enviar({ porcentaje, monto: "500000" });
     expect(redirigeA).toBe("/cuenta");
     expect(insertados).toHaveLength(1);
+    expect(insertados[0].porcentaje_credito).toBe(Number(porcentaje));
+  });
+});
+
+// PT: 50 % = 1.300.000 y 100 % = 2.700.000 → 60 % = 1.580.000, 70 % = 1.860.000,
+// 80 % = 2.140.000, 90 % = 2.420.000. PP 60 % = 1.220.000 (no es múltiplo de $50.000).
+describe("crearSolicitud · tope interpolado de 60 % a 90 %", () => {
+  it.each([
+    ["60", "1550000"],
+    ["70", "1850000"],
+    ["80", "2100000"],
+    ["90", "2400000"],
+  ])("PT al %s acepta el máximo del deslizador (%s)", async (porcentaje, monto) => {
+    const { insertados } = crearSupabaseFalso({ grado: "PT" });
+    const { redirigeA } = await enviar({ porcentaje, monto });
+    expect(redirigeA).toBe("/cuenta");
+    expect(insertados).toHaveLength(1);
+  });
+
+  it.each([
+    ["60", "1600000"],
+    ["70", "1900000"],
+    ["80", "2150000"],
+    ["90", "2450000"],
+  ])("PT al %s rechaza el siguiente paso sobre el tope (%s) y no inserta", async (porcentaje, monto) => {
+    const { insertados } = crearSupabaseFalso({ grado: "PT" });
+    const { resultado } = await enviar({ porcentaje, monto });
+    expect(resultado?.campo).toBe("monto");
+    expect(insertados).toHaveLength(0);
+  });
+
+  it("PP al 60 %: el máximo es 1.200.000 (cupo 1.220.000 redondeado hacia abajo) y 1.250.000 se rechaza", async () => {
+    const ok = crearSupabaseFalso({ grado: "PP" });
+    expect((await enviar({ porcentaje: "60", monto: "1200000" })).redirigeA).toBe("/cuenta");
+    expect(ok.insertados).toHaveLength(1);
+
+    const no = crearSupabaseFalso({ grado: "PP" });
+    expect((await enviar({ porcentaje: "60", monto: "1250000" })).resultado?.campo).toBe("monto");
+    expect(no.insertados).toHaveLength(0);
+  });
+
+  it("un 70 % no puede pedir el tope del 100 % (PT 2.700.000)", async () => {
+    const { insertados } = crearSupabaseFalso({ grado: "PT" });
+    const { resultado } = await enviar({ porcentaje: "70", monto: "2700000" });
+    expect(resultado?.error).toBeTruthy();
+    expect(insertados).toHaveLength(0);
   });
 });
 
@@ -381,7 +434,15 @@ describe("crearSolicitud · datos que se insertan", () => {
   it("inserta porcentaje y monto como los validó (sin reinterpretarlos)", async () => {
     const { insertados } = crearSupabaseFalso({ grado: "IT" });
     await enviar({ porcentaje: "100", monto: "2000000" });
-    expect(insertados[0]).toMatchObject({ porcentaje_devolucion: "100", monto_solicitado: 2000000 });
+    expect(insertados[0]).toMatchObject({ porcentaje_credito: 100, monto_solicitado: 2000000 });
+  });
+
+  it("inserta porcentaje_credito (número) y NO manda porcentaje_devolucion (lo deriva el trigger)", async () => {
+    const { insertados } = crearSupabaseFalso({ grado: "IT" });
+    await enviar({ porcentaje: "70", monto: "2500000", porcentaje_devolucion: "100" });
+    expect(insertados).toHaveLength(1);
+    expect(insertados[0]).toEqual({ asociado_id: ID_SESION, porcentaje_credito: 70, monto_solicitado: 2500000 });
+    expect(insertados[0]).not.toHaveProperty("porcentaje_devolucion");
   });
 });
 
@@ -456,5 +517,83 @@ describe("crearSolicitud · solo con el proceso operando y el asociado activo", 
     const { resultado } = await enviar({ porcentaje: "100", monto: "4250000" });
     expect(resultado?.error).toBeTruthy();
     expect(insertados).toHaveLength(0);
+  });
+});
+
+// Función pura compartida por el formulario (cliente) y crearSolicitud (servidor).
+describe("lib/credito · cupoParaPorcentaje y opcionesCredito", () => {
+  const PT = [
+    { porcentaje: "50", capacidad_maxima: 1300000 },
+    { porcentaje: "100", capacidad_maxima: 2700000 },
+  ];
+
+  it("los porcentajes permitidos son 50, 60, 70, 80, 90 y 100", () => {
+    expect([...PORCENTAJES_CREDITO]).toEqual([50, 60, 70, 80, 90, 100]);
+  });
+
+  it.each([
+    [50, 1300000],
+    [60, 1580000],
+    [70, 1860000],
+    [80, 2140000],
+    [90, 2420000],
+    [100, 2700000],
+  ])("PT al %i → %i", (porcentaje, esperado) => {
+    expect(cupoParaPorcentaje(PT, porcentaje)).toBe(esperado);
+  });
+
+  it("50 % y 100 % son exactamente los de su fila (también con porcentaje numérico)", () => {
+    const filas = [
+      { porcentaje: 100, capacidad_maxima: 4200000 },
+      { porcentaje: 50, capacidad_maxima: 2150000 },
+    ];
+    expect(cupoParaPorcentaje(filas, 50)).toBe(2150000);
+    expect(cupoParaPorcentaje(filas, 100)).toBe(4200000);
+  });
+
+  it("redondea al peso el cupo interpolado (como round() del trigger)", () => {
+    const filas = [
+      { porcentaje: "50", capacidad_maxima: 1000001 },
+      { porcentaje: "100", capacidad_maxima: 2000004 },
+    ];
+    // 1000001 + 1000003 × 0,2 = 1200001,6 → 1200002
+    expect(cupoParaPorcentaje(filas, 60)).toBe(1200002);
+  });
+
+  it.each([55, 65, 0, 40, 110])("devuelve undefined para el porcentaje no permitido %i", (porcentaje) => {
+    expect(cupoParaPorcentaje(PT, porcentaje)).toBeUndefined();
+  });
+
+  it("devuelve undefined si falta la fila de 50 % o la de 100 %", () => {
+    expect(cupoParaPorcentaje([PT[0]], 70)).toBeUndefined();
+    expect(cupoParaPorcentaje([PT[1]], 70)).toBeUndefined();
+    expect(cupoParaPorcentaje([], 50)).toBeUndefined();
+    expect(opcionesCredito([PT[0]])).toEqual([]);
+  });
+
+  it("el máximo del deslizador es el cupo redondeado hacia abajo a $50.000", () => {
+    expect(montoMaximoParaCupo(1220000)).toBe(1200000);
+    expect(montoMaximoParaCupo(1250000)).toBe(1250000);
+    expect(montoMaximoParaCupo(1299999)).toBe(1250000);
+  });
+
+  it("opcionesCredito da las 6 opciones con su cupo y su máximo", () => {
+    const PP = [
+      { porcentaje: "50", capacidad_maxima: 1000000 },
+      { porcentaje: "100", capacidad_maxima: 2100000 },
+    ];
+    expect(opcionesCredito(PP)).toEqual([
+      { porcentaje: 50, cupo: 1000000, montoMaximo: 1000000 },
+      { porcentaje: 60, cupo: 1220000, montoMaximo: 1200000 },
+      { porcentaje: 70, cupo: 1440000, montoMaximo: 1400000 },
+      { porcentaje: 80, cupo: 1660000, montoMaximo: 1650000 },
+      { porcentaje: 90, cupo: 1880000, montoMaximo: 1850000 },
+      { porcentaje: 100, cupo: 2100000, montoMaximo: 2100000 },
+    ]);
+  });
+
+  it("esPorcentajeCredito acepta el texto exacto o el número, nada más", () => {
+    for (const v of ["50", "60", "100", 70, 90]) expect(esPorcentajeCredito(v)).toBe(true);
+    for (const v of ["65", "50 ", "50%", "060", 55, null, undefined]) expect(esPorcentajeCredito(v)).toBe(false);
   });
 });

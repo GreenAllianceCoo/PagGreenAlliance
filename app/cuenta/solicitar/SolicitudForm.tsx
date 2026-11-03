@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { CamposSolicitud, type PaqueteCampos } from "@/components/cuenta/CamposSolicitud";
+import { opcionesCredito, type OpcionCredito, type PorcentajeCredito } from "@/lib/credito";
 import { crearSolicitud, type EstadoSolicitud } from "./actions";
 
 type Paquete = PaqueteCampos;
@@ -10,8 +11,9 @@ type Paquete = PaqueteCampos;
 const initialState: EstadoSolicitud = {};
 
 /**
- * Formulario de solicitud de crédito: porcentaje de devolución (50 / 100),
- * monto (mínimo $100.000, máximo el tope del grado) y el plazo del grado.
+ * Formulario de solicitud de crédito: porcentaje del cupo (50, 60, 70, 80, 90
+ * o 100 %), monto (mínimo $100.000, máximo el cupo de ese porcentaje
+ * redondeado hacia abajo a $50.000) y el plazo del paquete de 50 %.
  * Los campos se dibujan con `CamposSolicitud` (los mismos de la cuenta demo);
  * la acción vuelve a validar todo en el servidor.
  */
@@ -23,10 +25,8 @@ export default function SolicitudForm({
   gradoNombre: string;
 }) {
   // Pieza 3t: no hay porcentaje elegido de entrada; «Enviar solicitud» queda apagado hasta elegirlo.
-  const [porcentaje, setPorcentaje] = useState<"" | "50" | "100">("");
-  const paquete =
-    paquetes.find((p) => p.porcentaje === porcentaje) ?? paquetes[0];
-  const [monto, setMonto] = useState(paquete.capacidad_maxima);
+  const [porcentaje, setPorcentaje] = useState<PorcentajeCredito | null>(null);
+  const [monto, setMonto] = useState(() => opcionesCredito(paquetes)[0]?.montoMaximo ?? 0);
   const [state, formAction, pending] = useActionState(
     crearSolicitud,
     initialState,
@@ -54,9 +54,10 @@ export default function SolicitudForm({
     }
   }, [state]);
 
-  function seleccionarPorcentaje(nuevo: Paquete) {
+  function seleccionarPorcentaje(nuevo: OpcionCredito) {
     setPorcentaje(nuevo.porcentaje);
-    setMonto(nuevo.capacidad_maxima);
+    // Al elegir, el monto queda en el máximo que permite ese porcentaje.
+    setMonto(nuevo.montoMaximo);
   }
 
   return (
@@ -84,7 +85,7 @@ export default function SolicitudForm({
       ) : null}
 
       <Button
-        disabled={porcentaje === ""}
+        disabled={porcentaje === null}
         cargando={pending}
         textoCargando="Enviando…"
         className="lg:self-start lg:px-9"

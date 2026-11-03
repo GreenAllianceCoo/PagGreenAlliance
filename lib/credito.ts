@@ -14,6 +14,60 @@ export function interpolarPorcentaje(valor50: number, valor100: number, porcenta
   return valor50 + ((valor100 - valor50) * (porcentaje - 50)) / 50;
 }
 
+/** Paso del deslizador de monto (COP): el servidor también exige múltiplos de este valor (F-06). */
+export const PASO_MONTO = 50000;
+
+/** Porcentajes del cupo que el asociado puede elegir (decisión del dueño, nov-2026): múltiplos de 10. */
+export const PORCENTAJES_CREDITO = [50, 60, 70, 80, 90, 100] as const;
+export type PorcentajeCredito = (typeof PORCENTAJES_CREDITO)[number];
+
+/** ¿Es uno de los 6 porcentajes permitidos? Acepta el texto exacto del formulario («60») o el número. */
+export function esPorcentajeCredito(valor: unknown): valor is PorcentajeCredito | `${PorcentajeCredito}` {
+  return PORCENTAJES_CREDITO.some((p) => valor === p || valor === String(p));
+}
+
+/** Lo mínimo de un paquete de `grados_credito` que hace falta para el cupo (sin tasa). */
+type PaqueteCupo = { porcentaje: string | number; capacidad_maxima: number };
+
+/**
+ * Cupo (tope en pesos) para un porcentaje elegido: 50 % y 100 % son los de su
+ * fila de `grados_credito`; de 60 % a 90 % se interpola en línea recta entre
+ * los dos y se redondea al peso, igual que el trigger chk_monto_solicitud
+ * (`round(cupo interpolado)`). undefined si falta la fila de 50 % o la de 100 %,
+ * o si el porcentaje no es uno de los 6 permitidos.
+ */
+export function cupoParaPorcentaje(paquetes: readonly PaqueteCupo[], porcentaje: number): number | undefined {
+  if (!esPorcentajeCredito(porcentaje)) return undefined;
+  const de = (p: number) => paquetes.find((f) => Number(f.porcentaje) === p)?.capacidad_maxima;
+  const cupo50 = de(50);
+  const cupo100 = de(100);
+  if (cupo50 === undefined || cupo100 === undefined) return undefined;
+  return Math.round(interpolarPorcentaje(Number(cupo50), Number(cupo100), porcentaje));
+}
+
+/**
+ * Máximo del deslizador para un cupo: el múltiplo de $50.000 más alto que no lo
+ * supera (redondeo hacia abajo). El servidor acepta exactamente ese valor
+ * (monto ≤ cupo y múltiplo de $50.000), así que nunca se ofrece algo que se rechace.
+ */
+export function montoMaximoParaCupo(cupo: number) {
+  return Math.floor(cupo / PASO_MONTO) * PASO_MONTO;
+}
+
+/** Una opción del selector de porcentaje: su cupo y el máximo que permite el deslizador. */
+export type OpcionCredito = { porcentaje: PorcentajeCredito; cupo: number; montoMaximo: number };
+
+/** Las 6 opciones (50 % → 100 %) del grupo; [] si falta la fila de 50 % o la de 100 %. */
+export function opcionesCredito(paquetes: readonly PaqueteCupo[]): OpcionCredito[] {
+  const opciones: OpcionCredito[] = [];
+  for (const porcentaje of PORCENTAJES_CREDITO) {
+    const cupo = cupoParaPorcentaje(paquetes, porcentaje);
+    if (cupo === undefined) return [];
+    opciones.push({ porcentaje, cupo, montoMaximo: montoMaximoParaCupo(cupo) });
+  }
+  return opciones;
+}
+
 /** Total sugerido: monto + plazo × interés mensual a miles (misma fórmula de los cupos de `grados_credito`). */
 export function totalSugerido(monto: number, tasaMensual: number, plazoMeses: number) {
   return monto + plazoMeses * Math.round((monto * tasaMensual) / 1000) * 1000;
