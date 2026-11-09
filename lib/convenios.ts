@@ -86,6 +86,7 @@ const BASE: DatosBase[] = [
     especialidad: "Tecnología",
     nit: "902.038.118-7",
     medio: { tipo: "video", src: "/convenios/amb-movil.mp4" },
+    logoUrl: "/convenios/logos/amb-movil.webp",
     whatsapp: "3214612714",
     descripcion:
       "Como aliado estratégico, pondrá al alcance de nuestros asociados una amplia oferta de tecnología de punta, que incluye:",
