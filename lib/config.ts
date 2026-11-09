@@ -51,6 +51,9 @@ export function enlaceWhatsappFlotante(nombre?: string | null) {
 // Tiempo de respuesta a una solicitud de afiliación (confirmado por la cooperativa).
 export const TIEMPO_RESPUESTA = "poco tiempo";
 
+// Horario de atención de la cooperativa (pedido de Sebas, 8-nov): entre semana, 8:30 a. m. a 5:00 p. m.
+export const HORARIO_ATENCION = { dias: "Lunes a viernes", horas: "8:30 a. m. a 5:00 p. m." } as const;
+
 // Correo de contacto público.
 export const CORREO_CONTACTO = "soporte@greenallianceco.com";
 

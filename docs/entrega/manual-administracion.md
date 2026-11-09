@@ -28,6 +28,7 @@ Este manual explica, paso a paso, cómo usar el panel de administración. No hac
 16. Preguntas frecuentes
 17. Historial del equipo
 18. Plataforma: pausar el ingreso de asociados y avisos
+19. Cambios de los asociados
 
 ---
 
@@ -70,6 +71,7 @@ En computador el menú está a la izquierda; en celular, en pestañas arriba. Ti
 | Sorteo | Inscritos y boletas del sorteo mensual, y el botón para sortear |
 | Plataforma | Pausar el ingreso de asociados y publicar avisos para su próximo ingreso (solo el administrador; sección 18) |
 | Historial | Lo que hizo cada administrador y secretario (solo el administrador; sección 17) |
+| Cambios | Cada cambio en los asociados: datos con el valor anterior y el nuevo, fotos, proceso y sus documentos (solo el administrador; sección 19) |
 | Demostración | Una cuenta de ejemplo para mostrar la plataforma sin datos reales |
 
 ---
@@ -269,7 +271,7 @@ Tenga en cuenta:
 - El **correo de ingreso** (el personal) tampoco se cambia aquí: se usa la sección 6.
 - No puede editar sus propios datos ni los de sus propios clientes; debe hacerlo otro administrador.
 - El secretario no ve este bloque.
-- El cambio queda guardado en la base de datos (quién, cuándo y qué campos cambió, sin los valores), pero todavía **no aparece** en la sección «Historial».
+- El cambio queda en la sección **«Cambios»** (sección 19) con quién lo hizo, cuándo, y el **valor anterior y el nuevo** de cada dato. Los cambios hechos antes del 8 de noviembre de 2026 aparecen solo con el nombre del campo, sin valores.
 - Estos datos solo se pueden cambiar desde aquí: la base de datos rechaza cualquier otro camino.
 - Si cambia el **correo institucional** o la **cuenta de nómina**, el asociado verá un aviso («Actualizamos tus datos») la próxima vez que entre a su cuenta. El aviso dice qué cambió y cuándo, pero no muestra los datos nuevos. No se envía correo.
 - El asociado puede seguir cambiando su celular desde su perfil.
@@ -282,7 +284,35 @@ La cédula es **con lo que el asociado ingresa** a su cuenta. Si quedó mal escr
 2. Escriba la **cédula nueva** (solo números, 6 a 10 dígitos; los puntos y espacios se quitan solos) y el **motivo**. Revísela con el documento: desde que la guarde, el asociado solo podrá entrar con la nueva.
 3. Toque **«Guardar cédula»**.
 
-El cambio queda en el historial con el motivo. El asociado recibe un correo en su correo personal con la cédula nueva (sin el motivo); al institucional solo le llega el aviso genérico. No puede corregir su propia cédula ni la de sus propios clientes, y no puede usar una cédula que ya tenga otra cuenta. El secretario no ve este botón.
+El cambio queda en **«Cambios»** con la cédula anterior, la nueva y el motivo. El asociado recibe un correo en su correo personal con la cédula nueva (sin el motivo); al institucional solo le llega el aviso genérico. No puede corregir su propia cédula ni la de sus propios clientes, y no puede usar una cédula que ya tenga otra cuenta. El secretario no ve este botón.
+
+### 5.8 Ver y cambiar las fotos de afiliación
+
+En la ficha del asociado, el bloque **«Fotos de afiliación»** muestra las tres fotos que mandó al afiliarse: **cédula (frente)**, **cédula (reverso)** y **selfie**. Las fotos se cargan con un enlace que dura pocos minutos: si aparece «El enlace venció», recargue la página.
+
+Para cambiar una foto:
+
+1. Toque **«Cambiar …»** debajo de la foto.
+2. Elija la foto nueva (JPG, PNG o WEBP, máximo 5 MB) y escriba el **motivo** (de 5 a 300 caracteres).
+3. Toque **«Guardar foto»**. Verá «Foto actualizada. La anterior quedó en «Cambios»».
+
+Tenga en cuenta:
+
+- La foto anterior **no se borra**: queda en **«Cambios»** (sección 19), junto a la nueva, con el motivo, quién la cambió y cuándo.
+- Si el asociado **no subió una foto propia para el carné**, el carné usa la selfie de la afiliación, así que también cambia la foto de su carné.
+- No puede cambiar sus propias fotos ni las de sus propios clientes; debe hacerlo otro administrador (la selfie sirve para reconocer a la persona).
+- Si el asociado no tiene una afiliación aprobada (por ejemplo, una cuenta creada a mano), el bloque lo dice y no hay fotos.
+- El secretario no ve este bloque.
+
+### 5.9 Documentos del proceso (PDF)
+
+En la ficha del asociado, el bloque **«Documentos del proceso»** guarda los PDF de su proceso ejecutivo (por ejemplo, la demanda o el auto que libra mandamiento de pago). Puede haber varios.
+
+- **Subir:** toque **«Subir PDF»**, escriba el **nombre del documento** (si lo deja vacío, se propone el nombre del archivo) y elija el archivo (solo PDF, máximo 10 MB). Toque **«Guardar documento»**.
+- **Descargar:** toque **«Descargar»** en la fila del documento. El archivo se guarda con su nombre (por ejemplo, `demanda-ejecutiva.pdf`).
+- **Quitar:** toque **«Quitar»**, escriba el motivo y toque **«Quitar documento»**. El archivo se borra, pero en **«Cambios»** queda que se subió, que se quitó, quién y por qué.
+
+Solo el administrador sube, descarga y quita documentos. No puede subirlos a su propio proceso. El secretario y el asociado no los ven.
 
 ---
 
@@ -573,6 +603,8 @@ En **«Empresas en convenio»**, cada convenio tiene:
 - **«Ocultar»** y **«Mostrar»:** lo quitan de la vista del público sin borrarlo. Es la opción recomendada si un convenio se suspende por un tiempo.
 - **«Eliminar»:** lo borra definitivamente. Pide confirmación y **no se puede deshacer**.
 
+> Los logos de **Dr. Ribero, Locos por los Viajes, Dream & Go, SB7 y El Decreto**, y el video de **SB7**, los dejó el equipo técnico dentro de la página (8-nov). Si sube otro logo desde **«Editar»**, el nuevo reemplaza al anterior; si marca «Quitar el logo actual», vuelve a verse el emoji.
+
 ---
 
 ## 12. Modo demostración
@@ -617,7 +649,8 @@ El **secretario** es una persona de apoyo que revisa las afiliaciones, consulta 
 - **Dar de baja ni reactivar** a un asociado, ni **eliminarlo definitivamente**.
 - **Habilitar un nuevo crédito**, **aprobar, rechazar o marcar el desembolso** de un crédito, ni **subir o ver comprobantes**.
 - **Cambiar el correo de ingreso** de un asociado, **editar sus datos** (nombre, celular, correo institucional o cuenta de nómina) ni ver su foto del carné.
-- Entrar a **Asesores, Alertas, Convenios, Sorteo, Plataforma, Historial ni Demostración**: esas secciones **no aparecen** en su menú y, si escribe la dirección a mano, la plataforma lo devuelve al Resumen. Tampoco puede registrar pagos de comisión ni hacer el sorteo.
+- Ver o cambiar las **fotos de afiliación** de un asociado desde su ficha, ni ver, subir o descargar los **documentos del proceso**.
+- Entrar a **Asesores, Alertas, Convenios, Sorteo, Plataforma, Historial, Cambios ni Demostración**: esas secciones **no aparecen** en su menú y, si escribe la dirección a mano, la plataforma lo devuelve al Resumen. Tampoco puede registrar pagos de comisión ni hacer el sorteo.
 - Cambiar su propio rol ni el de nadie.
 
 Los botones que no le corresponden **no se muestran**, y además la plataforma y la base de datos los rechazan aunque alguien intente usarlos por otro camino.
@@ -759,3 +792,21 @@ Tenga en cuenta:
 - No se envía por correo ni llega como notificación al celular: aparece cuando la persona entra.
 - En la lista de avisos se ve quién lo publicó, cuándo y **cuántos asociados ya lo vieron**.
 - **«Retirar»** deja de mostrar el aviso a quienes todavía no lo han visto. No se puede editar ni borrar: si se equivocó, retírelo y publique uno nuevo.
+
+---
+
+## 19. Cambios de los asociados
+
+Solo el **administrador** ve la sección **«Cambios»** del menú. Muestra **cada cambio en los asociados**, lo más reciente primero, con quién lo hizo y la fecha y hora de Colombia:
+
+- **datos** (nombre, celular, correo institucional, cuenta de nómina) y **cédula**, con el **valor anterior tachado y el nuevo** al lado;
+- **fotos de afiliación**: la foto de **antes** y la de **después**, una al lado de la otra, con el motivo;
+- **foto del carné** que sube o quita el propio asociado;
+- **correo de ingreso**, **asesor**, **bajas y reactivaciones** (con su motivo) y **proceso ejecutivo** (estado anterior y nuevo);
+- **documentos del proceso** subidos y quitados (con el motivo).
+
+**Filtros.** Arriba puede buscar un **asociado** por su nombre o por su **cédula completa**, y elegir **Desde** y **Hasta** (días, ambos incluidos). Toque **«Filtrar»**; **«Quitar filtros»** vuelve a mostrar todo. Desde la ficha de un asociado, **«Ver todos sus cambios»** abre esta sección solo con los de esa persona.
+
+**Páginas.** Se muestran 25 cambios por página, con **«Anterior»** y **«Siguiente»**.
+
+> Si un asociado se **elimina definitivamente**, también se borran sus fotos (las actuales y las anteriores), sus documentos del proceso y los valores guardados de sus cambios.

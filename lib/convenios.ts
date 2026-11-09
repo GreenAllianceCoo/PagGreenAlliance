@@ -105,6 +105,7 @@ const BASE: DatosBase[] = [
     especialidad: "Viajes y turismo",
     nit: "901.865.816-3",
     medio: { tipo: "video", src: "/convenios/locos-por-los-viajes.mp4" },
+    logoUrl: "/convenios/logos/locos-por-los-viajes.webp",
     whatsapp: "3103397949",
     descripcion:
       "Con el respaldo de nuestra agencia de viajes de confianza, los asociados contarán con asesoría experta para planificar sus próximas vacaciones en familia, a través de:",
@@ -125,6 +126,7 @@ const BASE: DatosBase[] = [
     especialidad: "Odontología estética",
     nit: "1.090.464.475-4",
     medio: { tipo: "video", src: "/convenios/dr-ribero.mp4" },
+    logoUrl: "/convenios/logos/dr-ribero.webp",
     whatsapp: "3144612829",
     descripcion:
       "Red de servicios de salud odontológica que da prioridad a la atención de nuestros asociados: un equipo humano altamente capacitado y materiales de primera calidad garantizan a cada paciente una experiencia cómoda y agradable.",
@@ -161,6 +163,7 @@ const BASE: DatosBase[] = [
     especialidad: "Trámite de visas",
     nit: "52.953.735-3",
     medio: { tipo: "video", src: "/convenios/dream-go-visas.mp4" },
+    logoUrl: "/convenios/logos/dream-go-visas.webp",
     whatsapp: "3192544799",
     descripcion:
       "Mediante este convenio estratégico, ofreceremos acompañamiento integral durante la solicitud de visa, desde el inicio hasta su finalización. Profesionales especializados orientarán el diligenciamiento de formularios y evaluarán cada perfil para reducir el riesgo de rechazo en trámites individuales o grupales.",

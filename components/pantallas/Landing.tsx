@@ -23,7 +23,15 @@ export type LandingProps = {
   whatsappUrl?: string | null;
   correo: string;
   textoVigilancia: string;
+  /** Horario de atención (lib/config.ts HORARIO_ATENCION), junto al WhatsApp al final. */
+  horario?: { dias: string; horas: string };
 };
+
+// Contenedor común de todas las secciones (rediseño responsive, 8-nov): antes cada sección
+// tenía su ancho (1280 px unas, ancho completo otras) y en pantallas grandes los cuadros se
+// veían pequeños. Ahora todas comparten el mismo ancho (hasta 1600 px) y el mismo margen.
+// El pie de página NO usa este contenedor: conserva su tamaño (pedido de Sebas).
+const CONTENEDOR = "mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-10 xl:px-14";
 
 // Clases de los botones «píldora» del hero, propias de esta pantalla (altura
 // 56/58 px, no las 54 px de components/ui/Button). Desde la tanda 2 del
@@ -43,7 +51,7 @@ const ENLACE_NAV_DESKTOP =
 const SERVICIOS: Array<{ titulo: string; texto: string; puntoBg: string; fondo: string; oscuro?: boolean }> = [
   {
     titulo: "Microcréditos",
-    texto: "Pídelo en línea desde la plataforma, con modalidad del 50 % o 100 % y un tope claro según tu grado.",
+    texto: "Pídelo en línea desde la plataforma, eligiendo del 50 % al 100 % y con un tope claro según tu grado.",
     puntoBg: "bg-ga-verde",
     fondo: "bg-ga-verde-claro",
   },
@@ -89,12 +97,12 @@ const PASOS_ALIVIO: Array<{ numero: string; fondo: string; numeroFg: string; tit
 // Sedes (pieza 2a): Bogotá + 4 sucursales.
 const SEDES = ["Bogotá · sede principal", "Valledupar, Cesar", "Bosconia, Cesar", "La Jagua de Ibirico, Cesar", "Hatonuevo, La Guajira"];
 
-export function Landing({ convenios, whatsapp, whatsappUrl, correo, textoVigilancia }: LandingProps) {
+export function Landing({ convenios, whatsapp, whatsappUrl, correo, textoVigilancia, horario }: LandingProps) {
   return (
     <div className="flex min-h-dvh flex-col overflow-x-clip bg-ga-fondo-suave">
-      {/* Encabezado: píldora blanca flotante (pieza 2a). */}
-      <header className="px-4 pb-0 pt-4 lg:px-10 lg:pt-4">
-        <div className="mx-auto flex h-15 max-w-[1280px] items-center justify-between gap-3 rounded-full bg-white pl-3.5 pr-2 lg:h-[68px] lg:pl-5 lg:pr-3 lg:shadow-pildora">
+      {/* Encabezado: píldora blanca flotante (pieza 2a), del mismo ancho que las secciones. */}
+      <header className={`${CONTENEDOR} pb-0 pt-4`}>
+        <div className="flex h-15 items-center justify-between gap-3 rounded-full bg-white pl-3.5 pr-2 lg:h-[68px] lg:pl-5 lg:pr-3 lg:shadow-pildora">
           <Link href="/" aria-label="Cooperativa Green Alliance, inicio" className="block h-11 w-logo min-w-0 shrink">
             <Logo tone="dark" />
           </Link>
@@ -125,8 +133,8 @@ export function Landing({ convenios, whatsapp, whatsappUrl, correo, textoVigilan
 
       <main className="flex grow flex-col">
         {/* Hero */}
-        <section className="mx-auto grid w-full max-w-[1280px] gap-8 px-4 pb-10 pt-8 lg:grid-cols-2 lg:items-center lg:gap-10 lg:px-16 lg:pb-[72px] lg:pt-14">
-          <div className="flex flex-col gap-5 lg:gap-5.5">
+        <section className={`${CONTENEDOR} grid gap-8 pb-10 pt-8 lg:grid-cols-2 lg:items-center lg:gap-12 lg:pb-[72px] lg:pt-14 xl:gap-16 xl:pb-24 xl:pt-20`}>
+          <div className="flex flex-col gap-5 lg:gap-5.5 xl:gap-7">
             <span
               className="motion-safe:animate-ga-entrada self-start inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-13 font-bold text-ga-navy lg:text-14"
             >
@@ -134,15 +142,15 @@ export function Landing({ convenios, whatsapp, whatsappUrl, correo, textoVigilan
               <span className="lg:hidden">Policía · Ejército</span>
               <span className="hidden lg:inline">Policía Nacional · Ejército Nacional</span>
             </span>
-            <h1 className="motion-safe:animate-ga-entrada m-0 [text-wrap:balance] font-display text-44 font-extrabold leading-102 tracking-hero text-ga-navy [animation-delay:70ms] lg:text-76 lg:leading-none">
+            <h1 className="motion-safe:animate-ga-entrada m-0 [text-wrap:balance] font-display text-44 font-extrabold leading-102 tracking-hero text-ga-navy [animation-delay:70ms] sm:text-56 lg:text-76 lg:leading-none xl:text-88">
               Crédito entre compañeros, con{" "}
               <span className="rounded-12 bg-ga-ambar-fondo-fuerte px-1.5 lg:rounded-20 lg:px-3">reglas claras.</span>
             </h1>
-            <p className="motion-safe:animate-ga-entrada m-0 max-w-[520px] text-17 leading-155 text-ga-texto-2 [animation-delay:140ms] lg:text-20">
+            <p className="motion-safe:animate-ga-entrada m-0 max-w-[520px] text-17 leading-155 text-ga-texto-2 [animation-delay:140ms] lg:text-20 xl:max-w-[620px] xl:text-22">
               Somos una cooperativa hecha por y para la familia policial y militar. Pides en línea, sabes tu tope
               desde el inicio y ves cada paso de tu solicitud.
             </p>
-            <div className="motion-safe:animate-ga-entrada flex flex-col gap-3 [animation-delay:210ms] lg:flex-row">
+            <div className="motion-safe:animate-ga-entrada flex flex-col gap-3 [animation-delay:210ms] sm:flex-row">
               {/* Con sesión activa, proxy.ts redirige /ingresar → /cuenta. */}
               <Link href="/ingresar" className={PILDORA_PRIMARIA}>
                 Solicitar crédito
@@ -157,57 +165,58 @@ export function Landing({ convenios, whatsapp, whatsappUrl, correo, textoVigilan
             <div className="motion-safe:animate-ga-entrada mt-1 flex gap-8 [animation-delay:280ms] lg:gap-10">
               {/* §12.8: sin «+200 asociados»; el tiempo de respuesta ya no es una cifra. */}
               <div className="flex flex-col gap-1">
-                <span className="font-display text-44 font-extrabold leading-none tracking-cifra text-ga-navy lg:text-64">
+                <span className="font-display text-44 font-extrabold leading-none tracking-cifra text-ga-navy lg:text-64 xl:text-76">
                   Aprobados
                 </span>
-                <span className="text-14 text-ga-texto-2 lg:text-15">en poco tiempo</span>
+                <span className="text-14 text-ga-texto-2 lg:text-15 xl:text-17">en poco tiempo</span>
               </div>
             </div>
           </div>
 
           {/* Ilustración: manchas orgánicas + matriz de círculos + comprobante vivo. Sin fotos de personas. */}
-          <div className="relative flex flex-col gap-4 lg:block lg:h-[560px]">
-            <div className="relative flex h-[210px] items-center justify-center overflow-hidden rounded-20 bg-transparent lg:absolute lg:inset-x-6 lg:top-0 lg:h-[380px] lg:overflow-visible">
+          <div className="relative flex flex-col gap-4 lg:block lg:h-[560px] xl:h-[640px]">
+            <div className="relative flex h-[210px] items-center justify-center overflow-hidden rounded-20 bg-transparent sm:h-[260px] lg:absolute lg:inset-x-6 lg:top-0 lg:h-[380px] lg:overflow-visible xl:h-[440px]">
               {/* Mancha navy: rectángulo redondeado en celular; forma orgánica en escritorio. */}
               <div className="absolute inset-0 rounded-20 bg-ga-navy lg:hidden" aria-hidden />
               <div
-                className="absolute hidden lg:right-[4%] lg:top-0 lg:block lg:h-[380px] lg:w-[420px] lg:bg-ga-navy"
+                className="absolute hidden lg:right-[4%] lg:top-0 lg:block lg:h-[380px] lg:w-[420px] lg:bg-ga-navy xl:h-[440px] xl:w-[500px]"
                 style={{ borderRadius: "44% 56% 62% 38% / 52% 40% 60% 48%" }}
                 aria-hidden
               />
               {/* Mancha verde claro, orgánica en las dos versiones. */}
               <div
-                className="absolute inset-4 bg-ga-verde-claro lg:inset-auto lg:right-[-6%] lg:top-0 lg:h-[300px] lg:w-[380px]"
+                className="absolute inset-4 bg-ga-verde-claro lg:inset-auto lg:right-[-6%] lg:top-0 lg:h-[300px] lg:w-[380px] xl:h-[350px] xl:w-[450px]"
                 style={{ borderRadius: "52% 48% 44% 56% / 55% 45% 55% 45%" }}
                 aria-hidden
               />
-              <div className="absolute left-4 top-4 h-6 w-6 rounded-full bg-ga-ambar-fondo-fuerte lg:left-[8%] lg:top-[6%] lg:h-16 lg:w-16" aria-hidden />
+              <div className="absolute left-4 top-4 h-6 w-6 rounded-full bg-ga-ambar-fondo-fuerte lg:left-[8%] lg:top-[6%] lg:h-16 lg:w-16 xl:h-20 xl:w-20" aria-hidden />
               <MatrizCirculos celda={44} espacio={7} className="relative z-10 lg:hidden" />
-              <MatrizCirculos celda={72} espacio={10} className="relative z-10 hidden lg:block" />
+              <MatrizCirculos celda={72} espacio={10} className="relative z-10 hidden lg:block xl:hidden" />
+              <MatrizCirculos celda={84} espacio={12} className="relative z-10 hidden xl:block" />
             </div>
             <ComprobanteSolicitud variante="movil" className="lg:hidden" />
             <ComprobanteSolicitud
               variante="desktop"
-              className="hidden lg:absolute lg:bottom-0 lg:right-0 lg:block lg:w-[400px]"
+              className="hidden lg:absolute lg:bottom-0 lg:right-0 lg:block lg:w-[400px] xl:w-[460px]"
             />
           </div>
         </section>
 
         {/* Misión / visión */}
-        <section className="mx-auto flex w-full max-w-[1280px] flex-col gap-4 px-4 pb-8 lg:flex-row lg:gap-5 lg:px-16 lg:pb-0">
-          <article className="relative flex flex-col gap-3 overflow-hidden rounded-24 bg-white p-6 lg:gap-3.5 lg:rounded-32 lg:p-9">
+        <section className={`${CONTENEDOR} grid grid-cols-1 gap-4 pb-8 lg:grid-cols-2 lg:gap-5 lg:pb-0 xl:gap-6`}>
+          <article className="relative flex flex-col gap-3 overflow-hidden rounded-24 bg-white p-6 sm:p-8 lg:min-h-[300px] lg:gap-3.5 lg:rounded-32 lg:p-10 xl:min-h-[340px] xl:gap-4 xl:p-12">
             <span
               aria-hidden
-              className="absolute -right-8 -top-9 h-[130px] w-[150px] bg-ga-verde-claro lg:h-[180px] lg:w-[200px]"
+              className="absolute -right-8 -top-9 h-[130px] w-[150px] bg-ga-verde-claro lg:h-[180px] lg:w-[200px] xl:h-[220px] xl:w-[250px]"
               style={{ borderRadius: "58% 42% 55% 45% / 48% 58% 42% 52%" }}
             />
-            <span className="relative text-13 font-extrabold uppercase tracking-etiqueta text-ga-verde">
+            <span className="relative text-13 font-extrabold uppercase tracking-etiqueta text-ga-verde xl:text-14">
               Nuestra misión
             </span>
-            <p className="relative m-0 max-w-[500px] font-display text-26 font-extrabold leading-110 tracking-titular text-ga-navy lg:text-34">
+            <p className="relative m-0 max-w-[560px] font-display text-26 font-extrabold leading-110 tracking-titular text-ga-navy lg:text-34 xl:max-w-[640px] xl:text-40">
               Ser escudo y lazo solidario para la familia de la Policía Nacional y el Ejército Nacional.
             </p>
-            <p className="relative m-0 text-16 leading-150 text-ga-texto-2 lg:text-17 lg:leading-155">
+            <p className="relative m-0 text-16 leading-150 text-ga-texto-2 lg:text-17 lg:leading-155 xl:text-18">
               <span className="lg:hidden">
                 Microcréditos de fácil acceso, orientación financiera y acompañamiento jurídico integral.
               </span>
@@ -217,19 +226,19 @@ export function Landing({ convenios, whatsapp, whatsappUrl, correo, textoVigilan
               </span>
             </p>
           </article>
-          <article className="relative flex flex-col gap-3 overflow-hidden rounded-24 bg-ga-navy p-6 text-white lg:gap-3.5 lg:rounded-32 lg:p-9">
+          <article className="relative flex flex-col gap-3 overflow-hidden rounded-24 bg-ga-navy p-6 text-white sm:p-8 lg:min-h-[300px] lg:gap-3.5 lg:rounded-32 lg:p-10 xl:min-h-[340px] xl:gap-4 xl:p-12">
             <span
               aria-hidden
-              className="absolute -bottom-10 -right-6 h-[130px] w-[150px] bg-ga-navy-claro lg:h-[200px] lg:w-[220px]"
+              className="absolute -bottom-10 -right-6 h-[130px] w-[150px] bg-ga-navy-claro lg:h-[200px] lg:w-[220px] xl:h-[240px] xl:w-[270px]"
               style={{ borderRadius: "44% 56% 62% 38% / 52% 40% 60% 48%" }}
             />
-            <span className="relative text-13 font-extrabold uppercase tracking-etiqueta text-ga-menta">
+            <span className="relative text-13 font-extrabold uppercase tracking-etiqueta text-ga-menta xl:text-14">
               Nuestra visión
             </span>
-            <p className="relative m-0 font-display text-24 font-extrabold leading-110 lg:text-34">
+            <p className="relative m-0 max-w-[640px] font-display text-24 font-extrabold leading-110 lg:text-34 xl:text-40">
               Liderar el cooperativismo colombiano por identidad y arraigo institucional.
             </p>
-            <p className="relative m-0 hidden max-w-[500px] text-16 leading-150 text-ga-navy-texto-suave lg:block lg:text-17 lg:leading-155">
+            <p className="relative m-0 hidden max-w-[560px] text-16 leading-150 text-ga-navy-texto-suave lg:block lg:text-17 lg:leading-155 xl:max-w-[620px] xl:text-18">
               Con una organización moderna y de proyección internacional, capaz de asegurar el bienestar financiero
               de nuestros hombres y mujeres.
             </p>
@@ -237,61 +246,64 @@ export function Landing({ convenios, whatsapp, whatsappUrl, correo, textoVigilan
         </section>
 
         {/* «Si hoy el banco te dice que no…» */}
-        <section
-          id="c-como-funciona"
-          className="mx-4 mt-8 scroll-mt-4 rounded-28 bg-white p-6 lg:mx-16 lg:mt-12 lg:grid lg:grid-cols-[.9fr_1.1fr] lg:items-center lg:gap-12 lg:rounded-36 lg:p-12"
-        >
-          <div className="flex flex-col gap-3 lg:gap-4">
-            <h2 className="m-0 font-display text-28 font-extrabold leading-110 tracking-titular text-ga-navy lg:text-44">
-              Si hoy el banco te dice que no, aquí empezamos de nuevo.
-            </h2>
-            <p className="m-0 text-16 leading-150 text-ga-texto-2 lg:text-18 lg:leading-155">
-              Muchos compañeros quedan atrapados en deudas que terminan afectando su tranquilidad y su familia. Te
-              proponemos una alternativa pensada para tu caso y te acompañamos de principio a fin.
-            </p>
-          </div>
-          <div className="mt-5 flex flex-col gap-3.5 lg:mt-0">
-            <div className="flex items-baseline gap-3">
-              <span className="whitespace-nowrap font-display text-56 font-extrabold leading-90 tracking-cifra-grande text-ga-verde lg:text-88">
-                3 años
-              </span>
-              <span className="text-15 font-bold text-ga-texto-2 lg:text-17">
-                para volver al sistema financiero tradicional, sin rechazos
-              </span>
+        <section id="c-como-funciona" className={`${CONTENEDOR} mt-8 scroll-mt-4 lg:mt-12 xl:mt-16`}>
+          {/* Título y texto lado a lado arriba; la cifra y los 3 pasos ocupan todo el ancho abajo. */}
+          <div className="flex flex-col gap-5 rounded-28 bg-white p-6 sm:p-8 lg:gap-10 lg:rounded-36 lg:p-12 xl:gap-12 xl:p-16">
+            <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[1.25fr_1fr] lg:items-end lg:gap-12 xl:gap-16">
+              <h2 className="m-0 font-display text-28 font-extrabold leading-110 tracking-titular text-ga-navy sm:text-34 lg:text-44 xl:text-56">
+                Si hoy el banco te dice que no, aquí empezamos de nuevo.
+              </h2>
+              <p className="m-0 text-16 leading-150 text-ga-texto-2 lg:text-18 lg:leading-155 xl:text-20">
+                Muchos compañeros quedan atrapados en deudas que terminan afectando su tranquilidad y su familia. Te
+                proponemos una alternativa pensada para tu caso y te acompañamos de principio a fin.
+              </p>
             </div>
-            <ol className="m-0 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-3">
-              {PASOS_ALIVIO.map((paso) => (
-                <li key={paso.numero} className={`flex flex-col gap-1.5 rounded-22 p-4.5 ${paso.fondo}`}>
-                  <span className={`font-display text-30 font-extrabold ${paso.numeroFg}`}>{paso.numero}</span>
-                  <strong className="text-17">{paso.titulo}</strong>
-                  <span className="text-15 leading-145 text-ga-texto-2">{paso.texto}</span>
-                </li>
-              ))}
-            </ol>
+            <div className="flex flex-col gap-3.5 xl:gap-5">
+              <div className="flex items-baseline gap-3">
+                <span className="whitespace-nowrap font-display text-56 font-extrabold leading-90 tracking-cifra-grande text-ga-verde lg:text-88 xl:text-[104px]">
+                  3 años
+                </span>
+                <span className="text-15 font-bold text-ga-texto-2 lg:text-17 xl:text-20">
+                  para volver al sistema financiero tradicional, sin rechazos
+                </span>
+              </div>
+              <ol className="m-0 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-3 xl:gap-4">
+                {PASOS_ALIVIO.map((paso) => (
+                  <li
+                    key={paso.numero}
+                    className={`flex flex-col gap-1.5 rounded-22 p-4.5 lg:p-6 xl:gap-2 xl:rounded-24 xl:p-8 ${paso.fondo}`}
+                  >
+                    <span className={`font-display text-30 font-extrabold xl:text-40 ${paso.numeroFg}`}>{paso.numero}</span>
+                    <strong className="text-17 xl:text-20">{paso.titulo}</strong>
+                    <span className="text-15 leading-145 text-ga-texto-2 xl:text-17">{paso.texto}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
         </section>
 
         {/* Lo que encuentras en Green Alliance (antes «Tres apoyos, una cooperativa») */}
-        <section id="c-apoyos" className="mx-auto flex w-full scroll-mt-4 max-w-[1280px] flex-col gap-5 px-4 pb-10 pt-14 lg:gap-6 lg:px-16 lg:pb-16 lg:pt-22">
-          <h2 className="m-0 font-display text-28 font-extrabold tracking-titular text-ga-navy lg:text-44">
+        <section id="c-apoyos" className={`${CONTENEDOR} flex scroll-mt-4 flex-col gap-5 pb-10 pt-14 lg:gap-6 lg:pb-16 lg:pt-22 xl:gap-8 xl:pb-20 xl:pt-28`}>
+          <h2 className="m-0 font-display text-28 font-extrabold tracking-titular text-ga-navy sm:text-34 lg:text-44 xl:text-56">
             Lo que encuentras en Green Alliance
           </h2>
-          <div className="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-5 xl:gap-6">
             {SERVICIOS.map((s) => (
               <article
                 key={s.titulo}
-                className={`relative flex min-h-[180px] flex-col gap-2.5 overflow-hidden rounded-24 p-5 lg:min-h-[220px] lg:gap-2.5 lg:rounded-28 lg:p-6 ${s.fondo} ${s.oscuro ? "text-white" : ""}`}
+                className={`relative flex min-h-[180px] flex-col gap-2.5 overflow-hidden rounded-24 p-5 sm:p-6 lg:min-h-[260px] lg:gap-3 lg:rounded-28 lg:p-8 xl:min-h-[320px] xl:gap-4 xl:rounded-32 xl:p-10 ${s.fondo} ${s.oscuro ? "text-white" : ""}`}
               >
                 <span
                   aria-hidden
-                  className={`absolute -bottom-10 -right-8 h-[120px] w-[130px] ${s.oscuro ? "bg-blob-claro" : "bg-blob-oscuro"}`}
+                  className={`absolute -bottom-10 -right-8 h-[120px] w-[130px] lg:h-[160px] lg:w-[170px] xl:h-[200px] xl:w-[210px] ${s.oscuro ? "bg-blob-claro" : "bg-blob-oscuro"}`}
                   style={{ borderRadius: "58% 42% 55% 45% / 48% 58% 42% 52%" }}
                 />
-                <span className={`relative h-11 w-11 rounded-full ${s.puntoBg}`} />
-                <strong className={`relative font-display text-22 font-extrabold leading-115 ${s.oscuro ? "text-white" : "text-ga-navy"}`}>
+                <span className={`relative h-11 w-11 rounded-full xl:h-14 xl:w-14 ${s.puntoBg}`} />
+                <strong className={`relative font-display text-22 font-extrabold leading-115 lg:text-26 xl:text-32 ${s.oscuro ? "text-white" : "text-ga-navy"}`}>
                   {s.titulo}
                 </strong>
-                <p className={`relative m-0 text-16 leading-150 ${s.oscuro ? "text-ga-navy-texto-suave" : "text-ga-texto-2"}`}>
+                <p className={`relative m-0 text-16 leading-150 lg:text-17 xl:text-20 ${s.oscuro ? "text-ga-navy-texto-suave" : "text-ga-texto-2"}`}>
                   {s.texto}
                 </p>
               </article>
@@ -300,13 +312,13 @@ export function Landing({ convenios, whatsapp, whatsappUrl, correo, textoVigilan
         </section>
 
         {/* Empresas en convenio */}
-        <section id="c-convenios" className="mx-auto flex w-full scroll-mt-4 max-w-[1280px] flex-col gap-5 px-4 py-11 lg:gap-6 lg:px-16 lg:py-20">
+        <section id="c-convenios" className={`${CONTENEDOR} flex scroll-mt-4 flex-col gap-5 py-11 lg:gap-6 lg:py-20 xl:gap-8 xl:py-24`}>
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
-            <div className="flex max-w-texto-convenios flex-col gap-2 lg:gap-2.5">
-              <h2 className="m-0 font-display text-28 font-extrabold tracking-titular text-ga-navy lg:text-44">
+            <div className="flex max-w-texto-convenios flex-col gap-2 lg:gap-2.5 xl:max-w-[760px]">
+              <h2 className="m-0 font-display text-28 font-extrabold tracking-titular text-ga-navy sm:text-34 lg:text-44 xl:text-56">
                 Empresas en convenio
               </h2>
-              <p className="m-0 text-16 leading-150 text-ga-texto-2 lg:text-17 lg:leading-155">
+              <p className="m-0 text-16 leading-150 text-ga-texto-2 lg:text-17 lg:leading-155 xl:text-20">
                 Condiciones preferenciales y el respaldo de la cooperativa en cada compra o servicio.
               </p>
             </div>
@@ -322,31 +334,34 @@ export function Landing({ convenios, whatsapp, whatsappUrl, correo, textoVigilan
           <ListaConvenios convenios={convenios} variante="landing" />
         </section>
 
-        {/* Sedes */}
-        <section className="mx-4 mb-8 lg:mx-16 lg:mb-16">
-          <article className="relative flex flex-col gap-3.5 overflow-hidden rounded-28 bg-ga-navy p-6 text-white lg:gap-4 lg:rounded-36 lg:p-9">
+        {/* Sedes y horario de atención: al final, junto al WhatsApp del pie. */}
+        <section
+          aria-label="Sedes y horario de atención"
+          className={`${CONTENEDOR} mb-8 grid grid-cols-1 gap-4 lg:mb-16 lg:grid-cols-[1.4fr_1fr] lg:gap-5 xl:gap-6`}
+        >
+          <article className="relative flex flex-col gap-3.5 overflow-hidden rounded-28 bg-ga-navy p-6 text-white sm:p-8 lg:gap-4 lg:rounded-36 lg:p-10 xl:gap-5 xl:p-12">
             <span
               aria-hidden
-              className="absolute -right-12 -top-14 h-[220px] w-[250px] bg-ga-navy-claro"
+              className="absolute -right-12 -top-14 h-[220px] w-[250px] bg-ga-navy-claro xl:h-[280px] xl:w-[320px]"
               style={{ borderRadius: "52% 48% 44% 56% / 55% 45% 55% 45%" }}
             />
             <div className="relative flex items-baseline gap-2.5">
-              <span className="font-display text-56 font-extrabold leading-90 tracking-cifra-grande text-ga-menta lg:text-80">
+              <span className="font-display text-56 font-extrabold leading-90 tracking-cifra-grande text-ga-menta lg:text-80 xl:text-88">
                 5
               </span>
-              <span className="font-display text-22 font-extrabold lg:text-30">sedes para atenderte</span>
+              <span className="font-display text-22 font-extrabold lg:text-30 xl:text-36">sedes para atenderte</span>
             </div>
-            <p className="relative m-0 max-w-[560px] text-16 leading-150 text-ga-navy-texto-suave lg:text-17 lg:leading-155">
+            <p className="relative m-0 max-w-[560px] text-16 leading-150 text-ga-navy-texto-suave lg:text-17 lg:leading-155 xl:text-18">
               Sede principal en Bogotá y cuatro sucursales en la región.
             </p>
-            <div className="relative flex flex-wrap gap-2">
+            <div className="relative flex flex-wrap gap-2 xl:gap-2.5">
               {SEDES.map((sede, i) => (
                 <span
                   key={sede}
                   className={
                     i === 0
-                      ? "rounded-full bg-ga-menta px-3 py-1.5 text-14 font-bold text-ga-navy-chip-oscuro"
-                      : "rounded-full bg-ga-blanco-chip px-3 py-1.5 text-14 font-bold text-white"
+                      ? "rounded-full bg-ga-menta px-3 py-1.5 text-14 font-bold text-ga-navy-chip-oscuro xl:px-4 xl:py-2 xl:text-15"
+                      : "rounded-full bg-ga-blanco-chip px-3 py-1.5 text-14 font-bold text-white xl:px-4 xl:py-2 xl:text-15"
                   }
                 >
                   {sede}
@@ -354,6 +369,43 @@ export function Landing({ convenios, whatsapp, whatsappUrl, correo, textoVigilan
               ))}
             </div>
           </article>
+
+          {horario ? (
+            <article
+              aria-labelledby="titulo-horario"
+              className="relative flex flex-col gap-3 overflow-hidden rounded-28 bg-white p-6 sm:p-8 lg:justify-center lg:gap-3.5 lg:rounded-36 lg:p-10 xl:gap-4 xl:p-12"
+            >
+              <span
+                aria-hidden
+                className="absolute -bottom-12 -right-10 h-[150px] w-[170px] bg-ga-verde-claro xl:h-[190px] xl:w-[210px]"
+                style={{ borderRadius: "58% 42% 55% 45% / 48% 58% 42% 52%" }}
+              />
+              <h2 id="titulo-horario" className="relative m-0 text-13 font-extrabold uppercase tracking-etiqueta text-ga-verde xl:text-14">
+                Horario de atención
+              </h2>
+              <p className="relative m-0 flex flex-col gap-1">
+                <span className="font-display text-30 font-extrabold leading-110 tracking-titular text-ga-navy lg:text-36 xl:text-44">
+                  {horario.dias}
+                </span>
+                <span className="text-18 font-bold text-ga-texto-2 lg:text-20 xl:text-22">{horario.horas}</span>
+              </p>
+              <p className="relative m-0 text-15 leading-150 text-ga-texto-2 lg:text-16 xl:text-17">
+                Escríbenos por WhatsApp y te respondemos en ese horario.
+              </p>
+              {whatsappUrl ? (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Escribir a la cooperativa por WhatsApp, ${whatsapp} (se abre en una pestaña nueva)`}
+                  className="relative mt-1 inline-flex h-13 items-center justify-center gap-2 self-start rounded-full bg-ga-verde px-6 text-16 font-extrabold text-white no-underline transition-colors hover:bg-ga-verde-oscuro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde xl:h-14 xl:px-7 xl:text-17"
+                >
+                  <IconoWhatsapp tamano={20} />
+                  Escríbenos por WhatsApp
+                </a>
+              ) : null}
+            </article>
+          ) : null}
         </section>
       </main>
 

@@ -7,6 +7,10 @@ import { fechaBogotaDeInstante } from "@/lib/fechas";
 import { CorreoIngresoAsociado } from "@/components/admin/CorreoIngresoAsociado";
 import { CorregirCedula } from "@/components/admin/CorregirCedula";
 import { DetalleProcesoAsociado } from "@/components/admin/DetalleProcesoAsociado";
+import { DocumentosProceso } from "@/components/admin/DocumentosProceso";
+import { FotosAfiliacionAsociado } from "@/components/admin/FotosAfiliacionAsociado";
+import { listarDocumentosProceso } from "@/lib/admin/documentosProceso";
+import { cargarFotosAfiliacionAsociado } from "@/lib/admin/fotosAfiliacionAsociado";
 import { EditarDatosAsociado } from "@/components/admin/EditarDatosAsociado";
 import { EliminarAsociado } from "@/components/admin/EliminarAsociado";
 import { IconoVolver } from "@/components/ui/Iconos";
@@ -35,8 +39,15 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
   // «Editar datos»: solo el admin y solo para asociados vivos.
   const datosEditables =
     esAdmin && !asociado.eliminado && asociado.rol === "asociado" ? await cargarDatosEditablesAsociado(supabase, id) : null;
-  // Foto del carné (propia o la selfie de la afiliación): URL firmada corta, solo para el admin.
-  const fotoCarne = !esAdmin || asociado.eliminado || asociado.rol !== "asociado" ? null : await urlFotoCarneDeAsociado(asociado.id);
+  const esAsociadoVivo = esAdmin && !asociado.eliminado && asociado.rol === "asociado";
+  // Foto del carné, fotos de afiliación (URLs firmadas cortas) y PDF del proceso: solo para el admin.
+  const [fotoCarne, fotosAfiliacion, documentos] = esAsociadoVivo
+    ? await Promise.all([
+        urlFotoCarneDeAsociado(asociado.id),
+        cargarFotosAfiliacionAsociado(asociado.id),
+        listarDocumentosProceso(supabase, asociado.id),
+      ])
+    : [null, null, null];
   // Comprobantes de desembolso del eliminado: se guardan 30 días y solo el admin los ve.
   let comprobantesPorBorrar: ComprobantePorBorrar[] = [];
   if (esAdmin && asociado.eliminado) {
@@ -84,6 +95,22 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
       ) : (
         <div className="flex max-w-[640px] flex-col gap-4">
           <DetalleProcesoAsociado detalle={detalle} bloqueado={procesoBloqueado} soloProceso={!esAdmin} />
+          {esAsociadoVivo && documentos ? (
+            <DocumentosProceso
+              asociadoId={asociado.id}
+              documentos={documentos.documentos}
+              errorLista={documentos.error}
+              bloqueado={procesoBloqueado}
+            />
+          ) : null}
+          {esAsociadoVivo ? (
+            <Link
+              href={`/admin/cambios?asociado=${asociado.id}`}
+              className="flex h-11.5 items-center justify-center self-start rounded-full px-5 text-14 font-bold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
+            >
+              Ver todos sus cambios
+            </Link>
+          ) : null}
           {datosEditables ? (
             <EditarDatosAsociado asociadoId={asociado.id} datos={datosEditables} bloqueado={correoBloqueado} />
           ) : null}
@@ -96,6 +123,14 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
               <p className="m-0 text-15 font-bold text-admin-texto">C.C. {asociado.cedula}</p>
               <CorregirCedula asociadoId={asociado.id} cedulaActual={asociado.cedula} bloqueado={correoBloqueado} />
             </section>
+          ) : null}
+          {esAsociadoVivo ? (
+            <FotosAfiliacionAsociado
+              asociadoId={asociado.id}
+              nombre={asociado.nombre}
+              fotos={fotosAfiliacion}
+              bloqueado={correoBloqueado}
+            />
           ) : null}
           {esAdmin && asociado.rol === "asociado" ? (
             <section aria-labelledby="titulo-foto-carne" className="flex items-center gap-4 rounded-20 bg-admin-superficie p-5.5">
