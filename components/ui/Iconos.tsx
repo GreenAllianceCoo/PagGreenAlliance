@@ -49,6 +49,23 @@ export function IconoVolver(props: IconoProps) {
   );
 }
 
+export function IconoAbajo(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <path d="M6 9l6 6 6-6" />
+    </Base>
+  );
+}
+
+export function IconoUbicacion(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" />
+      <circle cx="12" cy="9.5" r="2.5" />
+    </Base>
+  );
+}
+
 export function IconoInfo(props: IconoProps) {
   return (
     <Base {...props}>

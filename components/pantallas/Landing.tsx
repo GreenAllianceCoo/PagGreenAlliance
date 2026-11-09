@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ComprobanteSolicitud } from "@/components/pantallas/landing/ComprobanteSolicitud";
 import { ListaConvenios } from "@/components/pantallas/ListaConvenios";
 import { MatrizCirculos } from "@/components/pantallas/landing/MatrizCirculos";
-import { IconoWhatsapp } from "@/components/ui/Iconos";
+import { IconoAbajo, IconoUbicacion, IconoWhatsapp } from "@/components/ui/Iconos";
 import { Logo } from "@/components/ui/Logo";
 import type { Convenio } from "@/lib/mock";
 
@@ -96,6 +96,18 @@ const PASOS_ALIVIO: Array<{ numero: string; fondo: string; numeroFg: string; tit
 
 // Sedes (pieza 2a): Bogotá + 4 sucursales.
 const SEDES = ["Bogotá · sede principal", "Valledupar, Cesar", "Bosconia, Cesar", "La Jagua de Ibirico, Cesar", "Hatonuevo, La Guajira"];
+
+// Sedes con video (pedido de Sebas, 9-nov): desplegable con la dirección y el video (vertical).
+// Valledupar sin dirección exacta por ahora (solo la ciudad).
+const SEDES_CON_VIDEO: Array<{ nombre: string; direccion: string; video: string; portada: string }> = [
+  {
+    nombre: "Sede principal · Bogotá",
+    direccion: "Carrera 10 # 26-21, oficina 821, Bogotá D.C.",
+    video: "/sedes/bogota.mp4",
+    portada: "/sedes/bogota.webp",
+  },
+  { nombre: "Sede Valledupar", direccion: "Valledupar, Cesar", video: "/sedes/valledupar.mp4", portada: "/sedes/valledupar.webp" },
+];
 
 export function Landing({ convenios, whatsapp, whatsappUrl, correo, textoVigilancia, horario }: LandingProps) {
   return (
@@ -334,10 +346,10 @@ export function Landing({ convenios, whatsapp, whatsappUrl, correo, textoVigilan
           <ListaConvenios convenios={convenios} variante="landing" />
         </section>
 
-        {/* Sedes y horario de atención: al final, junto al WhatsApp del pie. */}
+        {/* Sedes y, debajo con espacio, el horario de atención: al final, junto al WhatsApp del pie. */}
         <section
           aria-label="Sedes y horario de atención"
-          className={`${CONTENEDOR} mb-8 grid grid-cols-1 gap-4 lg:mb-16 lg:grid-cols-[1.4fr_1fr] lg:gap-5 xl:gap-6`}
+          className={`${CONTENEDOR} mb-8 flex flex-col gap-6 lg:mb-16 lg:gap-8 xl:gap-10`}
         >
           <article className="relative flex flex-col gap-3.5 overflow-hidden rounded-28 bg-ga-navy p-6 text-white sm:p-8 lg:gap-4 lg:rounded-36 lg:p-10 xl:gap-5 xl:p-12">
             <span
@@ -368,37 +380,74 @@ export function Landing({ convenios, whatsapp, whatsappUrl, correo, textoVigilan
                 </span>
               ))}
             </div>
+
+            {/* Desplegables con la dirección y el video de cada sede (sin JavaScript: <details>). */}
+            <div className="relative mt-2 grid grid-cols-1 items-start gap-3 md:grid-cols-2 lg:gap-4">
+              {SEDES_CON_VIDEO.map((sede) => (
+                <details key={sede.nombre} className="group rounded-22 bg-ga-blanco-chip">
+                  <summary className="flex cursor-pointer list-none items-center gap-3 rounded-22 p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-menta lg:p-5 [&::-webkit-details-marker]:hidden">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ga-menta text-ga-navy-chip-oscuro">
+                      <IconoUbicacion tamano={20} />
+                    </span>
+                    <span className="flex min-w-0 grow flex-col gap-0.5">
+                      <span className="text-16 font-extrabold text-white lg:text-17">{sede.nombre}</span>
+                      <span className="text-14 text-ga-navy-texto-suave lg:text-15">{sede.direccion}</span>
+                    </span>
+                    <span className="flex shrink-0 items-center gap-1.5 text-14 font-bold text-ga-menta">
+                      <span className="hidden sm:inline sm:group-open:hidden">Ver video</span>
+                      <span className="hidden sm:group-open:inline">Ocultar</span>
+                      <IconoAbajo tamano={20} className="transition-transform duration-200 group-open:rotate-180" />
+                    </span>
+                  </summary>
+                  <div className="px-4 pb-4 lg:px-5 lg:pb-5">
+                    {/* Video vertical: alto limitado para que no ocupe toda la pantalla. */}
+                    <video
+                      controls
+                      playsInline
+                      preload="none"
+                      poster={sede.portada}
+                      aria-label={`Video de la ${sede.nombre.toLowerCase()}`}
+                      className="mx-auto aspect-[9/16] max-h-[520px] w-full max-w-[300px] rounded-18 bg-black object-contain"
+                    >
+                      <source src={sede.video} type="video/mp4" />
+                    </video>
+                  </div>
+                </details>
+              ))}
+            </div>
           </article>
 
           {horario ? (
             <article
               aria-labelledby="titulo-horario"
-              className="relative flex flex-col gap-3 overflow-hidden rounded-28 bg-white p-6 sm:p-8 lg:justify-center lg:gap-3.5 lg:rounded-36 lg:p-10 xl:gap-4 xl:p-12"
+              className="relative flex flex-col gap-4 overflow-hidden rounded-28 bg-white p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:rounded-36 lg:p-10 xl:p-12"
             >
               <span
                 aria-hidden
                 className="absolute -bottom-12 -right-10 h-[150px] w-[170px] bg-ga-verde-claro xl:h-[190px] xl:w-[210px]"
                 style={{ borderRadius: "58% 42% 55% 45% / 48% 58% 42% 52%" }}
               />
-              <h2 id="titulo-horario" className="relative m-0 text-13 font-extrabold uppercase tracking-etiqueta text-ga-verde xl:text-14">
-                Horario de atención
-              </h2>
-              <p className="relative m-0 flex flex-col gap-1">
-                <span className="font-display text-30 font-extrabold leading-110 tracking-titular text-ga-navy lg:text-36 xl:text-44">
-                  {horario.dias}
-                </span>
-                <span className="text-18 font-bold text-ga-texto-2 lg:text-20 xl:text-22">{horario.horas}</span>
-              </p>
-              <p className="relative m-0 text-15 leading-150 text-ga-texto-2 lg:text-16 xl:text-17">
-                Escríbenos por WhatsApp y te respondemos en ese horario.
-              </p>
+              <div className="relative flex flex-col gap-3 lg:gap-3.5 xl:gap-4">
+                <h2 id="titulo-horario" className="m-0 text-13 font-extrabold uppercase tracking-etiqueta text-ga-verde xl:text-14">
+                  Horario de atención
+                </h2>
+                <p className="m-0 flex flex-col gap-1">
+                  <span className="font-display text-30 font-extrabold leading-110 tracking-titular text-ga-navy lg:text-36 xl:text-44">
+                    {horario.dias}
+                  </span>
+                  <span className="text-18 font-bold text-ga-texto-2 lg:text-20 xl:text-22">{horario.horas}</span>
+                </p>
+                <p className="m-0 text-15 leading-150 text-ga-texto-2 lg:text-16 xl:text-17">
+                  Escríbenos por WhatsApp y te respondemos en ese horario.
+                </p>
+              </div>
               {whatsappUrl ? (
                 <a
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Escribir a la cooperativa por WhatsApp, ${whatsapp} (se abre en una pestaña nueva)`}
-                  className="relative mt-1 inline-flex h-13 items-center justify-center gap-2 self-start rounded-full bg-ga-verde px-6 text-16 font-extrabold text-white no-underline transition-colors hover:bg-ga-verde-oscuro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde xl:h-14 xl:px-7 xl:text-17"
+                  className="relative mt-1 inline-flex h-13 shrink-0 items-center justify-center gap-2 self-start rounded-full bg-ga-verde px-6 lg:mt-0 lg:self-center text-16 font-extrabold text-white no-underline transition-colors hover:bg-ga-verde-oscuro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde xl:h-14 xl:px-7 xl:text-17"
                 >
                   <IconoWhatsapp tamano={20} />
                   Escríbenos por WhatsApp
