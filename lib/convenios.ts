@@ -151,6 +151,7 @@ const BASE: DatosBase[] = [
     especialidad: "Tours en Villa de Leyva",
     nit: "1.054.095.149-3",
     medio: { tipo: "pdf", src: "/convenios/racing-tours-presentacion.pdf", tamano: "3 MB" },
+    logoUrl: "/convenios/logos/racing-tours.webp",
     whatsapp: "3138008830",
     descripcion:
       "Empresa en convenio ubicada en el municipio de Villa de Leyva (Boyacá), donde los asociados encontrarán una amplia oferta de aventuras, atendida directamente por su propietario, con excelentes recorridos y vehículos de última generación.",
