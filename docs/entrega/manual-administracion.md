@@ -603,7 +603,7 @@ En **«Empresas en convenio»**, cada convenio tiene:
 - **«Ocultar»** y **«Mostrar»:** lo quitan de la vista del público sin borrarlo. Es la opción recomendada si un convenio se suspende por un tiempo.
 - **«Eliminar»:** lo borra definitivamente. Pide confirmación y **no se puede deshacer**.
 
-> Los logos de **Dr. Ribero, Locos por los Viajes, Dream & Go, SB7 y El Decreto**, y el video de **SB7**, los dejó el equipo técnico dentro de la página (8-nov). Si sube otro logo desde **«Editar»**, el nuevo reemplaza al anterior; si marca «Quitar el logo actual», vuelve a verse el emoji.
+> Los logos de **AMB Móvil, Dr. Ribero, Locos por los Viajes, Dream & Go, SB7 y El Decreto**, y los videos de **SB7** y **El Decreto**, los dejó el equipo técnico dentro de la página (8 y 9 de noviembre). Los videos de las sedes de Bogotá y Valledupar, con su dirección, están en la sección «Sedes» de la página principal y los cambia el equipo técnico. Si sube otro logo desde **«Editar»**, el nuevo reemplaza al anterior; si marca «Quitar el logo actual», vuelve a verse el emoji.
 
 ---
 
