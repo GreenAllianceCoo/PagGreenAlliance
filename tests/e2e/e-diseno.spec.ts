@@ -51,7 +51,7 @@ const CONVENIOS_LANDING = [
 const SERVICIOS_APOYOS = [
   "Lo que encuentras en Green Alliance",
   "Microcréditos",
-  "Pídelo en línea desde la plataforma, con modalidad del 50 % o 100 % y un tope claro según tu grado.",
+  "Pídelo en línea desde la plataforma, eligiendo del 50 % al 100 % y con un tope claro según tu grado.",
   "Orientación financiera",
   "Una conversación estratégica para ordenar tus cuentas y decidir mejor antes de endeudarte.",
   "Apoyo legal",
@@ -215,6 +215,8 @@ test.describe("E · Landing /", () => {
           ...CONVENIOS_LANDING,
           "5",
           "sedes para atenderte",
+          "Lunes a viernes",
+          "8:30 a. m. a 5:00 p. m.",
           "Sede principal en Bogotá y cuatro sucursales en la región.",
           "Bogotá · sede principal",
           "WhatsApp 311 724 1942 · soporte@greenallianceco.com",
@@ -248,6 +250,8 @@ test.describe("E · Landing /", () => {
           ...CONVENIOS_LANDING,
           "5",
           "sedes para atenderte",
+          "Lunes a viernes",
+          "8:30 a. m. a 5:00 p. m.",
           "WhatsApp 311 724 1942 · soporte@greenallianceco.com",
           "Vigilada por Supersolidaria",
         ];

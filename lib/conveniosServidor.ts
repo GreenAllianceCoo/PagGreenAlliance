@@ -50,9 +50,15 @@ export function medioDeFila(fila: Pick<FilaConvenio, "video_url" | "pdf_url" | "
   return null;
 }
 
+/** true si el logo es un archivo del propio sitio («/convenios/logos/…», como los videos), no del bucket. */
+export function esLogoEstatico(logoPath: string | null | undefined): boolean {
+  return !!logoPath && logoPath.startsWith("/");
+}
+
 /** URL pública del logo (getPublicUrl no hace red: arma la URL del bucket público). */
 export function urlLogo(logoPath: string | null | undefined): string | null {
   if (!logoPath) return null;
+  if (esLogoEstatico(logoPath)) return logoPath;
   return crearClienteAnonimoSinSesion().storage.from(BUCKET_LOGOS).getPublicUrl(logoPath).data.publicUrl;
 }
 

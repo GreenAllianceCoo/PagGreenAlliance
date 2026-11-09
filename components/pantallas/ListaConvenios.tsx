@@ -45,6 +45,26 @@ function LogoMarca({ convenio, tamano }: { convenio: Convenio; tamano: 32 | 56 |
 }
 
 /**
+ * Logo grande de la tarjeta de la landing: franja de ancho completo con el logo entero
+ * (`object-contain`); sin logo, el emoji sobre el fondo suave. Decorativo, como LogoMarca.
+ */
+function LogoTarjeta({ convenio }: { convenio: Convenio }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="flex h-28 w-full items-center justify-center overflow-hidden rounded-18 bg-ga-fondo-suave sm:h-32 xl:h-36"
+    >
+      {convenio.logoUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={convenio.logoUrl} alt="" loading="lazy" className="h-full w-full object-contain p-3" />
+      ) : (
+        <span className="text-56 leading-none">{convenio.emoji}</span>
+      )}
+    </span>
+  );
+}
+
+/**
  * Detalle de un convenio (pieza 3n): modal centrado en escritorio y hoja inferior en
  * celular, con descripción, servicios en viñetas, sedes (solo si tiene), NIT y
  * «Escribir por WhatsApp» (enlace wa.me directo, sin backend).
@@ -151,7 +171,7 @@ export function ListaConvenios({ convenios, variante }: ListaConveniosProps) {
       <div
         className={
           variante === "landing"
-            ? "flex flex-col gap-3 lg:grid lg:grid-cols-5 lg:gap-3.5"
+            ? "grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4 xl:grid-cols-4 xl:gap-5"
             : "flex flex-col gap-3 lg:grid lg:grid-cols-5"
         }
       >
@@ -162,20 +182,20 @@ export function ListaConvenios({ convenios, variante }: ListaConveniosProps) {
               type="button"
               aria-haspopup="dialog"
               onClick={() => setAbierto(convenio)}
-              className="flex flex-col gap-2.5 rounded-24 bg-white p-5 text-left transition-colors duration-200 hover:bg-ga-verde-tint focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
+              className="group flex h-full flex-col gap-2.5 rounded-24 bg-white p-4 text-left transition-colors duration-200 hover:bg-ga-verde-tint focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde lg:rounded-28 lg:p-5 xl:gap-3 xl:p-6"
             >
-              <LogoMarca convenio={convenio} tamano={56} />
-              <span className="text-13 font-bold uppercase tracking-[0.04em] text-ga-verde">
+              <LogoTarjeta convenio={convenio} />
+              <span className="mt-1.5 text-13 font-bold uppercase tracking-[0.04em] text-ga-verde xl:text-14">
                 {convenio.especialidad}
               </span>
-              <strong className="font-display text-20 font-extrabold leading-115 text-ga-navy">
+              <strong className="font-display text-20 font-extrabold leading-115 text-ga-navy xl:text-24">
                 {convenio.nombre}
               </strong>
               {/* Se omite si repite el nombre (evita leer dos veces lo mismo). */}
               {convenio.nombreCorto !== convenio.nombre ? (
-                <span className="text-15 text-ga-texto-2">{convenio.nombreCorto}</span>
+                <span className="text-15 text-ga-texto-2 xl:text-16">{convenio.nombreCorto}</span>
               ) : null}
-              <span className="text-14 font-extrabold text-ga-verde underline">Ver detalle</span>
+              <span className="mt-auto pt-1 text-14 font-extrabold text-ga-verde underline xl:text-15">Ver detalle</span>
             </button>
           ) : (
             <button

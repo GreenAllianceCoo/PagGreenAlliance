@@ -8,7 +8,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/admin/servidor", () => ({ exigirAdmin: vi.fn() }));
 vi.mock("@/lib/servidor/registro", () => ({ registrar: vi.fn() }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
-vi.mock("@/lib/conveniosServidor", () => ({ BUCKET_LOGOS: "convenios-logos" }));
+vi.mock("@/lib/conveniosServidor", () => ({
+  BUCKET_LOGOS: "convenios-logos",
+  esLogoEstatico: (ruta: string | null | undefined) => !!ruta && ruta.startsWith("/"),
+}));
 
 import { exigirAdmin } from "@/lib/admin/servidor";
 import { registrar } from "@/lib/servidor/registro";

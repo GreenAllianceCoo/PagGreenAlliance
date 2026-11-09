@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { exigirAdmin } from "@/lib/admin/servidor";
-import { BUCKET_LOGOS } from "@/lib/conveniosServidor";
+import { BUCKET_LOGOS, esLogoEstatico } from "@/lib/conveniosServidor";
 import { reordenarConvenios } from "@/lib/conveniosOrden";
 import { registrar } from "@/lib/servidor/registro";
 import { erroresPorCampo, textoDe } from "@/lib/validaciones/comunes";
@@ -145,7 +145,7 @@ export async function guardarConvenio(
   }
 
   // Borra el logo anterior si se reemplazó o se quitó (si falla, solo queda un archivo huérfano).
-  if (logoAnterior && logoAnterior !== logoPath) {
+  if (logoAnterior && logoAnterior !== logoPath && !esLogoEstatico(logoAnterior)) {
     const { error: errorBorrado } = await supabase.storage.from(BUCKET_LOGOS).remove([logoAnterior]);
     if (errorBorrado) registrar("warn", { evento: "convenio_logo_anterior_no_borrado", mensaje: errorBorrado.message });
   }
@@ -224,7 +224,7 @@ export async function eliminarConvenio(_previo: EstadoAccionConvenio, formData: 
   }
   if (!data) return { error: "No encontramos ese convenio." };
 
-  if (data.logo_path) {
+  if (data.logo_path && !esLogoEstatico(data.logo_path as string)) {
     const { error: errorBorrado } = await supabase.storage.from(BUCKET_LOGOS).remove([data.logo_path as string]);
     if (errorBorrado) registrar("warn", { evento: "convenio_logo_no_borrado", mensaje: errorBorrado.message });
   }

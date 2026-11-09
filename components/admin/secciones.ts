@@ -18,6 +18,8 @@ export const SECCIONES = [
   { href: "/admin/plataforma", etiqueta: "Plataforma", clave: "plataforma" },
   // Solo admin: lo que hizo cada admin y secretario (afiliaciones, procesos, roles, créditos).
   { href: "/admin/historial", etiqueta: "Historial", clave: "historial" },
+  // Solo admin (8-nov): cada cambio en los asociados (datos con antes/después, fotos, proceso y sus PDF).
+  { href: "/admin/cambios", etiqueta: "Cambios", clave: "cambios" },
   { href: "/admin/demo", etiqueta: "Demostración", clave: "demo" },
 ] as const;
 

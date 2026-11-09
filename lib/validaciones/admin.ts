@@ -656,3 +656,62 @@ export const esquemaAnularPagoComision = z.object({
   pagoId: z.uuid({ error: "Falta el pago." }),
   motivo: esquemaMotivoPago,
 });
+
+// ---------------------------------------------------------------------------
+// Fotos de afiliación y PDF del proceso (pedido de Sebas, 8-nov)
+// ---------------------------------------------------------------------------
+
+const CAMPOS_FOTO_ADMIN = ["foto_cedula_frente", "foto_cedula_reverso", "foto_selfie"] as const;
+const campoFotoAdmin = z.enum(CAMPOS_FOTO_ADMIN, { error: "Esa foto no existe." });
+
+/** Paso 1 de «Cambiar foto»: tipo y tamaño (el bucket los vuelve a exigir). */
+export const esquemaPrepararCambioFoto = z.object({
+  asociadoId: z.uuid({ error: "Falta el asociado." }),
+  campo: campoFotoAdmin,
+  tipo: z.enum(["image/jpeg", "image/png", "image/webp"], { error: "La foto debe ser JPG, PNG o WEBP." }),
+  tamano: z
+    .number()
+    .int()
+    .min(1, { error: "El archivo está vacío." })
+    .max(5 * 1024 * 1024, { error: "La foto pesa más de 5 MB." }),
+});
+
+/** Paso 2: la ruta subida y el motivo (queda en «Cambios»). */
+export const esquemaGuardarCambioFoto = z.object({
+  asociadoId: z.uuid({ error: "Falta el asociado." }),
+  campo: campoFotoAdmin,
+  ruta: z.string().min(1).max(200),
+  motivo: esquemaMotivoAdmin,
+});
+
+/** Paso 1 de «Subir documento»: solo PDF de máximo 10 MB. */
+export const esquemaPrepararDocumentoProceso = z.object({
+  asociadoId: z.uuid({ error: "Falta el asociado." }),
+  tamano: z
+    .number()
+    .int()
+    .min(1, { error: "El archivo está vacío." })
+    .max(10 * 1024 * 1024, { error: "El documento pesa más de 10 MB." }),
+});
+
+/** Nombre visible del documento (como la base: 3 a 120 caracteres, espacios normalizados). */
+export const esquemaNombreDocumentoProceso = z
+  .string({ error: "Escribe el nombre del documento." })
+  .transform((v) => v.trim().replace(/\s+/g, " "))
+  .pipe(
+    z
+      .string()
+      .min(3, { error: "El nombre debe tener entre 3 y 120 caracteres." })
+      .max(120, { error: "El nombre debe tener entre 3 y 120 caracteres." }),
+  );
+
+export const esquemaGuardarDocumentoProceso = z.object({
+  asociadoId: z.uuid({ error: "Falta el asociado." }),
+  ruta: z.string().min(1).max(200),
+  nombre: esquemaNombreDocumentoProceso,
+});
+
+export const esquemaQuitarDocumentoProceso = z.object({
+  documentoId: z.uuid({ error: "Falta el documento." }),
+  motivo: esquemaMotivoAdmin,
+});

@@ -1,5 +1,5 @@
 import { Landing } from "@/components/pantallas/Landing";
-import { CORREO_CONTACTO, TEXTO_VIGILANCIA, WHATSAPP_NUMERO, WHATSAPP_URL_PIE } from "@/lib/config";
+import { CORREO_CONTACTO, HORARIO_ATENCION, TEXTO_VIGILANCIA, WHATSAPP_NUMERO, WHATSAPP_URL_PIE } from "@/lib/config";
 import { cargarConvenios } from "@/lib/conveniosServidor";
 
 // Los convenios salen de la tabla `convenios` (spec-requerimientos-ricardo §4);
@@ -18,6 +18,7 @@ export default async function Home() {
       whatsappUrl={WHATSAPP_URL_PIE}
       correo={CORREO_CONTACTO}
       textoVigilancia={TEXTO_VIGILANCIA}
+      horario={HORARIO_ATENCION}
     />
   );
 }
