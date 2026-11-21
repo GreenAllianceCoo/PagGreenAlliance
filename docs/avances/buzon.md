@@ -36,3 +36,9 @@ Formato (copiar debajo de la línea, uno por tarea):
 - Estado: En curso
 - Qué se hizo: en /admin/asociados/[id] el admin ve y cambia las 3 fotos de afiliación (la anterior se conserva) y sube/descarga/quita varios PDF del proceso; nueva sección «Cambios» (solo admin) con datos y cédula antes/después, fotos antes/después, proceso y documentos. Landing: un solo contenedor de hasta 1600 px, tarjetas más grandes desde 1280 px, convenios en cuadrícula con logo grande, horario «Lunes a viernes, 8:30 a. m. a 5:00 p. m.» junto al WhatsApp (pie sin cambios). Logos de 5 convenios y video de SB7 como archivos del sitio. Migración 20261108000000 y pgTAP 39 (verificada en Postgres embebido, 50 comprobaciones).
 - Bloqueos o trabajo nuevo: aplicar la migración 20261108000000 en producción antes de desplegar; tras el despliegue, apuntar logo_path de los 5 convenios a /convenios/logos/… y video_url de SB7 a /convenios/sb7-motos.mp4; correr supabase test db con Docker.
+
+## 2026-11-21 · sesion-principal
+- Actividades: P-nuevo (módulo de convenios · B0 spec y B1 modelo de datos y RLS)
+- Estado: En curso
+- Qué se hizo: spec aprobada (docs/spec-convenios.md). Migración 20261121000000 aplicada en producción el 2026-11-21: rol `convenio`, convenios.nit_base y eliminado_en, convenio_cuentas, correo_por_nit (solo service_role), convenio_publicaciones con RLS, guardas y topes 10/5, métricas (totales y únicos) y bucket privado convenios-publicaciones. pgTAP 10 corrido en producción dentro de una transacción revertida: 48/48 ok, sin datos residuales.
+- Bloqueos o trabajo nuevo: siguen B2 (ingreso con NIT y cuentas desde el admin) a B6. Horas de B0–B1 por anotar en docs/avances/horas-convenios.md.

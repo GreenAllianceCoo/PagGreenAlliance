@@ -1,6 +1,6 @@
 # Spec · Módulo de convenios (fase 1)
 
-Estado: **aprobada** (2026-11-21). B1 escrito: `supabase/migrations/20261121000000_convenios_publicaciones.sql` y `supabase/tests/10_convenios_publicaciones.sql` (sin aplicar).
+Estado: **aprobada** (2026-11-21). B1 escrito: `supabase/migrations/20261121000000_convenios_publicaciones.sql` y `supabase/tests/10_convenios_publicaciones.sql` (aplicada en producción el 2026-11-21; pgTAP 48/48 ok).
 Fuente: `docs/prompt-convenios-y-rediseno.md`. Esquema real consultado en producción
 (`sqpmxizxkqorccpvjwoz`): enum `rol_usuario` = `asociado, admin, asesor, secretario`;
 `convenios.nit` es texto con formato (`902.038.118-7`); 8 convenios, todos visibles;

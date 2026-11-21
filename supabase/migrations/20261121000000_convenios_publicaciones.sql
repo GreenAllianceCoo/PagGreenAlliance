@@ -1,7 +1,7 @@
 -- ============================================================
 -- Módulo de convenios · B1 · rol «convenio», cuentas, publicaciones,
 -- métricas y storage (docs/spec-convenios.md §B1).
--- PROPUESTA: NO APLICADA en producción. Sebas la revisa y la aplica.
+-- APLICADA en producción el 2026-11-21 (autorizada por Sebas).
 --
 -- NOTA SOBRE EL ENUM (igual que 20261003100000_secretario…): un valor nuevo
 -- de enum no se puede USAR en la misma transacción en que se agrega. Por eso
