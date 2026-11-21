@@ -6,12 +6,13 @@ import { erroresPorCampo, textoDe } from "@/lib/validaciones/comunes";
 import {
   esquemaCodigo,
   esquemaIngresoCedula,
+  esquemaIngresoNit,
   leerCodigo,
   MENSAJE_CODIGO_INVALIDO,
 } from "@/lib/validaciones/ingreso";
 import {
   borrarCookieIngreso,
-  correoDeCedula,
+  correoDe,
   dentroDelLimiteDeVerificacion,
   ESPERA_REENVIO_SEGUNDOS,
   enviarCodigo,
@@ -19,6 +20,7 @@ import {
   leerCookieIngreso,
   MENSAJE_LIMITE_VERIFICACION,
   segundosParaReenviar,
+  tipoDeIngreso,
 } from "@/lib/ingreso/servidor";
 import { PARAMETRO_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 import { createClient } from "@/lib/supabase/server";
@@ -56,6 +58,37 @@ export async function enviarCodigoIngreso(
 }
 
 // ---------------------------------------------------------------------------
+// Paso 1 (empresa en convenio) · «Enviarme el código» con el NIT
+// ---------------------------------------------------------------------------
+
+export type EstadoIngresoNit = {
+  error?: string;
+  nit?: string;
+};
+
+/**
+ * Igual que con la cédula, pero con el NIT de la empresa (docs/spec-convenios.md
+ * §B2): mismo envío, misma cookie (con `t: "nit"`) y mismo paso 2. Responde
+ * igual exista o no el NIT.
+ */
+export async function enviarCodigoConvenio(
+  _previo: EstadoIngresoNit,
+  formData: FormData,
+): Promise<EstadoIngresoNit> {
+  const nitEscrito = textoDe(formData, "nit");
+  const resultado = esquemaIngresoNit.safeParse({ nit: nitEscrito });
+  if (!resultado.success) {
+    const errores = erroresPorCampo<"nit">(resultado.error);
+    return { error: errores.nit, nit: nitEscrito };
+  }
+
+  const { nit } = resultado.data;
+  const { mascara } = await enviarCodigo(nit, "nit");
+  await guardarCookieIngreso({ c: nit, t: "nit", m: mascara, u: Date.now() });
+  redirect("/ingresar/codigo");
+}
+
+// ---------------------------------------------------------------------------
 // Paso 2 · «Entrar a mi cuenta»
 // ---------------------------------------------------------------------------
 
@@ -74,11 +107,12 @@ export async function verificarCodigoIngreso(
   // F-02: tope de intentos (por cédula y por IP) antes de gastar un intento
   // real contra Supabase. Se revisa para cédulas registradas y no
   // registradas por igual, así el límite no delata si la cédula existe.
-  if (!(await dentroDelLimiteDeVerificacion(datos.c))) {
+  const tipo = tipoDeIngreso(datos);
+  if (!(await dentroDelLimiteDeVerificacion(datos.c, tipo))) {
     return { error: MENSAJE_LIMITE_VERIFICACION };
   }
 
-  const correo = await correoDeCedula(datos.c);
+  const correo = await correoDe(tipo, datos.c);
   if (!correo) {
     // Cédula no registrada: mismo mensaje que un código equivocado.
     return { error: MENSAJE_CODIGO_INVALIDO };
@@ -97,7 +131,8 @@ export async function verificarCodigoIngreso(
 
   await borrarCookieIngreso();
 
-  // Redirección por rol (admin y secretario → /admin, asesor → /asesor, asociado → /cuenta).
+  // Redirección por rol (admin y secretario → /admin, asesor → /asesor,
+  // convenio → /convenio, asociado → /cuenta).
   // Si por lo que sea no se puede leer el perfil, se manda a /cuenta (el destino
   // de siempre); /admin y /asesor exigen su propio rol con exigirAdmin() y su
   // equivalente, así que un asociado nunca llega ahí por error.
@@ -114,6 +149,7 @@ export async function verificarCodigoIngreso(
     }
     if (perfil?.rol === "admin" || perfil?.rol === "secretario") destino = "/admin";
     else if (perfil?.rol === "asesor") destino = "/asesor";
+    else if (perfil?.rol === "convenio") destino = "/convenio";
   }
   redirect(destino);
 }
@@ -145,10 +181,14 @@ export async function reenviarCodigoIngreso(): Promise<EstadoReenvio> {
     };
   }
 
-  const { mascara } = await enviarCodigo(datos.c);
-  await guardarCookieIngreso({ c: datos.c, m: mascara, u: Date.now() });
+  const tipo = tipoDeIngreso(datos);
+  const { mascara } = await enviarCodigo(datos.c, tipo);
+  await guardarCookieIngreso({ ...(tipo === "nit" ? { t: "nit" as const } : {}), c: datos.c, m: mascara, u: Date.now() });
   return {
-    mensaje: "Si tu cédula está registrada, te enviamos un código nuevo.",
+    mensaje:
+      tipo === "nit"
+        ? "Si tu NIT está registrado, te enviamos un código nuevo."
+        : "Si tu cédula está registrada, te enviamos un código nuevo.",
     segundos: ESPERA_REENVIO_SEGUNDOS,
     marca: Date.now(),
   };

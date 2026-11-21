@@ -108,6 +108,9 @@ export function IngresoCedula({
         <ButtonLink href="/afiliacion" variante="secundario">
           Deseo afiliarme
         </ButtonLink>
+        <Link href="/ingresar/convenio" className="enlace self-center text-15 font-bold">
+          ¿Eres empresa en convenio? Entra con tu NIT
+        </Link>
         <PieIngresoMovil interlineado={false}>Ayuda por WhatsApp {numero}</PieIngresoMovil>
       </form>
     </PanelIngreso>

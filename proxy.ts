@@ -56,7 +56,8 @@ export async function proxy(request: NextRequest) {
   const esPrivada =
     ruta === "/cuenta" || ruta.startsWith("/cuenta/") ||
     ruta === "/admin" || ruta.startsWith("/admin/") ||
-    ruta === "/asesor" || ruta.startsWith("/asesor/");
+    ruta === "/asesor" || ruta.startsWith("/asesor/") ||
+    ruta === "/convenio" || ruta.startsWith("/convenio/");
   if (!user && esPrivada) return redirigir("/ingresar");
 
   // Pausa del ingreso de asociados (admin, /admin/plataforma): cubre páginas
@@ -64,6 +65,11 @@ export async function proxy(request: NextRequest) {
   // no está aplicada) no se bloquea a nadie.
   const esCuenta = ruta === "/cuenta" || ruta.startsWith("/cuenta/");
   if (user && esCuenta) {
+    // La cuenta de una empresa en convenio no usa /cuenta (páginas ni Server
+    // Actions): va a su panel (docs/spec-convenios.md §B2). /admin y /asesor
+    // la mandan a /cuenta con sus propias guardas, y de aquí sigue a /convenio.
+    const { data: perfil } = await supabase.from("perfiles").select("rol").eq("id", user.id).maybeSingle();
+    if (perfil?.rol === "convenio") return redirigir("/convenio");
     const { data: pausa } = await supabase.rpc("estado_pausa_cuenta").maybeSingle<{ pausada: boolean }>();
     if (pausa?.pausada) return redirigir("/cuenta-pausada");
   }
@@ -77,5 +83,5 @@ export async function proxy(request: NextRequest) {
 export const config = {
   // "/cuenta/:path*" cubre /cuenta y /cuenta/solicitar. "/admin/:path*" y
   // "/asesor/:path*" solo exigen sesión aquí; el rol lo valida cada página.
-  matcher: ["/cuenta/:path*", "/ingresar/:path*", "/admin/:path*", "/asesor/:path*"],
+  matcher: ["/cuenta/:path*", "/ingresar/:path*", "/admin/:path*", "/asesor/:path*", "/convenio/:path*"],
 };

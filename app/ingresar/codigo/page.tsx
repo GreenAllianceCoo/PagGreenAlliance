@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { WHATSAPP_NUMERO, WHATSAPP_URL } from "@/lib/config";
-import { leerCookieIngreso, segundosParaReenviar } from "@/lib/ingreso/servidor";
+import { leerCookieIngreso, segundosParaReenviar, tipoDeIngreso } from "@/lib/ingreso/servidor";
 import { FormularioCodigo } from "./FormularioCodigo";
 
 export const metadata: Metadata = {
@@ -19,6 +19,7 @@ export default async function IngresarCodigoPage() {
       whatsapp={WHATSAPP_NUMERO}
       whatsappUrl={WHATSAPP_URL}
       segundosIniciales={segundosParaReenviar(datos)}
+      esConvenio={tipoDeIngreso(datos) === "nit"}
     />
   );
 }

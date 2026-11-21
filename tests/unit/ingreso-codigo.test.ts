@@ -27,7 +27,8 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn() }));
 vi.mock("@/lib/ingreso/servidor", () => ({
   leerCookieIngreso: vi.fn(),
-  correoDeCedula: vi.fn(),
+  correoDe: vi.fn(),
+  tipoDeIngreso: (d: { t?: string }) => (d.t === "nit" ? "nit" : "cedula"),
   dentroDelLimiteDeVerificacion: vi.fn(),
   borrarCookieIngreso: vi.fn(),
   guardarCookieIngreso: vi.fn(),
@@ -40,7 +41,7 @@ vi.mock("@/lib/servidor/registro", () => ({ registrar: vi.fn() }));
 
 import { createClient } from "@/lib/supabase/server";
 import {
-  correoDeCedula,
+  correoDe,
   dentroDelLimiteDeVerificacion,
   leerCookieIngreso,
   MENSAJE_LIMITE_VERIFICACION,
@@ -80,7 +81,7 @@ function verifyOtpFalso(
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(leerCookieIngreso).mockResolvedValue({ c: CEDULA, m: "ju•••@po•••.co", u: Date.now() });
-  vi.mocked(correoDeCedula).mockResolvedValue(CORREO);
+  vi.mocked(correoDe).mockResolvedValue(CORREO);
   vi.mocked(dentroDelLimiteDeVerificacion).mockResolvedValue(true);
 });
 
@@ -114,14 +115,14 @@ describe("verificarCodigoIngreso · tope de intentos (F-02)", () => {
   it("revisa el límite con la cédula de la cookie", async () => {
     verifyOtpFalso({ error: null });
     await verificar("123456");
-    expect(dentroDelLimiteDeVerificacion).toHaveBeenCalledWith(CEDULA);
+    expect(dentroDelLimiteDeVerificacion).toHaveBeenCalledWith(CEDULA, "cedula");
   });
 
   it("el tope se revisa también para una cédula NO registrada (no delata si existe)", async () => {
-    vi.mocked(correoDeCedula).mockResolvedValue(null);
+    vi.mocked(correoDe).mockResolvedValue(null);
     vi.mocked(dentroDelLimiteDeVerificacion).mockResolvedValue(false);
     const { resultado } = await verificar("123456");
-    expect(dentroDelLimiteDeVerificacion).toHaveBeenCalledWith(CEDULA);
+    expect(dentroDelLimiteDeVerificacion).toHaveBeenCalledWith(CEDULA, "cedula");
     expect(resultado?.error).toBe(MENSAJE_LIMITE_VERIFICACION);
   });
 
@@ -144,6 +145,7 @@ describe("verificarCodigoIngreso · redirección por rol", () => {
     ["admin", "/admin"],
     ["asesor", "/asesor"],
     ["asociado", "/cuenta"],
+    ["convenio", "/convenio"],
   ] as const)("rol %s → %s", async (rol, destino) => {
     verifyOtpFalso({ error: null }, rol);
     const { redirigeA } = await verificar("123456");
@@ -154,5 +156,26 @@ describe("verificarCodigoIngreso · redirección por rol", () => {
     verifyOtpFalso({ error: null }, null);
     const { redirigeA } = await verificar("123456");
     expect(redirigeA).toBe("/cuenta");
+  });
+});
+
+describe("verificarCodigoIngreso · empresa en convenio (NIT)", () => {
+  it("con la cookie de NIT busca el correo por NIT, limita por NIT y entra a /convenio", async () => {
+    vi.mocked(leerCookieIngreso).mockResolvedValue({ c: "902038118", t: "nit", m: "co•••@em•••.co", u: Date.now() });
+    const verifyOtp = verifyOtpFalso({ error: null }, "convenio");
+    const { redirigeA } = await verificar("123456");
+    expect(correoDe).toHaveBeenCalledWith("nit", "902038118");
+    expect(dentroDelLimiteDeVerificacion).toHaveBeenCalledWith("902038118", "nit");
+    expect(verifyOtp).toHaveBeenCalledWith({ email: CORREO, token: "123456", type: "email" });
+    expect(redirigeA).toBe("/convenio");
+  });
+
+  it("NIT sin cuenta activa: mismo mensaje que un código equivocado", async () => {
+    vi.mocked(leerCookieIngreso).mockResolvedValue({ c: "902038118", t: "nit", m: "x", u: Date.now() });
+    vi.mocked(correoDe).mockResolvedValue(null);
+    const verifyOtp = verifyOtpFalso({ error: null }, "convenio");
+    const { resultado } = await verificar("123456");
+    expect(verifyOtp).not.toHaveBeenCalled();
+    expect(resultado?.error).toBe(MENSAJE_CODIGO_INVALIDO);
   });
 });

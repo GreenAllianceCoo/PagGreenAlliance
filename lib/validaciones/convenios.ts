@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { normalizarCelular, textoDe } from "./comunes";
+import { esquemaCorreo, normalizarCelular, textoDe } from "./comunes";
 
 /**
  * Esquemas de /admin/convenios (5.9 / P-68). Los límites repiten los check de
@@ -90,6 +90,21 @@ const esquemaNitConvenio = textoOpcional(30, "El NIT puede tener máximo 30 cara
     }),
 );
 
+/**
+ * NIT sin puntos ni dígito de verificación, igual que la columna generada
+ * `convenios.nit_base` (migración 20261121000000): «902.038.118-7» → «902038118».
+ */
+export function nitBase(nit: string | null | undefined): string | null {
+  const base = (nit ?? "").split("-")[0].replace(/[^0-9]/g, "");
+  return base === "" ? null : base;
+}
+
+/** Correo de acceso de la empresa en convenio (opcional: vacío = sin cambios). */
+const esquemaCorreoAcceso = z
+  .string()
+  .transform((v) => v.trim())
+  .pipe(z.union([z.literal("").transform(() => null), esquemaCorreo]));
+
 /** Campos de datos del convenio (sin id ni logo). */
 const camposConvenio = {
   nombreEmpresa: texto(120, "El nombre puede tener máximo 120 caracteres.").pipe(
@@ -112,6 +127,7 @@ const camposConvenio = {
   videoUrl: esquemaUrlMedio("Video"),
   pdfUrl: esquemaUrlMedio("PDF"),
   pdfTamano: textoOpcional(20, "El tamaño del PDF puede tener máximo 20 caracteres."),
+  correoAcceso: esquemaCorreoAcceso,
 };
 
 export const esquemaGuardarConvenio = z
@@ -123,6 +139,15 @@ export const esquemaGuardarConvenio = z
   .superRefine((v, ctx) => {
     if (v.pdfUrl && !v.pdfTamano) {
       ctx.addIssue({ code: "custom", path: ["pdfTamano"], message: "Indica el tamaño del PDF (p. ej. 3 MB)." });
+    }
+    // El convenio entra con su NIT: para darle acceso, el NIT (sin DV) debe tener 6 a 10 dígitos.
+    const base = nitBase(v.nit);
+    if (v.correoAcceso && (!base || !/^[0-9]{6,10}$/.test(base))) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["nit"],
+        message: "Para dar acceso, escribe el NIT: 6 a 10 dígitos sin contar el de verificación.",
+      });
     }
   });
 
@@ -145,6 +170,7 @@ export function leerFormularioConvenio(formData: FormData) {
     videoUrl: textoDe(formData, "videoUrl"),
     pdfUrl: textoDe(formData, "pdfUrl"),
     pdfTamano: textoDe(formData, "pdfTamano"),
+    correoAcceso: textoDe(formData, "correoAcceso"),
     visible: formData.get("visible") === "on",
   };
 }

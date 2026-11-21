@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { exigirAdmin } from "@/lib/admin/servidor";
+import { asegurarCuentaConvenio } from "@/lib/admin/cuentaConvenio";
 import { BUCKET_LOGOS, esLogoEstatico } from "@/lib/conveniosServidor";
 import { reordenarConvenios } from "@/lib/conveniosOrden";
 import { registrar } from "@/lib/servidor/registro";
@@ -134,6 +135,10 @@ export async function guardarConvenio(
   if (error) {
     if (subido) await supabase.storage.from(BUCKET_LOGOS).remove([subido]);
     registrar("error", { evento: "convenio_guardar_fallo", codigo: error.code, mensaje: error.message });
+    // 23505 = índice único convenios_nit_base_key (mismo NIT sin DV).
+    if (error.code === "23505") {
+      return { errores: { nit: "Ya hay otro convenio con ese NIT." }, valores: entrada };
+    }
     // 23514 = check de la base (límites de longitud, formato de URL, teléfono…).
     return {
       errorGeneral:
@@ -151,8 +156,38 @@ export async function guardarConvenio(
   }
 
   registrar("info", { evento: datos.id ? "convenio_editado" : "convenio_creado", convenioId: id, admin: userId });
+
+  // Acceso de la empresa (docs/spec-convenios.md §B2): con correo nuevo o
+  // cambiado, crea o actualiza su cuenta y le envía el correo de bienvenida.
+  // Vacío = se deja la cuenta como está.
+  let accesoEnviado = false;
+  if (datos.correoAcceso) {
+    const { data: cuenta } = await supabase
+      .from("convenio_cuentas")
+      .select("usuario_id, correo_acceso")
+      .eq("convenio_id", id)
+      .maybeSingle();
+    const acceso = await asegurarCuentaConvenio({
+      convenioId: id,
+      nombre: datos.nombreEmpresa,
+      correo: datos.correoAcceso,
+      actual: cuenta ? { usuarioId: cuenta.usuario_id as string, correo: cuenta.correo_acceso as string } : null,
+    });
+    if (!acceso.ok) {
+      refrescar();
+      // Se devuelve el id para que un nuevo intento edite el convenio ya creado (no lo duplique).
+      return {
+        errores: { correoAcceso: acceso.mensaje },
+        errorGeneral: "Los datos del convenio se guardaron, pero el acceso no quedó listo.",
+        valores: { ...entrada, id },
+      };
+    }
+    accesoEnviado = acceso.cambio;
+  }
+
   refrescar();
-  return { mensaje: datos.id ? "Convenio actualizado." : "Convenio creado.", guardado: Date.now() };
+  const base = datos.id ? "Convenio actualizado." : "Convenio creado.";
+  return { mensaje: accesoEnviado ? `${base} Le enviamos el acceso al correo.` : base, guardado: Date.now() };
 }
 
 /** «Ocultar» / «Mostrar»: cambia `visible` (la landing y /cuenta solo leen los visibles). */
@@ -210,12 +245,42 @@ export async function moverConvenio(_previo: EstadoAccionConvenio, formData: For
   return { mensaje: direccion === "subir" ? "Subió una posición." : "Bajó una posición." };
 }
 
-/** «Eliminar» (con confirmación en pantalla): borra la fila y su logo. */
+/**
+ * «Eliminar» (con confirmación en pantalla). Sin cuenta ni publicaciones:
+ * borra la fila y su logo. Con cuenta o publicaciones (las llaves no dejan
+ * borrar): lo marca eliminado (`eliminado_en`), sale del listado, queda oculto,
+ * la empresa ya no puede entrar y sus publicaciones se ocultan sin borrarse.
+ */
 export async function eliminarConvenio(_previo: EstadoAccionConvenio, formData: FormData): Promise<EstadoAccionConvenio> {
   const { supabase, userId } = await exigirAdmin();
   const resultado = esquemaIdConvenio.safeParse({ id: textoDe(formData, "id") });
   if (!resultado.success) return { error: "Datos inválidos." };
   const { id } = resultado.data;
+
+  const [cuentas, publicaciones] = await Promise.all([
+    supabase.from("convenio_cuentas").select("convenio_id", { count: "exact", head: true }).eq("convenio_id", id),
+    supabase.from("convenio_publicaciones").select("id", { count: "exact", head: true }).eq("convenio_id", id),
+  ]);
+  if (cuentas.error || publicaciones.error) {
+    registrar("error", { evento: "convenio_eliminar_conteo_fallo", codigo: (cuentas.error ?? publicaciones.error)?.code });
+    return { error: "No pudimos eliminar el convenio. Intenta de nuevo." };
+  }
+  if ((cuentas.count ?? 0) > 0 || (publicaciones.count ?? 0) > 0) {
+    const { data: marcado, error: errorMarca } = await supabase
+      .from("convenios")
+      .update({ eliminado_en: new Date().toISOString(), visible: false })
+      .eq("id", id)
+      .select("nombre_empresa")
+      .maybeSingle();
+    if (errorMarca) {
+      registrar("error", { evento: "convenio_eliminar_fallo", codigo: errorMarca.code, mensaje: errorMarca.message });
+      return { error: "No pudimos eliminar el convenio. Intenta de nuevo." };
+    }
+    if (!marcado) return { error: "No encontramos ese convenio." };
+    registrar("info", { evento: "convenio_eliminado_conservado", convenioId: id, admin: userId });
+    refrescar();
+    return { mensaje: `«${marcado.nombre_empresa}» eliminado. Su acceso quedó cerrado y sus publicaciones, ocultas.` };
+  }
 
   const { data, error } = await supabase.from("convenios").delete().eq("id", id).select("nombre_empresa, logo_path").maybeSingle();
   if (error) {

@@ -67,6 +67,8 @@ export type IngresoCodigoProps = {
   mensajeEstado?: string;
   /** Destino de «Cambiar cédula» / «Volver»: borra la cookie del paso 1. */
   cambiarHref?: string;
+  /** Texto del enlace para volver al paso 1 («Cambiar cédula» o «Cambiar NIT»). */
+  textoCambiar?: string;
 };
 
 /** Ingreso paso 2 · código (pieza 3b del rediseño C+, docs/Green Alliance C+.dc.html). */
@@ -85,6 +87,7 @@ export function IngresoCodigo({
   reenviarDeshabilitado = false,
   mensajeEstado,
   cambiarHref = "/ingresar/cambiar",
+  textoCambiar = "Cambiar cédula",
 }: IngresoCodigoProps) {
   const numero = whatsappUrl ? (
     <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="underline">
@@ -121,7 +124,7 @@ export function IngresoCodigo({
           accion={
             // <a> normal (sin prefetch): /ingresar/cambiar borra la cookie y vuelve a /ingresar.
             <a href={cambiarHref} className="enlace hidden text-15 font-bold lg:inline">
-              Cambiar cédula
+              {textoCambiar}
             </a>
           }
         />
