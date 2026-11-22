@@ -1,7 +1,10 @@
 import "server-only";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import { RUTA_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
+import { BUCKET_PUBLICACIONES, type Publicacion, type TipoPublicacion } from "@/lib/convenio/publicaciones";
 import { urlLogo } from "@/lib/conveniosServidor";
+import { registrar } from "@/lib/servidor/registro";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -46,4 +49,98 @@ export async function exigirConvenio() {
       logoUrl: urlLogo(convenio.logo_path as string | null),
     },
   };
+}
+
+const COLUMNAS_PUBLICACION =
+  "id, tipo, titulo, descripcion, beneficio, imagenes, pdf_path, inicia_el, termina_el, oculta_en, oculta_motivo, creada_en";
+
+type FilaPublicacion = {
+  id: string;
+  tipo: TipoPublicacion;
+  titulo: string;
+  descripcion: string | null;
+  beneficio: string | null;
+  imagenes: string[] | null;
+  pdf_path: string | null;
+  inicia_el: string | null;
+  termina_el: string | null;
+  oculta_en: string | null;
+  oculta_motivo: string | null;
+  creada_en: string;
+};
+
+export function filaAPublicacion(f: FilaPublicacion): Publicacion {
+  return {
+    id: f.id,
+    tipo: f.tipo,
+    titulo: f.titulo,
+    descripcion: f.descripcion,
+    beneficio: f.beneficio,
+    imagenes: f.imagenes ?? [],
+    pdfPath: f.pdf_path,
+    iniciaEl: f.inicia_el,
+    terminaEl: f.termina_el,
+    ocultaEn: f.oculta_en,
+    ocultaMotivo: f.oculta_motivo,
+    creadaEn: f.creada_en,
+  };
+}
+
+export type Metricas = { vistas: number; vistasUnicas: number; clics: number; clicsUnicos: number };
+const SIN_METRICAS: Metricas = { vistas: 0, vistasUnicas: 0, clics: 0, clicsUnicos: 0 };
+
+/** URLs firmadas (1 h) de archivos del bucket privado; las rutas que fallen quedan sin URL. */
+export async function urlsFirmadas(supabase: SupabaseClient, rutas: string[]): Promise<Record<string, string>> {
+  if (rutas.length === 0) return {};
+  const { data, error } = await supabase.storage.from(BUCKET_PUBLICACIONES).createSignedUrls(rutas, 3600);
+  if (error) {
+    registrar("warn", { evento: "publicaciones_urls_fallo", mensaje: error.message });
+    return {};
+  }
+  const salida: Record<string, string> = {};
+  for (const d of data ?? []) if (d.path && d.signedUrl) salida[d.path] = d.signedUrl;
+  return salida;
+}
+
+/**
+ * Publicaciones del convenio de la sesión (RLS: solo las suyas, incluidas
+ * vencidas y ocultas), con sus métricas y la URL de la primera imagen.
+ */
+export async function listarPublicacionesPropias(supabase: SupabaseClient) {
+  const [{ data, error }, { data: metricas }] = await Promise.all([
+    supabase.from("convenio_publicaciones").select(COLUMNAS_PUBLICACION).order("creada_en", { ascending: false }),
+    supabase.rpc("metricas_publicaciones"),
+  ]);
+  if (error) {
+    registrar("error", { evento: "convenio_publicaciones_lista_fallo", codigo: error.code, mensaje: error.message });
+    return { publicaciones: [] as (Publicacion & { metricas: Metricas; portada: string | null })[], error: true };
+  }
+  const porId = new Map<string, Metricas>();
+  for (const m of (metricas ?? []) as { publicacion_id: string; vistas: number; vistas_unicas: number; clics: number; clics_unicos: number }[]) {
+    porId.set(m.publicacion_id, {
+      vistas: Number(m.vistas),
+      vistasUnicas: Number(m.vistas_unicas),
+      clics: Number(m.clics),
+      clicsUnicos: Number(m.clics_unicos),
+    });
+  }
+  const lista = ((data ?? []) as FilaPublicacion[]).map(filaAPublicacion);
+  const urls = await urlsFirmadas(
+    supabase,
+    lista.map((p) => p.imagenes[0]).filter((r): r is string => Boolean(r)),
+  );
+  return {
+    error: false,
+    publicaciones: lista.map((p) => ({
+      ...p,
+      metricas: porId.get(p.id) ?? SIN_METRICAS,
+      portada: p.imagenes[0] ? (urls[p.imagenes[0]] ?? null) : null,
+    })),
+  };
+}
+
+/** Una publicación propia por id (null si no es suya o no existe). */
+export async function obtenerPublicacionPropia(supabase: SupabaseClient, id: string) {
+  const { data } = await supabase.from("convenio_publicaciones").select(COLUMNAS_PUBLICACION).eq("id", id).maybeSingle();
+  return data ? filaAPublicacion(data as FilaPublicacion) : null;
 }

@@ -15,7 +15,8 @@ type PasosSolicitudProps = {
   variante?: "lista" | "cuenta";
 };
 
-function Marcador({ estado, className }: { estado: EstadoPaso; className?: string }) {
+/** Círculo de un paso (check verde, aro ámbar o borde pendiente). Se reutiliza en los estados de las publicaciones. */
+export function Marcador({ estado, className }: { estado: EstadoPaso; className?: string }) {
   if (estado === "hecho") {
     return (
       <span
