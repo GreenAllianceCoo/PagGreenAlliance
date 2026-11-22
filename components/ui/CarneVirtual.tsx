@@ -61,7 +61,7 @@ export function CarneVirtual({
           className="h-[34px] w-auto max-w-[60%]"
         />
         {activo !== undefined ? (
-          <span className="rounded-full bg-ga-menta px-2.5 py-1 text-13 font-semibold text-ga-navy-chip-oscuro">
+          <span className="shrink-0 whitespace-nowrap rounded-full bg-ga-menta px-2.5 py-1 text-13 font-semibold text-ga-navy-chip-oscuro">
             {activo ? "Asociado activo" : "Asociado inactivo"}
           </span>
         ) : null}
