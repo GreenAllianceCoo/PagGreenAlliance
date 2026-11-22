@@ -8,12 +8,13 @@ import { AvisoCreditoBloqueado } from "@/components/ui/AvisoCreditoBloqueado";
 import { ListaConvenios } from "@/components/pantallas/ListaConvenios";
 import { IconoConvenios, IconoDocumento, IconoMas, IconoSalir } from "@/components/ui/Iconos";
 import { BarraInferiorCuenta } from "@/components/pantallas/BarraInferiorCuenta";
-import { EncabezadoCuenta, RUTA_NUEVA_SOLICITUD } from "@/components/pantallas/EncabezadoCuenta";
+import { EncabezadoCuenta, RUTA_BENEFICIOS, RUTA_NUEVA_SOLICITUD } from "@/components/pantallas/EncabezadoCuenta";
 import { TarjetaTope } from "@/components/cuenta/TarjetaTope";
 import { PasosSolicitud } from "@/components/ui/PasosSolicitud";
 import { SorteoDelMes, type SorteoDelMesProps } from "@/components/sorteo/SorteoDelMes";
 import type { PerfilAsociado } from "@/lib/asociado/servidor";
 import type { ConteoCredito } from "@/lib/cuenta";
+import type { ResumenPublicacion } from "@/lib/beneficios/beneficios";
 import type { Convenio, PasoSolicitud } from "@/lib/mock";
 
 export type CuentaProps = {
@@ -33,6 +34,8 @@ export type CuentaProps = {
     conteo?: ConteoCredito | null;
   } | null;
   convenios: Convenio[];
+  /** Publicaciones activas por convenio (docs/spec-convenios.md §B5); solo para asociados. */
+  publicacionesConvenios?: Record<string, ResumenPublicacion[]>;
   /**
    * «Sorteo del mes» (docs/spec-fase-2.md §4): botón + modal, ver
    * components/sorteo/SorteoDelMes. `null` cuando quien ve /cuenta no es
@@ -195,6 +198,14 @@ function ColumnaLateral({
           <IconoConvenios grosor={1.8} className="text-ga-verde" />
           Convenios
         </a>
+        {/* Beneficios (docs/spec-convenios.md §B5): promociones y catálogos de los convenios. */}
+        <Link
+          href={RUTA_BENEFICIOS}
+          className="flex flex-col gap-2.5 rounded-16 bg-white p-4.5 text-15 font-bold text-ga-texto no-underline hover:bg-ga-verde-tint lg:hidden"
+        >
+          <IconoDocumento grosor={1.8} className="text-ga-verde" />
+          Beneficios
+        </Link>
         {/* Sorteo mensual (docs/spec-fase-2.md §4): botón + modal en un solo
             componente autocontenido (ver components/sorteo/SorteoDelMes.tsx).
             S-13: solo se renderiza para asociados (sorteo === null para
@@ -227,6 +238,7 @@ export function Cuenta({
   tope,
   solicitud,
   convenios,
+  publicacionesConvenios,
   sorteo,
   cedula,
   grado,
@@ -381,7 +393,7 @@ export function Cuenta({
         >
           <h2 className="m-0 font-display text-18 font-extrabold lg:text-22">Tus convenios</h2>
           {/* Detalle por marca (pieza 3n): modal en escritorio, hoja inferior en celular. */}
-          <ListaConvenios convenios={convenios} variante="cuenta" />
+          <ListaConvenios convenios={convenios} variante="cuenta" publicaciones={publicacionesConvenios} />
         </section>
 
       </main>

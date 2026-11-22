@@ -1,14 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import { useId, useState } from "react";
 import { IconoWhatsapp } from "@/components/ui/Iconos";
 import { Modal } from "@/components/ui/Modal";
+import type { ResumenPublicacion } from "@/lib/beneficios/beneficios";
 import type { Convenio } from "@/lib/convenios";
 
 type ListaConveniosProps = {
   convenios: Convenio[];
   /** `landing`: tarjetas grandes (pieza 2a). `cuenta`: chips compactos de /cuenta (pieza 2b). */
   variante: "landing" | "cuenta";
+  /** Publicaciones activas por id de convenio (solo /cuenta, para asociados; docs/spec-convenios.md §B5). */
+  publicaciones?: Record<string, ResumenPublicacion[]>;
 };
 
 /** Viñeta verde de «Servicios» (pieza 3n). */
@@ -69,7 +73,15 @@ function LogoTarjeta({ convenio }: { convenio: Convenio }) {
  * celular, con descripción, servicios en viñetas, sedes (solo si tiene), NIT y
  * «Escribir por WhatsApp» (enlace wa.me directo, sin backend).
  */
-function DetalleConvenio({ convenio, onCerrar }: { convenio: Convenio; onCerrar: () => void }) {
+function DetalleConvenio({
+  convenio,
+  publicaciones = [],
+  onCerrar,
+}: {
+  convenio: Convenio;
+  publicaciones?: ResumenPublicacion[];
+  onCerrar: () => void;
+}) {
   const idTitulo = useId();
   const medio = convenio.medio ?? undefined;
   return (
@@ -125,6 +137,32 @@ function DetalleConvenio({ convenio, onCerrar }: { convenio: Convenio; onCerrar:
             </ul>
           </div>
         ) : null}
+        {publicaciones.length > 0 ? (
+          <div className="flex flex-col gap-1.5 lg:gap-2">
+            <h3 className="m-0 text-14 font-extrabold text-ga-navy">Promociones y catálogos</h3>
+            <ul className="m-0 flex list-none flex-col gap-2 p-0">
+              {publicaciones.map((p) => (
+                <li key={p.id}>
+                  <Link
+                    href={`/cuenta/beneficios/${p.id}`}
+                    className="flex items-center justify-between gap-3 rounded-14 bg-ga-fondo-suave px-4 py-3 text-14 font-bold text-ga-texto no-underline hover:bg-ga-verde-tint lg:text-15"
+                  >
+                    <span className="min-w-0">
+                      <span className="block text-13 font-semibold text-ga-texto-3">
+                        {p.tipo === "promocion" ? "Promoción" : "Catálogo"}
+                        {p.beneficio ? ` · ${p.beneficio}` : ""}
+                      </span>
+                      <span className="block truncate">{p.titulo}</span>
+                    </span>
+                    <span aria-hidden="true" className="shrink-0 text-ga-verde">
+                      Ver
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
         {/* Sedes solo si el convenio tiene (Dr. Ribero y Racing Tours): si no, la fila no existe. */}
         {convenio.sedes.length > 0 ? (
           <div className="flex flex-col gap-1.5 lg:gap-2">
@@ -162,7 +200,7 @@ function DetalleConvenio({ convenio, onCerrar }: { convenio: Convenio; onCerrar:
 }
 
 /** Lista de convenios con su detalle por marca (pieza 3n), en la landing y en /cuenta. */
-export function ListaConvenios({ convenios, variante }: ListaConveniosProps) {
+export function ListaConvenios({ convenios, variante, publicaciones }: ListaConveniosProps) {
   const [abierto, setAbierto] = useState<Convenio | null>(null);
   const cerrar = () => setAbierto(null);
 
@@ -211,7 +249,13 @@ export function ListaConvenios({ convenios, variante }: ListaConveniosProps) {
           ),
         )}
       </div>
-      {abierto ? <DetalleConvenio convenio={abierto} onCerrar={cerrar} /> : null}
+      {abierto ? (
+        <DetalleConvenio
+          convenio={abierto}
+          publicaciones={abierto.id ? publicaciones?.[abierto.id] : undefined}
+          onCerrar={cerrar}
+        />
+      ) : null}
     </>
   );
 }

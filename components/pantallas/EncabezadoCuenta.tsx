@@ -5,6 +5,8 @@ import { Logo } from "@/components/ui/Logo";
 export const RUTA_NUEVA_SOLICITUD = "/cuenta/solicitar";
 /** «Perfil» del asociado (pieza 3k): pantalla propia, absorbe «Mis datos». */
 export const RUTA_PERFIL = "/cuenta/perfil";
+/** «Beneficios» (docs/spec-convenios.md §B5): promociones y catálogos de los convenios. */
+export const RUTA_BENEFICIOS = "/cuenta/beneficios";
 
 // Rediseño C+ (pieza 2b): el nav pasa de subrayado a píldora rellena
 // (verde-claro de fondo, texto verde-oscuro), como en el resto del design
@@ -16,7 +18,7 @@ const CLASE_INACTIVO =
 type EncabezadoCuentaProps = {
   nombre: string;
   /** Sección actual (subrayada y con aria-current). */
-  seccion: "inicio" | "solicitud" | "perfil";
+  seccion: "inicio" | "solicitud" | "perfil" | "beneficios";
   /** Server Action de «Salir» (signOut → /ingresar). */
   accionSalir?: (formData: FormData) => void;
 };
@@ -63,6 +65,13 @@ export function EncabezadoCuenta({ nombre, seccion, accionSalir }: EncabezadoCue
           <a href={seccion === "inicio" ? "#convenios" : "/cuenta#convenios"} className={CLASE_INACTIVO}>
             Convenios
           </a>
+          <Link
+            href={RUTA_BENEFICIOS}
+            aria-current={seccion === "beneficios" ? "page" : undefined}
+            className={seccion === "beneficios" ? CLASE_ACTIVO : CLASE_INACTIVO}
+          >
+            Beneficios
+          </Link>
           {/* «Perfil» (pieza 3k): pantalla propia /cuenta/perfil; absorbe «Mis datos». */}
           <Link
             href={RUTA_PERFIL}

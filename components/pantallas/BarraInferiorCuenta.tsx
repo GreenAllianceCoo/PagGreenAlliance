@@ -15,7 +15,7 @@ const CLASE_INACTIVA = `${CLASE_BASE} font-bold text-ga-texto-3`;
  * «Accesos») para no chocar con los locators de las pruebas e2e. El acceso
  * rápido «Nueva solicitud» de Inicio se conserva (a-navegacion.spec.ts).
  */
-export function BarraInferiorCuenta({ activa }: { activa: "inicio" | "perfil" }) {
+export function BarraInferiorCuenta({ activa }: { activa: "inicio" | "perfil" | null }) {
   return (
     <BarraInferior>
       <nav
