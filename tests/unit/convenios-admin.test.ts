@@ -6,6 +6,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/admin/servidor", () => ({ exigirAdmin: vi.fn() }));
+vi.mock("@/lib/admin/cuentaConvenio", () => ({ asegurarCuentaConvenio: vi.fn() }));
 vi.mock("@/lib/servidor/registro", () => ({ registrar: vi.fn() }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/lib/conveniosServidor", () => ({
@@ -14,6 +15,7 @@ vi.mock("@/lib/conveniosServidor", () => ({
 }));
 
 import { exigirAdmin } from "@/lib/admin/servidor";
+import { asegurarCuentaConvenio } from "@/lib/admin/cuentaConvenio";
 import { registrar } from "@/lib/servidor/registro";
 import { revalidatePath } from "next/cache";
 import { reordenarConvenios } from "@/lib/conveniosOrden";
@@ -30,6 +32,7 @@ import {
   esquemaMoverConvenio,
   esquemaVisibilidadConvenio,
   leerFormularioConvenio,
+  nitBase,
   validarLogo,
 } from "@/lib/validaciones/convenios";
 
@@ -60,6 +63,31 @@ function formulario(extra: Record<string, string | File> = {}) {
 
 const validar = (extra: Record<string, string | File> = {}) =>
   esquemaGuardarConvenio.safeParse(entradaGuardarConvenio(leerFormularioConvenio(formulario(extra))));
+
+describe("correo de acceso y NIT (convenios B2)", () => {
+  it("nitBase quita puntos y dígito de verificación, igual que la columna generada", () => {
+    expect(nitBase("902.038.118-7")).toBe("902038118");
+    expect(nitBase("902038118")).toBe("902038118");
+    expect(nitBase("")).toBeNull();
+    expect(nitBase(null)).toBeNull();
+  });
+
+  it("el correo de acceso es opcional y se normaliza a minúsculas", () => {
+    const vacio = validar({ correoAcceso: "  " });
+    expect(vacio.success && vacio.data.correoAcceso).toBeNull();
+    const r = validar({ correoAcceso: " Ventas@Empresa.CO " });
+    expect(r.success && r.data.correoAcceso).toBe("ventas@empresa.co");
+    expect(validar({ correoAcceso: "no-es-correo" }).success).toBe(false);
+  });
+
+  it("con correo de acceso exige un NIT de 6 a 10 dígitos sin DV", () => {
+    const sinNit = validar({ correoAcceso: "a@b.co", nit: "" });
+    expect(sinNit.success).toBe(false);
+    if (!sinNit.success) expect(sinNit.error.issues[0].path).toEqual(["nit"]);
+    expect(validar({ correoAcceso: "a@b.co", nit: "12345" }).success).toBe(false);
+    expect(validar({ correoAcceso: "a@b.co", nit: "902.038.118-7" }).success).toBe(true);
+  });
+});
 
 describe("esquemaGuardarConvenio", () => {
   it("normaliza un convenio válido (espacios, listas sin vacías ni repetidas, WhatsApp sin +57)", () => {
@@ -370,5 +398,76 @@ describe("eliminarConvenio", () => {
     malo.set("id", "x");
     expect((await eliminarConvenio({}, malo)).error).toBe("Datos inválidos.");
     expect(fake.remove).not.toHaveBeenCalled();
+  });
+});
+
+describe("guardarConvenio · acceso de la empresa (B2)", () => {
+  it("sin correo de acceso no toca cuentas", async () => {
+    const fake = supabaseFalso({ tablas: [{}] });
+    comoAdmin(fake);
+    const r = await guardarConvenio({}, formulario());
+    expect(r.mensaje).toBe("Convenio creado.");
+    expect(asegurarCuentaConvenio).not.toHaveBeenCalled();
+  });
+
+  it("con correo nuevo crea el acceso y lo avisa en el mensaje", async () => {
+    const fake = supabaseFalso({ tablas: [{}, { data: null }] });
+    comoAdmin(fake);
+    vi.mocked(asegurarCuentaConvenio).mockResolvedValue({ ok: true, cambio: true });
+    const r = await guardarConvenio({}, formulario({ correoAcceso: "Ventas@Empresa.co" }));
+    expect(asegurarCuentaConvenio).toHaveBeenCalledWith(
+      expect.objectContaining({ correo: "ventas@empresa.co", nombre: "AMB Móvil S.A.S.", actual: null }),
+    );
+    expect(r.mensaje).toBe("Convenio creado. Le enviamos el acceso al correo.");
+    expect(r.guardado).toBeTypeOf("number");
+  });
+
+  it("pasa la cuenta actual para cambiar su correo", async () => {
+    const fake = supabaseFalso({ tablas: [{ data: { logo_path: null } }, {}, { data: { usuario_id: "u-9", correo_acceso: "viejo@e.co" } }] });
+    comoAdmin(fake);
+    vi.mocked(asegurarCuentaConvenio).mockResolvedValue({ ok: true, cambio: true });
+    await guardarConvenio({}, formulario({ id: UUID, correoAcceso: "nuevo@e.co" }));
+    expect(asegurarCuentaConvenio).toHaveBeenCalledWith(
+      expect.objectContaining({ convenioId: UUID, actual: { usuarioId: "u-9", correo: "viejo@e.co" } }),
+    );
+  });
+
+  it("si el acceso falla, conserva el id del convenio creado para no duplicarlo", async () => {
+    const fake = supabaseFalso({ tablas: [{}, { data: null }] });
+    comoAdmin(fake);
+    vi.mocked(asegurarCuentaConvenio).mockResolvedValue({ ok: false, mensaje: "Ese correo ya tiene otra cuenta" });
+    const r = await guardarConvenio({}, formulario({ correoAcceso: "a@b.co" }));
+    expect(r.errores?.correoAcceso).toMatch(/otra cuenta/);
+    expect(r.errorGeneral).toMatch(/se guardaron/);
+    const idCreado = fake.cadenas[0].insert.mock.calls[0][0].id;
+    expect(r.valores?.id).toBe(idCreado);
+    expect(r.guardado).toBeUndefined();
+  });
+
+  it("un NIT repetido sale como error del campo NIT", async () => {
+    const fake = supabaseFalso({ tablas: [{ error: { code: "23505", message: "convenios_nit_base_key" } }] });
+    comoAdmin(fake);
+    const r = await guardarConvenio({}, formulario());
+    expect(r.errores?.nit).toMatch(/otro convenio con ese NIT/);
+  });
+});
+
+describe("eliminarConvenio · con cuenta o publicaciones (B2)", () => {
+  it("lo marca eliminado y oculto en lugar de borrarlo", async () => {
+    const conteo = cadena({});
+    (conteo as unknown as { then: unknown }).then = (res: (v: unknown) => unknown) => res({ data: null, error: null, count: 1 });
+    const marca = cadena({ data: { nombre_empresa: "AMB" } });
+    const cadenas = [conteo, conteo, marca];
+    let i = 0;
+    const remove = vi.fn();
+    const fake = { from: vi.fn(() => cadenas[i++]), storage: { from: vi.fn(() => ({ remove })) } };
+    vi.mocked(exigirAdmin).mockResolvedValue({ supabase: fake, userId: "admin-1", nombre: "Admin" } as never);
+    const f = new FormData();
+    f.set("id", UUID);
+    const r = await eliminarConvenio({}, f);
+    expect(r.mensaje).toMatch(/acceso quedó cerrado/);
+    expect(marca.update).toHaveBeenCalledWith(expect.objectContaining({ visible: false, eliminado_en: expect.any(String) }));
+    expect(marca.delete).not.toHaveBeenCalled();
+    expect(remove).not.toHaveBeenCalled();
   });
 });

@@ -92,7 +92,7 @@ function FormularioConvenio({ convenio, onCerrar }: { convenio?: ConvenioAdmin; 
   return (
     <form action={accion} noValidate className="flex flex-col gap-4 rounded-20 bg-admin-superficie p-5.5">
       <h2 className="m-0 font-display text-20 font-extrabold">{convenio ? `Editar «${convenio.nombreEmpresa}»` : "Nuevo convenio"}</h2>
-      <input type="hidden" name="id" value={convenio?.id ?? ""} />
+      <input type="hidden" name="id" value={p("id", convenio?.id ?? "")} />
       <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
         <Campo id="convenio-nombreEmpresa" label="Nombre de la empresa" error={e.nombreEmpresa}>
           {(d, i) => (
@@ -104,8 +104,30 @@ function FormularioConvenio({ convenio, onCerrar }: { convenio?: ConvenioAdmin; 
             <input id="convenio-especialidad" name="especialidad" required defaultValue={p("especialidad", convenio?.especialidad ?? "")} className={CLASE_CONTROL + " h-12"} {...control(d, i)} />
           )}
         </Campo>
-        <Campo id="convenio-nit" label="NIT" error={e.nit} ayuda="Opcional. Ejemplo: 902.038.118-7">
+        <Campo id="convenio-nit" label="NIT" error={e.nit} ayuda="Ejemplo: 902.038.118-7. Obligatorio si la empresa tiene acceso.">
           {(d, i) => <input id="convenio-nit" name="nit" defaultValue={p("nit", convenio?.nit ?? "")} className={CLASE_CONTROL + " h-12"} {...control(d, i)} />}
+        </Campo>
+        <Campo
+          id="convenio-correoAcceso"
+          label="Correo de acceso"
+          error={e.correoAcceso}
+          ayuda={
+            convenio?.correoAcceso
+              ? "La empresa entra con su NIT y un código a este correo. Cámbialo para mover el acceso."
+              : "Opcional. Al guardarlo, la empresa recibe su acceso: entra con el NIT y un código a este correo."
+          }
+        >
+          {(d, i) => (
+            <input
+              id="convenio-correoAcceso"
+              name="correoAcceso"
+              type="email"
+              autoComplete="off"
+              defaultValue={p("correoAcceso", convenio?.correoAcceso ?? "")}
+              className={CLASE_CONTROL + " h-12"}
+              {...control(d, i)}
+            />
+          )}
         </Campo>
         <Campo id="convenio-emoji" label="Emoji" error={e.emoji}>
           {(d, i) => <input id="convenio-emoji" name="emoji" defaultValue={p("emoji", convenio?.emoji ?? "")} className={CLASE_CONTROL + " h-12"} {...control(d, i)} />}
@@ -241,7 +263,9 @@ function BotonEliminar({ id, nombre, onResultado }: { id: string; nombre: string
   return (
     <form action={despachar} role="group" aria-label={`Confirmar eliminación de ${nombre}`} className="flex flex-wrap items-center gap-2">
       <input type="hidden" name="id" value={id} />
-      <span className="text-13 font-extrabold text-admin-rojo-2">¿Eliminar «{nombre}»? No se puede deshacer.</span>
+      <span className="text-13 font-extrabold text-admin-rojo-2">
+        ¿Eliminar «{nombre}»? No se puede deshacer. Si tiene acceso o publicaciones, se conservan ocultas.
+      </span>
       <button type="submit" disabled={pendiente} aria-busy={pendiente || undefined} className={CLASE_BOTON_SECUNDARIO + " text-admin-rojo-2 !shadow-[inset_0_0_0_1px_var(--ga-admin-rojo)]"}>
         {pendiente ? "Eliminando…" : "Sí, eliminar"}
       </button>
@@ -309,6 +333,9 @@ export function GestorConvenios({ convenios }: { convenios: ConvenioAdmin[] }) {
                     </span>
                     <span className={"text-13 font-extrabold " + (c.visible ? "text-admin-verde-2" : "text-admin-ambar")}>
                       {c.visible ? "Visible" : "Oculto"}
+                    </span>
+                    <span className="text-13 text-admin-texto-3">
+                      Acceso: {c.correoAcceso ? (c.visible ? `Activo · ${c.correoAcceso}` : `Desactivado · ${c.correoAcceso}`) : "Sin cuenta"}
                     </span>
                   </div>
                 </div>

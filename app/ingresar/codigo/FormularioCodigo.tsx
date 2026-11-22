@@ -22,10 +22,18 @@ type Props = {
   whatsappUrl: string | null;
   /** Segundos que faltan para poder reenviar (calculado en el servidor). */
   segundosIniciales: number;
+  /** true si ingresa una empresa en convenio (NIT): cambia el enlace de volver. */
+  esConvenio?: boolean;
 };
 
 /** Conecta /ingresar/codigo con sus dos Server Actions (entrar y reenviar). */
-export function FormularioCodigo({ correoEnmascarado, whatsapp, whatsappUrl, segundosIniciales }: Props) {
+export function FormularioCodigo({
+  correoEnmascarado,
+  whatsapp,
+  whatsappUrl,
+  segundosIniciales,
+  esConvenio = false,
+}: Props) {
   const [digitos, setDigitos] = useState<string[]>(VACIO);
   const [restantes, setRestantes] = useState(segundosIniciales);
   // F-02: una vez se supera el tope de intentos, «Entrar» queda deshabilitado
@@ -90,6 +98,8 @@ export function FormularioCodigo({ correoEnmascarado, whatsapp, whatsappUrl, seg
       reenviarDeshabilitado={restantes > 0 || reenviando || entrando}
       tiempoReenvio={restantes > 0 ? formatoTiempo(restantes) : undefined}
       mensajeEstado={reenviando ? "Enviando un código nuevo…" : reenvio.mensaje}
+      cambiarHref={esConvenio ? "/ingresar/cambiar?a=convenio" : "/ingresar/cambiar"}
+      textoCambiar={esConvenio ? "Cambiar NIT" : "Cambiar cédula"}
     />
   );
 }

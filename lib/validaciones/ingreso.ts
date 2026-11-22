@@ -4,6 +4,32 @@ import { esquemaCedula, textoDe } from "./comunes";
 /** Paso 1 de /ingresar: la cédula. */
 export const esquemaIngresoCedula = z.object({ cedula: esquemaCedula });
 
+export const MENSAJE_NIT_VACIO = "Escribe el NIT de tu empresa.";
+export const MENSAJE_NIT_FORMATO = "Revisa el NIT: solo números, con o sin puntos y guion (p. ej. 902.038.118-7).";
+
+/**
+ * NIT de la empresa en convenio (docs/spec-convenios.md, decisión 1). Acepta
+ * «902038118», «902.038.118-7» y «9020381187». Con guion, el dígito de
+ * verificación se descarta y queda la base; sin guion se mandan los dígitos
+ * tal cual y correo_por_nit() decide si el último es el DV (solo si coincide).
+ */
+export function normalizarNit(valor: string) {
+  const limpio = valor.trim();
+  if (!/^[0-9. -]*$/.test(limpio)) return "";
+  const base = limpio.includes("-") ? limpio.split("-")[0] : limpio;
+  return base.replace(/[^0-9]/g, "");
+}
+
+export const esquemaNit = z
+  .string({ error: MENSAJE_NIT_VACIO })
+  .refine((v) => v.trim() !== "", { error: MENSAJE_NIT_VACIO })
+  .refine((v) => /^[0-9. -]{6,20}$/.test(v.trim()), { error: MENSAJE_NIT_FORMATO })
+  .transform(normalizarNit)
+  .pipe(z.string().regex(/^[0-9]{6,11}$/, { error: MENSAJE_NIT_FORMATO }));
+
+/** Paso 1 de /ingresar/convenio: el NIT. */
+export const esquemaIngresoNit = z.object({ nit: esquemaNit });
+
 export const LONGITUD_CODIGO = 6;
 export const MENSAJE_CODIGO_INVALIDO = "El código no es válido o ya venció";
 /**

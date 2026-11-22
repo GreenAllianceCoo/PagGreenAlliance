@@ -36,3 +36,21 @@ Formato (copiar debajo de la línea, uno por tarea):
 - Estado: En curso
 - Qué se hizo: en /admin/asociados/[id] el admin ve y cambia las 3 fotos de afiliación (la anterior se conserva) y sube/descarga/quita varios PDF del proceso; nueva sección «Cambios» (solo admin) con datos y cédula antes/después, fotos antes/después, proceso y documentos. Landing: un solo contenedor de hasta 1600 px, tarjetas más grandes desde 1280 px, convenios en cuadrícula con logo grande, horario «Lunes a viernes, 8:30 a. m. a 5:00 p. m.» junto al WhatsApp (pie sin cambios). Logos de 5 convenios y video de SB7 como archivos del sitio. Migración 20261108000000 y pgTAP 39 (verificada en Postgres embebido, 50 comprobaciones).
 - Bloqueos o trabajo nuevo: aplicar la migración 20261108000000 en producción antes de desplegar; tras el despliegue, apuntar logo_path de los 5 convenios a /convenios/logos/… y video_url de SB7 a /convenios/sb7-motos.mp4; correr supabase test db con Docker.
+
+## 2026-11-21 · sesion-principal
+- Actividades: P-nuevo (módulo de convenios · B0 spec y B1 modelo de datos y RLS)
+- Estado: En curso
+- Qué se hizo: spec aprobada (docs/spec-convenios.md). Migración 20261121000000 aplicada en producción el 2026-11-21: rol `convenio`, convenios.nit_base y eliminado_en, convenio_cuentas, correo_por_nit (solo service_role), convenio_publicaciones con RLS, guardas y topes 10/5, métricas (totales y únicos) y bucket privado convenios-publicaciones. pgTAP 10 corrido en producción dentro de una transacción revertida: 48/48 ok, sin datos residuales.
+- Bloqueos o trabajo nuevo: siguen B2 (ingreso con NIT y cuentas desde el admin) a B6. Horas de B0–B1 por anotar en docs/avances/horas-convenios.md.
+
+## 2026-11-21 · sesion-principal
+- Actividades: P-nuevo (módulo de convenios · B2 cuenta y acceso)
+- Estado: En curso
+- Qué se hizo: ingreso con NIT en /ingresar/convenio reutilizando lib/ingreso/servidor.ts (cookie con `t: "nit"`, correo_por_nit, límites por tipo; mismo paso 2 en /ingresar/codigo con «Cambiar NIT»); rol convenio → /convenio. Admin → Convenios: campo «Correo de acceso» (crea o cambia la cuenta de Auth sin contraseña, vincula con vincular_cuenta_convenio y envía «Ya puedes publicar»; plantilla opcional RESEND_TEMPLATE_CONVENIO_ACCESO con respaldo en texto), línea «Acceso» en la lista, NIT repetido como error de campo, «Eliminar» con cuenta o publicaciones = marcar eliminado_en. Guarda exigirConvenio en /convenio (inicio provisional) y proxy que manda la cuenta de convenio fuera de /cuenta. Unitarias 940/940, tsc, eslint y next build ok; capturas de /ingresar/convenio a 390 y 1280 px.
+- Bloqueos o trabajo nuevo: falta la prueba real de punta a punta (crear un acceso con un correo de prueba y entrar con el NIT), que crea un usuario en producción y envía un correo. Sigue B3 (panel /convenio con publicaciones).
+
+## 2026-11-21 · sesion-principal
+- Actividades: P-nuevo (módulo de convenios · B2 prueba real y B3 panel del convenio)
+- Estado: En curso
+- Qué se hizo: prueba real de B2 contra producción con elguishe123@gmail.com: cuenta creada con el código real, ingreso por NIT → /convenio, /cuenta, /admin e /ingresar redirigen al panel, «Salir» y convenio oculto sin acceso. B3: /convenio con contadores (x de 10 / x de 5), lista con la línea de pasos (Programada → Publicada → Vencida; «Oculta por Green Alliance» con motivo) y métricas (vistas totales y únicas, clics en WhatsApp); /convenio/nueva?tipo=… y /convenio/[id] con vista previa de la tarjeta del asociado. Imágenes: el navegador las reduce a 1600 px y el servidor las reconvierte a WebP con sharp (agregado como dependencia); PDF hasta 15 MB por URL firmada directo al bucket y validación %PDF en el servidor. Retirar borra fila y archivos. Prueba real: promoción con imagen (PNG 118 KB → WebP 13,5 KB), catálogo PDF, edición y retiro; 390 px sin scroll horizontal. Unitarias 965/965, tsc, eslint y next build ok.
+- Bloqueos o trabajo nuevo: el correo «Ya puedes publicar» no se probó (Sebas no compartió RESEND_API_KEY; en producción usa la llave de Vercel). Convenio de prueba «Convenio de prueba QA» (NIT 811.111.111-8) queda OCULTO en producción con su cuenta y una promoción, para probar B4 y B5; se borra en B6. Sigue B4 (admin: publicaciones).

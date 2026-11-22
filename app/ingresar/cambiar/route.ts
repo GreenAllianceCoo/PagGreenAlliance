@@ -8,7 +8,9 @@ import { COOKIE_INGRESO } from "@/lib/ingreso/servidor";
  * llega una petición de prefetch no se borra nada.
  */
 export async function GET(request: NextRequest) {
-  const destino = NextResponse.redirect(new URL("/ingresar", request.url), 303);
+  // ?a=convenio: vuelve al paso 1 de las empresas en convenio (NIT).
+  const paso1 = request.nextUrl.searchParams.get("a") === "convenio" ? "/ingresar/convenio" : "/ingresar";
+  const destino = NextResponse.redirect(new URL(paso1, request.url), 303);
   const esPrefetch =
     request.headers.get("next-router-prefetch") !== null ||
     request.headers.get("purpose") === "prefetch" ||

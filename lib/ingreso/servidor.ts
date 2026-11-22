@@ -48,12 +48,12 @@ const VENTANA_VERIFICAR_SEGUNDOS = 15 * 60;
  * corto circuito con `&&` (si la IP ya está bloqueada no hace falta gastar
  * cupo de la cédula).
  */
-export async function dentroDelLimiteDeVerificacion(cedula: string) {
+export async function dentroDelLimiteDeVerificacion(cedula: string, tipo: TipoIngreso = "cedula") {
   const ip = await ipDelCliente();
   return (
     (await dentroDelLimite("otp-verificar-ip", ip, LIMITE_VERIFICAR_POR_IP, VENTANA_VERIFICAR_SEGUNDOS)) &&
     (await dentroDelLimite(
-      "otp-verificar-cedula",
+      `otp-verificar-${tipo}`,
       cedula,
       LIMITE_VERIFICAR_POR_CEDULA,
       VENTANA_VERIFICAR_SEGUNDOS,
@@ -66,9 +66,18 @@ export async function dentroDelLimiteDeVerificacion(cedula: string) {
  */
 const TIEMPO_MINIMO_ENVIO_MS = 1500;
 
+/**
+ * Quién ingresa: un asociado (cédula) o una empresa en convenio (NIT,
+ * docs/spec-convenios.md §B2). Mismo flujo, misma cookie, mismos límites
+ * (con su propia clave por tipo).
+ */
+export type TipoIngreso = "cedula" | "nit";
+
 export type DatosIngreso = {
-  /** Cédula normalizada. */
+  /** Cédula o NIT normalizado (según `t`). */
   c: string;
+  /** Tipo de ingreso. Sin `t` = cédula (las cookies anteriores siguen sirviendo). */
+  t?: "nit";
   /** Correo enmascarado para mostrar. */
   m: string;
   /** Último envío de código (epoch ms). */
@@ -103,6 +112,7 @@ function descifrar(valor: string): DatosIngreso | null {
     if (typeof datos.c !== "string" || typeof datos.m !== "string" || typeof datos.u !== "number") {
       return null;
     }
+    if (datos.t !== undefined && datos.t !== "nit") return null;
     // Vencida (por si el navegador no la borró).
     if (Date.now() - datos.u > VIDA_COOKIE_SEGUNDOS * 1000) return null;
     return datos;
@@ -140,18 +150,36 @@ export function segundosParaReenviar(datos: DatosIngreso, ahora = Date.now()) {
   return Math.max(0, ESPERA_REENVIO_SEGUNDOS - pasados);
 }
 
-/** Correo real de la cédula (service role). null si no existe. */
-export async function correoDeCedula(cedula: string): Promise<string | null> {
-  const { data, error } = await crearClienteAdmin().rpc("correo_por_cedula", { p_cedula: cedula });
+/** Tipo de ingreso guardado en la cookie. */
+export function tipoDeIngreso(datos: DatosIngreso): TipoIngreso {
+  return datos.t === "nit" ? "nit" : "cedula";
+}
+
+/**
+ * Correo real de la cédula o del NIT (service role): correo_por_cedula() o
+ * correo_por_nit() (solo convenios activos con cuenta). null si no existe.
+ */
+export async function correoDe(tipo: TipoIngreso, id: string): Promise<string | null> {
+  const { data, error } =
+    tipo === "nit"
+      ? await crearClienteAdmin().rpc("correo_por_nit", { p_nit: id })
+      : await crearClienteAdmin().rpc("correo_por_cedula", { p_cedula: id });
   if (error) {
-    registrar("error", { evento: "correo_por_cedula_fallo", codigo: error.code, mensaje: error.message });
+    registrar("error", { evento: `correo_por_${tipo}_fallo`, codigo: error.code, mensaje: error.message });
     return null;
   }
   return typeof data === "string" && data.length > 0 ? data : null;
 }
 
-function mascaraDeRelleno(cedula: string) {
-  const bytes = createHmac("sha256", llaveSecreta()).update(`relleno:${cedula}`).digest();
+/** Correo real de la cédula (service role). null si no existe. */
+export async function correoDeCedula(cedula: string): Promise<string | null> {
+  return correoDe("cedula", cedula);
+}
+
+function mascaraDeRelleno(id: string, tipo: TipoIngreso) {
+  // La cédula conserva su semilla de siempre (misma máscara que antes).
+  const semilla = tipo === "nit" ? `relleno:nit:${id}` : `relleno:${id}`;
+  const bytes = createHmac("sha256", llaveSecreta()).update(semilla).digest();
   return correoDeRelleno(bytes);
 }
 
@@ -161,23 +189,23 @@ async function esperarHasta(inicio: number, minimoMs: number) {
 }
 
 /**
- * Envía el código a la cédula si existe y si no se pasó de los límites.
+ * Envía el código a la cédula (o al NIT, `tipo = "nit"`) si existe y si no se pasó de los límites.
  * SIEMPRE devuelve lo mismo (el correo enmascarado, real o de relleno) y tarda
  * al menos TIEMPO_MINIMO_ENVIO_MS: quien llama no puede saber si la cédula
  * existe, ni si se envió el correo. Nunca lanza.
  */
-export async function enviarCodigo(cedula: string): Promise<{ mascara: string }> {
+export async function enviarCodigo(cedula: string, tipo: TipoIngreso = "cedula"): Promise<{ mascara: string }> {
   const inicio = Date.now();
-  let mascara = mascaraDeRelleno(cedula);
+  let mascara = mascaraDeRelleno(cedula, tipo);
 
   try {
     const ip = await ipDelCliente();
     const permitido =
       (await dentroDelLimite("otp-ip", ip, 20, 15 * 60)) &&
-      (await dentroDelLimite("otp-cedula-45s", cedula, 1, ESPERA_REENVIO_SEGUNDOS)) &&
-      (await dentroDelLimite("otp-cedula", cedula, 5, 15 * 60));
+      (await dentroDelLimite(`otp-${tipo}-45s`, cedula, 1, ESPERA_REENVIO_SEGUNDOS)) &&
+      (await dentroDelLimite(`otp-${tipo}`, cedula, 5, 15 * 60));
 
-    const correo = await correoDeCedula(cedula);
+    const correo = await correoDe(tipo, cedula);
     if (correo) {
       mascara = enmascararCorreo(correo);
       if (permitido) {
