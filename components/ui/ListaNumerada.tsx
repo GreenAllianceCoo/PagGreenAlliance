@@ -18,7 +18,7 @@ export function ListaNumerada({ items, className }: { items: ReactNode[]; classN
               verde y los demás navy); así se ve en el aside y en «Qué sigue». */}
           <span
             aria-hidden="true"
-            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ga-verde text-13 font-extrabold text-white"
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ga-verde text-13 font-semibold text-white"
           >
             {i + 1}
           </span>

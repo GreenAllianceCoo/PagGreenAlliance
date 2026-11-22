@@ -88,7 +88,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-manrope)", "system-ui", "sans-serif"],
-        // Bricolage Grotesque (600/800): títulos y cifras grandes. Rediseño C+.
+        // Bricolage Grotesque (600): títulos y cifras grandes. Rediseño C+.
         display: ["var(--font-bricolage)", "var(--font-manrope)", "system-ui", "sans-serif"],
       },
       // Tamaños de letra en px exactos del diseño: `text-15` = 15px.
@@ -176,9 +176,9 @@ const config: Config = {
         "5": "5px", // aro del paso actual en la línea de 8 pasos (pieza 3k)
         "6": "6px",
       },
-      // Curva «spring» del rediseño C+: transform/opacity únicamente (docs/Green Alliance C+.dc.html).
+      // Curva única de la casa (fase 2: sin rebote; el rebote queda solo en el sello del comprobante): transform/opacity únicamente (docs/Green Alliance C+.dc.html).
       transitionTimingFunction: {
-        spring: "cubic-bezier(.34,1.3,.64,1)",
+        ga: "cubic-bezier(.2,.7,.2,1)",
       },
       transitionDuration: {
         "320": "320ms",
@@ -285,20 +285,20 @@ const config: Config = {
       animation: {
         "ga-sello-chico": "ga-sello-chico 150ms ease-out both",
         "ga-flash": "ga-flash 100ms linear both",
-        "ga-hoja": "ga-hoja 260ms cubic-bezier(.34,1.3,.64,1) both",
-        "ga-modal": "ga-modal 200ms cubic-bezier(.34,1.3,.64,1) both",
-        "ga-entrada": "ga-entrada 400ms cubic-bezier(.34,1.3,.64,1) both",
+        "ga-hoja": "ga-hoja 260ms cubic-bezier(.2,.7,.2,1) both",
+        "ga-modal": "ga-modal 200ms cubic-bezier(.2,.7,.2,1) both",
+        "ga-entrada": "ga-entrada 400ms cubic-bezier(.2,.7,.2,1) both",
         "ga-sello": "ga-sello 500ms cubic-bezier(.34,1.3,.64,1) both",
         "ga-sacude": "ga-sacude 240ms linear",
-        "ga-trazo": "ga-trazo 400ms cubic-bezier(.34,1.3,.64,1) both",
+        "ga-trazo": "ga-trazo 400ms cubic-bezier(.2,.7,.2,1) both",
         "ga-aparecer": "ga-aparecer 200ms ease-out both",
-        "ga-barra": "ga-barra 400ms cubic-bezier(.34,1.3,.64,1) both",
-        "ga-tarjeta-entra": "ga-tarjeta-entra 350ms cubic-bezier(.34,1.3,.64,1) both",
-        "ga-fila-entra": "ga-fila-entra 320ms cubic-bezier(.34,1.3,.64,1) both",
+        "ga-barra": "ga-barra 400ms cubic-bezier(.2,.7,.2,1) both",
+        "ga-tarjeta-entra": "ga-tarjeta-entra 350ms cubic-bezier(.2,.7,.2,1) both",
+        "ga-fila-entra": "ga-fila-entra 320ms cubic-bezier(.2,.7,.2,1) both",
         "ga-toast": "ga-toast 220ms ease-out both",
         "ga-lista": "ga-lista 200ms ease-out both",
-        "ga-formulario": "ga-formulario 200ms cubic-bezier(.34,1.3,.64,1) both",
-        "ga-asesor-listo": "ga-asesor-listo 250ms cubic-bezier(.34,1.3,.64,1) both",
+        "ga-formulario": "ga-formulario 200ms cubic-bezier(.2,.7,.2,1) both",
+        "ga-asesor-listo": "ga-asesor-listo 250ms cubic-bezier(.2,.7,.2,1) both",
         "ga-error-chico": "ga-error-chico 150ms ease-out both",
       },
       spacing: {

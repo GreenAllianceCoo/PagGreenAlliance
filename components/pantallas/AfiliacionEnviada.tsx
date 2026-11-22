@@ -33,7 +33,7 @@ export function AfiliacionEnviada({ correoEnmascarado, tiempoRespuesta }: Afilia
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-ga-verde-tint text-ga-verde">
             <IconoCheck tamano={28} grosor={2.4} trazo />
           </span>
-          <h1 className="m-0 font-display text-28 font-extrabold text-ga-navy lg:text-32">
+          <h1 className="m-0 font-display text-28 font-semibold text-ga-navy lg:text-32">
             ¡Solicitud enviada!
           </h1>
           <p className="m-0 text-15 leading-150 text-ga-texto-2 lg:text-17 lg:leading-155">
@@ -46,7 +46,7 @@ export function AfiliacionEnviada({ correoEnmascarado, tiempoRespuesta }: Afilia
           </p>
         </div>
         <section className="flex flex-col gap-3.5 rounded-16 bg-ga-fondo-suave p-4.5 lg:hidden">
-          <h2 className="m-0 text-16 font-extrabold">Qué sigue</h2>
+          <h2 className="m-0 text-16 font-semibold">Qué sigue</h2>
           <ListaNumerada
             items={[
               `Revisamos tu solicitud en ${tiempoRespuesta}.`,

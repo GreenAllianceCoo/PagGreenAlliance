@@ -57,13 +57,13 @@ function Dato({ etiqueta, valor }: { etiqueta: string; valor: string }) {
   return (
     <div className={CLASE_TARJETA_DATO}>
       <dt className="text-13 text-ga-texto-3">{etiqueta}</dt>
-      <dd className="m-0 break-words text-15 font-extrabold text-ga-texto lg:text-17">{valor}</dd>
+      <dd className="m-0 break-words text-15 font-semibold text-ga-texto lg:text-17">{valor}</dd>
     </div>
   );
 }
 
 const BOTON_DESHABILITADO =
-  "flex h-12.5 cursor-not-allowed items-center justify-center rounded-full bg-ga-linea-suave px-5 text-15 font-extrabold text-ga-deshabilitado-texto";
+  "flex h-12.5 cursor-not-allowed items-center justify-center rounded-full bg-ga-linea-suave px-5 text-15 font-semibold text-ga-deshabilitado-texto";
 
 /** Modal «¿Seguro que quieres el retiro anticipado?»: explicación → enviado. Sin ninguna suma calculada. */
 function ModalRetiro({
@@ -91,33 +91,33 @@ function ModalRetiro({
     <Modal abierto={abierto} onCerrar={onCerrar} tituloId={idTitulo} anchoClassName="lg:max-w-[440px]">
       {estado.ok ? (
         <div className="flex flex-col items-center gap-3 text-center motion-safe:animate-ga-aparecer">
-          <span className="self-start text-12 font-extrabold uppercase text-ga-texto-3">Enviado</span>
+          <span className="self-start text-12 font-semibold text-ga-texto-3">Enviado</span>
           <span
             aria-hidden="true"
             className="flex h-13 w-13 items-center justify-center rounded-full bg-ga-verde-claro text-ga-verde"
           >
             <IconoCheck tamano={26} grosor={3} />
           </span>
-          <h2 id={idTitulo} role="status" className="m-0 font-display text-18 font-extrabold text-ga-navy">
+          <h2 id={idTitulo} role="status" className="m-0 font-display text-18 font-semibold text-ga-navy">
             {estado.mensaje ?? MENSAJE_ALERTA_ENVIADA}
           </h2>
           <button
             type="button"
             onClick={onCerrar}
-            className="mt-1 flex h-12 w-full items-center justify-center rounded-full border-1.5 border-ga-navy bg-white text-14 font-extrabold text-ga-navy hover:bg-ga-fondo-suave"
+            className="mt-1 flex h-12 w-full items-center justify-center rounded-full border-1.5 border-ga-navy bg-white text-14 font-semibold text-ga-navy hover:bg-ga-fondo-suave"
           >
             Cerrar
           </button>
         </div>
       ) : (
         <form action={despachar} className="flex flex-col gap-3.5">
-          <span className="text-12 font-extrabold uppercase text-ga-texto-3">Explicación</span>
-          <h2 id={idTitulo} className="m-0 pr-8 font-display text-18 font-extrabold text-ga-navy">
+          <span className="text-12 font-semibold text-ga-texto-3">Explicación</span>
+          <h2 id={idTitulo} className="m-0 pr-8 font-display text-18 font-semibold text-ga-navy">
             ¿Seguro que quieres el retiro anticipado?
           </h2>
           <div className="flex flex-col gap-1 rounded-14 bg-ga-error-fondo px-4 py-3.5">
-            <span className="text-13 font-bold text-ga-error-texto">Cobro por desconexión del servicio</span>
-            <span className="font-display text-28 font-extrabold text-ga-error-texto">
+            <span className="text-13 font-semibold text-ga-error-texto">Cobro por desconexión del servicio</span>
+            <span className="font-display text-28 font-semibold text-ga-error-texto">
               {TEXTO_COBRO_RETIRO_ANTICIPADO}
             </span>
           </div>
@@ -135,7 +135,7 @@ function ModalRetiro({
           <button
             type="button"
             onClick={onCerrar}
-            className="flex min-h-11 items-center justify-center text-center text-14 font-bold text-ga-texto-3 hover:text-ga-navy"
+            className="flex min-h-11 items-center justify-center text-center text-14 font-semibold text-ga-texto-3 hover:text-ga-navy"
           >
             Cancelar
           </button>
@@ -171,28 +171,28 @@ function ModalRenovacion({
     <Modal abierto={abierto} onCerrar={onCerrar} tituloId={idTitulo} anchoClassName="lg:max-w-[440px]">
       {estado.ok ? (
         <div className="flex flex-col items-center gap-3 text-center motion-safe:animate-ga-aparecer">
-          <span className="self-start text-12 font-extrabold uppercase text-ga-texto-3">Enviado</span>
+          <span className="self-start text-12 font-semibold text-ga-texto-3">Enviado</span>
           <span
             aria-hidden="true"
             className="flex h-13 w-13 items-center justify-center rounded-full bg-ga-verde-claro text-ga-verde"
           >
             <IconoCheck tamano={26} grosor={3} />
           </span>
-          <h2 id={idTitulo} role="status" className="m-0 font-display text-18 font-extrabold text-ga-navy">
+          <h2 id={idTitulo} role="status" className="m-0 font-display text-18 font-semibold text-ga-navy">
             {estado.mensaje ?? MENSAJE_ALERTA_ENVIADA}
           </h2>
           <button
             type="button"
             onClick={onCerrar}
-            className="mt-1 flex h-12 w-full items-center justify-center rounded-full border-1.5 border-ga-navy bg-white text-14 font-extrabold text-ga-navy hover:bg-ga-fondo-suave"
+            className="mt-1 flex h-12 w-full items-center justify-center rounded-full border-1.5 border-ga-navy bg-white text-14 font-semibold text-ga-navy hover:bg-ga-fondo-suave"
           >
             Cerrar
           </button>
         </div>
       ) : (
         <form action={despachar} className="flex flex-col items-center gap-3 text-center">
-          <span className="self-start text-12 font-extrabold uppercase text-ga-texto-3">Confirmación</span>
-          <h2 id={idTitulo} className="m-0 font-display text-17 font-extrabold text-ga-navy">
+          <span className="self-start text-12 font-semibold text-ga-texto-3">Confirmación</span>
+          <h2 id={idTitulo} className="m-0 font-display text-17 font-semibold text-ga-navy">
             ¿Confirmas que quieres renovar tus {MESES_EMBARGO} meses?
           </h2>
           <p className="m-0 text-14 leading-150 text-ga-texto-2">
@@ -266,7 +266,7 @@ export function PerfilCuenta({
         <div className={cx(CLASE_TARJETA_DATO, "col-span-2 lg:col-span-1")}>
           <dt className="text-13 text-ga-texto-3">Cédula</dt>
           {/* Es un dato propio del asociado, sin máscara en su propio perfil (igual que «Mis datos»). */}
-          <dd className="m-0 break-words text-15 font-extrabold text-ga-texto lg:text-17">
+          <dd className="m-0 break-words text-15 font-semibold text-ga-texto lg:text-17">
             {cedula}
           </dd>
         </div>
@@ -278,7 +278,7 @@ export function PerfilCuenta({
         className="flex flex-col gap-4 rounded-22 bg-white p-4.5 lg:gap-6 lg:rounded-28 lg:p-8"
       >
         <div className="flex flex-col gap-1 lg:flex-row lg:items-baseline lg:justify-between lg:gap-5">
-          <h3 id="proceso-titulo" className="m-0 font-display text-17 font-extrabold text-ga-navy lg:text-24">
+          <h3 id="proceso-titulo" className="m-0 font-display text-17 font-semibold text-ga-navy lg:text-24">
             Estado del proceso ejecutivo
           </h3>
           <span className="text-13 text-ga-texto-3 lg:text-14">Solo el equipo de la cooperativa lo actualiza</span>
@@ -287,7 +287,7 @@ export function PerfilCuenta({
         {proceso.tieneProceso && proceso.estado !== "operando" && indiceActual >= 0 ? (
           // Antes de «Operando» (R-05): todavía no hay conteo ni botones de retiro/renovación.
           <div className="flex flex-col gap-2 rounded-14 bg-ga-fondo-suave p-3.5 motion-safe:animate-ga-aparecer">
-            <span className="text-14 font-extrabold text-ga-navy">
+            <span className="text-14 font-semibold text-ga-navy">
               Vas en «{proceso.estadoTexto}» (paso {indiceActual + 1} de {proceso.pasos.length})
             </span>
             {conteo === null ? (
@@ -313,7 +313,7 @@ export function PerfilCuenta({
           >
             <div className="flex items-start justify-between gap-4 lg:gap-5">
               <div className="flex flex-col gap-1">
-                <h3 id="camino-titulo" className="m-0 font-display text-17 font-extrabold text-ga-navy lg:text-24">
+                <h3 id="camino-titulo" className="m-0 font-display text-17 font-semibold text-ga-navy lg:text-24">
                   Tu camino a la estabilidad
                 </h3>
                 <span className="hidden text-15 text-ga-texto-3 lg:block">
@@ -322,10 +322,10 @@ export function PerfilCuenta({
               </div>
               {camino ? (
                 <div className="flex flex-none items-baseline gap-1.5">
-                  <span className="font-display text-[34px] font-extrabold leading-[.9] tracking-cifra text-ga-verde lg:text-[56px]">
+                  <span className="font-display text-[34px] font-semibold leading-[.9] tracking-cifra text-ga-verde lg:text-[56px]">
                     {camino.mesActual}
                   </span>
-                  <span className="text-14 font-bold text-ga-texto-3 lg:text-16">
+                  <span className="text-14 font-semibold text-ga-texto-3 lg:text-16">
                     <span className="lg:hidden">/{camino.totalMeses}</span>
                     <span className="hidden lg:inline">de {camino.totalMeses} meses</span>
                   </span>
@@ -342,7 +342,7 @@ export function PerfilCuenta({
                 className="relative h-2.5 overflow-hidden rounded-full bg-ga-verde-claro lg:h-3"
               >
                 <div
-                  className="h-full w-full origin-left rounded-full bg-ga-verde transition-transform duration-500 ease-spring"
+                  className="h-full w-full origin-left rounded-full bg-ga-verde transition-transform duration-500 ease-ga"
                   style={{ transform: `scaleX(${Math.min(camino.mesActual / camino.totalMeses, 1)})` }}
                 />
               </div>
@@ -383,7 +383,7 @@ export function PerfilCuenta({
                         type="button"
                         aria-haspopup="dialog"
                         onClick={() => setModal("retiro")}
-                        className="flex h-12.5 items-center justify-center rounded-full border-1.5 border-ga-error px-5 text-15 font-extrabold text-ga-error-texto transition-colors duration-200 hover:bg-ga-error-fondo focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-error"
+                        className="flex h-12.5 items-center justify-center rounded-full border-1.5 border-ga-error px-5 text-15 font-semibold text-ga-error-texto transition-colors duration-200 hover:bg-ga-error-fondo focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-error"
                       >
                         Retiro anticipado
                       </button>
@@ -403,7 +403,7 @@ export function PerfilCuenta({
                         type="button"
                         aria-haspopup="dialog"
                         onClick={() => setModal("renovacion")}
-                        className="flex h-12.5 items-center justify-center rounded-full bg-ga-verde px-5 text-15 font-extrabold text-white transition-colors duration-200 hover:bg-ga-verde-oscuro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
+                        className="flex h-12.5 items-center justify-center rounded-full bg-ga-verde px-5 text-15 font-semibold text-white transition-colors duration-200 hover:bg-ga-verde-oscuro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
                       >
                         Renovar los {MESES_EMBARGO} meses
                       </button>
@@ -440,10 +440,10 @@ export function PerfilCuenta({
                 Tu crédito · plazo de {plazoCreditoMeses} meses
               </h3>
               <div className="relative flex items-baseline gap-1.5">
-                <span className="font-display text-[32px] font-extrabold leading-none tracking-cifra lg:text-[46px]">
+                <span className="font-display text-[32px] font-semibold leading-none tracking-cifra lg:text-[46px]">
                   {mesCredito}
                 </span>
-                <span className="text-14 font-bold lg:text-16">de {plazoCreditoMeses} meses</span>
+                <span className="text-14 font-semibold lg:text-16">de {plazoCreditoMeses} meses</span>
               </div>
               <div
                 role="progressbar"
@@ -454,7 +454,7 @@ export function PerfilCuenta({
                 className="relative h-2 overflow-hidden rounded-full bg-white/18"
               >
                 <div
-                  className="h-full w-full origin-left rounded-full bg-ga-ambar-fondo-fuerte transition-transform duration-500 ease-spring"
+                  className="h-full w-full origin-left rounded-full bg-ga-ambar-fondo-fuerte transition-transform duration-500 ease-ga"
                   style={{ transform: `scaleX(${Math.min(mesCredito / plazoCreditoMeses, 1)})` }}
                 />
               </div>
@@ -475,7 +475,7 @@ export function PerfilCuenta({
         className="flex scroll-mt-4 flex-col gap-4 rounded-22 bg-white p-4.5 lg:rounded-28 lg:px-8 lg:py-7"
       >
         <div className="flex flex-col gap-1">
-          <h3 id="mis-datos-titulo" className="m-0 font-display text-17 font-extrabold text-ga-navy lg:text-22">
+          <h3 id="mis-datos-titulo" className="m-0 font-display text-17 font-semibold text-ga-navy lg:text-22">
             Mis datos
           </h3>
           <p className="m-0 text-14 leading-150 text-ga-texto-3">
@@ -506,14 +506,14 @@ export function PerfilCuenta({
         </form>
         <p className="m-0 text-14 leading-150 text-ga-texto-3">
           ¿Necesitas cambiar tu correo de ingreso? Solicítalo en «
-          <Link href="/ingresar/recuperar" className="font-bold text-ga-navy underline">
+          <Link href="/ingresar/recuperar" className="font-semibold text-ga-navy underline">
             ¿Ya no tienes acceso a tu correo?
           </Link>
           » al ingresar
           {WHATSAPP_URL ? (
             <>
               , o{" "}
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="font-bold text-ga-navy underline">
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-ga-navy underline">
             escríbenos por WhatsApp
           </a>
             </>

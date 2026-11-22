@@ -69,7 +69,7 @@ export function CamposSolicitud({
     <>
       {/* Cupo del grado a la vista antes de elegir (3t). */}
       <div className="flex flex-col gap-0.5 rounded-16 bg-ga-verde-tint p-4">
-        <span className="text-14 font-bold text-ga-verde-oscuro">Tu cupo · {gradoNombre}</span>
+        <span className="text-14 font-semibold text-ga-verde-oscuro">Tu cupo · {gradoNombre}</span>
         <span className="text-15 text-ga-texto">
           {paquetes.map((p, i) => (
             <span key={p.porcentaje}>
@@ -84,7 +84,7 @@ export function CamposSolicitud({
         className="m-0 flex flex-col gap-1.5 border-0 p-0"
         aria-describedby={errorPorcentaje ? "porcentaje-error" : undefined}
       >
-        <legend className="mb-1.5 p-0 text-15 font-bold">¿Qué porcentaje de tu cupo quieres?</legend>
+        <legend className="mb-1.5 p-0 text-15 font-semibold">¿Qué porcentaje de tu cupo quieres?</legend>
         {/* 6 opciones: 3 columnas también en celular (2 filas); cada tarjeta muestra su cupo. */}
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
           {opciones.map((o) => (
@@ -99,7 +99,7 @@ export function CamposSolicitud({
                 aria-describedby={errorPorcentaje ? "porcentaje-error" : undefined}
                 className="peer sr-only"
               />
-              <span className="flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-12 border-1.5 border-ga-borde bg-white px-1.5 py-2 text-center text-16 font-extrabold leading-tight text-ga-texto transition-colors peer-checked:border-ga-verde peer-checked:bg-ga-verde-tint peer-checked:text-ga-verde peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ga-verde">
+              <span className="flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-12 border-1.5 border-ga-borde bg-white px-1.5 py-2 text-center text-16 font-semibold leading-tight text-ga-texto transition-colors peer-checked:border-ga-verde peer-checked:bg-ga-verde-tint peer-checked:text-ga-verde peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ga-verde">
                 <span>{o.porcentaje} %</span>
                 <span className="text-13 font-semibold text-ga-texto-3">
                   <span className="sr-only">Hasta </span>
@@ -121,10 +121,10 @@ export function CamposSolicitud({
       ) : (
         <div className="flex flex-col gap-1.5">
           <div className="flex items-baseline justify-between gap-3">
-            <label htmlFor="monto" className="text-15 font-bold">
+            <label htmlFor="monto" className="text-15 font-semibold">
               Monto a desembolsar
             </label>
-            <output htmlFor="monto" className="font-display text-26 font-extrabold tracking-cifra text-ga-navy">
+            <output htmlFor="monto" className="font-display text-26 font-semibold tracking-cifra text-ga-navy">
               {formatoCOP(monto)}
             </output>
           </div>
@@ -170,7 +170,7 @@ export function CamposSolicitud({
         <dl className="m-0 grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-0.5 rounded-12 bg-ga-fondo-suave p-3.5">
             <dt className="text-14 text-ga-texto-3">Plazo</dt>
-            <dd className="m-0 text-16 font-bold text-ga-texto">{plazoMeses} meses</dd>
+            <dd className="m-0 text-16 font-semibold text-ga-texto">{plazoMeses} meses</dd>
           </div>
         </dl>
       ) : null}

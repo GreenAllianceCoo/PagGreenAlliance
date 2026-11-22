@@ -54,7 +54,7 @@ export function CambiarCorreoIngreso({ asociadoId, nombre, solicitudes, bloquead
         type="button"
         disabled={bloqueado}
         onClick={() => setAbierto(true)}
-        className="flex h-11.5 items-center justify-center self-start rounded-full bg-admin-verde px-6 text-14 font-extrabold text-admin-fondo disabled:opacity-60"
+        className="flex h-11.5 items-center justify-center self-start rounded-full bg-admin-verde px-6 text-14 font-semibold text-admin-fondo disabled:opacity-60"
       >
         Cambiar correo de ingreso
       </button>
@@ -68,7 +68,7 @@ export function CambiarCorreoIngreso({ asociadoId, nombre, solicitudes, bloquead
         <form action={accion} noValidate className="flex flex-col gap-4 text-ga-texto">
           <input type="hidden" name="asociadoId" value={asociadoId} />
           <input type="hidden" name="solicitudId" value={solicitudElegida} />
-          <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-extrabold">
+          <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-semibold">
             Cambiar el correo de ingreso de {nombre}
           </h2>
           <p className="m-0 text-15 leading-150 text-ga-texto-2">
@@ -89,7 +89,7 @@ export function CambiarCorreoIngreso({ asociadoId, nombre, solicitudes, bloquead
           </CampoAdmin>
           {solicitudActual ? (
             <div className="flex flex-col gap-1.5 rounded-12 bg-admin-ambar-fondo p-3 text-14 text-admin-ambar">
-              <p className="m-0 font-bold">Correo nuevo: {solicitudActual.correoNuevo}</p>
+              <p className="m-0 font-semibold">Correo nuevo: {solicitudActual.correoNuevo}</p>
               <p className="m-0 text-13">Celular {solicitudActual.celularCoincide ? "coincide" : "NO coincide"}</p>
             </div>
           ) : null}
@@ -103,7 +103,7 @@ export function CambiarCorreoIngreso({ asociadoId, nombre, solicitudes, bloquead
           </Field>
           {celularNoCoincide ? (
             <div className="flex flex-col gap-1">
-              <label className="flex items-start gap-2.5 text-14 font-bold">
+              <label className="flex items-start gap-2.5 text-14 font-semibold">
                 <input
                   id={`${tituloId}-confirma`}
                   type="checkbox"
@@ -125,7 +125,7 @@ export function CambiarCorreoIngreso({ asociadoId, nombre, solicitudes, bloquead
             <button
               type="button"
               onClick={() => setAbierto(false)}
-              className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-bold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
+              className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-semibold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
             >
               Cancelar
             </button>

@@ -99,7 +99,7 @@ export function MatrizCirculos({ celda, espacio, velocidad = 1300, className }: 
       {estado.posiciones.map((posicion, i) => (
         <div
           key={`circulo-${i}`}
-          className={`absolute left-0 top-0 flex items-center justify-center rounded-full shadow-md transition-transform duration-620 ease-spring motion-reduce:transition-none ${COLORES[i]} ${i === CON_ANILLO ? "ring-[3px]" : ""}`}
+          className={`absolute left-0 top-0 flex items-center justify-center rounded-full shadow-md transition-transform duration-620 ease-ga motion-reduce:transition-none ${COLORES[i]} ${i === CON_ANILLO ? "ring-[3px]" : ""}`}
           style={{ width: celda, height: celda, transform: trasladar(posicion) }}
         >
           {i === CON_LOGO ? (

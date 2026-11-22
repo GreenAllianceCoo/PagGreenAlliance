@@ -33,18 +33,17 @@ import {
 const VERDE = "rgb(30, 102, 82)";
 const NAVY = "rgb(26, 60, 87)";
 
-// Las categorías se ven en MAYÚSCULA (`text-transform: uppercase`, pieza 2a):
-// `innerText` refleja el texto ya transformado por CSS, no el literal del JSX.
+// Fase 2: las categorías ya no van en mayúscula (antes `text-transform: uppercase`).
 const CONVENIOS_LANDING = [
-  "TECNOLOGÍA",
+  "Tecnología",
   "AMB Móvil S.A.S.",
-  "VIAJES Y TURISMO",
+  "Viajes y turismo",
   "Locos por los Viajes S.A.S.",
-  "ODONTOLOGÍA ESTÉTICA",
+  "Odontología estética",
   "Dr. Ribero Dental Group",
-  "TOURS EN VILLA DE LEYVA",
+  "Tours en Villa de Leyva",
   "Racing Tours Villa de Leyva",
-  "TRÁMITE DE VISAS",
+  "Trámite de visas",
   "Dream & Go Visas",
 ];
 
@@ -62,10 +61,8 @@ async function revisarEstilos(
   page: Page,
   primarios: string[],
   secundarios: string[],
-  // /cuenta (pieza 2b): el <h1> «Hola, {nombre}» deja «Hola,» en texto normal
-  // (caption) y solo el nombre en Bricolage Grotesque (`.font-display` en el
-  // <span>, no en el propio <h1>, que por eso no hereda ese font-family). El
-  // resto de pantallas sí pone `font-display` directo en el <h1>.
+  // Todas las pantallas ponen `font-display` directo en el <h1> (fase 2: /cuenta
+  // ya no lleva «Hola,» aparte).
   selectorTitulo = "h1",
 ) {
   // Puntero fuera de los botones: sin :hover (verde oscuro) al medir.
@@ -178,27 +175,25 @@ test.describe("E · Landing /", () => {
           "Cómo funciona",
           "Convenios",
           "Afíliate",
-          "Mi cuenta",
+          "Ingresar",
           "Policía Nacional · Ejército Nacional",
-          "Crédito entre compañeros, con reglas claras.",
+          "Crédito entre compañeros, con reglas claras",
           "Somos una cooperativa hecha por y para la familia policial y militar. Pides en línea, sabes tu tope desde el inicio y ves cada paso de tu solicitud.",
           "Solicitar crédito",
           "Conocer la cooperativa",
-          "Aprobados",
-          "en poco tiempo",
           ...comprobante,
           "Enviada",
           "En revisión",
           "Aprobada",
           "Desembolso",
           "Te respondemos en poco tiempo.",
-          "NUESTRA MISIÓN",
-          "Ser escudo y lazo solidario para la familia de la Policía Nacional y el Ejército Nacional.",
+          "Nuestra misión",
+          "Ser escudo y lazo solidario para la familia de la Policía Nacional y el Ejército Nacional",
           "Lo hacemos con microcréditos de fácil acceso, orientación financiera estratégica y acompañamiento jurídico integral, para que tu vocación de servicio también se traduzca en crecimiento económico.",
-          "NUESTRA VISIÓN",
-          "Liderar el cooperativismo colombiano por identidad y arraigo institucional.",
+          "Nuestra visión",
+          "Liderar el cooperativismo colombiano por identidad y arraigo institucional",
           "Con una organización moderna y de proyección internacional, capaz de asegurar el bienestar financiero de nuestros hombres y mujeres.",
-          "Si hoy el banco te dice que no, aquí empezamos de nuevo.",
+          "Si hoy el banco te dice que no, aquí empezamos de nuevo",
           "Muchos compañeros quedan atrapados en deudas que terminan afectando su tranquilidad y su familia. Te proponemos una alternativa pensada para tu caso y te acompañamos de principio a fin.",
           "3 años",
           "para volver al sistema financiero tradicional, sin rechazos",
@@ -225,24 +220,22 @@ test.describe("E · Landing /", () => {
       : [
           "Ingresar",
           "Policía · Ejército",
-          "Crédito entre compañeros, con reglas claras.",
+          "Crédito entre compañeros, con reglas claras",
           "Somos una cooperativa hecha por y para la familia policial y militar. Pides en línea, sabes tu tope desde el inicio y ves cada paso de tu solicitud.",
           "Solicitar crédito",
           "Quiero afiliarme",
-          "Aprobados",
-          "en poco tiempo",
           ...comprobante,
           "Enviada",
           "En revisión",
           "Aprobada",
           "Desembolso",
           "Te respondemos en poco tiempo.",
-          "NUESTRA MISIÓN",
-          "Ser escudo y lazo solidario para la familia de la Policía Nacional y el Ejército Nacional.",
+          "Nuestra misión",
+          "Ser escudo y lazo solidario para la familia de la Policía Nacional y el Ejército Nacional",
           "Microcréditos de fácil acceso, orientación financiera y acompañamiento jurídico integral.",
-          "NUESTRA VISIÓN",
-          "Liderar el cooperativismo colombiano por identidad y arraigo institucional.",
-          "Si hoy el banco te dice que no, aquí empezamos de nuevo.",
+          "Nuestra visión",
+          "Liderar el cooperativismo colombiano por identidad y arraigo institucional",
+          "Si hoy el banco te dice que no, aquí empezamos de nuevo",
           "3 años",
           ...SERVICIOS_APOYOS,
           "Empresas en convenio",
@@ -281,7 +274,7 @@ test.describe("E · Ingreso paso 1 /ingresar", () => {
     await page.goto("/ingresar");
     const esperados = esEscritorio(testInfo)
       ? [
-          "Hola de nuevo",
+          "Tu cuenta en Green Alliance",
           "Entra con tu cédula y un código que te llega al correo. Sin contraseñas que recordar.",
           "Pide tu crédito según tu grado",
           "Mira el estado de tu solicitud",
@@ -296,7 +289,7 @@ test.describe("E · Ingreso paso 1 /ingresar", () => {
           "Deseo afiliarme",
         ]
       : [
-          "Hola de nuevo",
+          "Tu cuenta en Green Alliance",
           "Entra para ver cómo va tu crédito.",
           "Paso 1 de 2",
           "Número de cédula",
@@ -396,7 +389,7 @@ test.describe("E · Inicio del asociado /cuenta", () => {
           "Convenios",
           u.nombre,
           "Salir",
-          `Hola, ${u.nombre}`,
+          u.nombre,
           ...(sorteoNav ? [sorteoNav] : []),
           "Tu solicitud",
           "En revisión",
@@ -429,7 +422,7 @@ test.describe("E · Inicio del asociado /cuenta", () => {
           "Dream & Go Visas",
         ]
       : [
-          `Hola, ${u.nombre}`,
+          u.nombre,
           "Tu solicitud",
           "En revisión",
           "Monto solicitado · modalidad 50%",
@@ -469,7 +462,7 @@ test.describe("E · Inicio del asociado /cuenta", () => {
       bordeHablar,
       "«Hablar con la cooperativa» debe llevar el borde verde (terciario)",
     ).toBe(VERDE);
-    await revisarEstilos(page, [] /* «Guardar» está en /cuenta/perfil (v3) */, [], "h1 .font-display");
+    await revisarEstilos(page, [] /* «Guardar» está en /cuenta/perfil (v3) */, []);
     await ctx.close();
   });
 

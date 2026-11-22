@@ -131,12 +131,12 @@ export function CuentaDemo({
           con «Salir de la demo» al alcance del pulgar derecho. */}
       <div className="sticky top-0 z-40 flex items-center justify-between gap-3 bg-ga-ambar px-4 py-2.5 text-ga-texto lg:px-5">
         <span className="flex flex-col leading-125">
-          <strong className="text-15 font-extrabold">{tituloDemo}</strong>
+          <strong className="text-15 font-semibold">{tituloDemo}</strong>
           <span className="text-13 font-semibold">{subtituloDemo}</span>
         </span>
         <Link
           href={volver.href}
-          className="inline-flex h-11 shrink-0 items-center whitespace-nowrap rounded-full bg-ga-texto px-4 text-14 font-extrabold text-white no-underline"
+          className="inline-flex h-11 shrink-0 items-center whitespace-nowrap rounded-full bg-ga-texto px-4 text-14 font-semibold text-white no-underline"
         >
           Salir de la demo
         </Link>
@@ -153,18 +153,14 @@ export function CuentaDemo({
           >
             <IconoVolver tamano={22} grosor={1.8} />
           </Link>
-          <h1 className="m-0 flex flex-col gap-0.5 text-ga-navy lg:block">
-            <span className="text-15 font-normal text-ga-texto-3 lg:font-display lg:text-44 lg:font-extrabold lg:text-ga-navy">
-              Hola,
-            </span>{" "}
-            <span className="font-display text-30 font-extrabold lg:text-44">{CLIENTE_DEMO.nombre}</span>
-          </h1>
+          {/* Fase 2: el título es el nombre, sin saludo. */}
+          <h1 className="m-0 font-display text-30 font-semibold text-ga-navy lg:text-44">{CLIENTE_DEMO.nombre}</h1>
         </div>
 
         <div className="flex flex-col gap-4 rounded-28 bg-white p-5 lg:flex-row lg:gap-6 lg:p-6">
           {/* Selector segmentado Policía / Ejército: radios nativos (flechas del teclado y lector de pantalla). */}
           <fieldset className="m-0 flex flex-1 flex-col gap-1.5 border-0 p-0">
-            <legend className="mb-1.5 p-0 text-15 font-bold">Institución del cliente</legend>
+            <legend className="mb-1.5 p-0 text-15 font-semibold">Institución del cliente</legend>
             <div role="radiogroup" aria-label="Institución del cliente" className="grid grid-cols-2 gap-1 rounded-full bg-ga-fondo-suave p-1 lg:max-w-xs">
               {INSTITUCIONES_DEMO.map((i) => (
                 <label key={i.codigo} className="cursor-pointer">
@@ -176,7 +172,7 @@ export function CuentaDemo({
                     onChange={() => cambiarInstitucion(i.codigo)}
                     className="peer sr-only"
                   />
-                  <span className="flex min-h-11 items-center justify-center rounded-full px-4 text-15 font-bold text-ga-texto-2 transition-colors peer-checked:bg-ga-verde peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ga-verde">
+                  <span className="flex min-h-11 items-center justify-center rounded-full px-4 text-15 font-semibold text-ga-texto-2 transition-colors peer-checked:bg-ga-verde peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ga-verde">
                     {i.nombre}
                   </span>
                 </label>
@@ -184,7 +180,7 @@ export function CuentaDemo({
             </div>
           </fieldset>
           <label className="flex flex-1 flex-col gap-1.5">
-            <span className="text-15 font-bold">Grado del cliente</span>
+            <span className="text-15 font-semibold">Grado del cliente</span>
             <Select
               value={grado}
               onChange={(e) => cambiarGrado(e.target.value)}
@@ -204,7 +200,7 @@ export function CuentaDemo({
           <section className="flex flex-col gap-4 rounded-28 bg-white p-5 lg:col-span-2 lg:gap-5.5 lg:p-8">
             {!mostrarFormulario ? (
               <>
-                <h2 className="m-0 font-display text-18 font-extrabold lg:text-24">Tu solicitud</h2>
+                <h2 className="m-0 font-display text-18 font-semibold lg:text-24">Tu solicitud</h2>
                 {sinDatos ? (
                   <p role="alert" className="m-0 text-14 font-semibold text-ga-error">
                     No pudimos cargar los topes de crédito. Recarga la página; si sigue igual, avisa al equipo técnico.
@@ -234,7 +230,7 @@ export function CuentaDemo({
                 >
                   <IconoCheck tamano={24} grosor={2} />
                 </span>
-                <h2 className="m-0 font-display text-18 font-extrabold lg:text-24">Solicitud de ejemplo enviada</h2>
+                <h2 className="m-0 font-display text-18 font-semibold lg:text-24">Solicitud de ejemplo enviada</h2>
                 <p className="m-0 text-15 leading-150 text-ga-texto-2">
                   Esto es una simulación: no se guardó ninguna solicitud real. Monto de ejemplo{" "}
                   {formatoCOP(monto)} al {porcentaje} %.
@@ -258,7 +254,7 @@ export function CuentaDemo({
                   enviarSolicitudDemo();
                 }}
               >
-                <h2 className="m-0 font-display text-18 font-extrabold lg:text-24">Solicita tu crédito</h2>
+                <h2 className="m-0 font-display text-18 font-semibold lg:text-24">Solicita tu crédito</h2>
                 <CamposSolicitud
                   paquetes={paquetes}
                   gradoNombre={nombreGrado}
@@ -311,24 +307,24 @@ export function CuentaDemo({
         />
 
         <section id="convenios-ejemplo" className="flex flex-col gap-4 rounded-28 bg-white p-5 lg:px-8 lg:py-7">
-          <h2 className="m-0 font-display text-18 font-extrabold lg:text-22">Convenios</h2>
+          <h2 className="m-0 font-display text-18 font-semibold lg:text-22">Convenios</h2>
           <ListaConvenios convenios={convenios} variante="cuenta" />
         </section>
 
         <section className="flex flex-col gap-4 rounded-28 bg-white p-5 lg:px-8 lg:py-7">
-          <h2 className="m-0 font-display text-18 font-extrabold lg:text-22">Datos del cliente (ejemplo)</h2>
+          <h2 className="m-0 font-display text-18 font-semibold lg:text-22">Datos del cliente (ejemplo)</h2>
           <dl className="m-0 grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div className="flex flex-col gap-0.5 rounded-12 bg-ga-fondo-suave p-3.5">
               <dt className="text-14 text-ga-texto-3">Nombre</dt>
-              <dd className="m-0 text-16 font-bold text-ga-texto">{CLIENTE_DEMO.nombre}</dd>
+              <dd className="m-0 text-16 font-semibold text-ga-texto">{CLIENTE_DEMO.nombre}</dd>
             </div>
             <div className="flex flex-col gap-0.5 rounded-12 bg-ga-fondo-suave p-3.5">
               <dt className="text-14 text-ga-texto-3">Cédula</dt>
-              <dd className="m-0 text-16 font-bold text-ga-texto">{CLIENTE_DEMO.cedula}</dd>
+              <dd className="m-0 text-16 font-semibold text-ga-texto">{CLIENTE_DEMO.cedula}</dd>
             </div>
             <div className="flex flex-col gap-0.5 rounded-12 bg-ga-fondo-suave p-3.5">
               <dt className="text-14 text-ga-texto-3">Institución · Grado</dt>
-              <dd className="m-0 text-16 font-bold text-ga-texto">
+              <dd className="m-0 text-16 font-semibold text-ga-texto">
                 {INSTITUCIONES_DEMO.find((i) => i.codigo === institucion)?.nombre} · {nombreGrado}
               </dd>
             </div>

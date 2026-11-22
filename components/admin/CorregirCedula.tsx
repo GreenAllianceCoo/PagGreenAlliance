@@ -40,7 +40,7 @@ export function CorregirCedula({ asociadoId, cedulaActual, bloqueado = false, on
             setAviso(null);
             setAbierto(true);
           }}
-          className="flex h-11.5 items-center justify-center self-start rounded-full px-5 text-14 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06] disabled:opacity-60"
+          className="flex h-11.5 items-center justify-center self-start rounded-full px-5 text-14 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06] disabled:opacity-60"
         >
           Corregir cédula
         </button>
@@ -128,7 +128,7 @@ function FormularioCedula({
         <button
           type="button"
           onClick={onCancelar}
-          className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
+          className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
         >
           Cancelar
         </button>

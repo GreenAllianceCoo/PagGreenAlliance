@@ -78,7 +78,7 @@ export default async function SolicitarPage() {
             >
               <IconoVolver tamano={22} grosor={1.8} />
             </Link>
-            <h1 className="m-0 font-display text-24 font-extrabold text-ga-navy lg:text-32">
+            <h1 className="m-0 font-display text-24 font-semibold text-ga-navy lg:text-32">
               Nueva solicitud
             </h1>
           </div>
@@ -98,7 +98,7 @@ export default async function SolicitarPage() {
           aria-labelledby="solicitud-titulo"
           className="flex flex-col gap-4 rounded-28 bg-white p-5 lg:gap-5.5 lg:p-9"
         >
-          <h2 id="solicitud-titulo" className="m-0 font-display text-18 font-extrabold lg:text-20">
+          <h2 id="solicitud-titulo" className="m-0 font-display text-18 font-semibold lg:text-20">
             Solicita tu crédito
           </h2>
           {!puedeSolicitar || !paquetes ? (

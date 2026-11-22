@@ -27,7 +27,7 @@ export function ToastAdmin({ mensaje, onCerrar }: Props) {
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-7 right-7 z-30 flex animate-ga-toast items-center gap-3 rounded-16 bg-admin-texto px-4.5 py-3.5 font-bold text-admin-fondo shadow-modal-toast"
+      className="fixed bottom-7 right-7 z-30 flex animate-ga-toast items-center gap-3 rounded-16 bg-admin-texto px-4.5 py-3.5 font-semibold text-admin-fondo shadow-modal-toast"
     >
       <span aria-hidden="true" className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-ga-verde text-white">
         <IconoCheck tamano={14} grosor={2.5} />

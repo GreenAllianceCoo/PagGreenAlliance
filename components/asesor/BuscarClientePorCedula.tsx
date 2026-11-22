@@ -28,16 +28,16 @@ function DetalleCliente({ cliente }: { cliente: ClienteBuscado }) {
           que agregar esa columna a la RPC (estado de solicitudes_afiliacion de la cédula) antes de pintarlo.
           No se infiere de «es un perfil»: sería un dato inventado. */}
       <div className="flex flex-col gap-0.5">
-        <strong className="font-display text-20 font-extrabold text-ga-navy lg:text-22">{cliente.nombre}</strong>
+        <strong className="font-display text-20 font-semibold text-ga-navy lg:text-22">{cliente.nombre}</strong>
         <span className="text-14 text-ga-texto-3">
           {[cliente.cedulaEnmascarada, cliente.grado, cliente.institucion].filter(Boolean).join(" · ")}
         </span>
       </div>
       <div className="flex flex-col gap-1.5">
-        <span className="text-13 font-bold uppercase tracking-[0.04em] text-ga-texto-3">
+        <span className="text-13 font-semibold text-ga-texto-3">
           Estado del proceso ejecutivo
         </span>
-        <span className="self-start rounded-full bg-ga-ambar-fondo px-3 py-1.5 text-14 font-extrabold text-ga-ambar-texto">
+        <span className="self-start rounded-full bg-ga-ambar-fondo px-3 py-1.5 text-14 font-semibold text-ga-ambar-texto">
           {paso ? `${cliente.estadoProcesoTexto} (paso ${paso} de ${ESTADOS_PROCESO.length})` : cliente.estadoProcesoTexto}
         </span>
         {cliente.fechaInicioEmbargoTexto ? (
@@ -45,18 +45,18 @@ function DetalleCliente({ cliente }: { cliente: ClienteBuscado }) {
         ) : null}
       </div>
       <div className="flex flex-col gap-2 rounded-16 bg-ga-fondo-suave px-4.5 py-4">
-        <span className="text-13 font-bold uppercase tracking-[0.04em] text-ga-texto-3">
+        <span className="text-13 font-semibold text-ga-texto-3">
           Capacidad de endeudamiento{cliente.grado ? ` · ${cliente.grado}` : ""}
         </span>
         {cliente.capacidad.configurada ? (
           <dl className="m-0 grid grid-cols-2 gap-3">
             <div>
               <dt className="text-13 text-ga-texto-3">50 %</dt>
-              <dd className="m-0 text-20 font-extrabold text-ga-navy">{cliente.capacidad.cupo50}</dd>
+              <dd className="m-0 text-20 font-semibold text-ga-navy">{cliente.capacidad.cupo50}</dd>
             </div>
             <div>
               <dt className="text-13 text-ga-texto-3">100 %</dt>
-              <dd className="m-0 text-20 font-extrabold text-ga-navy">{cliente.capacidad.cupo100}</dd>
+              <dd className="m-0 text-20 font-semibold text-ga-navy">{cliente.capacidad.cupo100}</dd>
             </div>
           </dl>
         ) : (
@@ -79,7 +79,7 @@ export function BuscarClientePorCedula({ accion }: BuscarClientePorCedulaProps) 
 
   return (
     <section aria-labelledby="buscar-cedula-titulo" className="flex flex-col gap-3 rounded-20 bg-white p-4.5 lg:rounded-24 lg:p-6">
-      <h2 id="buscar-cedula-titulo" className="m-0 font-display text-17 font-extrabold text-ga-navy lg:text-20">
+      <h2 id="buscar-cedula-titulo" className="m-0 font-display text-17 font-semibold text-ga-navy lg:text-20">
         Buscar cliente por cédula
       </h2>
       <form action={despachar} noValidate className="flex flex-col gap-3 sm:flex-row sm:items-start">

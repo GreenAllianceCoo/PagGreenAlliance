@@ -15,7 +15,7 @@ test.describe("C1 · Sin sesión", () => {
     test(`${ruta} sin sesión → /ingresar`, async ({ page }) => {
       await page.goto(ruta);
       await expect(page).toHaveURL(/\/ingresar$/);
-      await expect(page.locator("h1")).toHaveText("Hola de nuevo");
+      await expect(page.locator("h1")).toHaveText("Tu cuenta en Green Alliance");
     });
   }
 });
@@ -33,7 +33,7 @@ test.describe("C2 · Con sesión: datos del propio usuario", () => {
     const page = await ctx.newPage();
     await page.goto("/cuenta");
     await expect(page.locator("h1")).toContainText(
-      `Hola, ${u.nombre}`.replace("Hola, ", ""),
+      u.nombre,
     );
     const texto = (await page.locator("main").innerText()).replace(/\s+/g, " ");
     expect(texto).toContain("Tu solicitud");
@@ -205,7 +205,7 @@ test.describe("C3 · «Salir»", () => {
       await page.getByRole("button", { name: "Cerrar sesión" }).click();
     }
     await expect(page).toHaveURL(/\/ingresar$/);
-    await expect(page.locator("h1")).toHaveText("Hola de nuevo");
+    await expect(page.locator("h1")).toHaveText("Tu cuenta en Green Alliance");
 
     await page.goBack();
     await page.waitForLoadState("networkidle");

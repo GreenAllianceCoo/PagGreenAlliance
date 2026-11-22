@@ -38,7 +38,7 @@ export function DetalleProcesoAsociado({
     <section className="flex flex-col gap-4 rounded-20 bg-admin-superficie p-5.5">
       <div className="flex flex-col gap-1">
         {/* En celular el nombre ya es el h1 de la página (pieza 3m). */}
-        <span className="hidden font-display text-24 font-extrabold leading-115 lg:inline">{asociado.nombre}</span>
+        <span className="hidden font-display text-24 font-semibold leading-115 lg:inline">{asociado.nombre}</span>
         <span className="text-14 text-admin-texto-2">
           C.C. {asociado.cedula} · {asociado.grado ?? "Sin grado"} · {asociado.institucion ?? "—"}
         </span>
@@ -96,7 +96,7 @@ export function DetalleProcesoAsociado({
       {/* §12.6 (pieza 3q): dar de baja / reactivar con motivo obligatorio. Solo admin. */}
       {soloProceso ? null : (
         <div className="flex flex-col gap-2.5 border-t border-admin-borde-sutil pt-4">
-          <h2 className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Estado de la cuenta</h2>
+          <h2 className="m-0 text-12 font-semibold text-admin-texto-3">Estado de la cuenta</h2>
           <BajaAsociado
             key={String(asociado.activo)}
             asociadoId={asociado.id}
@@ -112,13 +112,13 @@ export function DetalleProcesoAsociado({
       {/* §13.2: solo si la última solicitud está rechazada y sin habilitar. Solo admin. */}
       {!soloProceso && detalle.puedeHabilitarCredito ? (
         <div className="flex flex-col gap-2.5 border-t border-admin-borde-sutil pt-4">
-          <h2 className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Crédito</h2>
+          <h2 className="m-0 text-12 font-semibold text-admin-texto-3">Crédito</h2>
           <HabilitarCredito asociadoId={asociado.id} nombre={asociado.nombre} bloqueado={bloqueado} onResuelto={setToast} />
         </div>
       ) : null}
 
       <div className="flex flex-col gap-2.5">
-        <h2 className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Historial del proceso</h2>
+        <h2 className="m-0 text-12 font-semibold text-admin-texto-3">Historial del proceso</h2>
         {detalle.historial.length === 0 ? (
           <p className="m-0 text-14 text-admin-texto-3">Todavía no hay cambios.</p>
         ) : (
@@ -130,7 +130,7 @@ export function DetalleProcesoAsociado({
                   className={"mt-1.5 h-2 w-2 flex-none rounded-full bg-admin-verde " + (i > 0 ? "opacity-50" : "")}
                 />
                 <span className="flex flex-col">
-                  <span className="font-bold text-admin-texto">
+                  <span className="font-semibold text-admin-texto">
                     Cambió el proceso a «{h.estadoNuevo}»
                     {h.fechaInicioEmbargoTexto ? ` · fecha de embargo: ${h.fechaInicioEmbargoTexto}` : ""}
                   </span>

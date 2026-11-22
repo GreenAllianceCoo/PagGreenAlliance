@@ -16,7 +16,7 @@ export function ConvenioCard({ convenio, variante = "tarjeta", href = "#" }: Con
     return (
       <a
         href={href}
-        className="flex items-center gap-2.5 rounded-12 border border-ga-borde-tarjeta p-3 text-14 font-bold text-ga-texto no-underline hover:bg-ga-fondo-suave"
+        className="flex items-center gap-2.5 rounded-12 border border-ga-borde-tarjeta p-3 text-14 font-semibold text-ga-texto no-underline hover:bg-ga-fondo-suave"
       >
         <span aria-hidden="true" className="text-22">
           {convenio.emoji}
@@ -35,7 +35,7 @@ export function ConvenioCard({ convenio, variante = "tarjeta", href = "#" }: Con
         {convenio.emoji}
       </span>
       <span className="flex flex-col gap-0.5 lg:contents">
-        <strong className="text-16 font-extrabold text-ga-texto lg:text-17 lg:leading-125">
+        <strong className="text-16 font-semibold text-ga-texto lg:text-17 lg:leading-125">
           {convenio.nombre}
         </strong>
         <span className="text-14 text-ga-texto-2">{convenio.especialidad}</span>

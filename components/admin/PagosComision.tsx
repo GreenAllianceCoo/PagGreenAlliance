@@ -25,7 +25,7 @@ const MAX_MOTIVO = 300;
 
 /** Botón secundario de 44 px de alto (área táctil mínima, pieza 3o). */
 const CLASE_BOTON_BORDE =
-  "h-11 rounded-full px-4 text-13 font-bold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]";
+  "h-11 rounded-full px-4 text-13 font-semibold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]";
 
 /** Chip de color por acción de la bitácora (pieza 3o): Registro verde, Corrección ámbar, Anulación rojo. */
 const CLASE_CHIP_ACCION: Record<AccionBitacoraPago, string> = {
@@ -47,7 +47,7 @@ export function FormularioPagoComision({ asesores, periodos }: { asesores: Opcio
   const v = estado.valores;
   return (
     <form action={despachar} noValidate className="flex flex-col gap-4 rounded-20 bg-admin-superficie p-5.5">
-      <h2 className="m-0 font-display text-20 font-extrabold">Registrar pago de comisión</h2>
+      <h2 className="m-0 font-display text-20 font-semibold">Registrar pago de comisión</h2>
       <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
         <CampoAdmin id="pago-asesor" label="Asesor" error={estado.errores?.asesorId}>
           {(c) => (
@@ -163,7 +163,7 @@ function FormularioCorregir({ pago, alCerrar }: { pago: PagoComisionAdmin; alCer
       </p>
       <div className="flex flex-wrap gap-2">
         <BotonAdmin textoCargando="Guardando…">Guardar corrección</BotonAdmin>
-        <button type="button" onClick={alCerrar} className="h-11.5 rounded-full px-5 text-14 font-bold text-admin-texto-2 hover:bg-white/[.06]">
+        <button type="button" onClick={alCerrar} className="h-11.5 rounded-full px-5 text-14 font-semibold text-admin-texto-2 hover:bg-white/[.06]">
           Cerrar
         </button>
       </div>
@@ -211,7 +211,7 @@ function FormularioAnular({ pago, alCerrar }: { pago: PagoComisionAdmin; alCerra
         <BotonAdmin variante="rojo" textoCargando="Anulando…">
           Anular pago
         </BotonAdmin>
-        <button type="button" onClick={alCerrar} className="h-11.5 rounded-full px-5 text-14 font-bold text-admin-texto-2 hover:bg-white/[.06]">
+        <button type="button" onClick={alCerrar} className="h-11.5 rounded-full px-5 text-14 font-semibold text-admin-texto-2 hover:bg-white/[.06]">
           Cerrar
         </button>
       </div>
@@ -225,12 +225,12 @@ function FilaPago({ pago, alVerHistorial }: { pago: PagoComisionAdmin; alVerHist
     <li className="flex flex-col gap-2.5 rounded-14 bg-admin-superficie-2 p-3.5">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className={"flex flex-col " + (pago.anulado ? "opacity-75" : "")}>
-          <span className="flex flex-wrap items-center gap-2 text-15 font-extrabold text-white">
+          <span className="flex flex-wrap items-center gap-2 text-15 font-semibold text-white">
             <span className={pago.anulado ? "line-through" : ""}>
               {pago.asesorNombre} · {pago.montoTexto}
             </span>
             {pago.anulado ? (
-              <span className="rounded-full bg-admin-rojo-fondo px-2.5 py-0.5 text-12 font-extrabold text-admin-rojo-2">Anulado</span>
+              <span className="rounded-full bg-admin-rojo-fondo px-2.5 py-0.5 text-12 font-semibold text-admin-rojo-2">Anulado</span>
             ) : null}
           </span>
           <span className="text-13 text-admin-texto-3">
@@ -271,7 +271,7 @@ function FilaPago({ pago, alVerHistorial }: { pago: PagoComisionAdmin; alVerHist
                 type="button"
                 aria-expanded={modo === "anular"}
                 onClick={() => setModo(modo === "anular" ? null : "anular")}
-                className="h-11 rounded-full px-4 text-13 font-bold text-admin-rojo shadow-[inset_0_0_0_1px_var(--ga-admin-rojo)] hover:bg-admin-rojo-fondo"
+                className="h-11 rounded-full px-4 text-13 font-semibold text-admin-rojo shadow-[inset_0_0_0_1px_var(--ga-admin-rojo)] hover:bg-admin-rojo-fondo"
               >
                 Anular
               </button>
@@ -358,7 +358,7 @@ export function ListaPagosComision({
   return (
     <section className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5.5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="m-0 font-display text-20 font-extrabold">Pagos de comisión</h2>
+        <h2 className="m-0 font-display text-20 font-semibold">Pagos de comisión</h2>
         <button
           type="button"
           aria-expanded={verBitacora}
@@ -399,7 +399,7 @@ export function ListaPagosComision({
       )}
       {verBitacora ? (
         <div className="flex flex-col gap-2.5 pt-2 motion-safe:animate-ga-lista">
-          <h3 className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+          <h3 className="m-0 text-12 font-semibold text-admin-texto-3">
             Bitácora de pagos
             {pagoDelFiltro ? ` · ${pagoDelFiltro.asesorNombre} · ${pagoDelFiltro.montoTexto}` : ""}
           </h3>
@@ -420,10 +420,10 @@ export function ListaPagosComision({
               {entradas.map((b) => (
                 <li key={b.id} className="flex flex-col gap-1 rounded-12 bg-admin-superficie-2 p-3 text-14 leading-140">
                   <span className="flex flex-wrap items-center gap-2">
-                    <span className={`rounded-full px-2.5 py-0.5 text-12 font-extrabold ${CLASE_CHIP_ACCION[b.accion]}`}>
+                    <span className={`rounded-full px-2.5 py-0.5 text-12 font-semibold ${CLASE_CHIP_ACCION[b.accion]}`}>
                       {b.accionTexto}
                     </span>
-                    <span className="font-bold text-admin-texto">{b.actorNombre ?? "Administrador"}</span>
+                    <span className="font-semibold text-admin-texto">{b.actorNombre ?? "Administrador"}</span>
                     <span className="text-13 text-admin-texto-3">{b.cuando}</span>
                   </span>
                   {b.cambios.map(cambioLegible).map((c) => (

@@ -126,7 +126,7 @@ export function Afiliacion({
         >
           <IconoVolver tamano={22} />
         </Link>
-        <Link href="/ingresar" className="enlace hidden text-16 font-extrabold lg:inline">
+        <Link href="/ingresar" className="enlace hidden text-16 font-semibold lg:inline">
           ¿Ya eres asociado? Ingresa
         </Link>
       </header>
@@ -134,7 +134,7 @@ export function Afiliacion({
       <main className="flex flex-col lg:flex-row lg:items-start lg:gap-12 lg:px-14 lg:py-12">
         <aside className="flex flex-col gap-4.5 px-6 pt-6 md:mx-auto md:w-full md:max-w-2xl lg:mx-0 lg:w-aside-afiliacion lg:max-w-none lg:shrink-0 lg:gap-5 lg:p-0">
           <div className="flex flex-col gap-2 lg:gap-5">
-            <h1 className="m-0 font-display text-28 font-extrabold leading-115 text-ga-navy lg:text-40 lg:leading-110 lg:tracking-titular">
+            <h1 className="m-0 font-display text-28 font-semibold leading-115 text-ga-navy lg:text-40 lg:leading-110 lg:tracking-titular">
               Quiero afiliarme
             </h1>
             <p className="m-0 text-15 leading-150 text-ga-texto-2 lg:text-17 lg:leading-155">
@@ -260,7 +260,7 @@ export function Afiliacion({
 
           {/* Cuenta de nómina en cascada (pieza 3j): entidad → tipo → número. Billetera: sin tipo. */}
           <fieldset className="m-0 flex min-w-0 flex-col gap-3 rounded-16 border-0 bg-ga-fondo-suave p-3.5 xl:col-span-2 xl:p-4.5">
-            <legend className="float-left mb-3 w-full p-0 text-15 font-extrabold text-ga-navy">
+            <legend className="float-left mb-3 w-full p-0 text-15 font-semibold text-ga-navy">
               Cuenta de nómina
             </legend>
             <div className="clear-both grid grid-cols-1 gap-3 xl:grid-cols-3">
@@ -295,7 +295,7 @@ export function Afiliacion({
                   aria-labelledby="af-nomina-tipo-etiqueta"
                   className="motion-safe:animate-ga-aparecer flex flex-col gap-1.5"
                 >
-                  <span id="af-nomina-tipo-etiqueta" className="text-15 font-bold">
+                  <span id="af-nomina-tipo-etiqueta" className="text-15 font-semibold">
                     Tipo de cuenta
                   </span>
                   <div className="grid grid-cols-2 gap-2">
@@ -306,8 +306,8 @@ export function Afiliacion({
                           "flex h-13 cursor-pointer items-center justify-center rounded-12 border-1.5 text-15 transition-colors duration-150",
                           "focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ga-verde",
                           tipo === t
-                            ? "border-ga-verde bg-ga-verde-claro font-extrabold text-ga-verde"
-                            : "border-ga-borde-input bg-white font-bold text-ga-texto",
+                            ? "border-ga-verde bg-ga-verde-claro font-semibold text-ga-verde"
+                            : "border-ga-borde-input bg-white font-semibold text-ga-texto",
                           errores.nomina_tipo && tipo !== t && "border-ga-error",
                         )}
                       >
@@ -441,7 +441,7 @@ export function Afiliacion({
           </Field>
 
           <div className="flex flex-col gap-4.5 xl:col-span-2">
-            <p className="m-0 text-15 font-extrabold text-ga-navy">Fotos de tu documento</p>
+            <p className="m-0 text-15 font-semibold text-ga-navy">Fotos de tu documento</p>
             <div className="grid grid-cols-1 gap-4.5 sm:grid-cols-3">
               <CampoFoto
                 id="af-foto-frente"
@@ -497,7 +497,7 @@ export function Afiliacion({
             afiliación, según su{" "}
             {/* Abre en otra pestaña para no perder lo escrito en el formulario.
                 /politica-de-datos: política v1.0 (VERSION_POLITICA_DATOS en lib/politica-datos.ts). */}
-            <a href="/politica-de-datos" target="_blank" rel="noopener" className="enlace font-bold">
+            <a href="/politica-de-datos" target="_blank" rel="noopener" className="enlace font-semibold">
               política de datos
             </a>{" "}
             (Ley 1581 de 2012).

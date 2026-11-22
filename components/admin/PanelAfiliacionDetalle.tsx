@@ -98,7 +98,7 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas, perfilAsoci
   return (
     <div className="grid grid-cols-1 items-start gap-4.5 lg:grid-cols-[minmax(0,1fr)_560px]">
       <section className="hidden overflow-hidden rounded-20 bg-admin-superficie lg:block">
-        <div className="grid grid-cols-[2fr_1fr_1fr_.9fr] gap-2.5 border-b border-admin-borde-sutil px-4.5 py-3.5 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+        <div className="grid grid-cols-[2fr_1fr_1fr_.9fr] gap-2.5 border-b border-admin-borde-sutil px-4.5 py-3.5 text-12 font-semibold text-admin-texto-3">
           <span>Nombre</span>
           <span>Grado</span>
           <span>Enviada</span>
@@ -114,7 +114,7 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas, perfilAsoci
             }
           >
             <span className="flex flex-col gap-0.5 truncate">
-              <span className="truncate text-15 font-extrabold text-white">{h.nombre}</span>
+              <span className="truncate text-15 font-semibold text-white">{h.nombre}</span>
               <span className="text-13 tracking-cedula text-admin-texto-3">{h.cedula}</span>
             </span>
             <span className="text-14 text-admin-texto-2">{h.grado}</span>
@@ -132,7 +132,7 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas, perfilAsoci
           <span className="text-13 text-admin-texto-3">Enviada: {formatearFecha(solicitud.created_at)}</span>
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="font-display text-24 font-extrabold leading-115">{solicitud.nombre}</span>
+          <span className="font-display text-24 font-semibold leading-115">{solicitud.nombre}</span>
           <span className="text-14 text-admin-texto-2">
             C.C. {solicitud.cedula} · {solicitud.gradoNombre ?? solicitud.grado} · {INSTITUCIONES[solicitud.institucion] ?? solicitud.institucion}
           </span>
@@ -141,27 +141,27 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas, perfilAsoci
         <div className="grid grid-cols-2 gap-2.5 text-14">
           <div className="rounded-12 bg-admin-superficie-2 px-3 py-2.5">
             <div className="text-admin-texto-3">Celular</div>
-            <div className="font-bold">{solicitud.celular || "—"}</div>
+            <div className="font-semibold">{solicitud.celular || "—"}</div>
           </div>
           <div className="rounded-12 bg-admin-superficie-2 px-3 py-2.5">
             <div className="text-admin-texto-3">Nequi</div>
-            <div className="font-bold">{solicitud.nequi || "—"}</div>
+            <div className="font-semibold">{solicitud.nequi || "—"}</div>
           </div>
           <div className="col-span-2 min-w-0 rounded-12 bg-admin-superficie-2 px-3 py-2.5">
             <div className="text-admin-texto-3">Correo personal</div>
-            <div className="truncate font-bold">{solicitud.email || "—"}</div>
+            <div className="truncate font-semibold">{solicitud.email || "—"}</div>
           </div>
           <div className="col-span-2 min-w-0 rounded-12 bg-admin-superficie-2 px-3 py-2.5">
             <div className="text-admin-texto-3">Correo institucional</div>
-            <div className="truncate font-bold">{solicitud.correoInstitucional || "—"}</div>
+            <div className="truncate font-semibold">{solicitud.correoInstitucional || "—"}</div>
           </div>
           <div className="col-span-2 min-w-0 rounded-12 bg-admin-superficie-2 px-3 py-2.5">
             <div className="text-admin-texto-3">Cuenta de nómina</div>
-            <div className="break-words font-bold">{solicitud.cuentaNomina || "—"}</div>
+            <div className="break-words font-semibold">{solicitud.cuentaNomina || "—"}</div>
           </div>
           <div className="col-span-2 rounded-12 bg-admin-superficie-2 px-3 py-2.5">
             <div className="text-admin-texto-3">Asesor que refirió</div>
-            <div className="font-bold">{solicitud.asesorNombre ?? "Sin asesor"}</div>
+            <div className="font-semibold">{solicitud.asesorNombre ?? "Sin asesor"}</div>
           </div>
         </div>
 
@@ -172,7 +172,7 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas, perfilAsoci
         ) : null}
 
         <div className="flex flex-col gap-2">
-          <span className="text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+          <span className="text-12 font-semibold text-admin-texto-3">
             Fotos · los enlaces vencen a los pocos minutos
           </span>
           <div className="grid grid-cols-3 gap-2.5">
@@ -208,7 +208,7 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas, perfilAsoci
               href={enlaceWhatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-11 items-center justify-center gap-2 rounded-full text-14 font-bold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] outline-none transition-colors duration-200 hover:bg-white/[.06] hover:text-white focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-admin-verde)]"
+              className="flex h-11 items-center justify-center gap-2 rounded-full text-14 font-semibold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] outline-none transition-colors duration-200 hover:bg-white/[.06] hover:text-white focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-admin-verde)]"
             >
               <IconoWhatsapp tamano={17} />
               Escribir por WhatsApp
@@ -218,7 +218,7 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas, perfilAsoci
               <button
                 type="button"
                 disabled
-                className="flex h-11 items-center justify-center gap-2 rounded-full text-14 font-bold text-admin-texto-3 opacity-40 shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:cursor-not-allowed"
+                className="flex h-11 items-center justify-center gap-2 rounded-full text-14 font-semibold text-admin-texto-3 opacity-40 shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:cursor-not-allowed"
               >
                 <IconoWhatsapp tamano={17} apagado />
                 Escribir por WhatsApp
@@ -250,11 +250,11 @@ export function PanelAfiliacionDetalle({ solicitud, fotos, hermanas, perfilAsoci
         {HISTORIAL_NOTAS_INTERNAS_HABILITADO ? <NotaInternaAfiliacion /> : null}
 
         <div className="flex flex-col gap-2">
-          <span className="text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Historial</span>
+          <span className="text-12 font-semibold text-admin-texto-3">Historial</span>
           <div className="flex gap-2.5 text-14 leading-140">
             <span aria-hidden="true" className="mt-1.5 h-2 w-2 flex-none rounded-full bg-admin-verde" />
             <span className="flex flex-col">
-              <span className="font-bold text-admin-texto">Envió la afiliación</span>
+              <span className="font-semibold text-admin-texto">Envió la afiliación</span>
               <span className="text-admin-texto-3">
                 {solicitud.nombre} ·{" "}
                 {new Date(solicitud.created_at).toLocaleString("es-CO", {
@@ -283,7 +283,7 @@ function NotaInternaAfiliacion() {
   const [notaInterna, setNotaInterna] = useState("");
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor="nota-interna-afiliacion" className="text-14 font-bold">
+      <label htmlFor="nota-interna-afiliacion" className="text-14 font-semibold">
         Nota interna <span className="font-medium text-admin-texto-3">· solo la ve el equipo</span>
       </label>
       <textarea

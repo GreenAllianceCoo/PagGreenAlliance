@@ -31,11 +31,11 @@ function TarjetaKpi({
     <div className="flex flex-col gap-1 rounded-20 bg-white px-4.5 py-4 lg:gap-2 lg:rounded-26 lg:px-6 lg:py-5.5">
       <span className="text-13 text-ga-texto-3 lg:text-14">{titulo}</span>
       <div className="flex items-baseline gap-2">
-        <span className="font-display text-32 font-extrabold leading-none text-ga-navy lg:text-[52px]">{cantidad}</span>
+        <span className="font-display text-32 font-semibold leading-none text-ga-navy lg:text-[52px]">{cantidad}</span>
         <span className="hidden text-15 text-ga-texto-3 lg:inline">× {unitario}</span>
-        <span className="text-14 font-bold text-ga-verde lg:hidden">{valor}</span>
+        <span className="text-14 font-semibold text-ga-verde lg:hidden">{valor}</span>
       </div>
-      <span className="hidden text-15 font-bold text-ga-verde lg:block">{valor}</span>
+      <span className="hidden text-15 font-semibold text-ga-verde lg:block">{valor}</span>
       <span className="hidden text-12 text-ga-deshabilitado-texto lg:block">{nota}</span>
     </div>
   );
@@ -44,7 +44,7 @@ function TarjetaKpi({
 export function BarraBono({ titulo, avance }: { titulo: string; avance: AvanceMeta }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="flex justify-between gap-3 text-14 font-bold">
+      <div className="flex justify-between gap-3 text-14 font-semibold">
         <span>{titulo}</span>
         <span className="text-ga-texto-3">
           {avance.actual} / {avance.meta} embargos
@@ -59,7 +59,7 @@ export function BarraBono({ titulo, avance }: { titulo: string; avance: AvanceMe
         className="h-2.5 overflow-hidden rounded-full bg-ga-verde-claro"
       >
         <div
-          className="h-full w-full origin-left rounded-full bg-ga-verde transition-transform duration-500 ease-spring motion-safe:animate-ga-barra"
+          className="h-full w-full origin-left rounded-full bg-ga-verde transition-transform duration-500 ease-ga motion-safe:animate-ga-barra"
           style={{ transform: `scaleX(${avance.porcentaje / 100})` }}
         />
       </div>
@@ -105,7 +105,7 @@ export function PanelComisiones({ comisiones, revelar, hrefSimulador }: PanelCom
         </p>
         <Link
           href={hrefSimulador}
-          className="inline-flex h-13 items-center justify-center gap-2 rounded-full border-1.5 border-ga-verde bg-white px-5.5 text-14 font-extrabold text-ga-verde no-underline hover:bg-ga-verde-tint hover:text-ga-verde lg:text-15"
+          className="inline-flex h-13 items-center justify-center gap-2 rounded-full border-1.5 border-ga-verde bg-white px-5.5 text-14 font-semibold text-ga-verde no-underline hover:bg-ga-verde-tint hover:text-ga-verde lg:text-15"
         >
           Simulador de crédito <span aria-hidden="true">↗</span>
         </Link>
@@ -141,7 +141,7 @@ export function PanelComisiones({ comisiones, revelar, hrefSimulador }: PanelCom
                 aria-live="polite"
                 key={revelado ? "visible" : "oculto"}
                 className={cx(
-                  "font-display text-26 font-extrabold leading-none motion-safe:animate-ga-aparecer lg:text-40",
+                  "font-display text-26 font-semibold leading-none motion-safe:animate-ga-aparecer lg:text-40",
                   !revelado && "tracking-[0.06em]",
                 )}
               >
@@ -159,7 +159,7 @@ export function PanelComisiones({ comisiones, revelar, hrefSimulador }: PanelCom
           ) : null}
 
           <section aria-labelledby="bonos-titulo" className="flex flex-col gap-3.5 rounded-20 bg-white p-5 lg:rounded-26 lg:px-6 lg:py-6">
-            <h2 id="bonos-titulo" className="m-0 text-14 font-extrabold uppercase tracking-[0.04em] text-ga-texto-3">
+            <h2 id="bonos-titulo" className="m-0 text-14 font-semibold text-ga-texto-3">
               Avance hacia los bonos <span className="font-medium normal-case text-ga-deshabilitado-texto">(opcional)</span>
             </h2>
             <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-6">

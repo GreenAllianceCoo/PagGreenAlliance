@@ -36,7 +36,7 @@ export function ListaClientesCliente({ filas }: ListaClientesClienteProps) {
   if (filas.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2 rounded-20 bg-white p-6 text-center">
-        <p className="m-0 font-display text-18 font-extrabold text-ga-navy">Todavía no tienes clientes</p>
+        <p className="m-0 font-display text-18 font-semibold text-ga-navy">Todavía no tienes clientes</p>
         <p className="m-0 text-15 leading-150 text-ga-texto-2">
           Cuando refieras una afiliación o la cooperativa te asigne un asociado, aparecerá aquí.
         </p>
@@ -110,7 +110,7 @@ function ChipEstado({
       onClick={onClick}
       aria-pressed={activo}
       className={cx(
-        "flex h-11 items-center gap-2 rounded-full px-4 text-15 font-bold transition-colors duration-200",
+        "flex h-11 items-center gap-2 rounded-full px-4 text-15 font-semibold transition-colors duration-200",
         activo ? "bg-ga-navy text-white" : "bg-white text-ga-navy",
       )}
     >

@@ -99,7 +99,7 @@ export function CampoFoto({ id, name, label, ayuda, capture, error }: CampoFotoP
   return (
     <div className="flex flex-col gap-1.5">
       <label htmlFor={id} className="flex flex-col gap-1.5">
-        <span className="text-15 font-bold">{label}</span>
+        <span className="text-15 font-semibold">{label}</span>
         <span
           className={cx(
             "relative flex h-36 w-full cursor-pointer items-center justify-center overflow-hidden rounded-12 border-1.5 border-dashed border-ga-borde-input bg-ga-fondo-suave text-14 text-ga-texto-3",
@@ -121,7 +121,7 @@ export function CampoFoto({ id, name, label, ayuda, capture, error }: CampoFotoP
           {previa && calidad?.aceptable ? <SelloCalidadFoto /> : null}
         </span>
         {previa ? (
-          <span className="self-start text-13 font-bold text-ga-verde">Toca la foto para cambiarla</span>
+          <span className="self-start text-13 font-semibold text-ga-verde">Toca la foto para cambiarla</span>
         ) : null}
       </label>
       {previa && calidad && !calidad.aceptable ? (

@@ -8,7 +8,7 @@ import { subirArchivoComprobante } from "./comprobanteCliente";
 
 /** Entrada de archivo con el estilo de los controles del admin (sin cambiar el diseño: mismos tokens). */
 export const CLASE_ARCHIVO_ADMIN =
-  "w-full min-w-0 rounded-12 bg-admin-fondo p-2.5 text-14 text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] outline-none file:mr-3 file:rounded-full file:border-0 file:bg-admin-superficie-2 file:px-3.5 file:py-2 file:text-13 file:font-bold file:text-admin-texto focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-admin-verde)] aria-[invalid=true]:shadow-[inset_0_0_0_1.5px_var(--ga-admin-rojo)]";
+  "w-full min-w-0 rounded-12 bg-admin-fondo p-2.5 text-14 text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] outline-none file:mr-3 file:rounded-full file:border-0 file:bg-admin-superficie-2 file:px-3.5 file:py-2 file:text-13 file:font-semibold file:text-admin-texto focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-admin-verde)] aria-[invalid=true]:shadow-[inset_0_0_0_1.5px_var(--ga-admin-rojo)]";
 
 export const ACEPTA_COMPROBANTE = TIPOS_COMPROBANTE.join(",");
 
@@ -81,14 +81,14 @@ export function ComprobanteDesembolsoAdmin({ solicitudId, tieneComprobante, onRe
   return (
     <div className="flex flex-col gap-3 rounded-14 bg-admin-superficie-2 p-3.5" data-testid="comprobante-admin">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-14 font-extrabold">Comprobante de la transferencia</span>
+        <span className="text-14 font-semibold">Comprobante de la transferencia</span>
         {tieneComprobante ? (
           <button
             type="button"
             onClick={ver}
             disabled={abriendo}
             aria-busy={abriendo || undefined}
-            className="flex h-11 items-center rounded-full px-4.5 text-14 font-bold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
+            className="flex h-11 items-center rounded-full px-4.5 text-14 font-semibold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
           >
             {abriendo ? "Abriendo…" : "Ver comprobante"}
           </button>

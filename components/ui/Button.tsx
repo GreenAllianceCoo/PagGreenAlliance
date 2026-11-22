@@ -10,7 +10,7 @@ export type VarianteBoton = "primario" | "secundario" | "terciario";
 // distinto (opacity .85 + aro girando), tal como muestra la fila «Botón» del
 // design system.
 const BASE =
-  "relative flex items-center justify-center rounded-full font-extrabold no-underline transition-colors duration-200 " +
+  "relative flex items-center justify-center rounded-full font-semibold no-underline transition-colors duration-200 " +
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde " +
   "disabled:cursor-not-allowed disabled:opacity-40 aria-disabled:cursor-not-allowed aria-disabled:opacity-40";
 

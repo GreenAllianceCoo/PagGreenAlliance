@@ -292,7 +292,7 @@ export function SorteoDelMes({
         disabled={!puedeAbrir}
         aria-haspopup="dialog"
         className={cx(
-          "col-span-2 flex flex-col gap-2.5 rounded-16 p-4.5 text-15 font-bold no-underline lg:col-span-1 lg:flex-row lg:items-center lg:gap-3 lg:p-5 lg:text-16 lg:font-extrabold",
+          "col-span-2 flex flex-col gap-2.5 rounded-16 p-4.5 text-15 font-semibold no-underline lg:col-span-1 lg:flex-row lg:items-center lg:gap-3 lg:p-5 lg:text-16 lg:font-semibold",
           puedeAbrir
             ? "bg-ga-ambar-fondo text-ga-ambar-texto hover:bg-ga-ambar-fondo/80"
             : // Pieza 3a («Acceso Sorteo del mes», estado «Fuera de fecha»): fondo
@@ -341,7 +341,7 @@ export function SorteoDelMes({
                 >
                   <IconoRegalo tamano={28} />
                 </span>
-                <h2 id={idTitulo} className="m-0 font-display text-20 font-extrabold text-ga-navy">
+                <h2 id={idTitulo} className="m-0 font-display text-20 font-semibold text-ga-navy">
                   ¡Participa en el sorteo de {mesTexto}!
                 </h2>
                 <p className="m-0 text-15 leading-150 text-ga-texto-2">
@@ -363,7 +363,7 @@ export function SorteoDelMes({
 
             {paso === "confirmar" ? (
               <>
-                <h2 id={idTitulo} className="m-0 font-display text-20 font-extrabold text-ga-navy">
+                <h2 id={idTitulo} className="m-0 font-display text-20 font-semibold text-ga-navy">
                   Te enviamos tu número de boleta a {correoEnmascarado}
                 </h2>
                 <p className="m-0 text-15 leading-150 text-ga-texto-2">
@@ -393,7 +393,7 @@ export function SorteoDelMes({
                       type="button"
                       onClick={alReenviar}
                       disabled={reenviando || restanteReenvio > 0}
-                      className="text-14 font-bold text-ga-verde underline decoration-1 underline-offset-2 disabled:cursor-not-allowed disabled:text-ga-texto-3 disabled:no-underline"
+                      className="text-14 font-semibold text-ga-verde underline decoration-1 underline-offset-2 disabled:cursor-not-allowed disabled:text-ga-texto-3 disabled:no-underline"
                     >
                       {reenviando
                         ? "Reenviando…"
@@ -435,12 +435,12 @@ export function SorteoDelMes({
                     />
                   ))}
                 </div>
-                <h2 id={idTitulo} className="m-0 font-display text-20 font-extrabold text-ga-navy">
+                <h2 id={idTitulo} className="m-0 font-display text-20 font-semibold text-ga-navy">
                   {animarCelebracion ? "¡Ya estás participando!" : `Ya estás participando con la boleta ${numero ?? ""}`}
                 </h2>
                 {animarCelebracion ? (
                   <p
-                    className="m-0 flex justify-center gap-1 font-display text-34 font-extrabold text-ga-navy"
+                    className="m-0 flex justify-center gap-1 font-display text-34 font-semibold text-ga-navy"
                     aria-label={`Tu número de boleta es ${numero ?? ""}`}
                   >
                     {(numero ?? "").split("").map((digito, i) => (
@@ -455,7 +455,7 @@ export function SorteoDelMes({
                     ))}
                   </p>
                 ) : (
-                  <p className="m-0 font-display text-34 font-extrabold text-ga-navy">{numero}</p>
+                  <p className="m-0 font-display text-34 font-semibold text-ga-navy">{numero}</p>
                 )}
                 <p className="m-0 text-14 text-ga-texto-3">
                   El ganador se anunciará por los canales oficiales de Green Alliance.

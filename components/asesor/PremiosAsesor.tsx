@@ -33,7 +33,7 @@ export function PremiosAsesor({ premios, registrarClic }: Props) {
 
   return (
     <section aria-labelledby="premios-titulo" className="flex flex-col gap-3.5 rounded-20 bg-white p-5 lg:rounded-26 lg:px-6 lg:py-6">
-      <h2 id="premios-titulo" className="m-0 text-14 font-extrabold uppercase tracking-[0.04em] text-ga-texto-3">
+      <h2 id="premios-titulo" className="m-0 text-14 font-semibold text-ga-texto-3">
         Premios
       </h2>
       <p className="m-0 text-15 text-ga-texto-2">
@@ -49,10 +49,10 @@ export function PremiosAsesor({ premios, registrarClic }: Props) {
               className="flex min-h-11 w-full flex-col gap-2.5 rounded-16 bg-ga-fondo-suave p-4 text-left"
             >
               <span className="flex items-start justify-between gap-3">
-                <span className="text-16 font-extrabold text-ga-navy">{p.titulo}</span>
+                <span className="text-16 font-semibold text-ga-navy">{p.titulo}</span>
                 <span
                   className={cx(
-                    "shrink-0 rounded-full px-3 py-1 text-13 font-extrabold",
+                    "shrink-0 rounded-full px-3 py-1 text-13 font-semibold",
                     p.estado === "ganado_por_mi"
                       ? "bg-ga-verde-claro text-ga-verde-oscuro"
                       : p.estado === "ya_ganado"
@@ -65,7 +65,7 @@ export function PremiosAsesor({ premios, registrarClic }: Props) {
               </span>
               <span className="text-14 leading-150 text-ga-texto-2">{p.descripcion}</span>
               <BarraBono titulo={`Hacia ${p.meta} asociados`} avance={{ actual: p.actual, meta: p.meta, porcentaje: p.porcentaje, alcanzado: p.actual >= p.meta, faltan: p.faltan }} />
-              {p.ganadoTexto ? <span className="text-14 font-bold text-ga-verde-oscuro">{p.ganadoTexto}</span> : null}
+              {p.ganadoTexto ? <span className="text-14 font-semibold text-ga-verde-oscuro">{p.ganadoTexto}</span> : null}
             </button>
           </li>
         ))}

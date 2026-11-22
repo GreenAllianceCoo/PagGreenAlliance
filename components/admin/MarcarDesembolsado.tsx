@@ -90,7 +90,7 @@ export function MarcarDesembolsado({ solicitudId, fechaDesembolso, plazoMeses, t
         <button
           type="button"
           onClick={() => setAbierto(true)}
-          className="flex h-12.5 items-center justify-center rounded-full bg-admin-verde text-16 font-extrabold text-admin-fondo"
+          className="flex h-12.5 items-center justify-center rounded-full bg-admin-verde text-16 font-semibold text-admin-fondo"
         >
           Marcar desembolsado
         </button>
@@ -139,7 +139,7 @@ export function MarcarDesembolsado({ solicitudId, fechaDesembolso, plazoMeses, t
           type="button"
           onClick={() => setAbierto(false)}
           disabled={ocupado}
-          className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
+          className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
         >
           Cancelar
         </button>

@@ -19,7 +19,7 @@ const PASOS = ["Enviada", "En revisión", "Aprobada", "Desembolso"] as const;
 const MENSAJES = [
   "Recibimos tu solicitud.",
   "Te respondemos en poco tiempo.",
-  "¡Aprobada! Te avisamos por correo.",
+  "Aprobada. Te avisamos por correo.",
   "El desembolso va en camino.",
 ] as const;
 const BADGE_TEXTO = ["Enviada", "En revisión", "Aprobada", "En desembolso"] as const;
@@ -94,12 +94,12 @@ export function ComprobanteSolicitud({ variante, className }: ComprobanteSolicit
 
       <div className={cx("flex flex-col", esDesktop ? "gap-3.5 px-[26px] pb-4.5 pt-6" : "gap-3 px-5 pb-3.5 pt-5")}>
         <div className="flex items-center gap-2.5">
-          <span className={cx("whitespace-nowrap font-display font-extrabold text-ga-navy", esDesktop ? "text-22" : "text-20")}>
+          <span className={cx("whitespace-nowrap font-display font-semibold text-ga-navy", esDesktop ? "text-22" : "text-20")}>
             {esDesktop ? "Tu solicitud" : "Así ves tu solicitud"}
           </span>
           <span
             className={cx(
-              "flex-none whitespace-nowrap rounded-full text-13 font-extrabold",
+              "flex-none whitespace-nowrap rounded-full text-13 font-semibold",
               esDesktop ? "px-3 py-1.5" : "px-2.5 py-[5px]",
               BADGE_ESTILO[claveBadge(paso)],
             )}
@@ -109,16 +109,16 @@ export function ComprobanteSolicitud({ variante, className }: ComprobanteSolicit
         </div>
 
         <div className="flex items-center gap-2 lg:items-baseline">
-          <span className={cx("font-display font-extrabold leading-none tracking-cifra text-ga-navy", esDesktop ? "text-60" : "text-40")}>
+          <span className={cx("font-display font-semibold leading-none tracking-cifra text-ga-navy", esDesktop ? "text-60" : "text-40")}>
             {paso + 1}
           </span>
-          <span className="text-15 font-bold text-ga-texto-3">de 4{esDesktop ? " pasos" : ""}</span>
+          <span className="text-15 font-semibold text-ga-texto-3">de 4{esDesktop ? " pasos" : ""}</span>
         </div>
 
         <div className="relative grid grid-cols-4">
           <div className="absolute left-[12.5%] right-[12.5%] top-4 h-[3px] rounded-full bg-ga-verde-claro" />
           <div
-            className="absolute left-[12.5%] right-[12.5%] top-4 h-[3px] origin-left rounded-full bg-ga-verde transition-transform duration-500 ease-spring"
+            className="absolute left-[12.5%] right-[12.5%] top-4 h-[3px] origin-left rounded-full bg-ga-verde transition-transform duration-500 ease-ga"
             style={{ transform: `scaleX(${paso / 3})` }}
           />
           {PASOS.map((etiqueta, i) => {
@@ -129,12 +129,12 @@ export function ComprobanteSolicitud({ variante, className }: ComprobanteSolicit
                 className={cx(
                   "relative flex flex-col items-center gap-1.5 text-center leading-125",
                   esDesktop ? "text-14" : "text-13",
-                  i === paso ? "font-extrabold text-ga-texto" : clave === "pend" ? "font-semibold text-ga-texto-3" : "font-semibold text-ga-texto",
+                  i === paso ? "font-semibold text-ga-texto" : clave === "pend" ? "font-semibold text-ga-texto-3" : "font-semibold text-ga-texto",
                 )}
               >
                 <span
                   className={cx(
-                    "box-border flex h-8 w-8 items-center justify-center rounded-full text-14 font-extrabold transition-colors duration-320",
+                    "box-border flex h-8 w-8 items-center justify-center rounded-full text-14 font-semibold transition-colors duration-320",
                     MARCADOR_ESTILO[clave],
                   )}
                 >

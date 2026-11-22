@@ -29,7 +29,7 @@ export function TarjetaKpi({ etiqueta, valor, tono = "normal", nota }: Props) {
     <div className="flex flex-col gap-1.5 rounded-20 bg-admin-superficie px-5 py-4.5">
       <span className="text-14 text-admin-texto-3">{etiqueta}</span>
       <span
-        className={`font-display font-extrabold leading-none tracking-cifra ${
+        className={`font-display font-semibold leading-none tracking-cifra ${
           typeof valor === "string" && valor.includes("$") ? "text-38" : "text-48"
         } ${TONOS[tono]}`}
       >

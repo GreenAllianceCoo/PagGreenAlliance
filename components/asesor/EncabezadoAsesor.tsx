@@ -39,9 +39,9 @@ export function EncabezadoAsesor({
   pestana = "clientes",
   onPestana,
 }: EncabezadoAsesorProps) {
-  const claseActiva = "rounded-full bg-ga-verde-claro px-4.5 py-2.5 text-16 font-bold text-ga-verde-oscuro";
+  const claseActiva = "rounded-full bg-ga-verde-claro px-4.5 py-2.5 text-16 font-semibold text-ga-verde-oscuro";
   const claseInactiva =
-    "rounded-full px-4.5 py-2.5 text-16 font-bold text-ga-texto-2 hover:bg-ga-fondo-suave hover:text-ga-verde";
+    "rounded-full px-4.5 py-2.5 text-16 font-semibold text-ga-texto-2 hover:bg-ga-fondo-suave hover:text-ga-verde";
   return (
     <header className="px-5 pt-6 md:mx-auto md:max-w-2xl lg:mx-0 lg:max-w-none lg:px-10 lg:pt-3.5">
       <div className="flex h-11 items-center justify-between gap-3 lg:h-16 lg:rounded-full lg:bg-white lg:pl-5 lg:pr-3 lg:shadow-pildora">
@@ -84,13 +84,13 @@ export function EncabezadoAsesor({
         </nav>
         <div className="hidden items-center gap-2.5 text-15 lg:flex">
           <span className="flex max-w-[180px] flex-col items-end leading-120">
-            <span className="truncate font-bold">{nombre}</span>
+            <span className="truncate font-semibold">{nombre}</span>
             <span className="text-13 font-semibold text-ga-texto-3">{rol}</span>
           </span>
           {hrefDemo ? (
             <Link
               href={hrefDemo}
-              className="inline-flex h-11 items-center whitespace-nowrap rounded-full bg-ga-ambar-fondo px-4.5 font-bold text-ga-ambar-texto no-underline hover:brightness-95"
+              className="inline-flex h-11 items-center whitespace-nowrap rounded-full bg-ga-ambar-fondo px-4.5 font-semibold text-ga-ambar-texto no-underline hover:brightness-95"
             >
               Ver cuenta de demostración
             </Link>
@@ -98,7 +98,7 @@ export function EncabezadoAsesor({
           <form action={accionSalir}>
             <button
               type="submit"
-              className="inline-flex h-11 items-center rounded-full bg-ga-fondo-suave px-4.5 font-bold text-ga-navy hover:bg-ga-linea"
+              className="inline-flex h-11 items-center rounded-full bg-ga-fondo-suave px-4.5 font-semibold text-ga-navy hover:bg-ga-linea"
             >
               Salir
             </button>

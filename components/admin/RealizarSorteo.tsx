@@ -32,7 +32,7 @@ export function RealizarSorteo({ mes, mesTexto, yaRealizado, hayParticipantes }:
         <button
           type="button"
           disabled
-          className="flex h-11.5 items-center justify-center self-start rounded-full bg-admin-superficie-2 px-6 text-14 font-extrabold text-admin-texto-3 opacity-70"
+          className="flex h-11.5 items-center justify-center self-start rounded-full bg-admin-superficie-2 px-6 text-14 font-semibold text-admin-texto-3 opacity-70"
         >
           Realizar sorteo
         </button>
@@ -59,7 +59,7 @@ export function RealizarSorteo({ mes, mesTexto, yaRealizado, hayParticipantes }:
             <button
               type="button"
               onClick={() => setConfirmando(false)}
-              className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
+              className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
             >
               Cancelar
             </button>
@@ -70,7 +70,7 @@ export function RealizarSorteo({ mes, mesTexto, yaRealizado, hayParticipantes }:
           type="button"
           disabled={!hayParticipantes}
           onClick={() => setConfirmando(true)}
-          className="flex h-11.5 items-center justify-center self-start rounded-full bg-admin-verde px-6 text-14 font-extrabold text-admin-fondo disabled:opacity-50"
+          className="flex h-11.5 items-center justify-center self-start rounded-full bg-admin-verde px-6 text-14 font-semibold text-admin-fondo disabled:opacity-50"
         >
           Realizar sorteo
         </button>

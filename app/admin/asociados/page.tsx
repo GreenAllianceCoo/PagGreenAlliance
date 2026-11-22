@@ -21,7 +21,7 @@ export default async function AsociadosPage({ searchParams }: { searchParams: Pr
 
   return (
     <AdminShell nombre={nombre} seccion="asociados" rol={rol}>
-      <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Asociados</h1>
+      <h1 className="m-0 font-display text-30 font-semibold tracking-titular lg:text-34">Asociados</h1>
       <form role="search" className="flex">
         <label htmlFor="buscar-asociado" className="sr-only">
           Buscar por nombre o cédula
@@ -59,7 +59,7 @@ export default async function AsociadosPage({ searchParams }: { searchParams: Pr
                 className="flex flex-col gap-2 border-b border-admin-borde-sutil px-4.5 py-3.5 no-underline transition-colors duration-200 last:border-0 hover:bg-admin-superficie-2 motion-safe:animate-ga-fila-entra sm:flex-row sm:items-center sm:justify-between"
               >
                 <span className="flex flex-col gap-0.5">
-                  <span className="text-15 font-extrabold text-white">{f.nombre}</span>
+                  <span className="text-15 font-semibold text-white">{f.nombre}</span>
                   <span className="text-13 text-admin-texto-3">
                     {enmascararCedula(f.cedula)} · {f.grado ?? "Sin grado"}
                   </span>
@@ -67,11 +67,11 @@ export default async function AsociadosPage({ searchParams }: { searchParams: Pr
                 <span className="flex flex-wrap items-center gap-2">
                   {/* §12.6 (pieza 3q): chip «Inactivo» para los dados de baja. */}
                   {f.activo ? null : (
-                    <span className="inline-flex rounded-full bg-admin-rojo-fondo px-2.5 py-1 text-13 font-extrabold text-admin-rojo-2">
+                    <span className="inline-flex rounded-full bg-admin-rojo-fondo px-2.5 py-1 text-13 font-semibold text-admin-rojo-2">
                       Inactivo
                     </span>
                   )}
-                  <span className={"inline-flex self-start rounded-full px-2.5 py-1 text-13 font-extrabold " + tono}>
+                  <span className={"inline-flex self-start rounded-full px-2.5 py-1 text-13 font-semibold " + tono}>
                     {f.estadoProcesoTexto}
                     {paso ? ` (${paso}/8)` : ""}
                   </span>

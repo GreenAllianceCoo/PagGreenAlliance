@@ -27,7 +27,7 @@ export function TarjetaTope({
     <section className="relative flex flex-col gap-1.5 overflow-hidden rounded-28 bg-ga-verde p-5 text-white lg:gap-3 lg:p-6">
       <span aria-hidden="true" className="absolute -right-10 -bottom-16 h-44 w-44 rounded-full bg-ga-verde-oscuro" />
       <span className="relative text-14 text-ga-verde-claro lg:text-15">{etiqueta}</span>
-      <span className="relative font-display text-26 font-extrabold leading-none tracking-cifra text-white lg:text-[46px]">
+      <span className="relative font-display text-26 font-semibold leading-none tracking-cifra text-white lg:text-[46px]">
         {tope}
       </span>
       {/* Medidor: solo cuando ya hay una solicitud que compare contra el tope. */}
@@ -35,7 +35,7 @@ export function TarjetaTope({
         <>
           <div className="relative h-2.5 overflow-hidden rounded-full bg-white/18 lg:h-2.5">
             <div
-              className="h-full origin-left rounded-full bg-ga-ambar-fondo-fuerte transition-transform duration-500 ease-spring"
+              className="h-full origin-left rounded-full bg-ga-ambar-fondo-fuerte transition-transform duration-500 ease-ga"
               style={{ width: "100%", transform: `scaleX(${fraccion})` }}
             />
           </div>

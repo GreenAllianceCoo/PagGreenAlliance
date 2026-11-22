@@ -24,7 +24,7 @@ export function AvisoCreditoBloqueado({ mensaje, conBoton = false, id, className
       {conBoton ? (
         <span
           aria-disabled="true"
-          className="flex h-13.5 cursor-not-allowed items-center justify-center rounded-full bg-ga-linea-suave px-6 text-16 font-extrabold text-ga-deshabilitado-texto"
+          className="flex h-13.5 cursor-not-allowed items-center justify-center rounded-full bg-ga-linea-suave px-6 text-16 font-semibold text-ga-deshabilitado-texto"
         >
           Nueva solicitud
         </span>
@@ -36,7 +36,7 @@ export function AvisoCreditoBloqueado({ mensaje, conBoton = false, id, className
         >
           <IconoInfo tamano={22} grosor={1.8} />
         </span>
-        <p className="m-0 font-display text-17 font-extrabold leading-130 text-ga-navy">{mensaje}</p>
+        <p className="m-0 font-display text-17 font-semibold leading-130 text-ga-navy">{mensaje}</p>
       </div>
     </div>
   );

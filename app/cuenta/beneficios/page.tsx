@@ -33,7 +33,7 @@ export default async function BeneficiosPage({ searchParams }: { searchParams: P
       <EncabezadoCuenta nombre={nombre} seccion="beneficios" accionSalir={cerrarSesion} />
       <main className="flex flex-col gap-5 px-5 pb-6 pt-5 md:mx-auto md:max-w-2xl lg:max-w-6xl lg:gap-6 lg:px-10 lg:py-10">
         <div className="flex flex-col gap-1.5">
-          <h1 className="m-0 font-display text-30 font-extrabold text-ga-navy lg:text-44">Beneficios</h1>
+          <h1 className="m-0 font-display text-30 font-semibold text-ga-navy lg:text-44">Beneficios</h1>
           <p className="m-0 max-w-[640px] text-15 leading-150 text-ga-texto-2 lg:text-16">
             Promociones y catálogos que publican las empresas en convenio para los asociados. Escríbeles por WhatsApp desde cada
             publicación.
@@ -103,14 +103,14 @@ export default async function BeneficiosPage({ searchParams }: { searchParams: P
               <div className="flex gap-2 sm:col-span-3 lg:col-span-1">
                 <button
                   type="submit"
-                  className="flex h-12 flex-1 items-center justify-center rounded-full bg-ga-verde px-7 text-15 font-extrabold text-white lg:flex-none"
+                  className="flex h-12 flex-1 items-center justify-center rounded-full bg-ga-verde px-7 text-15 font-semibold text-white lg:flex-none"
                 >
                   Filtrar
                 </button>
                 {hayFiltros ? (
                   <Link
                     href="/cuenta/beneficios"
-                    className="flex h-12 items-center justify-center rounded-full px-5 text-15 font-bold text-ga-navy no-underline shadow-[inset_0_0_0_1px_var(--ga-linea)] hover:bg-ga-fondo-suave"
+                    className="flex h-12 items-center justify-center rounded-full px-5 text-15 font-semibold text-ga-navy no-underline shadow-[inset_0_0_0_1px_var(--ga-linea)] hover:bg-ga-fondo-suave"
                   >
                     Quitar filtros
                   </Link>
