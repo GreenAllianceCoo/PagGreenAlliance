@@ -10,9 +10,9 @@ export const metadata: Metadata = { title: "Cambios · Admin · Green Alliance" 
 
 const CLASE_CONTROL =
   "h-12 w-full min-w-0 rounded-12 bg-admin-fondo px-3.5 text-16 text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] outline-none placeholder:text-admin-texto-3 focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-admin-verde)] [color-scheme:dark]";
-const CLASE_ETIQUETA = "text-13 font-bold uppercase tracking-[0.04em] text-admin-texto-3";
+const CLASE_ETIQUETA = "text-13 font-semibold text-admin-texto-3";
 const CLASE_BOTON_BORDE =
-  "flex h-11.5 items-center justify-center rounded-full px-5 text-14 font-bold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]";
+  "flex h-11.5 items-center justify-center rounded-full px-5 text-14 font-semibold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]";
 
 type Busqueda = { asociado?: string; q?: string; desde?: string; hasta?: string; pagina?: string };
 
@@ -45,7 +45,7 @@ export default async function CambiosPage({ searchParams }: { searchParams: Prom
 
   return (
     <AdminShell nombre={nombre} seccion="cambios">
-      <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">
+      <h1 className="m-0 font-display text-30 font-semibold tracking-titular lg:text-34">
         {nombreFiltro ? `Cambios de ${nombreFiltro}` : "Cambios"}
       </h1>
       <p className="m-0 max-w-[700px] text-14 text-admin-texto-2">
@@ -89,7 +89,7 @@ export default async function CambiosPage({ searchParams }: { searchParams: Prom
         <div className="flex gap-2.5">
           <button
             type="submit"
-            className="flex h-11.5 items-center justify-center rounded-full bg-admin-verde px-6 text-14 font-extrabold text-admin-fondo"
+            className="flex h-11.5 items-center justify-center rounded-full bg-admin-verde px-6 text-14 font-semibold text-admin-fondo"
           >
             Filtrar
           </button>
@@ -114,7 +114,7 @@ export default async function CambiosPage({ searchParams }: { searchParams: Prom
           <ol className="m-0 flex list-none flex-col p-0" data-testid="cambios-asociados">
             {cambios.map((c) => (
               <li key={c.id} className="flex flex-col gap-2 border-b border-admin-borde-sutil px-4.5 py-4 last:border-0">
-                <span className="text-15 font-bold text-admin-texto">
+                <span className="text-15 font-semibold text-admin-texto">
                   {filtros.asociado ? null : (
                     <>
                       <Link href={`/admin/asociados/${c.asociadoId}`} className="text-admin-verde-2 underline-offset-2 hover:underline">
@@ -137,7 +137,7 @@ export default async function CambiosPage({ searchParams }: { searchParams: Prom
                             →
                           </span>
                           <span className="sr-only"> cambió a </span>
-                          <strong className="font-bold text-admin-texto">{l.despues}</strong>
+                          <strong className="font-semibold text-admin-texto">{l.despues}</strong>
                         </dd>
                       </div>
                     ))}
@@ -150,7 +150,7 @@ export default async function CambiosPage({ searchParams }: { searchParams: Prom
                       <FotoAfiliacion etiqueta="Antes" url={c.foto.urlAnterior} />
                     ) : (
                       <div className="flex flex-col gap-1.5">
-                        <span className="text-13 font-bold text-admin-texto-2">Antes</span>
+                        <span className="text-13 font-semibold text-admin-texto-2">Antes</span>
                         <div className="flex aspect-[3/4] items-center justify-center rounded-12 border-1.5 border-dashed border-admin-borde p-2.5 text-center text-12 text-admin-texto-3">
                           No tenía foto
                         </div>

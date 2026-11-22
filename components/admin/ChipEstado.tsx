@@ -43,7 +43,7 @@ export function ChipEstado({ estado, tamano = "sm", className }: Props) {
   return (
     <span
       className={cx(
-        "inline-flex items-center whitespace-nowrap rounded-full font-extrabold transition-colors duration-300",
+        "inline-flex items-center whitespace-nowrap rounded-full font-semibold transition-colors duration-300",
         tamano === "sm" ? "px-2.5 py-[5px] text-13" : "px-3 py-1.5 text-14",
         TONOS[TONO_POR_ESTADO[estado]],
         className,

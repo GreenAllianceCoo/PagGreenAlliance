@@ -35,7 +35,7 @@ export function FotosAfiliacionAsociado({ asociadoId, nombre, fotos, bloqueado =
 
   return (
     <section aria-labelledby="titulo-fotos-afiliacion" className="flex flex-col gap-3.5 rounded-20 bg-admin-superficie p-5.5">
-      <h2 id="titulo-fotos-afiliacion" className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+      <h2 id="titulo-fotos-afiliacion" className="m-0 text-12 font-semibold text-admin-texto-3">
         Fotos de afiliación
       </h2>
       {fotos === null ? (
@@ -61,7 +61,7 @@ export function FotosAfiliacionAsociado({ asociadoId, nombre, fotos, bloqueado =
                       setAviso(null);
                       setEditando(f.campo);
                     }}
-                    className="flex h-11 items-center justify-center rounded-full px-4 text-14 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06] disabled:opacity-60"
+                    className="flex h-11 items-center justify-center rounded-full px-4 text-14 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06] disabled:opacity-60"
                   >
                     Cambiar {ETIQUETA_FOTO_AFILIACION[f.campo].toLowerCase()}
                   </button>
@@ -149,7 +149,7 @@ function FormularioCambioFoto({
       noValidate
       className="flex flex-col gap-3 rounded-16 bg-admin-superficie-2 p-4 shadow-[inset_0_0_0_1.5px_var(--ga-admin-ambar)] motion-safe:animate-ga-aparecer"
     >
-      <p className="m-0 text-15 font-extrabold text-admin-texto">Cambiar {ETIQUETA_FOTO_AFILIACION[campo].toLowerCase()}</p>
+      <p className="m-0 text-15 font-semibold text-admin-texto">Cambiar {ETIQUETA_FOTO_AFILIACION[campo].toLowerCase()}</p>
       <CampoAdmin id={`${prefijo}-archivo`} label="Foto nueva" ayuda={TEXTO_FORMATOS_FOTO_AFILIACION} error={errores.archivo}>
         {(c) => (
           <input
@@ -188,7 +188,7 @@ function FormularioCambioFoto({
           type="button"
           onClick={onCancelar}
           disabled={ocupado}
-          className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
+          className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
         >
           Cancelar
         </button>

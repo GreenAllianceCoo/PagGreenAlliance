@@ -51,13 +51,13 @@ export function ResumenClientes({ conteos, categoriaActiva, onCambiar }: Resumen
           >
             <span
               className={cx(
-                "font-display text-36 font-extrabold leading-none tracking-cifra-grande lg:text-60",
+                "font-display text-36 font-semibold leading-none tracking-cifra-grande lg:text-60",
                 estilo.texto,
               )}
             >
               {conteos[categoria]}
             </span>
-            <span className={cx("text-14 font-bold lg:text-16", estilo.texto)}>
+            <span className={cx("text-14 font-semibold lg:text-16", estilo.texto)}>
               {etiquetaCategoriaAfiliacion(categoria)}
             </span>
             <span className="hidden text-13 text-ga-texto-2 lg:inline">afiliación</span>

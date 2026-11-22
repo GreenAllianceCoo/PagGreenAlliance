@@ -26,15 +26,15 @@ export const metadata: Metadata = {
 
 const PARRAFO = "m-0 text-15 leading-150 text-ga-texto-2 lg:text-17 lg:leading-155 print:text-[11pt] print:leading-normal";
 const LISTA = `${PARRAFO} flex list-disc flex-col gap-1.5 pl-5`;
-const H2 = "m-0 text-20 font-extrabold leading-125 text-ga-navy lg:text-24 print:text-[14pt]";
-const H3 = "m-0 text-16 font-extrabold leading-125 text-ga-navy lg:text-18 print:text-[12pt]";
+const H2 = "m-0 text-20 font-semibold leading-125 text-ga-navy lg:text-24 print:text-[14pt]";
+const H3 = "m-0 text-16 font-semibold leading-125 text-ga-navy lg:text-18 print:text-[12pt]";
 
 // Secciones que el área jurídica todavía revisa (aviso discreto, no alarmante).
 const EN_REVISION = new Set(["7.3", "8", "18"]);
 
 function EnRevision() {
   return (
-    <span className="ml-2 inline-block whitespace-nowrap rounded-full border border-ga-linea px-2 py-0.5 align-middle text-12 font-bold text-ga-texto-2">
+    <span className="ml-2 inline-block whitespace-nowrap rounded-full border border-ga-linea px-2 py-0.5 align-middle text-12 font-semibold text-ga-texto-2">
       En revisión jurídica
     </span>
   );
@@ -130,7 +130,7 @@ export default function PoliticaDeDatosPage() {
       </header>
       <main className="flex flex-col gap-8 px-6 py-6 md:mx-auto md:max-w-2xl lg:py-12 print:max-w-none print:px-0 print:py-4">
         <div className="flex flex-col gap-3">
-          <h1 className="m-0 text-28 font-extrabold leading-115 text-ga-navy lg:text-40 lg:leading-110 print:text-[20pt]">
+          <h1 className="m-0 text-28 font-semibold leading-115 text-ga-navy lg:text-40 lg:leading-110 print:text-[20pt]">
             Política de tratamiento de datos
           </h1>
           <p className={PARRAFO}>
@@ -144,14 +144,14 @@ export default function PoliticaDeDatosPage() {
             <li>Domicilio y dirección: Cr 78 No. 16 D 71, Bogotá D.C.</li>
             <li>
               Correo para protección de datos:{" "}
-              <a className="enlace font-bold" href="mailto:greenalliancecooperativa@gmail.com">
+              <a className="enlace font-semibold" href="mailto:greenalliancecooperativa@gmail.com">
                 greenalliancecooperativa@gmail.com
               </a>
             </li>
             <li>Teléfono: 318 389 4034. WhatsApp: {WHATSAPP_NUMERO}.</li>
             <li>
               Página web: www.greenallianceco.com. Correo de soporte:{" "}
-              <a className="enlace font-bold" href={`mailto:${CORREO_CONTACTO}`}>
+              <a className="enlace font-semibold" href={`mailto:${CORREO_CONTACTO}`}>
                 {CORREO_CONTACTO}
               </a>
               .

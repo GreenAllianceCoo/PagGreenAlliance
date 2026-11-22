@@ -150,11 +150,11 @@ export function CampoSelfie({ id, name, label, error }: CampoSelfieProps) {
   }
 
   const botonPrimario =
-    "flex h-11.5 w-full items-center justify-center rounded-full bg-ga-verde text-14 font-extrabold text-white transition-colors duration-200 hover:bg-ga-verde-oscuro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde";
+    "flex h-11.5 w-full items-center justify-center rounded-full bg-ga-verde text-14 font-semibold text-white transition-colors duration-200 hover:bg-ga-verde-oscuro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde";
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span id={`${id}-etiqueta`} className="text-15 font-bold">
+      <span id={`${id}-etiqueta`} className="text-15 font-semibold">
         {label}
       </span>
 
@@ -176,7 +176,7 @@ export function CampoSelfie({ id, name, label, error }: CampoSelfieProps) {
               className="motion-safe:animate-ga-aparecer h-full w-full -scale-x-100 object-cover"
             />
             <span className={cx("pointer-events-none absolute", OVALO)} />
-            <span className="absolute left-2 top-2 rounded-full bg-black/35 px-2 py-0.5 text-12 font-bold text-white">
+            <span className="absolute left-2 top-2 rounded-full bg-black/35 px-2 py-0.5 text-12 font-semibold text-white">
               Cámara frontal
             </span>
           </>
@@ -184,7 +184,7 @@ export function CampoSelfie({ id, name, label, error }: CampoSelfieProps) {
         {fase === "inicio" ? <span className={OVALO} /> : null}
         {/* Estado «abriendo cámara» (pieza 3j): mientras el navegador pide el permiso. */}
         {abriendo ? (
-          <span role="status" className="absolute inset-x-0 bottom-2 text-center text-13 font-bold text-white motion-safe:animate-ga-aparecer">
+          <span role="status" className="absolute inset-x-0 bottom-2 text-center text-13 font-semibold text-white motion-safe:animate-ga-aparecer">
             Abriendo cámara…
           </span>
         ) : null}
@@ -238,7 +238,7 @@ export function CampoSelfie({ id, name, label, error }: CampoSelfieProps) {
           <button
             type="button"
             onClick={abrirCamara}
-            className="flex h-11.5 w-full items-center justify-center rounded-full border-1.5 border-ga-navy text-14 font-extrabold text-ga-navy transition-colors duration-200 hover:bg-ga-fondo-suave focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
+            className="flex h-11.5 w-full items-center justify-center rounded-full border-1.5 border-ga-navy text-14 font-semibold text-ga-navy transition-colors duration-200 hover:bg-ga-fondo-suave focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
           >
             Repetir selfie
           </button>

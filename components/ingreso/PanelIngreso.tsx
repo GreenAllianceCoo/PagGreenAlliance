@@ -88,8 +88,8 @@ export function PanelIngreso({
           ) : null}
         </div>
         <div className={cx("relative flex flex-col gap-1.5 lg:mt-14 lg:gap-3.5", COLUMNA_TABLETA)}>
-          {/* Bricolage Grotesque (pieza 3a): títulos grandes, «Hola de nuevo» / «Revisa tu correo». */}
-          <h1 className="m-0 font-display text-32 font-extrabold leading-110 lg:text-46 lg:leading-108 lg:tracking-titular">
+          {/* Bricolage Grotesque (pieza 3a): títulos grandes, «Tu cuenta en Green Alliance» / «Revisa tu correo». */}
+          <h1 className="m-0 font-display text-32 font-semibold leading-110 lg:text-46 lg:leading-108 lg:tracking-titular">
             {titulo}
           </h1>
           <p className="m-0 text-16 leading-145 text-ga-verde-claro lg:text-18 lg:leading-155">

@@ -16,7 +16,7 @@ const INICIAL_CONFIRMAR: EstadoConfirmarEliminacion = {};
 const CLASE_AREA =
   "min-h-24 w-full resize-none rounded-12 bg-ga-fondo-suave p-3 text-16 leading-140 text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)] outline-none focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-verde)] aria-[invalid=true]:shadow-[inset_0_0_0_1.5px_var(--ga-error)]";
 const CLASE_CODIGO =
-  "h-13 w-full rounded-12 bg-ga-fondo-suave px-3.5 text-center font-mono text-22 font-bold tracking-[0.4em] text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)] outline-none focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-verde)] aria-[invalid=true]:shadow-[inset_0_0_0_1.5px_var(--ga-error)]";
+  "h-13 w-full rounded-12 bg-ga-fondo-suave px-3.5 text-center font-mono text-22 font-semibold tracking-[0.4em] text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)] outline-none focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-verde)] aria-[invalid=true]:shadow-[inset_0_0_0_1.5px_var(--ga-error)]";
 
 type Props = {
   asociadoId: string;
@@ -61,7 +61,7 @@ export function EliminarAsociado({ asociadoId, nombre, activo, esPropio }: Props
         type="button"
         disabled={bloqueado}
         onClick={() => setAbierto(true)}
-        className="flex h-11.5 items-center justify-center self-start rounded-full px-6 text-14 font-extrabold text-admin-rojo shadow-[inset_0_0_0_1px_var(--ga-admin-rojo)] disabled:opacity-60"
+        className="flex h-11.5 items-center justify-center self-start rounded-full px-6 text-14 font-semibold text-admin-rojo shadow-[inset_0_0_0_1px_var(--ga-admin-rojo)] disabled:opacity-60"
       >
         Eliminar definitivamente
       </button>
@@ -69,7 +69,7 @@ export function EliminarAsociado({ asociadoId, nombre, activo, esPropio }: Props
       <Modal abierto={abierto} onCerrar={() => setAbierto(false)} tituloId={tituloId} variante="centrado">
         {hecho ? (
           <div className="flex flex-col gap-4 text-ga-texto">
-            <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-extrabold">
+            <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-semibold">
               Asociado eliminado
             </h2>
             <p role="status" className="m-0 text-15 leading-150 text-ga-texto-2">
@@ -77,7 +77,7 @@ export function EliminarAsociado({ asociadoId, nombre, activo, esPropio }: Props
             </p>
             <Link
               href="/admin/asociados"
-              className="flex h-11.5 items-center justify-center self-end rounded-full bg-ga-verde px-6 text-15 font-extrabold text-white no-underline"
+              className="flex h-11.5 items-center justify-center self-end rounded-full bg-ga-verde px-6 text-15 font-semibold text-white no-underline"
             >
               Volver a asociados
             </Link>
@@ -148,7 +148,7 @@ function Pasos({
         <input type="hidden" name="asociadoId" value={asociadoId} />
         <input type="hidden" name="solicitudId" value={pedido.solicitudId} />
         {limpieza ? <input type="hidden" name="reintento" value="1" /> : null}
-        <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-extrabold">
+        <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-semibold">
           Escribe el código para eliminar a {nombre}
         </h2>
         <p className="m-0 text-15 leading-150 text-ga-texto-2">
@@ -157,7 +157,7 @@ function Pasos({
         </p>
         {limpieza ? null : (
           <div className="flex flex-col gap-1.5">
-            <label htmlFor={`${tituloId}-codigo`} className="text-14 font-bold">
+            <label htmlFor={`${tituloId}-codigo`} className="text-14 font-semibold">
               Código de 6 números
             </label>
             <input
@@ -189,7 +189,7 @@ function Pasos({
           <button
             type="button"
             onClick={onCerrar}
-            className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-bold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
+            className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-semibold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
           >
             Cancelar
           </button>
@@ -197,7 +197,7 @@ function Pasos({
             <button
               type="button"
               onClick={onReiniciar}
-              className="flex h-11.5 items-center justify-center rounded-full bg-ga-verde px-6 text-15 font-extrabold text-white"
+              className="flex h-11.5 items-center justify-center rounded-full bg-ga-verde px-6 text-15 font-semibold text-white"
             >
               Pedir un código nuevo
             </button>
@@ -213,7 +213,7 @@ function Pasos({
   return (
     <form action={pedir} noValidate className="flex flex-col gap-4 text-ga-texto">
       <input type="hidden" name="asociadoId" value={asociadoId} />
-      <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-extrabold">
+      <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-semibold">
         ¿Eliminar definitivamente a {nombre}?
       </h2>
       <div role="note" className="rounded-14 bg-ga-error-fondo p-3.5 text-14 leading-150 text-ga-error-texto">
@@ -223,7 +223,7 @@ function Pasos({
         administrador, y luego se borran automáticamente.
       </div>
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={`${tituloId}-motivo`} className="text-14 font-bold">
+        <label htmlFor={`${tituloId}-motivo`} className="text-14 font-semibold">
           Motivo <span className="font-medium text-ga-texto-3">(obligatorio · 5 a 300 caracteres · sin datos personales)</span>
         </label>
         <textarea
@@ -274,7 +274,7 @@ function Pasos({
         <button
           type="button"
           onClick={onCerrar}
-          className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-bold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
+          className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-semibold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
         >
           Cancelar
         </button>

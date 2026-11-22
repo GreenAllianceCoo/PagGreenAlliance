@@ -13,7 +13,7 @@ export default async function PlataformaPage() {
 
   return (
     <AdminShell nombre={nombre} seccion="plataforma">
-      <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Plataforma</h1>
+      <h1 className="m-0 font-display text-30 font-semibold tracking-titular lg:text-34">Plataforma</h1>
       {error || !pausa ? (
         <p role="alert" className="m-0 max-w-[640px] rounded-12 bg-admin-superficie p-4 text-15 text-admin-rojo-2">
           No pudimos cargar la configuración de la plataforma. Si es la primera vez, falta aplicar la migración

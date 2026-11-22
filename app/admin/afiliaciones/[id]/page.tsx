@@ -106,7 +106,7 @@ export default async function DetalleAfiliacionPage({ params }: { params: Promis
         >
           <IconoVolver tamano={20} grosor={1.8} />
         </Link>
-        <h1 className="m-0 font-display font-extrabold tracking-titular">
+        <h1 className="m-0 font-display font-semibold tracking-titular">
           <span className="text-20 lg:hidden">Solicitud de afiliación</span>
           <span className="hidden text-30 lg:inline lg:text-34">Afiliaciones</span>
         </h1>

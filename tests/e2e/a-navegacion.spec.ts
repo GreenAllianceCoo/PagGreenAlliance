@@ -8,6 +8,7 @@ import {
   limpiarLimites,
   llenarAfiliacion,
   pedirCodigo,
+  USUARIOS,
 } from "./utils";
 
 /**
@@ -16,10 +17,9 @@ import {
  */
 
 const H1 = {
-  "/": "Crédito entre compañeros, con reglas claras.",
-  "/ingresar": "Hola de nuevo",
+  "/": "Crédito entre compañeros, con reglas claras",
+  "/ingresar": "Tu cuenta en Green Alliance",
   "/afiliacion": "Quiero afiliarme",
-  "/cuenta": "Hola,",
 };
 
 async function h1(page: Page) {
@@ -70,10 +70,9 @@ test.describe("A · Landing /", () => {
     expect(await h1(page)).toBe(H1["/afiliacion"]);
   });
 
-  test("«Mi cuenta» (escritorio) / «Ingresar» (celular) → /ingresar", async ({ page }, testInfo) => {
+  test("«Ingresar» del encabezado → /ingresar", async ({ page }) => {
     await page.goto("/");
-    const nombre = esEscritorio(testInfo) ? "Mi cuenta" : "Ingresar";
-    const enlace = page.getByRole("link", { name: nombre, exact: true });
+    const enlace = page.getByRole("link", { name: "Ingresar", exact: true });
     await expect(enlace).toBeVisible();
     await enlace.click();
     await expect(page).toHaveURL(/\/ingresar$/);
@@ -127,7 +126,7 @@ test.describe("A · Landing /", () => {
 });
 
 test.describe("A · Landing con sesión → /cuenta", () => {
-  test("«Solicitar crédito», «Mi cuenta/Ingresar» y «Ver beneficios» llevan a /cuenta con sesión", async ({
+  test("«Solicitar crédito», «Ingresar» y «Ver beneficios» llevan a /cuenta con sesión", async ({
     browser,
   }, testInfo) => {
     const ctx = await contextoConSesion(browser, "conSolicitud", testInfo);
@@ -135,10 +134,10 @@ test.describe("A · Landing con sesión → /cuenta", () => {
     await page.goto("/");
     await page.getByRole("link", { name: "Solicitar crédito" }).click();
     await expect(page).toHaveURL(/\/cuenta$/);
-    await expect(page.locator("h1")).toContainText("Hola,");
+    await expect(page.locator("h1")).toHaveText(USUARIOS.conSolicitud.nombre);
 
     await page.goto("/");
-    await page.getByRole("link", { name: esEscritorio(testInfo) ? "Mi cuenta" : "Ingresar", exact: true }).click();
+    await page.getByRole("link", { name: "Ingresar", exact: true }).click();
     await expect(page).toHaveURL(/\/cuenta$/);
 
     if (esEscritorio(testInfo)) {
@@ -255,7 +254,7 @@ test.describe("A · Cuenta", () => {
     await page.keyboard.press("Escape");
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await expect(page).toHaveURL(/\/cuenta#?$/);
-    await expect(page.locator("h1")).toContainText("Hola,");
+    await expect(page.locator("h1")).toHaveText(USUARIOS.conSolicitud.nombre);
 
     // Logo → /
     await page.getByRole("link", { name: "Ir al inicio" }).click();

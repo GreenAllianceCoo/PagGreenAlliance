@@ -63,13 +63,13 @@ export function NuevoCreditoAdmin({
       className="flex w-full flex-col gap-4 rounded-20 bg-admin-superficie p-5.5 motion-safe:animate-ga-aparecer"
     >
       <div className="flex items-center justify-between gap-3">
-        <h2 id="nuevo-credito-titulo" className="m-0 font-display text-22 font-extrabold">
+        <h2 id="nuevo-credito-titulo" className="m-0 font-display text-22 font-semibold">
           Nuevo crédito
         </h2>
         <button
           type="button"
           onClick={onCerrar}
-          className="flex h-11 items-center rounded-full px-4.5 text-14 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
+          className="flex h-11 items-center rounded-full px-4.5 text-14 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
         >
           Cerrar
         </button>
@@ -149,7 +149,7 @@ function FichaAsociado({ asociado }: { asociado: AsociadoParaCredito }) {
   return (
     <div className="flex flex-col gap-3 rounded-16 bg-admin-superficie-2 p-4">
       <div className="flex flex-col gap-0.5">
-        <span className="font-display text-20 font-extrabold">{asociado.nombre}</span>
+        <span className="font-display text-20 font-semibold">{asociado.nombre}</span>
         <span className="text-14 text-admin-texto-2">C.C. {asociado.cedula}</span>
       </div>
       <dl className="m-0 grid grid-cols-2 gap-2.5 text-14">
@@ -176,7 +176,7 @@ function Dato({ termino, children }: { termino: string; children: React.ReactNod
   return (
     <div className="rounded-12 bg-admin-superficie px-3 py-2.5">
       <dt className="text-admin-texto-3">{termino}</dt>
-      <dd className="m-0 font-bold">{children}</dd>
+      <dd className="m-0 font-semibold">{children}</dd>
     </div>
   );
 }

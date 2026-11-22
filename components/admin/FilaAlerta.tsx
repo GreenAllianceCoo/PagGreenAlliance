@@ -20,11 +20,11 @@ export function FilaAlerta({ alerta }: { alerta: FilaAlertaAdmin }) {
       }
     >
       <div className="flex flex-col gap-0.5">
-        <span className="flex flex-wrap items-center gap-2 text-15 font-extrabold text-white">
+        <span className="flex flex-wrap items-center gap-2 text-15 font-semibold text-white">
           {alerta.asociado.nombre}
           <span
             className={
-              "rounded-full px-2.5 py-0.5 text-12 font-extrabold " +
+              "rounded-full px-2.5 py-0.5 text-12 font-semibold " +
               (alerta.tipo === "retiro_anticipado"
                 ? "bg-admin-rojo-fondo text-admin-rojo-2"
                 : "bg-admin-ambar-fondo text-admin-ambar")
@@ -52,7 +52,7 @@ export function FilaAlerta({ alerta }: { alerta: FilaAlertaAdmin }) {
               href={alerta.asociado.whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-11.5 items-center gap-2 rounded-full px-4 text-14 font-bold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
+              className="flex h-11.5 items-center gap-2 rounded-full px-4 text-14 font-semibold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
             >
               <IconoWhatsapp tamano={17} />
               Escribir por WhatsApp
@@ -61,7 +61,7 @@ export function FilaAlerta({ alerta }: { alerta: FilaAlertaAdmin }) {
           <BotonAdmin textoCargando="Marcando…">Marcar atendida</BotonAdmin>
         </form>
       ) : (
-        <span className="text-13 font-bold text-admin-verde">✓ Atendida</span>
+        <span className="text-13 font-semibold text-admin-verde">✓ Atendida</span>
       )}
     </div>
   );

@@ -19,7 +19,7 @@ const ACCION_VACIA: EstadoAccionConvenio = {};
 const CLASE_CONTROL =
   "rounded-12 bg-admin-fondo px-3.5 text-16 text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] outline-none placeholder:text-admin-texto-3 aria-[invalid=true]:shadow-[inset_0_0_0_1.5px_var(--ga-admin-rojo)] focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-admin-verde)]";
 const CLASE_BOTON_SECUNDARIO =
-  "flex h-11 items-center justify-center rounded-10 px-4 text-14 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-admin-superficie disabled:opacity-40";
+  "flex h-11 items-center justify-center rounded-10 px-4 text-14 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-admin-superficie disabled:opacity-40";
 
 function Campo({
   id,
@@ -37,7 +37,7 @@ function Campo({
   const ids = [error ? `${id}-error` : null, ayuda ? `${id}-ayuda` : null].filter(Boolean).join(" ") || undefined;
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-14 font-extrabold">
+      <label htmlFor={id} className="text-14 font-semibold">
         {label}
       </label>
       {children(ids, Boolean(error))}
@@ -47,7 +47,7 @@ function Campo({
         </span>
       ) : null}
       {error ? (
-        <span id={`${id}-error`} className="text-12 font-bold text-admin-rojo-2">
+        <span id={`${id}-error`} className="text-12 font-semibold text-admin-rojo-2">
           {error}
         </span>
       ) : null}
@@ -62,7 +62,7 @@ function BotonGuardar({ nuevo }: { nuevo: boolean }) {
       type="submit"
       disabled={pending}
       aria-busy={pending || undefined}
-      className="flex h-12 items-center gap-2 self-start rounded-full bg-admin-verde px-7 text-15 font-extrabold text-admin-fondo disabled:opacity-85"
+      className="flex h-12 items-center gap-2 self-start rounded-full bg-admin-verde px-7 text-15 font-semibold text-admin-fondo disabled:opacity-85"
     >
       {pending ? "Guardando…" : nuevo ? "Crear convenio" : "Guardar cambios"}
     </button>
@@ -92,7 +92,7 @@ function FormularioConvenio({ convenio, onCerrar }: { convenio?: ConvenioAdmin; 
 
   return (
     <form action={accion} noValidate className="flex flex-col gap-4 rounded-20 bg-admin-superficie p-5.5">
-      <h2 className="m-0 font-display text-20 font-extrabold">{convenio ? `Editar «${convenio.nombreEmpresa}»` : "Nuevo convenio"}</h2>
+      <h2 className="m-0 font-display text-20 font-semibold">{convenio ? `Editar «${convenio.nombreEmpresa}»` : "Nuevo convenio"}</h2>
       <input type="hidden" name="id" value={p("id", convenio?.id ?? "")} />
       <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
         <Campo id="convenio-nombreEmpresa" label="Nombre de la empresa" error={e.nombreEmpresa}>
@@ -188,7 +188,7 @@ function FormularioConvenio({ convenio, onCerrar }: { convenio?: ConvenioAdmin; 
           Quitar el logo actual
         </label>
       ) : null}
-      <label className="flex items-center gap-2.5 text-14 font-bold">
+      <label className="flex items-center gap-2.5 text-14 font-semibold">
         <input
           type="checkbox"
           name="visible"
@@ -264,7 +264,7 @@ function BotonEliminar({ id, nombre, onResultado }: { id: string; nombre: string
   return (
     <form action={despachar} role="group" aria-label={`Confirmar eliminación de ${nombre}`} className="flex flex-wrap items-center gap-2">
       <input type="hidden" name="id" value={id} />
-      <span className="text-13 font-extrabold text-admin-rojo-2">
+      <span className="text-13 font-semibold text-admin-rojo-2">
         ¿Eliminar «{nombre}»? No se puede deshacer. Si tiene acceso o publicaciones, se conservan ocultas.
       </span>
       <button type="submit" disabled={pendiente} aria-busy={pendiente || undefined} className={CLASE_BOTON_SECUNDARIO + " text-admin-rojo-2 !shadow-[inset_0_0_0_1px_var(--ga-admin-rojo)]"}>
@@ -292,18 +292,18 @@ export function GestorConvenios({ convenios }: { convenios: ConvenioAdmin[] }) {
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Convenios</h1>
+        <h1 className="m-0 font-display text-30 font-semibold tracking-titular lg:text-34">Convenios</h1>
         <div className="flex flex-wrap gap-2">
           <Link
             href="/admin/convenios/publicaciones"
-            className="flex h-12 items-center rounded-full px-6 text-15 font-bold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
+            className="flex h-12 items-center rounded-full px-6 text-15 font-semibold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
           >
             Publicaciones
           </Link>
           <button
             type="button"
             onClick={() => setEditando("nuevo")}
-            className="flex h-12 items-center rounded-full bg-admin-verde px-7 text-15 font-extrabold text-admin-fondo"
+            className="flex h-12 items-center rounded-full bg-admin-verde px-7 text-15 font-semibold text-admin-fondo"
           >
             Nuevo convenio
           </button>
@@ -313,12 +313,12 @@ export function GestorConvenios({ convenios }: { convenios: ConvenioAdmin[] }) {
       {editando === "nuevo" ? <FormularioConvenio key="nuevo" onCerrar={cerrar} /> : null}
       {abierto ? <FormularioConvenio key={abierto.id} convenio={abierto} onCerrar={cerrar} /> : null}
 
-      <p role="status" aria-live="polite" className={"m-0 text-14 font-bold " + (aviso.error ? "text-admin-rojo-2" : "text-admin-verde-2")}>
+      <p role="status" aria-live="polite" className={"m-0 text-14 font-semibold " + (aviso.error ? "text-admin-rojo-2" : "text-admin-verde-2")}>
         {aviso.error ?? aviso.mensaje}
       </p>
 
       <section className="flex flex-col gap-2 rounded-20 bg-admin-superficie p-5.5">
-        <h2 className="m-0 font-display text-20 font-extrabold">Empresas en convenio</h2>
+        <h2 className="m-0 font-display text-20 font-semibold">Empresas en convenio</h2>
         {convenios.length === 0 ? (
           <p className="m-0 text-15 text-admin-texto-3">Todavía no hay convenios. Crea el primero con «Nuevo convenio».</p>
         ) : (
@@ -335,12 +335,12 @@ export function GestorConvenios({ convenios }: { convenios: ConvenioAdmin[] }) {
                     </span>
                   )}
                   <div className="flex min-w-0 flex-col gap-0.5">
-                    <span className="text-16 font-extrabold text-white">{c.nombreEmpresa}</span>
+                    <span className="text-16 font-semibold text-white">{c.nombreEmpresa}</span>
                     <span className="text-13 text-admin-texto-3">
                       {c.especialidad || "Sin especialidad"}
                       {c.nit ? ` · NIT ${c.nit}` : ""} · Orden {c.orden}
                     </span>
-                    <span className={"text-13 font-extrabold " + (c.visible ? "text-admin-verde-2" : "text-admin-ambar")}>
+                    <span className={"text-13 font-semibold " + (c.visible ? "text-admin-verde-2" : "text-admin-ambar")}>
                       {c.visible ? "Visible" : "Oculto"}
                     </span>
                     <span className="text-13 text-admin-texto-3">

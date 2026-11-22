@@ -38,7 +38,7 @@ export function CampoModal({
   const desc = [ayuda ? `${id}-ayuda` : "", error ? `${id}-error` : ""].filter(Boolean).join(" ") || undefined;
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-14 font-bold">
+      <label htmlFor={id} className="text-14 font-semibold">
         {etiqueta}
       </label>
       {children({ id, "aria-invalid": error ? true : undefined, "aria-describedby": desc })}
@@ -78,7 +78,7 @@ export function CamposCuentaNomina({
   const pasos = pasosCuentaNomina(control("nomina_entidad").value);
   return (
     <fieldset className="m-0 flex flex-col gap-4 border-0 p-0">
-      <legend className="mb-2 p-0 text-14 font-bold">Cuenta de nómina</legend>
+      <legend className="mb-2 p-0 text-14 font-semibold">Cuenta de nómina</legend>
       <CampoModal id={`${idBase}-entidad`} etiqueta="Entidad" error={errores.nomina_entidad}>
         {(p) => (
           <select {...p} {...control("nomina_entidad")} className={CLASE_CAMPO_MODAL}>

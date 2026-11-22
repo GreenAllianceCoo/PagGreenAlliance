@@ -59,7 +59,7 @@ export function DocumentosProceso({ asociadoId, documentos, errorLista = false, 
   return (
     <section aria-labelledby="titulo-documentos-proceso" className="flex flex-col gap-3.5 rounded-20 bg-admin-superficie p-5.5">
       <div className="flex items-center justify-between gap-3">
-        <h2 id="titulo-documentos-proceso" className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+        <h2 id="titulo-documentos-proceso" className="m-0 text-12 font-semibold text-admin-texto-3">
           Documentos del proceso
         </h2>
         {subiendo ? null : (
@@ -72,7 +72,7 @@ export function DocumentosProceso({ asociadoId, documentos, errorLista = false, 
               setError(null);
               setSubiendo(true);
             }}
-            className="flex h-11 items-center rounded-full px-4.5 text-14 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06] disabled:opacity-60"
+            className="flex h-11 items-center rounded-full px-4.5 text-14 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06] disabled:opacity-60"
           >
             Subir PDF
           </button>
@@ -112,7 +112,7 @@ export function DocumentosProceso({ asociadoId, documentos, errorLista = false, 
             <li key={d.id} className="flex flex-col gap-2.5 rounded-14 bg-admin-superficie-2 p-3.5">
               <div className="flex flex-wrap items-center justify-between gap-2.5">
                 <div className="flex min-w-0 flex-col gap-0.5">
-                  <span className="break-words text-15 font-bold text-admin-texto">{d.nombre}</span>
+                  <span className="break-words text-15 font-semibold text-admin-texto">{d.nombre}</span>
                   <span className="text-13 text-admin-texto-3">
                     PDF · {formatearTamanoArchivo(d.tamanoBytes)} · {d.subidoEl} · {d.subidoPor}
                   </span>
@@ -124,7 +124,7 @@ export function DocumentosProceso({ asociadoId, documentos, errorLista = false, 
                     disabled={descargando === d.id}
                     aria-busy={descargando === d.id || undefined}
                     aria-label={`Descargar ${d.nombre}`}
-                    className="flex h-11 items-center rounded-full bg-admin-verde px-4.5 text-14 font-extrabold text-admin-fondo disabled:opacity-80"
+                    className="flex h-11 items-center rounded-full bg-admin-verde px-4.5 text-14 font-semibold text-admin-fondo disabled:opacity-80"
                   >
                     {descargando === d.id ? "Preparando…" : "Descargar"}
                   </button>
@@ -137,7 +137,7 @@ export function DocumentosProceso({ asociadoId, documentos, errorLista = false, 
                         setQuitando(d.id);
                       }}
                       aria-label={`Quitar ${d.nombre}`}
-                      className="flex h-11 items-center rounded-full px-4 text-14 font-bold text-admin-rojo-2 shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-admin-rojo-fondo disabled:opacity-60"
+                      className="flex h-11 items-center rounded-full px-4 text-14 font-semibold text-admin-rojo-2 shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-admin-rojo-fondo disabled:opacity-60"
                     >
                       Quitar
                     </button>
@@ -262,7 +262,7 @@ function FormularioSubida({
           type="button"
           onClick={onCancelar}
           disabled={ocupado}
-          className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
+          className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
         >
           Cancelar
         </button>
@@ -322,7 +322,7 @@ function FormularioQuitar({
           type="button"
           onClick={onCancelar}
           disabled={ocupado}
-          className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
+          className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
         >
           Cancelar
         </button>

@@ -18,7 +18,7 @@ export function Perfil({ accionSalir, ...perfil }: PerfilProps) {
       <EncabezadoCuenta nombre={perfil.nombre} seccion="perfil" accionSalir={accionSalir} />
 
       <main className="flex flex-col gap-4 px-5 pb-6 pt-5 md:mx-auto md:max-w-2xl lg:max-w-none lg:gap-6 lg:px-14 lg:py-10">
-        <h1 className="m-0 font-display text-30 font-extrabold tracking-titulo text-ga-navy lg:text-44">Tu perfil</h1>
+        <h1 className="m-0 font-display text-30 font-semibold tracking-titulo text-ga-navy lg:text-44">Tu perfil</h1>
         <PerfilCuenta {...perfil} />
       </main>
 

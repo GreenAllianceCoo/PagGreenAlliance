@@ -61,7 +61,7 @@ export function PasosSolicitud({ pasos, variante = "lista" }: PasosSolicitudProp
             key={paso.etiqueta}
             className={cx(
               "flex items-center gap-2.5",
-              paso.estado === "actual" && "font-bold",
+              paso.estado === "actual" && "font-semibold",
               paso.estado === "pendiente" && "text-ga-texto-3",
             )}
           >
@@ -81,12 +81,12 @@ export function PasosSolicitud({ pasos, variante = "lista" }: PasosSolicitudProp
           className={cx(
             "flex items-center gap-2.5 lg:flex-col lg:items-start lg:gap-2 lg:border-t-4 lg:pt-3",
             BARRA[paso.estado],
-            paso.estado === "actual" && "font-bold",
+            paso.estado === "actual" && "font-semibold",
             paso.estado === "pendiente" && "text-ga-texto-3",
           )}
         >
           <Marcador estado={paso.estado} className="lg:hidden" />
-          <span className={cx("grow lg:grow-0", paso.estado !== "actual" && "lg:font-bold")}>
+          <span className={cx("grow lg:grow-0", paso.estado !== "actual" && "lg:font-semibold")}>
             {paso.etiqueta}
           </span>
           {paso.fecha ? (

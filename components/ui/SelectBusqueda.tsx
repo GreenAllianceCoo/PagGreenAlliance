@@ -148,8 +148,8 @@ export function SelectBusqueda({
               onMouseEnter={() => setActiva(i)}
               className={cx(
                 "cursor-pointer px-3.5 py-2.5 text-15",
-                o.destacada && "bg-ga-fondo-suave font-bold text-ga-verde",
-                i === activa ? "bg-ga-verde-claro font-bold text-ga-verde-oscuro" : undefined,
+                o.destacada && "bg-ga-fondo-suave font-semibold text-ga-verde",
+                i === activa ? "bg-ga-verde-claro font-semibold text-ga-verde-oscuro" : undefined,
               )}
             >
               {o.etiqueta}

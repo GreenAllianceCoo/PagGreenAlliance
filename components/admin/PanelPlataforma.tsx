@@ -36,10 +36,10 @@ export function PausaCuenta({ pausa }: { pausa: EstadoPausa }) {
       aria-labelledby="pausa-titulo"
       className={cx("flex flex-col gap-3.5 rounded-20 p-5.5", pausa.pausada ? "bg-admin-rojo-fondo" : "bg-admin-superficie")}
     >
-      <h2 id="pausa-titulo" className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+      <h2 id="pausa-titulo" className="m-0 text-12 font-semibold text-admin-texto-3">
         Ingreso de asociados
       </h2>
-      <p className="m-0 text-16 font-bold text-admin-texto">
+      <p className="m-0 text-16 font-semibold text-admin-texto">
         {pausa.pausada
           ? "En pausa: los asociados no pueden entrar a su cuenta."
           : "Abierto: los asociados entran con normalidad."}
@@ -85,7 +85,7 @@ export function AvisosAsociados({ avisos }: { avisos: AvisoAdmin[] }) {
 
   return (
     <section aria-labelledby="avisos-titulo" className="flex flex-col gap-3.5 rounded-20 bg-admin-superficie p-5.5">
-      <h2 id="avisos-titulo" className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+      <h2 id="avisos-titulo" className="m-0 text-12 font-semibold text-admin-texto-3">
         Avisos para los asociados
       </h2>
       <p className="m-0 text-14 leading-145 text-admin-texto-2">
@@ -147,7 +147,7 @@ function FilaAviso({ aviso }: { aviso: AvisoAdmin }) {
         <strong className="text-15 text-admin-texto">{aviso.titulo}</strong>
         <span
           className={cx(
-            "rounded-full px-2.5 py-0.5 text-12 font-bold",
+            "rounded-full px-2.5 py-0.5 text-12 font-semibold",
             aviso.activo ? "bg-admin-verde-fondo text-admin-verde-2" : "bg-white/[.06] text-admin-texto-3",
           )}
         >

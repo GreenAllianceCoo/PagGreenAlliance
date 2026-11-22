@@ -96,7 +96,7 @@ export function OtpInput({ name = "codigo", valores = [], longitud = 6, error, o
 
   return (
     <fieldset className="m-0 flex flex-col border-0 p-0" aria-describedby={idError}>
-      <legend className="pb-2.5 text-16 font-bold">Código de 6 números</legend>
+      <legend className="pb-2.5 text-16 font-semibold">Código de 6 números</legend>
       {/* `key`: cambia en cada código inválido para que la sacudida se reproduzca
           de nuevo, aunque el mensaje de error sea el mismo que el intento anterior. */}
       <div
@@ -145,7 +145,7 @@ export function OtpInput({ name = "codigo", valores = [], longitud = 6, error, o
               : { defaultValue: valor })}
             aria-invalid={error ? true : undefined}
             className={cx(
-              "h-13 min-w-0 rounded-10 border-1.5 bg-white text-center text-20 font-extrabold text-ga-texto",
+              "h-13 min-w-0 rounded-10 border-1.5 bg-white text-center text-20 font-semibold text-ga-texto",
               "lg:h-14.5 lg:rounded-12 lg:text-24",
               "transition-[border-color,box-shadow] duration-150",
               "focus:outline-none focus:border-ga-verde focus:shadow-[0_0_0_3px_rgba(30,102,82,0.15)]",

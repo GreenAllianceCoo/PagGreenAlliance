@@ -221,7 +221,7 @@ export function FormularioPublicacion({ modo, tipo, publicacionId, convenio, hoy
         </Field>
 
         <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
-          <legend className="mb-1 p-0 text-15 font-bold">{tipo === "promocion" ? "Vigencia" : "Vigencia (opcional)"}</legend>
+          <legend className="mb-1 p-0 text-15 font-semibold">{tipo === "promocion" ? "Vigencia" : "Vigencia (opcional)"}</legend>
           <div className="grid grid-cols-2 gap-3">
             <Field id="publicacion-iniciaEl" label="Desde" error={e.iniciaEl}>
               {(control) => <Input {...control} type="date" name="iniciaEl" value={iniciaEl} onChange={(ev) => setIniciaEl(ev.target.value)} />}
@@ -238,7 +238,7 @@ export function FormularioPublicacion({ modo, tipo, publicacionId, convenio, hoy
         </fieldset>
 
         <fieldset className="m-0 flex flex-col gap-3 border-0 p-0" aria-describedby={e.archivos || errorArchivo ? "publicacion-archivos-error" : undefined}>
-          <legend className="mb-1 p-0 text-15 font-bold">{tipo === "promocion" ? "Imagen" : "Contenido"}</legend>
+          <legend className="mb-1 p-0 text-15 font-semibold">{tipo === "promocion" ? "Imagen" : "Contenido"}</legend>
           {tipo === "catalogo" ? (
             <div role="radiogroup" aria-label="Formato del catálogo" className="flex gap-2">
               {(["imagenes", "pdf"] as const).map((f) => (

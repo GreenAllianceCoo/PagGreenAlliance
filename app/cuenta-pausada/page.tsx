@@ -34,7 +34,7 @@ export default async function CuentaPausadaPage() {
     <div className="flex min-h-dvh items-center justify-center bg-ga-fondo-suave px-4 py-10">
       <main className="flex w-full max-w-[480px] flex-col items-center gap-5 rounded-28 bg-white px-6 py-9 text-center shadow-comprobante">
         <Logo variant="apilado" className="w-[170px]" />
-        <h1 className="m-0 font-display text-26 font-extrabold text-ga-navy">Volvemos pronto</h1>
+        <h1 className="m-0 font-display text-26 font-semibold text-ga-navy">Volvemos pronto</h1>
         <p role="status" className="m-0 whitespace-pre-line text-16 leading-150 text-ga-texto-2">
           {data.mensaje ?? MENSAJE_POR_DEFECTO}
         </p>

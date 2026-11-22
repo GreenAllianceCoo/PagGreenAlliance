@@ -38,7 +38,7 @@ export default async function BeneficioPage({ params }: { params: Promise<{ id: 
       <EncabezadoCuenta nombre={nombre} seccion="beneficios" accionSalir={cerrarSesion} />
       <RegistrarVista id={b.id} />
       <main className="flex flex-col gap-5 px-5 pb-6 pt-5 md:mx-auto md:max-w-2xl lg:max-w-5xl lg:px-10 lg:py-10">
-        <Link href="/cuenta/beneficios" className="flex items-center gap-1.5 self-start text-15 font-bold text-ga-verde no-underline">
+        <Link href="/cuenta/beneficios" className="flex items-center gap-1.5 self-start text-15 font-semibold text-ga-verde no-underline">
           <IconoVolver tamano={18} />
           Beneficios
         </Link>
@@ -56,7 +56,7 @@ export default async function BeneficioPage({ params }: { params: Promise<{ id: 
                   href={b.pdfUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-12.5 items-center justify-center rounded-full bg-ga-verde px-6 text-15 font-extrabold text-white no-underline hover:bg-ga-verde-oscuro hover:text-white"
+                  className="flex h-12.5 items-center justify-center rounded-full bg-ga-verde px-6 text-15 font-semibold text-white no-underline hover:bg-ga-verde-oscuro hover:text-white"
                 >
                   Abrir el catálogo (PDF)
                 </a>
@@ -95,8 +95,8 @@ export default async function BeneficioPage({ params }: { params: Promise<{ id: 
                 />
               ) : null}
               <div className="flex min-w-0 flex-col">
-                <span className="text-13 font-bold uppercase tracking-[0.04em] text-ga-verde">{b.especialidad || tipoTexto}</span>
-                <span className="truncate text-16 font-bold text-ga-texto">{b.convenioNombre}</span>
+                <span className="text-13 font-semibold text-ga-verde">{b.especialidad || tipoTexto}</span>
+                <span className="truncate text-16 font-semibold text-ga-texto">{b.convenioNombre}</span>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -105,7 +105,7 @@ export default async function BeneficioPage({ params }: { params: Promise<{ id: 
               ) : null}
               {b.nuevo ? <span className="rounded-full bg-ga-verde-tint px-2.5 py-0.5 text-13 font-semibold text-ga-verde-oscuro">Nuevo</span> : null}
             </div>
-            <h1 className="m-0 font-display text-26 font-extrabold leading-snug text-ga-navy lg:text-30">{b.titulo}</h1>
+            <h1 className="m-0 font-display text-26 font-semibold leading-snug text-ga-navy lg:text-30">{b.titulo}</h1>
             {b.descripcion ? <p className="m-0 whitespace-pre-line text-16 leading-155 text-ga-texto-2">{b.descripcion}</p> : null}
             <p className="m-0 text-14 text-ga-texto-3">
               {tipoTexto}

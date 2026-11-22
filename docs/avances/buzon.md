@@ -72,3 +72,9 @@ Formato (copiar debajo de la línea, uno por tarea):
 - Estado: Hecho
 - Qué se hizo: migración 20261121100000 aplicada en producción (autorizada por Sebas): tabla historial_publicaciones_convenio con RLS (solo admin la lee, nadie inserta a mano), trigger de ocultar/mostrar y tipo «publicacion» en admin_historial_equipo. Verificado en el catálogo.
 - Bloqueos o trabajo nuevo: subir los commits de B4–B6 a la rama del PR; e2e pendiente en un equipo con Docker; borrar el «Convenio de prueba QA» tras las pruebas reales.
+
+## 2026-11-22 · sesion-principal
+- Actividades: P-nuevo (fase 2 · rediseño unslop, tanda 1: landing, ingreso y ajustes globales)
+- Estado: En curso
+- Qué se hizo: auditoría en docs/rediseno/auditoria-unslop.md (modo pulido, se conserva la marca C+), aprobada por Sebas. Global: pesos 800/700 → 600 (Manrope 400/500/600, Bricolage 600), etiquetas sin mayúsculas ni espaciado ancho (salvo «Afiliado Titular» del carné), curva de movimiento sin rebote (`ease-ga`; el rebote solo en el sello del comprobante), borde del admin 14 % → 10 %. Landing: sin la cifra «Aprobados», botones del hero más abajo y con aire, una sola mancha orgánica igual en todas las secciones (pedido de Sebas: decorado parejo), tarjetas de apoyos y pasos con un mismo fondo, títulos sin punto final, píldora del público como texto, «Ingresar» en el encabezado, WhatsApp del horario con el estilo de la casa, convenios sin logo con iniciales en vez de emoji, «¡Aprobada!» → «Aprobada.». Ingreso: «Hola de nuevo» → «Tu cuenta en Green Alliance». Cuenta: el título es el nombre, sin «Hola,». e2e actualizados con los textos nuevos. Unitarias 986/986, tsc, eslint y next build ok; capturas a 1440 y 390.
+- Bloqueos o trabajo nuevo: revisar en pantalla /cuenta y /admin con una sesión real (necesita a Sebas para el código del correo). Rediseño no se cobra.

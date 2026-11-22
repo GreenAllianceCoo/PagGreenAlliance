@@ -123,12 +123,12 @@ export function IngresoCodigo({
           totalPasos={2}
           accion={
             // <a> normal (sin prefetch): /ingresar/cambiar borra la cookie y vuelve a /ingresar.
-            <a href={cambiarHref} className="enlace hidden text-15 font-bold lg:inline">
+            <a href={cambiarHref} className="enlace hidden text-15 font-semibold lg:inline">
               {textoCambiar}
             </a>
           }
         />
-        <h2 className="m-0 hidden font-display text-32 font-extrabold text-ga-navy lg:block">
+        <h2 className="m-0 hidden font-display text-32 font-semibold text-ga-navy lg:block">
           Escribe el código
         </h2>
         <OtpInput name="codigo" valores={digitos} error={error} onCambio={onCambioCodigo} />
@@ -146,7 +146,7 @@ export function IngresoCodigo({
             formAction={accionReenviar}
             disabled={reenviarDeshabilitado}
             // min-h-11: área de toque de al menos 44 px, sin cambiar el aspecto de enlace.
-            className="enlace inline-flex min-h-11 items-center px-1 font-extrabold disabled:cursor-not-allowed"
+            className="enlace inline-flex min-h-11 items-center px-1 font-semibold disabled:cursor-not-allowed"
           >
             Reenviar código
           </button>

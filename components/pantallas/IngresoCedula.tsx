@@ -46,7 +46,7 @@ export function IngresoCedula({
 
   return (
     <PanelIngreso
-      titulo="Hola de nuevo"
+      titulo="Tu cuenta en Green Alliance"
       subtitulo={
         <>
           <span className="lg:hidden">Entra para ver cómo va tu crédito.</span>
@@ -73,7 +73,7 @@ export function IngresoCedula({
     >
       <form action={accion} className={CLASES_FORM_INGRESO} noValidate>
         <ProgressSteps pasoActual={1} totalPasos={2} />
-        <h2 className="m-0 hidden font-display text-32 font-extrabold text-ga-navy lg:block">
+        <h2 className="m-0 hidden font-display text-32 font-semibold text-ga-navy lg:block">
           Ingresa con tu cédula
         </h2>
         <Field id="cedula" label="Número de cédula" tamano="lg" error={error}>
@@ -97,7 +97,7 @@ export function IngresoCedula({
           Enviarme el código
         </Button>
         {/* Recuperación de acceso: quien perdió o cambió su correo pide ayuda a la cooperativa. */}
-        <Link href="/ingresar/recuperar" className="enlace self-center text-15 font-bold">
+        <Link href="/ingresar/recuperar" className="enlace self-center text-15 font-semibold">
           ¿Ya no tienes acceso a tu correo?
         </Link>
         <div className="flex items-center gap-3 text-14 text-ga-texto-3">
@@ -108,7 +108,7 @@ export function IngresoCedula({
         <ButtonLink href="/afiliacion" variante="secundario">
           Deseo afiliarme
         </ButtonLink>
-        <Link href="/ingresar/convenio" className="enlace self-center text-15 font-bold">
+        <Link href="/ingresar/convenio" className="enlace self-center text-15 font-semibold">
           ¿Eres empresa en convenio? Entra con tu NIT
         </Link>
         <PieIngresoMovil interlineado={false}>Ayuda por WhatsApp {numero}</PieIngresoMovil>

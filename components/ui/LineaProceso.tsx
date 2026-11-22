@@ -35,7 +35,7 @@ function Circulo({ estado, tamano }: { estado: PasoProceso["estado"]; tamano: "g
 
 /**
  * Línea de los 8 pasos del proceso ejecutivo (pieza 3k): Reparto → … → Terminado.
- * Escritorio (lg): 8 columnas con una barra que se llena con scaleX (500 ms, spring).
+ * Escritorio (lg): 8 columnas con una barra que se llena con scaleX (500 ms, ease-ga).
  * Celular: lista vertical (8 columnas no caben en 390 px). Solo lectura: el asociado
  * no puede cambiarla (la escribe el admin).
  */
@@ -52,7 +52,7 @@ export function LineaProceso({ pasos, className }: LineaProcesoProps) {
         <span aria-hidden="true" className="absolute left-[6.25%] right-[6.25%] top-3.5 h-[3px] rounded-sm bg-ga-verde-claro" />
         <span
           aria-hidden="true"
-          className="absolute left-[6.25%] top-3.5 h-[3px] w-[87.5%] origin-left rounded-sm bg-ga-verde transition-transform duration-500 ease-spring"
+          className="absolute left-[6.25%] top-3.5 h-[3px] w-[87.5%] origin-left rounded-sm bg-ga-verde transition-transform duration-500 ease-ga"
           style={{ transform: `scaleX(${fraccion})` }}
         />
         {pasos.map((paso, i) => (
@@ -65,7 +65,7 @@ export function LineaProceso({ pasos, className }: LineaProcesoProps) {
             <span
               className={cx(
                 "text-12 leading-tight",
-                paso.estado === "actual" ? "font-extrabold text-ga-texto" : "font-semibold",
+                paso.estado === "actual" ? "font-semibold text-ga-texto" : "font-semibold",
                 paso.estado === "pendiente" ? "text-ga-texto-3" : "text-ga-texto",
               )}
             >
@@ -85,7 +85,7 @@ export function LineaProceso({ pasos, className }: LineaProcesoProps) {
             className={cx(
               "flex items-center gap-2.5",
               paso.estado === "hecho" && "opacity-[.55]",
-              paso.estado === "actual" && "font-extrabold",
+              paso.estado === "actual" && "font-semibold",
               paso.estado === "pendiente" && "text-ga-texto-3",
             )}
           >

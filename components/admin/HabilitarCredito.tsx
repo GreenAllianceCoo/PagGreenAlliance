@@ -49,7 +49,7 @@ export function HabilitarCredito({ asociadoId, nombre, bloqueado = false, onResu
         type="button"
         disabled={bloqueado}
         onClick={() => setAbierto(true)}
-        className="flex h-11.5 items-center justify-center self-start rounded-full bg-admin-verde px-6 text-14 font-extrabold text-admin-fondo disabled:opacity-60"
+        className="flex h-11.5 items-center justify-center self-start rounded-full bg-admin-verde px-6 text-14 font-semibold text-admin-fondo disabled:opacity-60"
       >
         Habilitar nuevo crédito
       </button>
@@ -57,14 +57,14 @@ export function HabilitarCredito({ asociadoId, nombre, bloqueado = false, onResu
       <Modal abierto={abierto && !estado.mensaje} onCerrar={() => setAbierto(false)} tituloId={tituloId} variante="centrado">
         <form action={accion} noValidate className="flex flex-col gap-4 text-ga-texto">
           <input type="hidden" name="asociadoId" value={asociadoId} />
-          <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-extrabold">
+          <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-semibold">
             ¿Habilitar el crédito de {nombre}?
           </h2>
           <p className="m-0 text-15 leading-150 text-ga-texto-2">
             Podrá hacer una nueva solicitud. El motivo queda en el historial y el asociado no lo ve.
           </p>
           <div className="flex flex-col gap-1.5">
-            <label htmlFor={`${tituloId}-motivo`} className="text-14 font-bold">
+            <label htmlFor={`${tituloId}-motivo`} className="text-14 font-semibold">
               Motivo <span className="font-medium text-ga-texto-3">(obligatorio · 5 a 300 caracteres)</span>
             </label>
             <textarea
@@ -90,7 +90,7 @@ export function HabilitarCredito({ asociadoId, nombre, bloqueado = false, onResu
             <button
               type="button"
               onClick={() => setAbierto(false)}
-              className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-bold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
+              className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-semibold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
             >
               Cancelar
             </button>

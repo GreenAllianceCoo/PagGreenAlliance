@@ -23,7 +23,7 @@ export function BotonWhatsappBeneficio({ id, href }: { id: string; href: string 
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => void registrarEventoBeneficio(id, "whatsapp")}
-      className="flex h-12.5 items-center justify-center gap-2.5 rounded-full border-1.5 border-ga-navy bg-white px-6 text-15 font-extrabold text-ga-navy no-underline transition-colors duration-200 hover:bg-ga-fondo-suave hover:text-ga-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
+      className="flex h-12.5 items-center justify-center gap-2.5 rounded-full border-1.5 border-ga-navy bg-white px-6 text-15 font-semibold text-ga-navy no-underline transition-colors duration-200 hover:bg-ga-fondo-suave hover:text-ga-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
     >
       <IconoWhatsapp tamano={18} />
       Escribir por WhatsApp

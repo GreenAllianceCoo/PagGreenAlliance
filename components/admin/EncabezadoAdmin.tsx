@@ -79,7 +79,7 @@ export function EncabezadoAdmin({ nombre, seccion, alertasPendientes = 0, rol = 
 
         {/* Nav en línea: solo en escritorio (usado por /admin/demo; en las otras
             4 secciones AdminShell oculta esta barra completa en `lg:`). */}
-        <nav aria-label="Secciones del panel" className="hidden items-center gap-6 text-15 font-bold text-admin-texto-3 lg:flex">
+        <nav aria-label="Secciones del panel" className="hidden items-center gap-6 text-15 font-semibold text-admin-texto-3 lg:flex">
           {secciones.map((s) => (
             <Link
               key={s.href}
@@ -104,7 +104,7 @@ export function EncabezadoAdmin({ nombre, seccion, alertasPendientes = 0, rol = 
             fondos claros): invisible mientras el encabezado era transparente,
             pero muy poco contraste ahora que /admin/demo lo muestra sobre
             fondo oscuro de verdad (hallazgo de axe, ver nota de más arriba). */}
-        <div className="hidden items-center gap-3 text-14 font-bold text-admin-texto lg:flex">
+        <div className="hidden items-center gap-3 text-14 font-semibold text-admin-texto lg:flex">
           <span className="max-w-[160px] truncate">{nombre}</span>
           <form action={cerrarSesion}>
             <button
@@ -131,7 +131,7 @@ export function EncabezadoAdmin({ nombre, seccion, alertasPendientes = 0, rol = 
       </div>
 
       {/* Pestañas en píldora: solo en celular, en todas las secciones (incluida /admin/demo). */}
-      <div className="flex gap-1.5 overflow-x-auto px-4 pb-3 text-13 font-bold whitespace-nowrap lg:hidden">
+      <div className="flex gap-1.5 overflow-x-auto px-4 pb-3 text-13 font-semibold whitespace-nowrap lg:hidden">
         {secciones.map((s) => (
           <Link
             key={s.href}
@@ -167,12 +167,12 @@ export function EncabezadoAdmin({ nombre, seccion, alertasPendientes = 0, rol = 
             aria-label="Menú del panel"
             className="motion-safe:animate-ga-toast fixed right-3 top-16 z-30 flex w-56 flex-col gap-3 rounded-16 bg-admin-superficie p-4 shadow-modal-toast lg:hidden"
           >
-            <span className="truncate text-15 font-bold">{nombre}</span>
+            <span className="truncate text-15 font-semibold">{nombre}</span>
             <span className="text-13 text-admin-texto-3">{etiquetaRol}</span>
             <form action={cerrarSesion}>
               <button
                 type="submit"
-                className="flex h-11 w-full items-center justify-center rounded-10 shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] font-bold hover:bg-admin-superficie-2"
+                className="flex h-11 w-full items-center justify-center rounded-10 shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] font-semibold hover:bg-admin-superficie-2"
               >
                 Salir
               </button>

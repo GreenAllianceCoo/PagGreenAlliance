@@ -28,7 +28,7 @@ function Relleno({ parte, indice, clase = "bg-admin-verde" }: { parte: number; i
 export function ResumenAdmin({ metricas, alertasPendientes, soloLectura = false }: Props) {
   const encabezado = (
     <div className="flex flex-col gap-1">
-      <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Resumen de clientes</h1>
+      <h1 className="m-0 font-display text-30 font-semibold tracking-titular lg:text-34">Resumen de clientes</h1>
       <span className="text-14 text-admin-texto-3">Cifras del mes en curso</span>
     </div>
   );
@@ -41,7 +41,7 @@ export function ResumenAdmin({ metricas, alertasPendientes, soloLectura = false 
           No pudimos cargar el resumen. Intenta de nuevo.
           <Link
             href="/admin"
-            className="inline-flex h-11 items-center rounded-full px-5 text-14 font-bold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-admin-superficie-2"
+            className="inline-flex h-11 items-center rounded-full px-5 text-14 font-semibold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-admin-superficie-2"
           >
             Reintentar
           </Link>
@@ -87,15 +87,15 @@ export function ResumenAdmin({ metricas, alertasPendientes, soloLectura = false 
       ) : (
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           <section aria-labelledby="por-grado" className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5">
-            <h2 id="por-grado" className="m-0 font-display text-18 font-extrabold">Asociados por grado</h2>
+            <h2 id="por-grado" className="m-0 font-display text-18 font-semibold">Asociados por grado</h2>
             <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
               {grados.map(([grado, n], i) => (
                 <li key={grado} className="grid grid-cols-[3.5rem_minmax(0,1fr)_2rem] items-center gap-3 text-14">
-                  <span className="font-bold text-admin-texto-2">{grado === "sin_grado" ? "Sin grado" : grado}</span>
+                  <span className="font-semibold text-admin-texto-2">{grado === "sin_grado" ? "Sin grado" : grado}</span>
                   <div className="h-2.5 overflow-hidden rounded-full bg-admin-superficie-2" aria-hidden="true">
                     <Relleno parte={(n / maxGrado) * 100} indice={i} />
                   </div>
-                  <span className="text-right font-extrabold">{n}</span>
+                  <span className="text-right font-semibold">{n}</span>
                 </li>
               ))}
             </ul>
@@ -103,7 +103,7 @@ export function ResumenAdmin({ metricas, alertasPendientes, soloLectura = false 
 
           <div className="flex flex-col gap-4">
             <section aria-labelledby="por-institucion" className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5">
-              <h2 id="por-institucion" className="m-0 font-display text-18 font-extrabold">Por institución</h2>
+              <h2 id="por-institucion" className="m-0 font-display text-18 font-semibold">Por institución</h2>
               <div className="flex h-3 gap-1 overflow-hidden rounded-full" aria-hidden="true">
                 {instituciones.map(([inst, n], i) => (
                   <div key={inst} style={{ width: `${(n / totalInst) * 100}%` }} className="h-full">
@@ -122,10 +122,10 @@ export function ResumenAdmin({ metricas, alertasPendientes, soloLectura = false 
 
             {soloLectura ? null : (
             <section aria-labelledby="alertas-resumen" className="flex flex-col gap-2 rounded-20 bg-admin-superficie p-5">
-              <h2 id="alertas-resumen" className="m-0 font-display text-18 font-extrabold">
+              <h2 id="alertas-resumen" className="m-0 font-display text-18 font-semibold">
                 Alertas pendientes · {alertasPendientes}
               </h2>
-              <Link href="/admin/alertas" className="text-14 font-bold text-admin-verde-2 no-underline hover:underline">
+              <Link href="/admin/alertas" className="text-14 font-semibold text-admin-verde-2 no-underline hover:underline">
                 Ir a Alertas →
               </Link>
             </section>
@@ -135,7 +135,7 @@ export function ResumenAdmin({ metricas, alertasPendientes, soloLectura = false 
       )}
 
       <section aria-labelledby="por-estado" className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5">
-        <h2 id="por-estado" className="m-0 font-display text-18 font-extrabold">Procesos por estado</h2>
+        <h2 id="por-estado" className="m-0 font-display text-18 font-semibold">Procesos por estado</h2>
         <ul className="m-0 grid list-none grid-cols-2 gap-2 p-0 sm:grid-cols-4 lg:grid-cols-8">
           {ESTADOS_PROCESO.map((estado, i) => (
             <li
@@ -143,7 +143,7 @@ export function ResumenAdmin({ metricas, alertasPendientes, soloLectura = false 
               style={{ animationDelay: `${i * 40}ms` }}
               className="flex flex-col gap-0.5 rounded-16 bg-admin-superficie-2 px-3 py-2.5 motion-safe:animate-ga-tarjeta-entra"
             >
-              <span className="font-display text-24 font-extrabold leading-none">{metricas.porEstadoProceso[estado] ?? 0}</span>
+              <span className="font-display text-24 font-semibold leading-none">{metricas.porEstadoProceso[estado] ?? 0}</span>
               <span className="text-13 text-admin-texto-3">{ETIQUETA_ESTADO_PROCESO[estado]}</span>
             </li>
           ))}

@@ -47,7 +47,7 @@ export function IngresoNit({ whatsapp, whatsappUrl, error, cargando = false, acc
     >
       <form action={accion} className={CLASES_FORM_INGRESO} noValidate>
         <ProgressSteps pasoActual={1} totalPasos={2} />
-        <h2 className="m-0 hidden font-display text-32 font-extrabold text-ga-navy lg:block">Ingresa con tu NIT</h2>
+        <h2 className="m-0 hidden font-display text-32 font-semibold text-ga-navy lg:block">Ingresa con tu NIT</h2>
         <Field id="nit" label="NIT de la empresa" tamano="lg" error={error}>
           {(control) => (
             <Input
@@ -68,7 +68,7 @@ export function IngresoNit({ whatsapp, whatsappUrl, error, cargando = false, acc
         <Button cargando={cargando} textoCargando="Enviando…">
           Enviarme el código
         </Button>
-        <Link href="/ingresar" className="enlace self-center text-15 font-bold">
+        <Link href="/ingresar" className="enlace self-center text-15 font-semibold">
           Soy asociado, entrar con mi cédula
         </Link>
         <PieIngresoMovil interlineado={false}>Ayuda por WhatsApp {numero}</PieIngresoMovil>

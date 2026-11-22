@@ -63,7 +63,7 @@ export function BajaAsociado({ asociadoId, nombre, activo, bloqueado = false, es
         disabled={bloqueado}
         onClick={() => setAbierto(true)}
         className={
-          "flex h-11.5 items-center justify-center self-start rounded-full px-6 text-14 font-extrabold disabled:opacity-60 " +
+          "flex h-11.5 items-center justify-center self-start rounded-full px-6 text-14 font-semibold disabled:opacity-60 " +
           (darDeBaja
             ? "text-admin-rojo shadow-[inset_0_0_0_1px_var(--ga-admin-rojo)]"
             : "bg-admin-verde text-admin-fondo")
@@ -76,7 +76,7 @@ export function BajaAsociado({ asociadoId, nombre, activo, bloqueado = false, es
         <form action={accion} noValidate className="flex flex-col gap-4 text-ga-texto">
           <input type="hidden" name="asociadoId" value={asociadoId} />
           <input type="hidden" name="activo" value={darDeBaja ? "false" : "true"} />
-          <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-extrabold">
+          <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-semibold">
             {darDeBaja ? `¿Dar de baja a ${nombre}?` : `¿Reactivar a ${nombre}?`}
           </h2>
           <p className="m-0 text-15 leading-150 text-ga-texto-2">
@@ -86,7 +86,7 @@ export function BajaAsociado({ asociadoId, nombre, activo, bloqueado = false, es
             El motivo queda en el historial.
           </p>
           <div className="flex flex-col gap-1.5">
-            <label htmlFor={`${tituloId}-motivo`} className="text-14 font-bold">
+            <label htmlFor={`${tituloId}-motivo`} className="text-14 font-semibold">
               Motivo <span className="font-medium text-ga-texto-3">(obligatorio · 5 a 300 caracteres)</span>
             </label>
             <textarea
@@ -111,7 +111,7 @@ export function BajaAsociado({ asociadoId, nombre, activo, bloqueado = false, es
             <button
               type="button"
               onClick={() => setAbierto(false)}
-              className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-bold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
+              className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-semibold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
             >
               Cancelar
             </button>

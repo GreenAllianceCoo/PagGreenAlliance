@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Publicaciones de convenios · Admin 
 
 const CLASE_CONTROL =
   "h-12 w-full min-w-0 rounded-12 bg-admin-fondo px-3.5 text-16 text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] outline-none focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-admin-verde)] [color-scheme:dark]";
-const CLASE_ETIQUETA = "text-13 font-bold uppercase tracking-[0.04em] text-admin-texto-3";
+const CLASE_ETIQUETA = "text-13 font-semibold text-admin-texto-3";
 
 const ETIQUETA_ESTADO: Record<EstadoPublicacion, { texto: string; clase: string }> = {
   publicada: { texto: "Publicada", clase: "text-admin-verde-2" },
@@ -65,10 +65,10 @@ export default async function PublicacionesConveniosPage({ searchParams }: { sea
   return (
     <AdminShell nombre={nombre} seccion="convenios">
       <div className="flex flex-col gap-1.5">
-        <Link href="/admin/convenios" className="self-start text-14 font-bold text-admin-verde-2 no-underline hover:underline">
+        <Link href="/admin/convenios" className="self-start text-14 font-semibold text-admin-verde-2 no-underline hover:underline">
           ← Convenios
         </Link>
-        <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Publicaciones de convenios</h1>
+        <h1 className="m-0 font-display text-30 font-semibold tracking-titular lg:text-34">Publicaciones de convenios</h1>
         <p className="m-0 max-w-[640px] text-14 text-admin-texto-2">
           Lo que publican los convenios sale en Beneficios sin aprobación. Si algo no debe estar ahí, ocúltalo: deja de verse al
           instante y el convenio ve el motivo.
@@ -116,13 +116,13 @@ export default async function PublicacionesConveniosPage({ searchParams }: { sea
           </select>
         </div>
         <div className="flex gap-2.5 sm:col-span-3 lg:col-span-1">
-          <button type="submit" className="flex h-11.5 items-center justify-center rounded-full bg-admin-verde px-6 text-14 font-extrabold text-admin-fondo">
+          <button type="submit" className="flex h-11.5 items-center justify-center rounded-full bg-admin-verde px-6 text-14 font-semibold text-admin-fondo">
             Filtrar
           </button>
           {hayFiltros ? (
             <Link
               href="/admin/convenios/publicaciones"
-              className="flex h-11.5 items-center justify-center rounded-full px-5 text-14 font-bold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
+              className="flex h-11.5 items-center justify-center rounded-full px-5 text-14 font-semibold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
             >
               Quitar filtros
             </Link>
@@ -149,7 +149,7 @@ export default async function PublicacionesConveniosPage({ searchParams }: { sea
               return (
                 <li key={p.id} className="flex flex-col gap-3 rounded-14 bg-admin-superficie-2 p-3.5">
                   <div className="flex items-start gap-3">
-                    <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-10 bg-admin-fondo text-12 font-bold text-admin-texto-3">
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-10 bg-admin-fondo text-12 font-semibold text-admin-texto-3">
                       {p.portada ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={p.portada} alt="" className="h-full w-full object-cover" />
@@ -162,10 +162,10 @@ export default async function PublicacionesConveniosPage({ searchParams }: { sea
                         {p.convenioNombre} · {p.tipo === "promocion" ? "Promoción" : p.pdfPath ? "Catálogo en PDF" : "Catálogo"}
                         {p.beneficio ? ` · ${p.beneficio}` : ""}
                       </span>
-                      <span className="text-16 font-extrabold text-white">{p.titulo}</span>
+                      <span className="text-16 font-semibold text-white">{p.titulo}</span>
                       {p.descripcion ? <span className="line-clamp-2 text-14 text-admin-texto-2">{p.descripcion}</span> : null}
                       <span className="text-13 text-admin-texto-3">
-                        <span className={"font-extrabold " + etiqueta.clase}>{etiqueta.texto}</span> · {vigencia(p.iniciaEl, p.terminaEl)}
+                        <span className={"font-semibold " + etiqueta.clase}>{etiqueta.texto}</span> · {vigencia(p.iniciaEl, p.terminaEl)}
                       </span>
                       <span className="text-13 text-admin-texto-3">
                         {numero(p.metricas.vistas)} {p.metricas.vistas === 1 ? "vista" : "vistas"} · {numero(p.metricas.clics)}{" "}
@@ -185,7 +185,7 @@ export default async function PublicacionesConveniosPage({ searchParams }: { sea
                         href={p.archivoUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex h-11 items-center justify-center rounded-10 px-4 text-14 font-bold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-admin-superficie"
+                        className="flex h-11 items-center justify-center rounded-10 px-4 text-14 font-semibold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-admin-superficie"
                       >
                         {p.pdfPath ? "Ver PDF" : p.imagenes.length > 1 ? `Ver imagen (1 de ${p.imagenes.length})` : "Ver imagen"}
                       </a>

@@ -14,7 +14,7 @@ function CampoAdmin({
 }: React.InputHTMLAttributes<HTMLInputElement> & { id: string; label: string; error?: string }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-14 font-bold">
+      <label htmlFor={id} className="text-14 font-semibold">
         {label}
       </label>
       <input
@@ -43,7 +43,7 @@ function BotonRegistrar({ rol }: { rol: "asesor" | "secretario" }) {
       type="submit"
       disabled={pending}
       aria-busy={pending || undefined}
-      className="flex h-12 items-center gap-2 self-start rounded-full bg-admin-verde px-7 text-15 font-extrabold text-admin-fondo disabled:opacity-85"
+      className="flex h-12 items-center gap-2 self-start rounded-full bg-admin-verde px-7 text-15 font-semibold text-admin-fondo disabled:opacity-85"
     >
       {pending ? "Creando…" : rol === "secretario" ? "Registrar secretario" : "Registrar asesor"}
     </button>
@@ -70,7 +70,7 @@ export function FormularioAsesor({ rol = "asesor" }: { rol?: "asesor" | "secreta
 
   return (
     <form action={accion} noValidate className="flex flex-col gap-4 rounded-20 bg-admin-superficie p-5.5">
-      <h2 className="m-0 font-display text-20 font-extrabold">
+      <h2 className="m-0 font-display text-20 font-semibold">
         {rol === "secretario" ? "Registrar secretario" : "Registrar asesor"}
       </h2>
       <input type="hidden" name="rol" value={rol} />
