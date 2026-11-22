@@ -12,6 +12,7 @@
 -- La fila de convenio_publicaciones ya sella oculta_en / oculta_por; pero al
 -- volver a mostrar se limpian, por eso hace falta esta tabla aparte.
 -- Idempotente.
+-- APLICADA en producción el 2026-11-22 (autorizada por Sebas).
 -- ============================================================
 
 create table if not exists public.historial_publicaciones_convenio (
