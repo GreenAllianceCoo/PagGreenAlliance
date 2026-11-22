@@ -146,6 +146,8 @@ la sesión y manda a `/ingresar?cuenta=inactiva`. `/cuenta`, `/admin` y `/asesor
 `/admin/convenios/publicaciones`: tabla de todas, con filtro por convenio, tipo y estado.
 Acciones **Ocultar** (motivo opcional, ≤ 200) y **Volver a mostrar**. Queda en el historial
 del admin quién ocultó y cuándo. Enlace desde cada convenio a sus publicaciones.
+Migración `20261121100000_historial_publicaciones_convenio.sql` (tabla de historial + tipo
+«publicacion» en `admin_historial_equipo`). Solo admin, como el resto de /admin/convenios.
 
 ## B5 · Beneficios para el asociado
 

@@ -2,6 +2,7 @@
 
 import { useActionState, useCallback, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
+import Link from "next/link";
 import {
   alternarVisibilidadConvenio,
   eliminarConvenio,
@@ -292,13 +293,21 @@ export function GestorConvenios({ convenios }: { convenios: ConvenioAdmin[] }) {
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Convenios</h1>
-        <button
-          type="button"
-          onClick={() => setEditando("nuevo")}
-          className="flex h-12 items-center rounded-full bg-admin-verde px-7 text-15 font-extrabold text-admin-fondo"
-        >
-          Nuevo convenio
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/admin/convenios/publicaciones"
+            className="flex h-12 items-center rounded-full px-6 text-15 font-bold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
+          >
+            Publicaciones
+          </Link>
+          <button
+            type="button"
+            onClick={() => setEditando("nuevo")}
+            className="flex h-12 items-center rounded-full bg-admin-verde px-7 text-15 font-extrabold text-admin-fondo"
+          >
+            Nuevo convenio
+          </button>
+        </div>
       </div>
 
       {editando === "nuevo" ? <FormularioConvenio key="nuevo" onCerrar={cerrar} /> : null}
@@ -353,6 +362,9 @@ export function GestorConvenios({ convenios }: { convenios: ConvenioAdmin[] }) {
                     etiquetaCarga="Guardando…"
                     onResultado={alResultado}
                   />
+                  <Link href={`/admin/convenios/publicaciones?convenio=${c.id}`} className={CLASE_BOTON_SECUNDARIO + " text-admin-texto no-underline"}>
+                    Publicaciones
+                  </Link>
                   <BotonEliminar id={c.id} nombre={c.nombreEmpresa} onResultado={alResultado} />
                 </div>
               </li>

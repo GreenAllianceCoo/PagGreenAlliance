@@ -47,7 +47,7 @@ export default async function HistorialEquipoPage({ searchParams }: { searchPara
       <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Historial del equipo</h1>
       <p className="m-0 max-w-[640px] text-14 text-admin-texto-2">
         Lo que hicieron los administradores y secretarios: afiliaciones, procesos ejecutivos, asignaciones de asesor, cambios de rol,
-        bajas y créditos. Lo más reciente primero. Las horas son de Colombia.
+        bajas, créditos y publicaciones de convenios ocultadas. Lo más reciente primero. Las horas son de Colombia.
       </p>
 
       <form role="search" aria-label="Filtrar el historial" className="grid max-w-[900px] grid-cols-1 gap-3.5 rounded-20 bg-admin-superficie p-5.5 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_auto] lg:items-end">

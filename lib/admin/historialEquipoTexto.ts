@@ -3,7 +3,7 @@
  * (función pura, sin acceso a la base): «Aprobó la afiliación de Juan Pérez».
  */
 
-export type TipoEventoEquipo = "afiliacion" | "proceso" | "asesor" | "rol" | "estado" | "credito";
+export type TipoEventoEquipo = "afiliacion" | "proceso" | "asesor" | "rol" | "estado" | "credito" | "publicacion";
 
 /** Fila tal como la devuelve la RPC. */
 export type FilaHistorialEquipo = {
@@ -135,6 +135,12 @@ export function describirEventoEquipo(f: Pick<FilaHistorialEquipo, "tipo" | "obj
         default:
           return `Actualizó el crédito de ${quien}`;
       }
+    case "publicacion": {
+      const titulo = f.extra ? `«${f.extra}»` : "una publicación";
+      if (f.detalle === "mostrada") return `Volvió a mostrar ${titulo} de ${quien}`;
+      if (f.detalle === "ocultada") return `Ocultó ${titulo} de ${quien}`;
+      return `Cambió ${titulo} de ${quien}`;
+    }
     default:
       return `Hizo un cambio sobre ${quien}`;
   }
