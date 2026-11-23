@@ -59,7 +59,7 @@ export function EncabezadoAdmin({ nombre, seccion, alertasPendientes = 0, rol = 
         <Link
           href="/admin"
           aria-label="Ir al panel de administración"
-          className="flex min-h-11 items-center gap-2 lg:min-h-0 lg:gap-2.5"
+          className="flex min-h-11 shrink-0 items-center gap-2 lg:min-h-0 lg:gap-2.5"
         >
           <Image
             src="/logos/blanco/green-alliance-isotipo-blanco.svg"
@@ -79,7 +79,7 @@ export function EncabezadoAdmin({ nombre, seccion, alertasPendientes = 0, rol = 
 
         {/* Nav en línea: solo en escritorio (usado por /admin/demo; en las otras
             4 secciones AdminShell oculta esta barra completa en `lg:`). */}
-        <nav aria-label="Secciones del panel" className="hidden items-center gap-6 text-15 font-semibold text-admin-texto-3 lg:flex">
+        <nav aria-label="Secciones del panel" className="hidden min-w-0 flex-1 items-center justify-center gap-4 overflow-x-auto whitespace-nowrap text-14 font-semibold text-admin-texto-3 lg:flex xl:gap-5">
           {secciones.map((s) => (
             <Link
               key={s.href}
@@ -104,7 +104,7 @@ export function EncabezadoAdmin({ nombre, seccion, alertasPendientes = 0, rol = 
             fondos claros): invisible mientras el encabezado era transparente,
             pero muy poco contraste ahora que /admin/demo lo muestra sobre
             fondo oscuro de verdad (hallazgo de axe, ver nota de más arriba). */}
-        <div className="hidden items-center gap-3 text-14 font-semibold text-admin-texto lg:flex">
+        <div className="hidden shrink-0 items-center gap-3 text-14 font-semibold text-admin-texto lg:flex">
           <span className="max-w-[160px] truncate">{nombre}</span>
           <form action={cerrarSesion}>
             <button
