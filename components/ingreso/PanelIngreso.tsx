@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Logo } from "@/components/ui/Logo";
@@ -109,12 +110,33 @@ export function PanelIngreso({
         </span>
       </aside>
       {/* Entre 1024 y 1279 px el relleno baja a 32 px: con el panel de 540 px no caben 48 + 440 + 48. */}
-      <main className="flex grow flex-col lg:min-w-0 lg:items-center lg:justify-center lg:p-8 xl:p-12">
-        {/* Logo oficial a color (escritorio), sobre la columna del formulario. */}
-        <Link href="/" aria-label="Ir al inicio" className="mb-12 hidden h-11 w-full max-w-form-ingreso lg:block">
-          <Logo tone="dark" />
-        </Link>
-        {children}
+      {/* Escritorio (fase 2): fondo gris muy claro, el formulario en una tarjeta blanca,
+          el sello de la cooperativa como marca de agua y un pie con la línea legal. */}
+      <main className="relative flex grow flex-col lg:min-w-0 lg:items-center lg:overflow-hidden lg:bg-ga-fondo-suave lg:p-8 xl:p-12">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-16 -left-16 hidden h-[280px] w-[280px] -rotate-12 items-center justify-center rounded-full border-4 border-dashed border-ga-verde opacity-[0.07] lg:flex"
+        >
+          <Image src="/logos/vector/green-alliance-isotipo.svg" alt="" width={150} height={150} />
+        </span>
+        <div className="relative flex grow flex-col lg:my-auto lg:w-full lg:max-w-[520px] lg:grow-0 lg:rounded-24 lg:border lg:border-ga-linea lg:bg-white lg:p-10">
+          {/* Logo oficial a color (escritorio), sobre el formulario. */}
+          <Link href="/" aria-label="Ir al inicio" className="mb-10 hidden h-11 w-full max-w-form-ingreso lg:block">
+            <Logo tone="dark" />
+          </Link>
+          {children}
+        </div>
+        <footer className="relative mt-8 hidden flex-wrap justify-center gap-x-2 text-13 text-ga-texto-3 lg:flex">
+          <span>© {new Date().getFullYear()} Cooperativa Green Alliance</span>
+          <span aria-hidden="true">·</span>
+          <Link href="/politica-de-datos" className="underline hover:text-ga-verde">
+            Política de datos
+          </Link>
+          <span aria-hidden="true">·</span>
+          <Link href="/" className="underline hover:text-ga-verde">
+            Volver al inicio
+          </Link>
+        </footer>
       </main>
     </div>
   );
