@@ -4,6 +4,7 @@ import { useEffect, useId, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cerrarSesion } from "@/app/cuenta/actions";
+import { IconoSeccion } from "./IconoSeccion";
 import { seccionesDelRol, type Seccion } from "./secciones";
 
 type EncabezadoAdminProps = {
@@ -138,10 +139,11 @@ export function EncabezadoAdmin({ nombre, seccion, alertasPendientes = 0, rol = 
             href={s.href}
             aria-current={seccion === s.clave ? "page" : undefined}
             className={
-              "inline-flex min-h-11 items-center rounded-full px-3.5 no-underline " +
+              "inline-flex min-h-11 items-center gap-2 rounded-full pl-1.5 pr-3.5 no-underline " +
               (s.clave === seccion ? "bg-admin-superficie-2 text-white" : "text-admin-texto-3")
             }
           >
+            <IconoSeccion seccion={s.clave} tamano="sm" className="rounded-full" />
             {s.etiqueta}
             {s.clave === "alertas" && alertasPendientes > 0 ? (
               <span className="ml-1.5 rounded-full bg-admin-rojo-fondo px-1.5 text-12 text-admin-rojo-2">{alertasPendientes}</span>

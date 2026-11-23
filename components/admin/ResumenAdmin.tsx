@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { TarjetaKpi } from "@/components/admin/TarjetaKpi";
+import { IconoSeccion } from "@/components/admin/IconoSeccion";
+import { IconoBilletera, IconoPersonaMas, IconoPersonas, IconoRegalo, IconoReloj } from "@/components/ui/Iconos";
 import { formatearPesos } from "@/lib/cuenta";
 import { GRUPOS_CREDITO } from "@/lib/gradosCatalogo";
 import type { MetricasAdmin } from "@/lib/admin/metricas";
@@ -64,14 +66,14 @@ export function ResumenAdmin({ metricas, alertasPendientes, soloLectura = false 
       {encabezado}
 
       <section aria-label="Cifras principales" className="grid grid-cols-2 gap-3 lg:grid-cols-5 lg:gap-4">
-        <TarjetaKpi etiqueta="Asociados activos" valor={metricas.asociadosActivos} />
-        <TarjetaKpi etiqueta="Afiliaciones pendientes" valor={metricas.afiliacionesPendientes} tono="ambar" />
-        <TarjetaKpi etiqueta="Créditos pendientes" valor={metricas.creditosPendientes} tono="ambar" />
+        <TarjetaKpi etiqueta="Asociados activos" valor={metricas.asociadosActivos} tono="azul" icono={<IconoPersonas tamano={17} />} />
+        <TarjetaKpi etiqueta="Afiliaciones pendientes" valor={metricas.afiliacionesPendientes} tono="ambar" icono={<IconoPersonaMas tamano={17} />} />
+        <TarjetaKpi etiqueta="Créditos pendientes" valor={metricas.creditosPendientes} tono="ambar" icono={<IconoReloj tamano={17} />} />
         {soloLectura ? (
-          <TarjetaKpi etiqueta="Inscritos al sorteo del mes" valor={metricas.inscritosSorteoMes} />
+          <TarjetaKpi etiqueta="Inscritos al sorteo del mes" valor={metricas.inscritosSorteoMes} tono="violeta" icono={<IconoRegalo tamano={17} />} />
         ) : (
           <Link href="/admin/sorteo" className="flex flex-col no-underline [&>div]:flex-1">
-            <TarjetaKpi etiqueta="Inscritos al sorteo del mes" valor={metricas.inscritosSorteoMes} />
+            <TarjetaKpi etiqueta="Inscritos al sorteo del mes" valor={metricas.inscritosSorteoMes} tono="violeta" icono={<IconoRegalo tamano={17} />} />
           </Link>
         )}
         <TarjetaKpi
@@ -79,6 +81,7 @@ export function ResumenAdmin({ metricas, alertasPendientes, soloLectura = false 
           valor={metricas.desembolsosMes.conteo}
           nota={formatearPesos(metricas.desembolsosMes.monto)}
           tono="verde"
+          icono={<IconoBilletera tamano={17} />}
         />
       </section>
 
@@ -87,7 +90,7 @@ export function ResumenAdmin({ metricas, alertasPendientes, soloLectura = false 
       ) : (
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           <section aria-labelledby="por-grado" className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5">
-            <h2 id="por-grado" className="m-0 font-display text-18 font-semibold">Asociados por grado</h2>
+            <h2 id="por-grado" className="m-0 flex items-center gap-2.5 font-display text-18 font-semibold"><IconoSeccion seccion="asociados" />Asociados por grado</h2>
             <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
               {grados.map(([grado, n], i) => (
                 <li key={grado} className="grid grid-cols-[3.5rem_minmax(0,1fr)_2rem] items-center gap-3 text-14">
@@ -103,7 +106,7 @@ export function ResumenAdmin({ metricas, alertasPendientes, soloLectura = false 
 
           <div className="flex flex-col gap-4">
             <section aria-labelledby="por-institucion" className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5">
-              <h2 id="por-institucion" className="m-0 font-display text-18 font-semibold">Por institución</h2>
+              <h2 id="por-institucion" className="m-0 flex items-center gap-2.5 font-display text-18 font-semibold"><IconoSeccion seccion="plataforma" />Por institución</h2>
               <div className="flex h-3 gap-1 overflow-hidden rounded-full" aria-hidden="true">
                 {instituciones.map(([inst, n], i) => (
                   <div key={inst} style={{ width: `${(n / totalInst) * 100}%` }} className="h-full">
@@ -122,7 +125,8 @@ export function ResumenAdmin({ metricas, alertasPendientes, soloLectura = false 
 
             {soloLectura ? null : (
             <section aria-labelledby="alertas-resumen" className="flex flex-col gap-2 rounded-20 bg-admin-superficie p-5">
-              <h2 id="alertas-resumen" className="m-0 font-display text-18 font-semibold">
+              <h2 id="alertas-resumen" className="m-0 flex items-center gap-2.5 font-display text-18 font-semibold">
+                <IconoSeccion seccion="alertas" />
                 Alertas pendientes · {alertasPendientes}
               </h2>
               <Link href="/admin/alertas" className="text-14 font-semibold text-admin-verde-2 no-underline hover:underline">
@@ -135,7 +139,7 @@ export function ResumenAdmin({ metricas, alertasPendientes, soloLectura = false 
       )}
 
       <section aria-labelledby="por-estado" className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5">
-        <h2 id="por-estado" className="m-0 font-display text-18 font-semibold">Procesos por estado</h2>
+        <h2 id="por-estado" className="m-0 flex items-center gap-2.5 font-display text-18 font-semibold"><IconoSeccion seccion="creditos" />Procesos por estado</h2>
         <ul className="m-0 grid list-none grid-cols-2 gap-2 p-0 sm:grid-cols-4 lg:grid-cols-8">
           {ESTADOS_PROCESO.map((estado, i) => (
             <li

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BotonRetirar } from "@/components/convenio/BotonRetirar";
-import { EncabezadoConvenio } from "@/components/convenio/EncabezadoConvenio";
+import { MarcoConvenio } from "@/components/convenio/MarcoConvenio";
 import { FormularioPublicacion } from "@/components/convenio/FormularioPublicacion";
 import { LineaEstadoPublicacion } from "@/components/convenio/LineaEstadoPublicacion";
 import { IconoVolver } from "@/components/ui/Iconos";
@@ -26,26 +26,30 @@ export default async function PublicacionPage({ params }: { params: Promise<{ id
   const urls = await urlsFirmadas(supabase, publicacion.imagenes);
 
   return (
-    <main className="min-h-dvh bg-ga-fondo-suave">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 lg:py-10">
-        <EncabezadoConvenio nombre={convenio.nombre} logoUrl={convenio.logoUrl} />
-        <div className="flex flex-col gap-3">
-          <Link href="/convenio" className="enlace flex items-center gap-1 self-start text-15 font-semibold">
-            <IconoVolver tamano={18} /> Tus publicaciones
+    <MarcoConvenio
+      nombre={convenio.nombre}
+      logoUrl={convenio.logoUrl}
+      seccion="publicacion"
+      hero={
+        <div className="flex flex-col gap-2">
+          <Link href="/convenio" className="flex items-center gap-1 self-start text-15 font-semibold text-ga-menta-suave no-underline hover:text-white">
+            <IconoVolver tamano={18} /> Volver al inicio
           </Link>
-          <h1 className="m-0 font-display text-26 font-semibold text-ga-navy">
+          <h1 className="m-0 font-display text-30 font-semibold leading-tight lg:text-34">
             {estado === "oculta" ? publicacion.titulo : `Editar ${NOMBRE_TIPO[publicacion.tipo].uno}`}
           </h1>
-          <div className="max-w-md">
-            <LineaEstadoPublicacion
-              estado={estado}
-              iniciaEl={publicacion.iniciaEl}
-              terminaEl={publicacion.terminaEl}
-              motivo={publicacion.ocultaMotivo}
-            />
-          </div>
         </div>
-
+      }
+    >
+      <div className="flex flex-col gap-6 rounded-24 bg-white p-5 shadow-[0_8px_24px_-16px_rgba(20,73,58,0.35)] sm:p-6">
+        <div className="max-w-md">
+          <LineaEstadoPublicacion
+            estado={estado}
+            iniciaEl={publicacion.iniciaEl}
+            terminaEl={publicacion.terminaEl}
+            motivo={publicacion.ocultaMotivo}
+          />
+        </div>
         {estado === "oculta" ? (
           <p className="m-0 max-w-xl text-15 leading-150 text-ga-texto-2">
             Green Alliance ocultó esta publicación y los asociados ya no la ven. No puedes editarla ni volver a mostrarla; si
@@ -73,6 +77,6 @@ export default async function PublicacionPage({ params }: { params: Promise<{ id
           </>
         )}
       </div>
-    </main>
+    </MarcoConvenio>
   );
 }

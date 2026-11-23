@@ -20,6 +20,14 @@ import { erroresPorCampo } from "@/lib/validaciones/comunes";
 import { dentroDelLimite } from "@/lib/servidor/limite";
 import { registrar } from "@/lib/servidor/registro";
 import { createClient } from "@/lib/supabase/server";
+import { BUCKET_LOGOS, esLogoEstatico } from "@/lib/conveniosServidor";
+import {
+  bytesCoincidenConTipo,
+  esquemaDatosConvenioPropio,
+  leerFormularioConvenioPropio,
+  validarLogo,
+  type CampoConvenioPropio,
+} from "@/lib/validaciones/convenios";
 
 /** «Salir» del panel del convenio: cierra la sesión y vuelve al ingreso con NIT. */
 export async function cerrarSesionConvenio() {
@@ -247,4 +255,83 @@ export async function retirarPublicacion(_previo: EstadoRetirar, formData: FormD
   registrar("info", { evento: "publicacion_retirada", convenioId: convenio.id, publicacionId: id.data });
   refrescar(id.data);
   redirect("/convenio?listo=retirada");
+}
+
+export type EstadoDatosEmpresa = {
+  errores?: Partial<Record<CampoConvenioPropio, string>>;
+  errorGeneral?: string;
+  valores?: ReturnType<typeof leerFormularioConvenioPropio>;
+};
+
+/**
+ * «Guardar cambios» de /convenio/empresa. Valida con los mismos límites del
+ * admin, sube el logo a la carpeta <convenio_id>/ del bucket público (RLS:
+ * solo su carpeta) y guarda con actualizar_datos_convenio(), que solo toca
+ * los campos de la ficha. Nombre y NIT siguen siendo del admin.
+ */
+export async function guardarDatosEmpresa(_previo: EstadoDatosEmpresa, formData: FormData): Promise<EstadoDatosEmpresa> {
+  const { supabase, convenio } = await exigirConvenio();
+  const entrada = leerFormularioConvenioPropio(formData);
+  const resultado = esquemaDatosConvenioPropio.safeParse(entrada);
+  const errores: Partial<Record<CampoConvenioPropio, string>> = resultado.success
+    ? {}
+    : erroresPorCampo<CampoConvenioPropio>(resultado.error);
+
+  const quitarLogo = formData.get("quitarLogo") === "on";
+  const archivo = formData.get("logo");
+  let logoNuevo: { bytes: Uint8Array; extension: string; tipo: string } | null = null;
+  if (archivo instanceof File && archivo.size > 0) {
+    const valido = validarLogo(archivo);
+    if (!valido.ok) errores.logo = valido.mensaje;
+    else {
+      const bytes = new Uint8Array(await archivo.arrayBuffer());
+      if (!bytesCoincidenConTipo(bytes, valido.tipo)) errores.logo = "El archivo no coincide con el tipo de imagen indicado.";
+      else logoNuevo = { bytes, extension: valido.extension, tipo: valido.tipo };
+    }
+  }
+  if (!resultado.success || errores.logo) return { errores, valores: entrada };
+
+  if (logoNuevo && !(await dentroDelLimite("convenio-logo", convenio.id, 20, 60 * 60))) {
+    return { errores: { logo: MENSAJE_LIMITE_SUBIDAS }, valores: entrada };
+  }
+
+  let logoPath: string | null = null;
+  if (logoNuevo) {
+    logoPath = `${convenio.id}/${Date.now()}.${logoNuevo.extension}`;
+    const { error } = await supabase.storage
+      .from(BUCKET_LOGOS)
+      .upload(logoPath, logoNuevo.bytes, { contentType: logoNuevo.tipo, upsert: false });
+    if (error) {
+      registrar("error", { evento: "convenio_propio_logo_subida_fallo", mensaje: error.message });
+      return { errores: { logo: "No pudimos subir el logo. Intenta de nuevo." }, valores: entrada };
+    }
+  }
+
+  const datos = resultado.data;
+  const { data: logoAnterior, error } = await supabase.rpc("actualizar_datos_convenio", {
+    p_especialidad: datos.especialidad,
+    p_descripcion: datos.descripcion,
+    p_telefono: datos.telefonoContacto,
+    p_servicios: datos.servicios,
+    p_sedes: datos.sedes,
+    p_cambiar_logo: Boolean(logoNuevo) || quitarLogo,
+    p_logo_path: logoPath,
+  });
+  if (error) {
+    registrar("error", { evento: "convenio_propio_guardar_fallo", codigo: error.code, mensaje: error.message });
+    if (logoPath) await supabase.storage.from(BUCKET_LOGOS).remove([logoPath]);
+    return { errorGeneral: "No pudimos guardar los cambios. Intenta de nuevo.", valores: entrada };
+  }
+
+  // Borra el logo reemplazado si estaba en su carpeta (si falla, solo queda un archivo huérfano).
+  if (typeof logoAnterior === "string" && logoAnterior.startsWith(`${convenio.id}/`) && !esLogoEstatico(logoAnterior)) {
+    const { error: errorBorrado } = await supabase.storage.from(BUCKET_LOGOS).remove([logoAnterior]);
+    if (errorBorrado) registrar("warn", { evento: "convenio_propio_logo_anterior_no_borrado", mensaje: errorBorrado.message });
+  }
+
+  registrar("info", { evento: "convenio_propio_editado", convenioId: convenio.id });
+  revalidatePath("/convenio", "layout");
+  revalidatePath("/");
+  revalidatePath("/cuenta");
+  redirect("/convenio?listo=empresa");
 }

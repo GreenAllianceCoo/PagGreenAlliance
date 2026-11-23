@@ -8,6 +8,7 @@ import { ChipEstado } from "./ChipEstado";
 import { MarcarDesembolsado } from "./MarcarDesembolsado";
 import { ToastAdmin } from "./ToastAdmin";
 import { TarjetaKpi } from "./TarjetaKpi";
+import { IconoBilletera, IconoCheck, IconoPersonaMas, IconoReloj } from "@/components/ui/Iconos";
 import { coincideBusqueda } from "@/lib/admin/busqueda";
 import { formatearFecha, formatearPesos } from "@/lib/cuenta";
 import { formatTasa } from "@/lib/credito";
@@ -193,10 +194,10 @@ export function PanelCreditos({
       ) : null}
 
       <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
-        <TarjetaKpi etiqueta="Créditos pendientes" valor={kpis.creditosPendientes} tono="ambar" />
-        <TarjetaKpi etiqueta="Afiliaciones pendientes" valor={kpis.afiliacionesPendientes} />
-        <TarjetaKpi etiqueta="Aprobados este mes" valor={kpis.aprobadosEsteMes} tono="verde" />
-        <TarjetaKpi etiqueta="Monto aprobado este mes" valor={kpis.montoAprobadoEsteMes} tono="verde" />
+        <TarjetaKpi etiqueta="Créditos pendientes" valor={kpis.creditosPendientes} tono="ambar" icono={<IconoReloj tamano={17} />} />
+        <TarjetaKpi etiqueta="Afiliaciones pendientes" valor={kpis.afiliacionesPendientes} tono="azul" icono={<IconoPersonaMas tamano={17} />} />
+        <TarjetaKpi etiqueta="Aprobados este mes" valor={kpis.aprobadosEsteMes} tono="verde" icono={<IconoCheck tamano={17} />} />
+        <TarjetaKpi etiqueta="Monto aprobado este mes" valor={kpis.montoAprobadoEsteMes} tono="verde" icono={<IconoBilletera tamano={17} />} />
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
