@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useCallback, useEffect, useState } from "react";
+import { useActionState, useCallback, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import Link from "next/link";
 import {
@@ -75,6 +75,15 @@ function FormularioConvenio({ convenio, onCerrar }: { convenio?: ConvenioAdmin; 
   const v = estado.valores;
   const p = (campo: keyof NonNullable<typeof v>, inicial: string) => (v ? String(v[campo] ?? "") : inicial);
   const e = estado.errores ?? {};
+  const formulario = useRef<HTMLFormElement>(null);
+
+  // El formulario se abre arriba de la lista: al pulsar «Editar» en un convenio de más
+  // abajo no se veía nada y parecía que el botón no servía. Se lleva a la vista y se
+  // enfoca el primer campo.
+  useEffect(() => {
+    formulario.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById("convenio-nombreEmpresa")?.focus({ preventScroll: true });
+  }, []);
 
   useEffect(() => {
     if (estado.guardado) onCerrar();
@@ -91,7 +100,7 @@ function FormularioConvenio({ convenio, onCerrar }: { convenio?: ConvenioAdmin; 
   });
 
   return (
-    <form action={accion} noValidate className="flex flex-col gap-4 rounded-20 bg-admin-superficie p-5.5">
+    <form ref={formulario} action={accion} noValidate className="flex scroll-mt-24 flex-col gap-4 rounded-20 bg-admin-superficie p-5.5">
       <h2 className="m-0 font-display text-20 font-semibold">{convenio ? `Editar «${convenio.nombreEmpresa}»` : "Nuevo convenio"}</h2>
       <input type="hidden" name="id" value={p("id", convenio?.id ?? "")} />
       <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
