@@ -12,7 +12,7 @@ const CLASE_AREA =
 const CLASE_SELECT =
   "h-12 w-full rounded-12 bg-ga-fondo-suave px-3.5 text-16 text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)] outline-none focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-verde)] aria-[invalid=true]:shadow-[inset_0_0_0_1.5px_var(--ga-error)]";
 const CLASE_BOTON_BORDE =
-  "flex h-11 items-center justify-center rounded-full px-4 text-13 font-extrabold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06] disabled:opacity-60";
+  "flex h-11 items-center justify-center rounded-full px-4 text-13 font-semibold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06] disabled:opacity-60";
 
 type Rol = "asesor" | "admin" | "secretario";
 
@@ -76,7 +76,7 @@ function CampoMotivo({
   }, [error]);
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-14 font-bold">
+      <label htmlFor={id} className="text-14 font-semibold">
         Motivo <span className="font-medium text-ga-texto-3">(obligatorio · 5 a 300 caracteres)</span>
       </label>
       <textarea
@@ -120,7 +120,7 @@ function ModalEstado({ perfilId, nombre, activo }: { perfilId: string; nombre: s
           <form action={accion} noValidate className="flex flex-col gap-4 text-ga-texto">
             <input type="hidden" name="asociadoId" value={perfilId} />
             <input type="hidden" name="activo" value={desactivar ? "false" : "true"} />
-            <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-extrabold">
+            <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-semibold">
               {desactivar ? `¿Desactivar a ${nombre}?` : `¿Reactivar a ${nombre}?`}
             </h2>
             <p className="m-0 text-15 leading-150 text-ga-texto-2">
@@ -134,7 +134,7 @@ function ModalEstado({ perfilId, nombre, activo }: { perfilId: string; nombre: s
               <button
                 type="button"
                 onClick={() => setAbierto(false)}
-                className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-bold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
+                className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-semibold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
               >
                 Cancelar
               </button>
@@ -164,14 +164,14 @@ function ModalRol({ perfilId, nombre, rol, destinos }: { perfilId: string; nombr
         <Modal abierto={abierto && !estado.mensaje} onCerrar={() => setAbierto(false)} tituloId={tituloId} variante="centrado">
           <form action={accion} noValidate className="flex flex-col gap-4 text-ga-texto">
             <input type="hidden" name="perfilId" value={perfilId} />
-            <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-extrabold">
+            <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-semibold">
               Cambiar el rol de {nombre}
             </h2>
             <p className="m-0 text-15 leading-150 text-ga-texto-2">
               Hoy es {ETIQUETA_ROL[rol].toLowerCase()}. El cambio aplica de inmediato y el motivo queda en el historial.
             </p>
             <div className="flex flex-col gap-1.5">
-              <label htmlFor={`${tituloId}-rol`} className="text-14 font-bold">
+              <label htmlFor={`${tituloId}-rol`} className="text-14 font-semibold">
                 Nuevo rol
               </label>
               <select
@@ -199,7 +199,7 @@ function ModalRol({ perfilId, nombre, rol, destinos }: { perfilId: string; nombr
               <button
                 type="button"
                 onClick={() => setAbierto(false)}
-                className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-bold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
+                className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-semibold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
               >
                 Cancelar
               </button>

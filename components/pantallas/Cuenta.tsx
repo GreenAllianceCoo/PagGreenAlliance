@@ -8,12 +8,13 @@ import { AvisoCreditoBloqueado } from "@/components/ui/AvisoCreditoBloqueado";
 import { ListaConvenios } from "@/components/pantallas/ListaConvenios";
 import { IconoConvenios, IconoDocumento, IconoMas, IconoSalir } from "@/components/ui/Iconos";
 import { BarraInferiorCuenta } from "@/components/pantallas/BarraInferiorCuenta";
-import { EncabezadoCuenta, RUTA_NUEVA_SOLICITUD } from "@/components/pantallas/EncabezadoCuenta";
+import { EncabezadoCuenta, RUTA_BENEFICIOS, RUTA_NUEVA_SOLICITUD } from "@/components/pantallas/EncabezadoCuenta";
 import { TarjetaTope } from "@/components/cuenta/TarjetaTope";
 import { PasosSolicitud } from "@/components/ui/PasosSolicitud";
 import { SorteoDelMes, type SorteoDelMesProps } from "@/components/sorteo/SorteoDelMes";
 import type { PerfilAsociado } from "@/lib/asociado/servidor";
 import type { ConteoCredito } from "@/lib/cuenta";
+import type { ResumenPublicacion } from "@/lib/beneficios/beneficios";
 import type { Convenio, PasoSolicitud } from "@/lib/mock";
 
 export type CuentaProps = {
@@ -33,6 +34,8 @@ export type CuentaProps = {
     conteo?: ConteoCredito | null;
   } | null;
   convenios: Convenio[];
+  /** Publicaciones activas por convenio (docs/spec-convenios.md §B5); solo para asociados. */
+  publicacionesConvenios?: Record<string, ResumenPublicacion[]>;
   /**
    * «Sorteo del mes» (docs/spec-fase-2.md §4): botón + modal, ver
    * components/sorteo/SorteoDelMes. `null` cuando quien ve /cuenta no es
@@ -110,7 +113,7 @@ function SelloComprobante() {
 function SolicitudVacia({ creditoBloqueado }: { creditoBloqueado?: string | null }) {
   return (
     <>
-      <h2 className="m-0 font-display text-18 font-extrabold lg:text-24">Tu solicitud</h2>
+      <h2 className="m-0 font-display text-18 font-semibold lg:text-24">Tu solicitud</h2>
       <div className="flex grow flex-col gap-4 motion-safe:animate-ga-aparecer lg:justify-center lg:gap-5">
         <div className="flex items-start gap-3.5">
           <span
@@ -120,7 +123,7 @@ function SolicitudVacia({ creditoBloqueado }: { creditoBloqueado?: string | null
             <IconoDocumento grosor={1.8} />
           </span>
           <div className="flex flex-col gap-1">
-            <p className="m-0 font-display text-17 font-extrabold text-ga-navy lg:text-20">
+            <p className="m-0 font-display text-17 font-semibold text-ga-navy lg:text-20">
               Todavía no tienes solicitudes de crédito
             </p>
             <p className="m-0 text-15 leading-150 text-ga-texto-2">
@@ -173,7 +176,7 @@ function ColumnaLateral({
             role="link"
             aria-disabled="true"
             aria-describedby={ID_AVISO_CREDITO}
-            className="flex cursor-not-allowed flex-col gap-2.5 rounded-16 bg-ga-linea-suave p-4.5 text-15 font-bold text-ga-deshabilitado-texto lg:flex-row lg:items-center lg:gap-3 lg:p-5 lg:text-16 lg:font-extrabold"
+            className="flex cursor-not-allowed flex-col gap-2.5 rounded-16 bg-ga-linea-suave p-4.5 text-15 font-semibold text-ga-deshabilitado-texto lg:flex-row lg:items-center lg:gap-3 lg:p-5 lg:text-16 lg:font-semibold"
           >
             <IconoMas grosor={1.8} />
             Nueva solicitud
@@ -181,7 +184,7 @@ function ColumnaLateral({
         ) : (
           <Link
             href={RUTA_NUEVA_SOLICITUD}
-            className="flex flex-col gap-2.5 rounded-16 bg-white p-4.5 text-15 font-bold text-ga-texto no-underline hover:bg-ga-verde-tint lg:flex-row lg:items-center lg:gap-3 lg:p-5 lg:text-16 lg:font-extrabold"
+            className="flex flex-col gap-2.5 rounded-16 bg-white p-4.5 text-15 font-semibold text-ga-texto no-underline hover:bg-ga-verde-tint lg:flex-row lg:items-center lg:gap-3 lg:p-5 lg:text-16 lg:font-semibold"
           >
             <IconoMas grosor={1.8} className="text-ga-verde" />
             Nueva solicitud
@@ -190,11 +193,19 @@ function ColumnaLateral({
         {/* TODO(pendiente-spec): confirmar si «Convenios» tendrá página propia. Hoy: sección #convenios. */}
         <a
           href="#convenios"
-          className="flex flex-col gap-2.5 rounded-16 bg-white p-4.5 text-15 font-bold text-ga-texto no-underline hover:bg-ga-verde-tint lg:hidden"
+          className="flex flex-col gap-2.5 rounded-16 bg-white p-4.5 text-15 font-semibold text-ga-texto no-underline hover:bg-ga-verde-tint lg:hidden"
         >
           <IconoConvenios grosor={1.8} className="text-ga-verde" />
           Convenios
         </a>
+        {/* Beneficios (docs/spec-convenios.md §B5): promociones y catálogos de los convenios. */}
+        <Link
+          href={RUTA_BENEFICIOS}
+          className="flex flex-col gap-2.5 rounded-16 bg-white p-4.5 text-15 font-semibold text-ga-texto no-underline hover:bg-ga-verde-tint lg:hidden"
+        >
+          <IconoDocumento grosor={1.8} className="text-ga-verde" />
+          Beneficios
+        </Link>
         {/* Sorteo mensual (docs/spec-fase-2.md §4): botón + modal en un solo
             componente autocontenido (ver components/sorteo/SorteoDelMes.tsx).
             S-13: solo se renderiza para asociados (sorteo === null para
@@ -227,6 +238,7 @@ export function Cuenta({
   tope,
   solicitud,
   convenios,
+  publicacionesConvenios,
   sorteo,
   cedula,
   grado,
@@ -262,14 +274,10 @@ export function Cuenta({
 
       <main className="flex flex-col gap-4 px-5 pb-6 pt-5 md:mx-auto md:max-w-2xl lg:max-w-none lg:gap-6 lg:px-14 lg:py-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="m-0 flex flex-col gap-0.5 text-ga-navy lg:block">
-            <span className="text-15 font-normal text-ga-texto-3 lg:font-display lg:text-44 lg:font-extrabold lg:text-ga-navy">
-              Hola,
-            </span>{" "}
-            <span className="font-display text-30 font-extrabold lg:text-44">{nombre}</span>
-          </h1>
+          {/* Fase 2: el título es el nombre, sin saludo. */}
+          <h1 className="m-0 font-display text-30 font-semibold text-ga-navy lg:text-44">{nombre}</h1>
           {pillSorteo ? (
-            <span className="hidden items-center gap-2 rounded-full bg-ga-ambar-fondo px-4 py-2.5 text-15 font-bold text-ga-ambar-texto lg:inline-flex">
+            <span className="hidden items-center gap-2 rounded-full bg-ga-ambar-fondo px-4 py-2.5 text-15 font-semibold text-ga-ambar-texto lg:inline-flex">
               <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full bg-ga-ambar" />
               Sorteo de {pillSorteo.mesTexto}: abre el {pillSorteo.textoProximaApertura}
             </span>
@@ -292,7 +300,7 @@ export function Cuenta({
         {ganadorSorteo ? (
           <p
             role="status"
-            className="m-0 flex items-center gap-2.5 rounded-20 bg-ga-ambar-fondo px-4 py-3 text-15 font-bold text-ga-ambar-texto motion-safe:animate-ga-aparecer lg:px-5 lg:text-16"
+            className="m-0 flex items-center gap-2.5 rounded-20 bg-ga-ambar-fondo px-4 py-3 text-15 font-semibold text-ga-ambar-texto motion-safe:animate-ga-aparecer lg:px-5 lg:text-16"
           >
             <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full bg-ga-ambar" />
             <span>
@@ -307,7 +315,7 @@ export function Cuenta({
               <>
                 <SelloComprobante />
                 <div className="flex items-center gap-3">
-                  <h2 className="m-0 whitespace-nowrap font-display text-18 font-extrabold lg:text-24">
+                  <h2 className="m-0 whitespace-nowrap font-display text-18 font-semibold lg:text-24">
                     Tu solicitud
                   </h2>
                   {insigniaBadge}
@@ -318,19 +326,19 @@ export function Cuenta({
                       Monto solicitado
                       <span className="lg:hidden"> · modalidad {solicitud.modalidad}</span>
                     </span>
-                    <span className="font-display text-44 font-extrabold leading-none tracking-cifra text-ga-navy lg:text-[72px]">
+                    <span className="font-display text-44 font-semibold leading-none tracking-cifra text-ga-navy lg:text-[72px]">
                       {solicitud.monto}
                     </span>
                   </div>
                   <div className="hidden flex-col gap-1 lg:flex">
                     <span className="text-14 text-ga-texto-3">Modalidad</span>
-                    <span className="font-display text-[34px] font-extrabold text-ga-navy">
+                    <span className="font-display text-[34px] font-semibold text-ga-navy">
                       {solicitud.modalidad}
                     </span>
                   </div>
                   <div className="hidden flex-col gap-1 lg:flex">
                     <span className="text-14 text-ga-texto-3">Plazo</span>
-                    <span className="font-display text-[34px] font-extrabold text-ga-navy">
+                    <span className="font-display text-[34px] font-semibold text-ga-navy">
                       {solicitud.plazo}
                     </span>
                   </div>
@@ -379,9 +387,9 @@ export function Cuenta({
           id="convenios"
           className="flex scroll-mt-4 flex-col gap-4 rounded-28 bg-white p-5 lg:px-8 lg:py-7"
         >
-          <h2 className="m-0 font-display text-18 font-extrabold lg:text-22">Tus convenios</h2>
+          <h2 className="m-0 font-display text-18 font-semibold lg:text-22">Tus convenios</h2>
           {/* Detalle por marca (pieza 3n): modal en escritorio, hoja inferior en celular. */}
-          <ListaConvenios convenios={convenios} variante="cuenta" />
+          <ListaConvenios convenios={convenios} variante="cuenta" publicaciones={publicacionesConvenios} />
         </section>
 
       </main>

@@ -28,8 +28,8 @@ export function AvisosAlEntrar({ avisos }: { avisos: AvisoPendiente[] }) {
   return (
     <Modal abierto onCerrar={cerrar} tituloId={tituloId} variante="adaptable">
       <div className="flex flex-col gap-4 text-ga-texto">
-        <span className="text-12 font-bold uppercase tracking-etiqueta text-ga-verde">Aviso de la cooperativa</span>
-        <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-extrabold">
+        <span className="text-12 font-semibold text-ga-verde">Aviso de la cooperativa</span>
+        <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-semibold">
           {aviso.titulo}
         </h2>
         <p className="m-0 whitespace-pre-line text-16 leading-150 text-ga-texto-2">{aviso.mensaje}</p>

@@ -278,7 +278,7 @@ export function TablaCreditos({ filas, busqueda, estadoFiltro, paquetesPorGrado,
     <section aria-label="Créditos en tabla" className="flex min-w-0 flex-col gap-3">
       {soloLectura ? null : (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-16 bg-admin-superficie px-4.5 py-3">
-          <p role="status" aria-live="polite" className="m-0 text-14 font-bold text-admin-texto-2">
+          <p role="status" aria-live="polite" className="m-0 text-14 font-semibold text-admin-texto-2">
             {totalCambios === 0 ? (
               estadoFiltro === "pendiente" ? (
                 "Escribe en una celda para corregir nombre, cédula o celular, o elige Aprobar / Rechazar en el estado."
@@ -297,7 +297,7 @@ export function TablaCreditos({ filas, busqueda, estadoFiltro, paquetesPorGrado,
                 type="button"
                 onClick={descartar}
                 disabled={enviando}
-                className="flex h-10 items-center rounded-full px-4.5 text-14 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
+                className="flex h-10 items-center rounded-full px-4.5 text-14 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
               >
                 Descartar
               </button>
@@ -306,7 +306,7 @@ export function TablaCreditos({ filas, busqueda, estadoFiltro, paquetesPorGrado,
                 onClick={() => setPidiendoMotivo(true)}
                 disabled={enviando || hayCeldaInvalida || totalCambios > MAX_CAMBIOS_TABLA_CREDITOS}
                 title={hayCeldaInvalida ? "Corrige las celdas marcadas en rojo" : undefined}
-                className="flex h-10 items-center rounded-full bg-admin-verde px-4.5 text-14 font-extrabold text-admin-fondo disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-10 items-center rounded-full bg-admin-verde px-4.5 text-14 font-semibold text-admin-fondo disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Guardar cambios
               </button>
@@ -329,7 +329,7 @@ export function TablaCreditos({ filas, busqueda, estadoFiltro, paquetesPorGrado,
           noValidate
           className="flex flex-col gap-3 rounded-16 bg-admin-superficie-2 p-4 shadow-[inset_0_0_0_1.5px_var(--ga-admin-verde)] motion-safe:animate-ga-aparecer"
         >
-          <label htmlFor="motivo-tabla" className="text-14 font-bold">
+          <label htmlFor="motivo-tabla" className="text-14 font-semibold">
             Motivo de los {totalCambios === 1 ? "cambios" : `${totalCambios} cambios`}{" "}
             <span className="font-medium text-admin-texto-3">(obligatorio · 5 a 300 caracteres · uno para todos)</span>
           </label>
@@ -370,7 +370,7 @@ export function TablaCreditos({ filas, busqueda, estadoFiltro, paquetesPorGrado,
               type="submit"
               disabled={enviando}
               aria-busy={enviando || undefined}
-              className="flex h-11.5 flex-1 items-center justify-center rounded-full bg-admin-verde text-15 font-extrabold text-admin-fondo disabled:opacity-85"
+              className="flex h-11.5 flex-1 items-center justify-center rounded-full bg-admin-verde text-15 font-semibold text-admin-fondo disabled:opacity-85"
             >
               {enviando ? "Guardando…" : "Confirmar y guardar"}
             </button>
@@ -378,7 +378,7 @@ export function TablaCreditos({ filas, busqueda, estadoFiltro, paquetesPorGrado,
               type="button"
               onClick={() => setPidiendoMotivo(false)}
               disabled={enviando}
-              className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
+              className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
             >
               Cancelar
             </button>
@@ -401,14 +401,14 @@ export function TablaCreditos({ filas, busqueda, estadoFiltro, paquetesPorGrado,
                   scope="col"
                   aria-sort={orden?.columna === c ? (orden.asc ? "ascending" : "descending") : undefined}
                   className={cx(
-                    "border-b border-admin-borde-sutil bg-admin-superficie px-3 py-3 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3",
+                    "border-b border-admin-borde-sutil bg-admin-superficie px-3 py-3 text-12 font-semibold text-admin-texto-3",
                     i === 0 && "sticky left-0 z-20",
                   )}
                 >
                   <button
                     type="button"
                     onClick={() => alternarOrden(c)}
-                    className="flex items-center gap-1 rounded-6 uppercase outline-none hover:text-admin-texto focus-visible:shadow-[0_0_0_2px_var(--ga-admin-verde)]"
+                    className="flex items-center gap-1 rounded-6 outline-none hover:text-admin-texto focus-visible:shadow-[0_0_0_2px_var(--ga-admin-verde)]"
                   >
                     {ETIQUETA_COLUMNA[c]}
                     <span aria-hidden="true" className="w-3 text-admin-texto-2">
@@ -484,7 +484,7 @@ function FilaTabla({
   function celdaPersona(campo: CampoPersona, extra?: { inputMode?: "numeric" | "tel"; ancho: string }) {
     const original = originalPersona(f, campo);
     if (!editaPersona) {
-      return <span className={campo === "nombre" ? "font-extrabold text-white" : "text-admin-texto-2"}>{original || "—"}</span>;
+      return <span className={campo === "nombre" ? "font-semibold text-white" : "text-admin-texto-2"}>{original || "—"}</span>;
     }
     const cambiado = edicion[campo] !== undefined;
     const valor = edicion[campo] ?? original;
@@ -502,7 +502,7 @@ function FilaTabla({
           inputMode={extra?.inputMode}
           autoComplete="off"
           maxLength={campo === "nombre" ? 120 : 16}
-          className={cx(CLASE_CONTROL, cambiado && CLASE_CAMBIADA, campo === "nombre" && "font-bold")}
+          className={cx(CLASE_CONTROL, cambiado && CLASE_CAMBIADA, campo === "nombre" && "font-semibold")}
         />
         {error ? (
           <span id={`${idCelda}-error`} className="text-12 font-semibold text-admin-rojo-2">
@@ -524,7 +524,7 @@ function FilaTabla({
       case "grado":
         return f.grado;
       case "recibe":
-        return <span className="font-mono font-bold tabular-nums">{formatearPesos(f.monto_solicitado)}</span>;
+        return <span className="font-mono font-semibold tabular-nums">{formatearPesos(f.monto_solicitado)}</span>;
       case "devuelve":
         return f.total_a_pagar === null ? (
           <span className="text-admin-texto-3">Sin definir</span>

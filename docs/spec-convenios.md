@@ -1,6 +1,6 @@
 # Spec · Módulo de convenios (fase 1)
 
-Estado: **aprobada** (2026-11-21). B1 escrito: `supabase/migrations/20261121000000_convenios_publicaciones.sql` y `supabase/tests/10_convenios_publicaciones.sql` (aplicada en producción el 2026-11-21; pgTAP 48/48 ok).
+Estado: **aprobada** (2026-11-21). B1 escrito: `supabase/migrations/20261121000000_convenios_publicaciones.sql` y `supabase/tests/10_convenios_publicaciones.sql` (aplicada en producción el 2026-11-21; pgTAP 48/48 ok). B2–B6 hechos en la rama `convenios-fase1`; migración de B4 `20261121100000` aplicada en producción el 2026-11-22.
 Fuente: `docs/prompt-convenios-y-rediseno.md`. Esquema real consultado en producción
 (`sqpmxizxkqorccpvjwoz`): enum `rol_usuario` = `asociado, admin, asesor, secretario`;
 `convenios.nit` es texto con formato (`902.038.118-7`); 8 convenios, todos visibles;
@@ -146,6 +146,8 @@ la sesión y manda a `/ingresar?cuenta=inactiva`. `/cuenta`, `/admin` y `/asesor
 `/admin/convenios/publicaciones`: tabla de todas, con filtro por convenio, tipo y estado.
 Acciones **Ocultar** (motivo opcional, ≤ 200) y **Volver a mostrar**. Queda en el historial
 del admin quién ocultó y cuándo. Enlace desde cada convenio a sus publicaciones.
+Migración `20261121100000_historial_publicaciones_convenio.sql` (tabla de historial + tipo
+«publicacion» en `admin_historial_equipo`). Solo admin, como el resto de /admin/convenios.
 
 ## B5 · Beneficios para el asociado
 

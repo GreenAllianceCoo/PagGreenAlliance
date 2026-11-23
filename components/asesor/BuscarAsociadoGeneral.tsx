@@ -25,7 +25,7 @@ export function BuscarAsociadoGeneral({ accion }: BuscarAsociadoGeneralProps) {
   return (
     <section aria-labelledby="buscar-general-titulo" className="flex flex-col gap-3 rounded-20 bg-white p-4.5 lg:rounded-24 lg:p-6">
       <div className="flex flex-col gap-1">
-        <h2 id="buscar-general-titulo" className="m-0 font-display text-17 font-extrabold text-ga-navy lg:text-20">
+        <h2 id="buscar-general-titulo" className="m-0 font-display text-17 font-semibold text-ga-navy lg:text-20">
           Buscar en toda la cooperativa
         </h2>
         <p className="m-0 text-14 text-ga-texto-2">
@@ -64,7 +64,7 @@ export function BuscarAsociadoGeneral({ accion }: BuscarAsociadoGeneralProps) {
           <ul aria-label="Resultados de la búsqueda" className="m-0 flex list-none flex-col gap-2 p-0 motion-safe:animate-ga-lista">
             {estado.resultados.map((r, i) => (
               <li key={`${r.cedulaEnmascarada}-${i}`} className="flex flex-col gap-0.5 rounded-14 bg-ga-fondo-suave px-4 py-3">
-                <strong className="text-16 font-extrabold text-ga-navy">{r.nombre}</strong>
+                <strong className="text-16 font-semibold text-ga-navy">{r.nombre}</strong>
                 <span className="text-14 text-ga-texto-3">{r.cedulaEnmascarada}</span>
                 <span className="text-14 text-ga-texto-2">
                   {r.asesor === "Sin asesor" ? (

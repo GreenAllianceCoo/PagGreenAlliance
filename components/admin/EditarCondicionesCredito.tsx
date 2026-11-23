@@ -48,7 +48,7 @@ export function EditarCondicionesCredito({ onResuelto, solicitudId, monto, total
       <button
         type="button"
         onClick={() => setAbierto(true)}
-        className="flex h-11.5 items-center justify-center rounded-full text-15 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
+        className="flex h-11.5 items-center justify-center rounded-full text-15 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
       >
         Editar condiciones
       </button>
@@ -243,7 +243,7 @@ export function FormularioCondiciones({
             <button
               type="button"
               onClick={() => setConfirmando(false)}
-              className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
+              className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
             >
               Volver
             </button>
@@ -255,7 +255,7 @@ export function FormularioCondiciones({
             <button
               type="button"
               onClick={() => setConfirmando(true)}
-              className="flex h-11.5 flex-1 items-center justify-center rounded-full bg-admin-verde px-6 text-14 font-extrabold text-admin-fondo"
+              className="flex h-11.5 flex-1 items-center justify-center rounded-full bg-admin-verde px-6 text-14 font-semibold text-admin-fondo"
             >
               Revisar y confirmar
             </button>
@@ -267,7 +267,7 @@ export function FormularioCondiciones({
           <button
             type="button"
             onClick={onCancelar}
-            className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
+            className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
           >
             Cancelar
           </button>

@@ -51,11 +51,11 @@ export default async function CarneQrPage() {
     <main className="mx-auto flex w-full max-w-[760px] flex-col gap-5 px-5 py-6 lg:py-10">
       <Link
         href="/cuenta"
-        className="text-15 font-bold text-ga-verde no-underline hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
+        className="text-15 font-semibold text-ga-verde no-underline hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
       >
         ← Volver a mi cuenta
       </Link>
-      <h1 className="m-0 font-display text-26 font-extrabold text-ga-navy">Tu carné con QR</h1>
+      <h1 className="m-0 font-display text-26 font-semibold text-ga-navy">Tu carné con QR</h1>
 
       <CarneVirtual
         nombre={perfil?.nombre ?? "Asociado"}
@@ -71,7 +71,7 @@ export default async function CarneQrPage() {
       <FotoCarne origen={foto?.origen ?? null} />
 
       <section aria-labelledby="titulo-qr" className="flex flex-col items-center gap-4 rounded-28 bg-white p-6 text-center">
-        <h2 id="titulo-qr" className="m-0 font-display text-20 font-extrabold text-ga-navy">
+        <h2 id="titulo-qr" className="m-0 font-display text-20 font-semibold text-ga-navy">
           Código QR de verificación
         </h2>
         {svg ? (
@@ -93,7 +93,7 @@ export default async function CarneQrPage() {
           <a
             href="/cuenta/carne/pdf"
             download="carne-green-alliance.pdf"
-            className="flex h-12 items-center justify-center rounded-full bg-ga-verde px-8 text-15 font-extrabold text-white no-underline transition-colors duration-200 hover:bg-ga-verde-oscuro hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
+            className="flex h-12 items-center justify-center rounded-full bg-ga-verde px-8 text-15 font-semibold text-white no-underline transition-colors duration-200 hover:bg-ga-verde-oscuro hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
           >
             Descargar PDF
           </a>

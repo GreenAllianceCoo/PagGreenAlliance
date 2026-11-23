@@ -5,6 +5,8 @@ import { Logo } from "@/components/ui/Logo";
 export const RUTA_NUEVA_SOLICITUD = "/cuenta/solicitar";
 /** «Perfil» del asociado (pieza 3k): pantalla propia, absorbe «Mis datos». */
 export const RUTA_PERFIL = "/cuenta/perfil";
+/** «Beneficios» (docs/spec-convenios.md §B5): promociones y catálogos de los convenios. */
+export const RUTA_BENEFICIOS = "/cuenta/beneficios";
 
 // Rediseño C+ (pieza 2b): el nav pasa de subrayado a píldora rellena
 // (verde-claro de fondo, texto verde-oscuro), como en el resto del design
@@ -16,7 +18,7 @@ const CLASE_INACTIVO =
 type EncabezadoCuentaProps = {
   nombre: string;
   /** Sección actual (subrayada y con aria-current). */
-  seccion: "inicio" | "solicitud" | "perfil";
+  seccion: "inicio" | "solicitud" | "perfil" | "beneficios";
   /** Server Action de «Salir» (signOut → /ingresar). */
   accionSalir?: (formData: FormData) => void;
 };
@@ -43,7 +45,7 @@ export function EncabezadoCuenta({ nombre, seccion, accionSalir }: EncabezadoCue
         </Link>
         {/* whitespace-nowrap: con nombres largos entre 1024 y ~1150 px, «Nueva solicitud»
             no debe partirse en 2 líneas (se hereda a los enlaces de adentro). */}
-        <nav aria-label="Principal" className="hidden items-center gap-1 whitespace-nowrap text-16 font-bold lg:flex">
+        <nav aria-label="Principal" className="hidden items-center gap-1 whitespace-nowrap text-16 font-semibold lg:flex">
           <Link
             href="/cuenta"
             aria-current={seccion === "inicio" ? "page" : undefined}
@@ -63,6 +65,13 @@ export function EncabezadoCuenta({ nombre, seccion, accionSalir }: EncabezadoCue
           <a href={seccion === "inicio" ? "#convenios" : "/cuenta#convenios"} className={CLASE_INACTIVO}>
             Convenios
           </a>
+          <Link
+            href={RUTA_BENEFICIOS}
+            aria-current={seccion === "beneficios" ? "page" : undefined}
+            className={seccion === "beneficios" ? CLASE_ACTIVO : CLASE_INACTIVO}
+          >
+            Beneficios
+          </Link>
           {/* «Perfil» (pieza 3k): pantalla propia /cuenta/perfil; absorbe «Mis datos». */}
           <Link
             href={RUTA_PERFIL}
@@ -74,11 +83,11 @@ export function EncabezadoCuenta({ nombre, seccion, accionSalir }: EncabezadoCue
         </nav>
         <div className="hidden items-center gap-3.5 text-15 lg:flex">
           {/* Nombre largo: no debe partir el header en 2 líneas entre 1024 y ~1150 px. */}
-          <span className="max-w-[160px] truncate font-bold">{nombre}</span>
+          <span className="max-w-[160px] truncate font-semibold">{nombre}</span>
           <form action={accionSalir}>
             <button
               type="submit"
-              className="inline-flex h-11 items-center rounded-full bg-ga-fondo-suave px-4.5 font-bold text-ga-navy hover:bg-ga-linea"
+              className="inline-flex h-11 items-center rounded-full bg-ga-fondo-suave px-4.5 font-semibold text-ga-navy hover:bg-ga-linea"
             >
               Salir
             </button>

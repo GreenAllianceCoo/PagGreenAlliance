@@ -46,18 +46,18 @@ export function TablaClientes({ filas }: TablaClientesProps) {
       {/* ≥ lg: tabla dentro de la tarjeta blanca (section la envuelve en ListaClientesCliente). */}
       <table className="hidden w-full border-collapse text-left lg:table">
         <thead>
-          <tr className="text-13 font-bold uppercase tracking-[0.04em] text-ga-texto-3">
-            <th scope="col" className="px-5 py-3.5 font-bold">Nombre</th>
-            <th scope="col" className="px-3 py-3.5 font-bold">Cédula</th>
-            <th scope="col" className="px-3 py-3.5 font-bold">Grado</th>
-            <th scope="col" className="px-3 py-3.5 font-bold">Afiliación</th>
-            <th scope="col" className="px-3 py-3.5 font-bold">Último crédito</th>
+          <tr className="text-13 font-semibold text-ga-texto-3">
+            <th scope="col" className="px-5 py-3.5 font-semibold">Nombre</th>
+            <th scope="col" className="px-3 py-3.5 font-semibold">Cédula</th>
+            <th scope="col" className="px-3 py-3.5 font-semibold">Grado</th>
+            <th scope="col" className="px-3 py-3.5 font-semibold">Afiliación</th>
+            <th scope="col" className="px-3 py-3.5 font-semibold">Último crédito</th>
           </tr>
         </thead>
         <tbody>
           {filas.map((fila) => (
             <tr key={idFilaResumen(fila)} className="border-t border-ga-linea-suave text-16">
-              <td className="px-5 py-3.5 font-extrabold text-ga-texto">{fila.nombre}</td>
+              <td className="px-5 py-3.5 font-semibold text-ga-texto">{fila.nombre}</td>
               <td className="px-3 py-3.5 tabular-nums tracking-cedula text-ga-texto-2">{fila.cedula}</td>
               <td className="px-3 py-3.5 text-ga-texto-2">{fila.grado}</td>
               <td className="px-3 py-3.5">
@@ -86,7 +86,7 @@ export function TablaClientes({ filas }: TablaClientesProps) {
       <ul className="m-0 flex list-none flex-col gap-2.5 p-0 lg:hidden">
         {filas.map((fila) => (
           <li key={idFilaResumen(fila)} className="flex flex-col gap-2 rounded-20 bg-white p-3.5">
-            <strong className="text-16 font-bold text-ga-texto">{fila.nombre}</strong>
+            <strong className="text-16 font-semibold text-ga-texto">{fila.nombre}</strong>
             <span className="text-14 tabular-nums text-ga-texto-3">
               {fila.cedula} · {fila.grado}
             </span>
@@ -121,7 +121,7 @@ function EstadoVacio() {
         />
       </span>
       <div className="flex flex-col gap-1">
-        <strong className="font-display text-18 font-extrabold text-ga-navy lg:text-22">
+        <strong className="font-display text-18 font-semibold text-ga-navy lg:text-22">
           Nadie en este estado por ahora
         </strong>
         <span className="text-15 text-ga-texto-2 lg:text-16">

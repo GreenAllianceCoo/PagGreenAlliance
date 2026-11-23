@@ -62,7 +62,7 @@ export function PanelAsesor({ nombre, filas, comisiones, metricas, premios = nul
           <>
             <div className="flex flex-col gap-0.5 lg:gap-1.5">
               <span className="text-15 text-ga-texto-3 lg:hidden">Hola, {nombre}</span>
-              <h1 className="m-0 font-display text-30 font-extrabold tracking-titular text-ga-navy lg:text-44">Resumen</h1>
+              <h1 className="m-0 font-display text-30 font-semibold tracking-titular text-ga-navy lg:text-44">Resumen</h1>
             </div>
             <ResumenAsesor metricas={metricas} comisiones={comisiones} onIrAComisiones={() => setPestana("comisiones")} />
             {registrarClic ? <PremiosAsesor premios={premios} registrarClic={registrarClic} /> : null}
@@ -72,7 +72,7 @@ export function PanelAsesor({ nombre, filas, comisiones, metricas, premios = nul
             <div className="flex items-start justify-between gap-3">
               <div className="flex flex-col gap-0.5 lg:gap-1.5">
                 <span className="text-15 text-ga-texto-3 lg:hidden">Hola, {nombre}</span>
-                <h1 className="m-0 font-display text-30 font-extrabold tracking-titular text-ga-navy lg:text-44">
+                <h1 className="m-0 font-display text-30 font-semibold tracking-titular text-ga-navy lg:text-44">
                   Mis clientes
                 </h1>
                 <p className="m-0 hidden text-17 text-ga-texto-2 lg:block">
@@ -82,7 +82,7 @@ export function PanelAsesor({ nombre, filas, comisiones, metricas, premios = nul
               {/* Celular: acceso condensado a la cuenta de demostración (en escritorio vive en el encabezado). */}
               <Link
                 href={RUTA_SIMULADOR}
-                className="inline-flex h-11 shrink-0 items-center rounded-full bg-ga-ambar-fondo px-3.5 text-14 font-extrabold text-ga-ambar-texto no-underline lg:hidden"
+                className="inline-flex h-11 shrink-0 items-center rounded-full bg-ga-ambar-fondo px-3.5 text-14 font-semibold text-ga-ambar-texto no-underline lg:hidden"
               >
                 Demo
               </Link>
@@ -101,7 +101,7 @@ export function PanelAsesor({ nombre, filas, comisiones, metricas, premios = nul
           <>
             <div className="flex flex-col gap-0.5 lg:gap-1.5">
               <span className="text-15 text-ga-texto-3 lg:hidden">Hola, {nombre}</span>
-              <h1 className="m-0 font-display text-30 font-extrabold tracking-titular text-ga-navy lg:text-44">
+              <h1 className="m-0 font-display text-30 font-semibold tracking-titular text-ga-navy lg:text-44">
                 Comisiones
               </h1>
             </div>
@@ -123,14 +123,14 @@ export function PanelAsesor({ nombre, filas, comisiones, metricas, premios = nul
               onClick={() => setPestana(clave)}
               className={cx(
                 "flex h-13 items-center justify-center rounded-full text-13",
-                pestana === clave ? "bg-ga-verde-claro font-extrabold text-ga-verde-oscuro" : "font-bold text-ga-texto-3",
+                pestana === clave ? "bg-ga-verde-claro font-semibold text-ga-verde-oscuro" : "font-semibold text-ga-texto-3",
               )}
             >
               {clave === "resumen" ? "Resumen" : clave === "clientes" ? "Clientes" : "Comisiones"}
             </button>
           ))}
           <form action={accionSalir} className="contents">
-            <button type="submit" className="flex h-13 items-center justify-center rounded-full text-13 font-bold text-ga-texto-3">
+            <button type="submit" className="flex h-13 items-center justify-center rounded-full text-13 font-semibold text-ga-texto-3">
               Salir
             </button>
           </form>

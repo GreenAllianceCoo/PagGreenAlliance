@@ -22,7 +22,7 @@ export function CorreoIngresoAsociado({
 }) {
   return (
     <section aria-labelledby="correo-ingreso-titulo" className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5.5">
-      <h2 id="correo-ingreso-titulo" className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+      <h2 id="correo-ingreso-titulo" className="m-0 text-12 font-semibold text-admin-texto-3">
         Correo de ingreso
       </h2>
       {pendientes.length > 0 ? (
@@ -61,7 +61,7 @@ export function CorreoIngresoAsociado({
             <li key={h.id} className="flex gap-2.5 text-14 leading-140">
               <span aria-hidden="true" className="mt-1.5 h-2 w-2 flex-none rounded-full bg-admin-verde" />
               <span className="flex flex-col">
-                <span className="font-bold text-admin-texto">
+                <span className="font-semibold text-admin-texto">
                   {h.origen === "admin" ? "Cambió el correo de ingreso" : "Cambió su propio correo de ingreso"}
                 </span>
                 <span className="text-admin-texto-3">

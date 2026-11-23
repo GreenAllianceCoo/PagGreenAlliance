@@ -67,7 +67,7 @@ export function AccionesAfiliacion({ id, estado, nombre, onResuelto }: Props) {
           <button
             type="button"
             onClick={() => setPaso("idle")}
-            className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
+            className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
           >
             Cancelar
           </button>
@@ -92,7 +92,7 @@ export function AccionesAfiliacion({ id, estado, nombre, onResuelto }: Props) {
           <button
             type="button"
             onClick={() => setPaso("idle")}
-            className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
+            className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
           >
             Cancelar
           </button>
@@ -107,14 +107,14 @@ export function AccionesAfiliacion({ id, estado, nombre, onResuelto }: Props) {
       <button
         type="button"
         onClick={() => setPaso("aprobar")}
-        className="flex h-12 items-center justify-center rounded-full bg-admin-verde text-15 font-extrabold text-admin-fondo"
+        className="flex h-12 items-center justify-center rounded-full bg-admin-verde text-15 font-semibold text-admin-fondo"
       >
         Aprobar (crea la cuenta)
       </button>
       <button
         type="button"
         onClick={() => setPaso("rechazar")}
-        className="flex h-12 items-center justify-center rounded-full text-15 font-extrabold text-admin-rojo-2 shadow-[inset_0_0_0_1.5px_var(--ga-admin-rojo)]"
+        className="flex h-12 items-center justify-center rounded-full text-15 font-semibold text-admin-rojo-2 shadow-[inset_0_0_0_1.5px_var(--ga-admin-rojo)]"
       >
         Rechazar
       </button>
@@ -135,7 +135,7 @@ function BotonContactado() {
     <button
       type="submit"
       disabled={pending}
-      className="flex h-11 w-full items-center justify-center rounded-full text-14 font-bold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
+      className="flex h-11 w-full items-center justify-center rounded-full text-14 font-semibold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
     >
       {pending ? "Guardando…" : "Marcar como contactado"}
     </button>
@@ -158,7 +158,7 @@ function BotonAdmin({
       type="submit"
       disabled={pending}
       aria-busy={pending || undefined}
-      className={`flex h-11.5 items-center justify-center gap-2 rounded-full px-5 text-15 font-extrabold disabled:opacity-85 ${claseColor}`}
+      className={`flex h-11.5 items-center justify-center gap-2 rounded-full px-5 text-15 font-semibold disabled:opacity-85 ${claseColor}`}
     >
       {pending ? textoCargando : children}
     </button>

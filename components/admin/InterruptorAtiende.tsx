@@ -17,7 +17,7 @@ export function InterruptorAtiende({ perfilId, nombre, atiende }: { perfilId: st
       <input type="hidden" name="perfilId" value={perfilId} />
       <input type="hidden" name="atiende" value={String(!atiende)} />
       <div className="flex items-center gap-2.5">
-        <span id={`atiende-${perfilId}`} className={"text-13 font-bold " + (atiende ? "text-admin-texto-2" : "text-admin-texto-3")}>
+        <span id={`atiende-${perfilId}`} className={"text-13 font-semibold " + (atiende ? "text-admin-texto-2" : "text-admin-texto-3")}>
           Atiende asociados
         </span>
         <button

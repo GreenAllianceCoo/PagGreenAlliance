@@ -23,7 +23,7 @@ export function ProgressSteps({ pasoActual, totalPasos, accion }: ProgressStepsP
         ))}
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-14 font-bold text-ga-verde">
+        <span className="text-14 font-semibold text-ga-verde">
           Paso {pasoActual} de {totalPasos}
         </span>
         {accion}

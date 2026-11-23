@@ -61,7 +61,7 @@ export function CarneVirtual({
           className="h-[34px] w-auto max-w-[60%]"
         />
         {activo !== undefined ? (
-          <span className="rounded-full bg-ga-menta px-2.5 py-1 text-13 font-extrabold text-ga-navy-chip-oscuro">
+          <span className="shrink-0 whitespace-nowrap rounded-full bg-ga-menta px-2.5 py-1 text-13 font-semibold text-ga-navy-chip-oscuro">
             {activo ? "Asociado activo" : "Asociado inactivo"}
           </span>
         ) : null}
@@ -80,45 +80,46 @@ export function CarneVirtual({
           />
         ) : null}
         <div className="flex min-w-0 flex-col gap-1">
-          <span className="text-13 font-bold uppercase tracking-etiqueta text-ga-menta-suave">Afiliado Titular</span>
-          <strong className="break-words font-display text-22 font-extrabold lg:text-34">{nombre}</strong>
+          {/* El carné imita un documento: aquí las mayúsculas sí van (fase 2). */}
+          <span className="text-13 font-semibold uppercase tracking-etiqueta text-ga-menta-suave">Afiliado Titular</span>
+          <strong className="break-words font-display text-22 font-semibold lg:text-34">{nombre}</strong>
         </div>
       </div>
       <dl className="relative m-0 grid grid-cols-2 gap-x-4 gap-y-3 text-14">
         <div className="min-w-0">
           <dt className="text-12 text-ga-menta-suave">Grado</dt>
-          <dd className="m-0 break-words font-bold">{grado}</dd>
+          <dd className="m-0 break-words font-semibold">{grado}</dd>
         </div>
         <div className="min-w-0">
           <dt className="text-12 text-ga-menta-suave">Cédula</dt>
-          <dd className="m-0 font-bold" style={{ fontVariantNumeric: "tabular-nums" }}>
+          <dd className="m-0 font-semibold" style={{ fontVariantNumeric: "tabular-nums" }}>
             {enmascararCedula(cedula)}
           </dd>
         </div>
         {institucion ? (
           <div className="col-span-2 min-w-0">
             <dt className="text-12 text-ga-menta-suave">Institución</dt>
-            <dd className="m-0 break-words font-bold">{institucion}</dd>
+            <dd className="m-0 break-words font-semibold">{institucion}</dd>
           </div>
         ) : null}
       </dl>
       <span className="relative text-14 text-ga-menta-suave">Muéstralo en cada empresa en convenio.</span>
     </section>
     <aside className="flex flex-col gap-3 lg:rounded-28 lg:bg-white lg:p-[26px]">
-      <h2 className="m-0 hidden font-display text-20 font-extrabold text-ga-navy lg:block">Para usarlo en un convenio</h2>
+      <h2 className="m-0 hidden font-display text-20 font-semibold text-ga-navy lg:block">Para usarlo en un convenio</h2>
       <p className="m-0 hidden text-15 leading-150 text-ga-texto-2 lg:block">
         Abre esta pantalla y muéstrasela a la empresa en convenio junto con tu documento. El carné no es un documento de identidad.
       </p>
       <Link
         href={hrefConvenios}
-        className="flex h-12 items-center justify-center rounded-full border-1.5 border-ga-navy text-15 font-extrabold text-ga-navy no-underline transition-colors duration-200 hover:bg-ga-fondo-suave focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
+        className="flex h-12 items-center justify-center rounded-full border-1.5 border-ga-navy text-15 font-semibold text-ga-navy no-underline transition-colors duration-200 hover:bg-ga-fondo-suave focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
       >
         Ver empresas en convenio
       </Link>
       {hrefQr ? (
         <Link
           href={hrefQr}
-          className="flex h-12 items-center justify-center rounded-full bg-ga-verde text-15 font-extrabold text-white no-underline transition-colors duration-200 hover:bg-ga-verde-oscuro hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
+          className="flex h-12 items-center justify-center rounded-full bg-ga-verde text-15 font-semibold text-white no-underline transition-colors duration-200 hover:bg-ga-verde-oscuro hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ga-verde"
         >
           Ver carné con QR
         </Link>

@@ -71,7 +71,7 @@ export async function AdminShell({ nombre, seccion, contadorSeccionActual, rol =
           />
         </Link>
 
-        <nav className="flex flex-col gap-1 text-15 font-bold">
+        <nav className="flex flex-col gap-1 text-15 font-semibold">
           {secciones.map((s) => {
             const activa = s.clave === seccion;
             // «Alertas» muestra siempre cuántas hay pendientes; las demás, el contador de su lista si están activas.
@@ -102,14 +102,14 @@ export async function AdminShell({ nombre, seccion, contadorSeccionActual, rol =
         </nav>
 
         <div className="mt-auto flex flex-col gap-2.5 rounded-14 bg-admin-superficie p-3.5">
-          <span className="truncate text-14 font-bold">{nombre}</span>
+          <span className="truncate text-14 font-semibold">{nombre}</span>
           {/* No hay dato de género en `perfiles`: se deja un rótulo neutro
               (el diseño usa «Administradora» como ejemplo de María Fernanda López). */}
           <span className="text-13 text-admin-texto-3">{rol === "secretario" ? "Secretaría" : "Administrador"}</span>
           <form action={cerrarSesion}>
             <button
               type="submit"
-              className="flex h-10 w-full items-center justify-center rounded-10 text-14 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-admin-superficie-2"
+              className="flex h-10 w-full items-center justify-center rounded-10 text-14 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-admin-superficie-2"
             >
               Salir
             </button>

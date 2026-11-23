@@ -67,7 +67,7 @@ export default async function SorteoPage({
   return (
     <AdminShell nombre={nombre} seccion="sorteo">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Sorteo mensual</h1>
+        <h1 className="m-0 font-display text-30 font-semibold tracking-titular lg:text-34">Sorteo mensual</h1>
         <SelectorMes anio={anio} mes={mes} anios={anios} />
       </div>
 
@@ -87,7 +87,7 @@ export default async function SorteoPage({
           <div className="hidden overflow-x-auto rounded-20 bg-admin-superficie lg:block">
             <table className="w-full min-w-[480px] border-collapse text-15">
               <thead>
-                <tr className="border-b border-admin-borde-sutil text-left text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+                <tr className="border-b border-admin-borde-sutil text-left text-12 font-semibold text-admin-texto-3">
                   <th className="p-4">Boleta</th>
                   <th className="p-4">Nombre</th>
                   <th className="p-4">Cédula</th>
@@ -97,8 +97,8 @@ export default async function SorteoPage({
               <tbody>
                 {boletas.map((b) => (
                   <tr key={b.numero} className="border-b border-admin-borde-sutil last:border-0">
-                    <td className="p-4 font-mono font-extrabold tracking-cedula">{b.numero}</td>
-                    <td className="p-4 font-bold text-white">{b.nombre_completo ?? "—"}</td>
+                    <td className="p-4 font-mono font-semibold tracking-cedula">{b.numero}</td>
+                    <td className="p-4 font-semibold text-white">{b.nombre_completo ?? "—"}</td>
                     <td className="p-4 text-admin-texto-2">{b.cedula ?? "—"}</td>
                     <td className="p-4 text-admin-texto-3">
                       {b.fecha_confirmacion
@@ -116,14 +116,14 @@ export default async function SorteoPage({
             {boletas.map((b) => (
               <li key={b.numero} className="flex flex-col gap-1.5 rounded-16 bg-admin-superficie p-4">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-mono text-16 font-extrabold tracking-cedula text-white">{b.numero}</span>
+                  <span className="font-mono text-16 font-semibold tracking-cedula text-white">{b.numero}</span>
                   <span className="text-13 text-admin-texto-3">
                     {b.fecha_confirmacion
                       ? new Date(b.fecha_confirmacion).toLocaleString("es-CO", { dateStyle: "short", timeStyle: "short" })
                       : "—"}
                   </span>
                 </div>
-                <span className="text-15 font-bold text-white">{b.nombre_completo ?? "—"}</span>
+                <span className="text-15 font-semibold text-white">{b.nombre_completo ?? "—"}</span>
                 <span className="text-14 text-admin-texto-2">{b.cedula ?? "—"}</span>
               </li>
             ))}
@@ -132,7 +132,7 @@ export default async function SorteoPage({
       )}
 
       <section aria-labelledby="inscritos-sorteo" className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5">
-        <h2 id="inscritos-sorteo" className="m-0 font-display text-18 font-extrabold">
+        <h2 id="inscritos-sorteo" className="m-0 font-display text-18 font-semibold">
           Inscritos del mes · {inscritos.length}
         </h2>
         {inscritos.length === 0 ? (
@@ -141,7 +141,7 @@ export default async function SorteoPage({
           <ul className="m-0 flex list-none flex-col gap-2 p-0">
             {inscritos.map((i, n) => (
               <li key={n} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-15">
-                <span className="font-bold text-white">{i.nombre_completo ?? "—"}</span>
+                <span className="font-semibold text-white">{i.nombre_completo ?? "—"}</span>
                 <span className="text-admin-texto-2">
                   {i.grado ?? "Sin grado"} · <span className="font-mono tracking-cedula">{i.cedula_enmascarada ?? "—"}</span>
                   {i.estado === "confirmada" ? " · confirmada" : " · sin confirmar"}

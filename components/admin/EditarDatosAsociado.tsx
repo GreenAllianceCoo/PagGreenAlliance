@@ -37,7 +37,7 @@ export function EditarDatosAsociado({ asociadoId, datos, bloqueado = false }: Pr
 
   return (
     <section aria-labelledby="datos-asociado-titulo" className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5.5">
-      <h2 id="datos-asociado-titulo" className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+      <h2 id="datos-asociado-titulo" className="m-0 text-12 font-semibold text-admin-texto-3">
         Datos del asociado
       </h2>
       <dl className="m-0 grid grid-cols-1 gap-x-4 gap-y-2.5 text-14 sm:grid-cols-[auto_1fr]">
@@ -64,7 +64,7 @@ export function EditarDatosAsociado({ asociadoId, datos, bloqueado = false }: Pr
           setVuelta((v) => v + 1);
           setAbierto(true);
         }}
-        className="flex h-11.5 items-center justify-center self-start rounded-full px-6 text-14 font-extrabold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06] disabled:opacity-60"
+        className="flex h-11.5 items-center justify-center self-start rounded-full px-6 text-14 font-semibold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06] disabled:opacity-60"
       >
         Editar datos
       </button>
@@ -87,7 +87,7 @@ export function EditarDatosAsociado({ asociadoId, datos, bloqueado = false }: Pr
 function Dato({ termino, children }: { termino: string; children: ReactNode }) {
   return (
     <>
-      <dt className="font-bold text-admin-texto-3">{termino}</dt>
+      <dt className="font-semibold text-admin-texto-3">{termino}</dt>
       <dd className="m-0 break-words text-admin-texto">{children}</dd>
     </>
   );
@@ -155,7 +155,7 @@ function FormularioDatos({
         className="flex flex-col gap-4 text-ga-texto"
       >
         <input type="hidden" name="asociadoId" value={asociadoId} />
-        <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-extrabold">
+        <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-semibold">
           Editar datos
         </h2>
         <p className="m-0 text-15 leading-150 text-ga-texto-2">
@@ -212,7 +212,7 @@ function FormularioDatos({
           <button
             type="button"
             onClick={onCerrar}
-            className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-bold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
+            className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-semibold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
           >
             Cancelar
           </button>

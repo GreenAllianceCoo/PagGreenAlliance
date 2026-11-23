@@ -582,7 +582,8 @@ Los convenios son las empresas aliadas. Se muestran en la página principal y en
 1. Entre a **Convenios** y toque **«Nuevo convenio»**.
 2. Llene los campos:
    - **Nombre de la empresa** y **Especialidad** (obligatorios);
-   - **NIT** (opcional);
+   - **NIT** (obligatorio si la empresa va a tener acceso para publicar);
+   - **Correo de acceso** (opcional): si lo llena, la empresa recibe su acceso y entra con su NIT y un código que le llega a ese correo (ver 11.3);
    - **Emoji** (se usa si no hay logo);
    - **WhatsApp del convenio:** 10 dígitos, empieza por 3, sin +57;
    - **Orden:** el número menor se muestra primero;
@@ -601,9 +602,30 @@ En **«Empresas en convenio»**, cada convenio tiene:
 - **«Editar»:** abre el mismo formulario. Para quitar el logo, marque **«Quitar el logo actual»**. Toque **«Guardar cambios»**.
 - **«Subir»** y **«Bajar»:** cambian el orden en que aparecen.
 - **«Ocultar»** y **«Mostrar»:** lo quitan de la vista del público sin borrarlo. Es la opción recomendada si un convenio se suspende por un tiempo.
-- **«Eliminar»:** lo borra definitivamente. Pide confirmación y **no se puede deshacer**.
+- **«Publicaciones»:** abre las promociones y catálogos de ese convenio (ver 11.4).
+- **«Eliminar»:** si el convenio no tiene cuenta ni publicaciones, lo borra definitivamente. Si tiene, lo desactiva: deja de verse y la empresa pierde el acceso, pero se conserva su historial. Pide confirmación y **no se puede deshacer**.
+- La línea **«Acceso»** dice si la empresa tiene cuenta y con qué correo: *Activo*, *Desactivado* (el convenio está oculto) o *Sin cuenta*.
 
 > Los logos de **todos los convenios** (AMB Móvil, Locos por los Viajes, Dr. Ribero, Racing Tours, Dream & Go, El Decreto, SB7 y MOTOFEST), y los videos de **SB7**, **El Decreto** y **MOTOFEST**, los dejó el equipo técnico dentro de la página (8 y 9 de noviembre). Los videos de las sedes de Bogotá y Valledupar, con su dirección, están en la sección «Sedes» de la página principal y los cambia el equipo técnico. Si sube otro logo desde **«Editar»**, el nuevo reemplaza al anterior; si marca «Quitar el logo actual», vuelve a verse el emoji.
+
+
+### 11.3 Acceso de la empresa para publicar
+
+1. En **«Editar»** escriba el **NIT** y el **Correo de acceso** y toque **«Guardar cambios»**.
+2. La empresa recibe el correo «Ya puedes publicar en Green Alliance». Entra en **www.greenallianceco.com/ingresar/convenio** con su NIT (con o sin puntos y dígito de verificación) y el código de 6 dígitos que le llega al correo.
+3. Para mover el acceso a otro correo, cambie el **Correo de acceso** y guarde. Para quitarle el acceso por un tiempo, **oculte** el convenio.
+
+La empresa ve su **Panel del convenio**: puede publicar hasta **10 promociones** y **5 catálogos** activos a la vez (en imágenes o en un PDF), con fechas de inicio y fin, y ve cuántas vistas y clics en WhatsApp tuvo cada una. Lo que publica sale en **Beneficios** de la cuenta del asociado **sin aprobación previa**. La guía para la empresa está en *docs/entrega/guia-convenios.md*.
+
+### 11.4 Revisar y ocultar publicaciones
+
+En **Convenios → «Publicaciones»** ve todas las publicaciones de todos los convenios, las más recientes primero. Puede filtrar por **convenio**, **tipo** (promociones o catálogos) y **estado** (publicada, programada, vencida u oculta).
+
+- **«Ver imagen» / «Ver PDF»:** abre el archivo en otra pestaña.
+- **«Ocultar»:** escriba un **motivo** si quiere (hasta 200 caracteres; la empresa lo ve) y toque **«Sí, ocultar»**. Sale de Beneficios al instante y la empresa ya no puede editarla ni retirarla.
+- **«Volver a mostrar»:** la publicación regresa a Beneficios si sus fechas siguen vigentes, aunque la empresa ya esté en su máximo.
+
+Quién ocultó o volvió a mostrar cada publicación, y cuándo, queda en la fila y en **Historial** («Ocultó «…» de …»).
 
 ---
 

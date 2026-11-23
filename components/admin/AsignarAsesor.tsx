@@ -78,7 +78,7 @@ export function AsignarAsesor({ solicitudId, perfilAsociado, asesores, onResuelt
       <div className="flex flex-col gap-2 rounded-16 bg-admin-superficie-2 p-4">
         <EncabezadoAsesor />
         <p className="m-0 text-13 leading-150 text-admin-texto-2">Todavía no hay asesores registrados.</p>
-        <Link href="/admin/asesores" className="text-13 font-bold text-admin-verde-2 underline">
+        <Link href="/admin/asesores" className="text-13 font-semibold text-admin-verde-2 underline">
           Ir a /admin/asesores
         </Link>
       </div>
@@ -106,7 +106,7 @@ export function AsignarAsesor({ solicitudId, perfilAsociado, asesores, onResuelt
 function EncabezadoAsesor() {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Asesor</span>
+      <span className="text-12 font-semibold text-admin-texto-3">Asesor</span>
       <span className="text-13 leading-145 text-admin-texto-3">
         Distinto de «Asesor que refirió»: es quien atenderá sus créditos de aquí en adelante.
       </span>
@@ -155,7 +155,7 @@ function BotonAsignar({ deshabilitado }: { deshabilitado: boolean }) {
       disabled={deshabilitado || pending}
       aria-busy={pending || undefined}
       className={
-        "flex h-11.5 items-center justify-center gap-2 rounded-full bg-admin-verde text-14 font-extrabold text-admin-fondo disabled:cursor-not-allowed disabled:opacity-40" +
+        "flex h-11.5 items-center justify-center gap-2 rounded-full bg-admin-verde text-14 font-semibold text-admin-fondo disabled:cursor-not-allowed disabled:opacity-40" +
         (pending ? " opacity-85" : "")
       }
     >

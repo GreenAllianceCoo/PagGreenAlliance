@@ -4,6 +4,7 @@ import { RUTA_CUENTA_INACTIVA } from "@/lib/asociado/inactivo";
 import { cargarPerfilAsociado } from "@/lib/asociado/servidor";
 import { WHATSAPP_URL } from "@/lib/config";
 import { urlFotoCarneDeAsociado } from "@/lib/carneFoto";
+import { resumenesPorConvenio } from "@/lib/beneficios/servidor";
 import { cargarConveniosAutenticados } from "@/lib/conveniosServidor";
 import { textoTope, vistaSolicitud, type FilaSolicitud } from "@/lib/cuenta";
 import { hoyBogota } from "@/lib/fechas";
@@ -83,7 +84,11 @@ export default async function CuentaPage({
   // S-13: solo los asociados participan en el sorteo.
   const esAsociado = perfil?.rol === "asociado";
 
-  const fotoCarne = esAsociado ? await urlFotoCarneDeAsociado(user.id) : null;
+  const [fotoCarne, publicacionesConvenios] = await Promise.all([
+    esAsociado ? urlFotoCarneDeAsociado(user.id) : null,
+    // §B5: el detalle de cada convenio muestra sus publicaciones activas (solo asociados; RLS).
+    esAsociado ? resumenesPorConvenio(supabase) : {},
+  ]);
 
   const topes = perfil?.cupo.estado === "con_cupo" ? perfil.cupo.paquetes : null;
 
@@ -93,6 +98,7 @@ export default async function CuentaPage({
       tope={textoTope(topes, { sinCupo: perfil?.cupo.estado === "sin_cupo" })}
       solicitud={ultima ? vistaSolicitud(ultima, hoy) : null}
       convenios={convenios}
+      publicacionesConvenios={publicacionesConvenios}
       sorteo={
         esAsociado
           ? {

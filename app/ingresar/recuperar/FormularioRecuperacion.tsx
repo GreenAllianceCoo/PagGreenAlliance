@@ -59,7 +59,7 @@ export function FormularioRecuperacion({ whatsapp, whatsappUrl }: { whatsapp: st
     >
       {estado.mensaje ? (
         <div className={CLASES_FORM_INGRESO}>
-          <h2 className="m-0 font-display text-26 font-extrabold text-ga-navy lg:text-32">Solicitud recibida</h2>
+          <h2 className="m-0 font-display text-26 font-semibold text-ga-navy lg:text-32">Solicitud recibida</h2>
           <p role="status" className="m-0 text-16 leading-150 text-ga-texto-2">
             {estado.mensaje}
           </p>
@@ -70,7 +70,7 @@ export function FormularioRecuperacion({ whatsapp, whatsappUrl }: { whatsapp: st
         </div>
       ) : (
         <form action={accion} className={CLASES_FORM_INGRESO} noValidate>
-          <h2 className="m-0 hidden font-display text-32 font-extrabold text-ga-navy lg:block">
+          <h2 className="m-0 hidden font-display text-32 font-semibold text-ga-navy lg:block">
             ¿Ya no tienes acceso a tu correo?
           </h2>
           <Field id="cedula" label="Número de cédula" tamano="lg" error={e.cedula}>
@@ -151,7 +151,7 @@ export function FormularioRecuperacion({ whatsapp, whatsappUrl }: { whatsapp: st
           <Button cargando={enviando} textoCargando="Enviando…">
             Enviar solicitud
           </Button>
-          <Link href="/ingresar" className="enlace self-center text-15 font-bold">
+          <Link href="/ingresar" className="enlace self-center text-15 font-semibold">
             Volver a ingresar
           </Link>
           <PieIngresoMovil interlineado={false}>Ayuda por WhatsApp {numero}</PieIngresoMovil>

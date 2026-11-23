@@ -41,7 +41,7 @@ export default async function VerificarCarnePage({ params }: { params: Promise<{
       />
       {datos ? (
         <section aria-labelledby="titulo-verif" className="flex w-full flex-col gap-3 rounded-28 bg-white p-6">
-          <h1 id="titulo-verif" className="m-0 font-display text-24 font-extrabold text-ga-verde-oscuro">
+          <h1 id="titulo-verif" className="m-0 font-display text-24 font-semibold text-ga-verde-oscuro">
             Afiliado verificado
           </h1>
           {fotoUrl ? (
@@ -56,21 +56,21 @@ export default async function VerificarCarnePage({ params }: { params: Promise<{
               className="h-40 w-40 rounded-20 bg-ga-fondo-suave object-cover"
             />
           ) : null}
-          <strong className="break-words font-display text-22 font-extrabold text-ga-navy">{datos.nombre}</strong>
+          <strong className="break-words font-display text-22 font-semibold text-ga-navy">{datos.nombre}</strong>
           <dl className="m-0 grid grid-cols-1 gap-3 text-15">
             <div>
               <dt className="text-12 text-ga-texto-2">Grado</dt>
-              <dd className="m-0 font-bold text-ga-navy">{datos.grado}</dd>
+              <dd className="m-0 font-semibold text-ga-navy">{datos.grado}</dd>
             </div>
             {datos.institucion ? (
               <div>
                 <dt className="text-12 text-ga-texto-2">Institución</dt>
-                <dd className="m-0 font-bold text-ga-navy">{datos.institucion}</dd>
+                <dd className="m-0 font-semibold text-ga-navy">{datos.institucion}</dd>
               </div>
             ) : null}
             <div>
               <dt className="text-12 text-ga-texto-2">Estado</dt>
-              <dd className="m-0 font-bold text-ga-navy">{datos.activo ? "Asociado activo" : "Asociado inactivo"}</dd>
+              <dd className="m-0 font-semibold text-ga-navy">{datos.activo ? "Asociado activo" : "Asociado inactivo"}</dd>
             </div>
           </dl>
           <p className="m-0 text-13 text-ga-texto-2">
@@ -79,7 +79,7 @@ export default async function VerificarCarnePage({ params }: { params: Promise<{
         </section>
       ) : (
         <section aria-labelledby="titulo-verif" className="flex w-full flex-col gap-2 rounded-28 bg-white p-6">
-          <h1 id="titulo-verif" className="m-0 font-display text-24 font-extrabold text-ga-navy">
+          <h1 id="titulo-verif" className="m-0 font-display text-24 font-semibold text-ga-navy">
             Carné no válido
           </h1>
           <p className="m-0 text-15 text-ga-texto-2">

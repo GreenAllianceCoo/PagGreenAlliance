@@ -44,7 +44,7 @@ export function Field({
 
   return (
     <div className={cx("flex flex-col gap-1.5", className)}>
-      <label htmlFor={id} className={cx("font-bold", tamano === "lg" ? "text-16" : "text-15")}>
+      <label htmlFor={id} className={cx("font-semibold", tamano === "lg" ? "text-16" : "text-15")}>
         {label}
         {opcional ? <span className="font-normal text-ga-texto-3"> (opcional)</span> : null}
       </label>

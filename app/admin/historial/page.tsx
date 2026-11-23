@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Historial del equipo · Admin · Gre
 
 const CLASE_CONTROL =
   "h-12 w-full min-w-0 rounded-12 bg-admin-fondo px-3.5 text-16 text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] outline-none placeholder:text-admin-texto-3 focus-visible:shadow-[inset_0_0_0_1.5px_var(--ga-admin-verde)] [color-scheme:dark]";
-const CLASE_ETIQUETA = "text-13 font-bold uppercase tracking-[0.04em] text-admin-texto-3";
+const CLASE_ETIQUETA = "text-13 font-semibold text-admin-texto-3";
 
 type Busqueda = { persona?: string; desde?: string; hasta?: string; pagina?: string };
 
@@ -44,10 +44,10 @@ export default async function HistorialEquipoPage({ searchParams }: { searchPara
 
   return (
     <AdminShell nombre={nombre} seccion="historial">
-      <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Historial del equipo</h1>
+      <h1 className="m-0 font-display text-30 font-semibold tracking-titular lg:text-34">Historial del equipo</h1>
       <p className="m-0 max-w-[640px] text-14 text-admin-texto-2">
         Lo que hicieron los administradores y secretarios: afiliaciones, procesos ejecutivos, asignaciones de asesor, cambios de rol,
-        bajas y créditos. Lo más reciente primero. Las horas son de Colombia.
+        bajas, créditos y publicaciones de convenios ocultadas. Lo más reciente primero. Las horas son de Colombia.
       </p>
 
       <form role="search" aria-label="Filtrar el historial" className="grid max-w-[900px] grid-cols-1 gap-3.5 rounded-20 bg-admin-superficie p-5.5 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_auto] lg:items-end">
@@ -79,14 +79,14 @@ export default async function HistorialEquipoPage({ searchParams }: { searchPara
         <div className="flex gap-2.5">
           <button
             type="submit"
-            className="flex h-11.5 items-center justify-center rounded-full bg-admin-verde px-6 text-14 font-extrabold text-admin-fondo"
+            className="flex h-11.5 items-center justify-center rounded-full bg-admin-verde px-6 text-14 font-semibold text-admin-fondo"
           >
             Filtrar
           </button>
           {hayFiltros ? (
             <Link
               href="/admin/historial"
-              className="flex h-11.5 items-center justify-center rounded-full px-5 text-14 font-bold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
+              className="flex h-11.5 items-center justify-center rounded-full px-5 text-14 font-semibold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
             >
               Quitar filtros
             </Link>
@@ -110,7 +110,7 @@ export default async function HistorialEquipoPage({ searchParams }: { searchPara
                 key={`${e.cuandoISO}-${i}`}
                 className="flex flex-col gap-1 border-b border-admin-borde-sutil px-4.5 py-3.5 last:border-0"
               >
-                <span className="text-15 font-bold text-admin-texto">
+                <span className="text-15 font-semibold text-admin-texto">
                   <span className="text-admin-verde-2">{e.actorNombre}</span> · {e.descripcion}
                 </span>
                 {e.motivo ? <span className="text-14 text-admin-texto-2">Motivo: {e.motivo}</span> : null}
@@ -128,7 +128,7 @@ export default async function HistorialEquipoPage({ searchParams }: { searchPara
           {filtros.pagina > 1 ? (
             <Link
               href={enlace(filtros.pagina - 1)}
-              className="flex h-11 items-center rounded-full px-5 font-bold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
+              className="flex h-11 items-center rounded-full px-5 font-semibold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
             >
               Anterior
             </Link>
@@ -139,7 +139,7 @@ export default async function HistorialEquipoPage({ searchParams }: { searchPara
           {filtros.pagina < paginas ? (
             <Link
               href={enlace(filtros.pagina + 1)}
-              className="flex h-11 items-center rounded-full px-5 font-bold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
+              className="flex h-11 items-center rounded-full px-5 font-semibold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
             >
               Siguiente
             </Link>

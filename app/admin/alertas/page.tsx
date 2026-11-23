@@ -21,7 +21,7 @@ export default async function AlertasPage({ searchParams }: { searchParams: Prom
 
   return (
     <AdminShell nombre={nombre} seccion="alertas">
-      <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Alertas</h1>
+      <h1 className="m-0 font-display text-30 font-semibold tracking-titular lg:text-34">Alertas</h1>
       <nav aria-label="Filtrar por estado" className="flex gap-2">
         {(["pendiente", "atendida"] as const).map((e) => (
           <Link
@@ -29,7 +29,7 @@ export default async function AlertasPage({ searchParams }: { searchParams: Prom
             href={`/admin/alertas?estado=${e}`}
             aria-current={estado === e ? "page" : undefined}
             className={
-              "flex h-11 items-center rounded-full px-4 text-14 font-bold no-underline " +
+              "flex h-11 items-center rounded-full px-4 text-14 font-semibold no-underline " +
               (estado === e
                 ? "bg-admin-rojo-fondo text-admin-rojo-2"
                 : "text-admin-texto-3 shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]")
@@ -49,7 +49,7 @@ export default async function AlertasPage({ searchParams }: { searchParams: Prom
         <section aria-labelledby="recuperacion-titulo" className="flex max-w-[820px] flex-col gap-2.5">
           <h2
             id="recuperacion-titulo"
-            className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3"
+            className="m-0 text-12 font-semibold text-admin-texto-3"
           >
             Recuperación de acceso
           </h2>

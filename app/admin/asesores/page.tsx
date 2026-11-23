@@ -48,13 +48,13 @@ export default async function AsesoresPage() {
 
   return (
     <AdminShell nombre={nombre} seccion="asesores">
-      <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Asesores</h1>
+      <h1 className="m-0 font-display text-30 font-semibold tracking-titular lg:text-34">Asesores</h1>
 
       <FormularioAsesor />
       <FormularioAsesor rol="secretario" />
 
       <section className="flex flex-col gap-2 rounded-20 bg-admin-superficie p-5.5">
-        <h2 className="m-0 font-display text-20 font-extrabold">Asesores registrados</h2>
+        <h2 className="m-0 font-display text-20 font-semibold">Asesores registrados</h2>
         <p className="m-0 text-14 text-admin-texto-2">
           Bono de 50 asociados ($1.000.000): {ganadores[50] ? `ganó ${ganadores[50]}` : "sin ganador todavía"} · Viaje por 100:{" "}
           {ganadores[100] ? `ganó ${ganadores[100]}` : "sin ganador todavía"}
@@ -70,7 +70,7 @@ export default async function AsesoresPage() {
                 className="flex flex-col gap-2 rounded-14 bg-admin-superficie-2 p-3.5 motion-safe:animate-ga-fila-entra sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex flex-col">
-                  <span className="text-16 font-extrabold text-white">{a.nombre}</span>
+                  <span className="text-16 font-semibold text-white">{a.nombre}</span>
                   <span className="text-13 text-admin-texto-3">
                     Cédula {a.cedula} · {a.rol === "admin" ? "Administrador" : a.rol === "secretario" ? "Secretario" : "Asesor"}
                     {a.activo ? "" : " · Inactivo"}

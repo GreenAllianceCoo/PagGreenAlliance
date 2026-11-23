@@ -40,7 +40,7 @@ export function ComprobantesPorBorrar({ comprobantes }: { comprobantes: Comproba
       data-testid="comprobantes-por-borrar"
       className="flex max-w-[640px] flex-col gap-3 rounded-20 bg-admin-superficie p-5.5"
     >
-      <h2 id="titulo-comprobantes-por-borrar" className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+      <h2 id="titulo-comprobantes-por-borrar" className="m-0 text-12 font-semibold text-admin-texto-3">
         Comprobantes de desembolso
       </h2>
       <ul className="m-0 flex list-none flex-col gap-2 p-0">
@@ -52,7 +52,7 @@ export function ComprobantesPorBorrar({ comprobantes }: { comprobantes: Comproba
               onClick={() => ver(c.solicitudId)}
               disabled={abriendo !== null}
               aria-busy={abriendo === c.solicitudId || undefined}
-              className="flex h-11 items-center rounded-full px-4.5 text-14 font-bold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
+              className="flex h-11 items-center rounded-full px-4.5 text-14 font-semibold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] disabled:opacity-60"
             >
               {abriendo === c.solicitudId ? "Abriendo…" : "Ver"}
             </button>

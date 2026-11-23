@@ -74,12 +74,12 @@
   --ga-blob-claro: rgba(255, 255, 255, 0.06); /* mancha orgánica decorativa sobre tarjetas navy */
 
   /* Movimiento (pieza 3a): duración representativa de cada categoría (el
-     lienzo da un rango; Tailwind usa estos valores en `duration-*`/`ease-spring`
+     lienzo da un rango; Tailwind usa estos valores en `duration-*`/`ease-ga`
      de tailwind.config.ts, así que estas variables son para CSS a mano). */
   --ga-dur-micro: 200ms; /* 120–250 ms: botón, chip, casilla OTP */
   --ga-dur-entrada: 400ms; /* 300–500 ms: aparece contenido, comprobante */
   --ga-dur-escalon: 70ms; /* 60–80 ms: retardo entre ítems de una lista */
-  --ga-ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+  --ga-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 
   /* Panel de administración en modo oscuro (pieza 2d + design system 3a).
      Tokens listos para cuando se maquete /admin (pedido D-05,
@@ -99,7 +99,7 @@
   --ga-admin-rojo: #ff8a80; /* borde/botón «Rechazar» */
   --ga-admin-rojo-2: #ffb4ab; /* texto del chip «No aprobado» */
   --ga-admin-rojo-claro: #ffd3ce; /* extra de 2d: cuerpo del aviso «Supera el tope» (no está en la lista de 3a) */
-  --ga-admin-borde: rgba(255, 255, 255, 0.14);
+  --ga-admin-borde: rgba(255, 255, 255, 0.1); /* fase 2: 14 % → 10 %, filete y no marco */
   --ga-admin-borde-sutil: rgba(255, 255, 255, 0.06);
 
   /* Agregados por ga-diseno-a-codigo (tanda 4b, piezas 2d/3e-3h): fondos
@@ -119,6 +119,11 @@
     /* El diseño no usa el reset de Tailwind: el interlineado por defecto es «normal». */
     line-height: normal;
   }
+  /* Fase 2: dos pesos (400 y 600); <strong> y <b> no pasan de 600. */
+  strong,
+  b {
+    font-weight: 600;
+  }
 }
 
 @layer components {
@@ -135,8 +140,8 @@
 }
 
 /* ---------------------------------------------------------------------
- * Movimiento (rediseño C+): solo transform/opacity, curva «spring»
- * cubic-bezier(.34,1.3,.64,1) (docs/Green Alliance C+.dc.html). Las
+ * Movimiento: solo transform/opacity, curva `ease-ga` cubic-bezier(.2,.7,.2,1),
+ * sin rebote (fase 2; el rebote queda solo en el sello del comprobante). Las
  * utilidades `animate-ga-*` y `duration-*` viven en tailwind.config.ts;
  * esta es la red de seguridad que exige la spec: con
  * prefers-reduced-motion, cualquier animación o transición del sitio

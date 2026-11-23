@@ -79,7 +79,7 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
           <IconoVolver tamano={20} grosor={1.8} />
         </Link>
         {/* Pieza 3m: en celular el h1 es el nombre de la persona; en escritorio sigue siendo «Asociados». */}
-        <h1 className="m-0 font-display text-24 font-extrabold tracking-titular lg:text-34">
+        <h1 className="m-0 font-display text-24 font-semibold tracking-titular lg:text-34">
           <span className="lg:hidden">{asociado.nombre}</span>
           <span className="hidden lg:inline">Asociados</span>
         </h1>
@@ -106,7 +106,7 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
           {esAsociadoVivo ? (
             <Link
               href={`/admin/cambios?asociado=${asociado.id}`}
-              className="flex h-11.5 items-center justify-center self-start rounded-full px-5 text-14 font-bold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
+              className="flex h-11.5 items-center justify-center self-start rounded-full px-5 text-14 font-semibold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
             >
               Ver todos sus cambios
             </Link>
@@ -117,10 +117,10 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
           {/* «Corregir cédula»: mismo componente de /admin/creditos; mismas condiciones que «Editar datos». */}
           {datosEditables ? (
             <section aria-labelledby="titulo-cedula-ingreso" className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5.5">
-              <h2 id="titulo-cedula-ingreso" className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+              <h2 id="titulo-cedula-ingreso" className="m-0 text-12 font-semibold text-admin-texto-3">
                 Cédula de ingreso
               </h2>
-              <p className="m-0 text-15 font-bold text-admin-texto">C.C. {asociado.cedula}</p>
+              <p className="m-0 text-15 font-semibold text-admin-texto">C.C. {asociado.cedula}</p>
               <CorregirCedula asociadoId={asociado.id} cedulaActual={asociado.cedula} bloqueado={correoBloqueado} />
             </section>
           ) : null}
@@ -147,7 +147,7 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
                 />
               ) : null}
               <div className="flex flex-col gap-1">
-                <h2 id="titulo-foto-carne" className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">
+                <h2 id="titulo-foto-carne" className="m-0 text-12 font-semibold text-admin-texto-3">
                   Foto del carné
                 </h2>
                 <p className="m-0 text-14 text-admin-texto-2">
@@ -172,7 +172,7 @@ export default async function DetalleAsociadoPage({ params }: { params: Promise<
           {/* Pedido de Sebas (1-oct): anonimizar al asociado dado de baja. Asesores y admins no se eliminan por aquí. */}
           {esAdmin && asociado.rol === "asociado" ? (
             <section className="flex flex-col gap-3 rounded-20 bg-admin-superficie p-5.5">
-              <h2 className="m-0 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Eliminar definitivamente</h2>
+              <h2 className="m-0 text-12 font-semibold text-admin-texto-3">Eliminar definitivamente</h2>
               <EliminarAsociado
                 asociadoId={asociado.id}
                 nombre={asociado.nombre}

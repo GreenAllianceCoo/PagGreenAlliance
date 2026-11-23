@@ -154,7 +154,7 @@ export function PanelCreditos({
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="m-0 font-display text-30 font-extrabold tracking-titular lg:text-34">Créditos</h1>
+          <h1 className="m-0 font-display text-30 font-semibold tracking-titular lg:text-34">Créditos</h1>
           {/* Solo admin: el secretario no crea créditos. */}
           {soloLectura || nuevoAbierto ? null : (
             <button
@@ -163,7 +163,7 @@ export function PanelCreditos({
                 setVueltaNuevo((v) => v + 1);
                 setNuevoAbierto(true);
               }}
-              className="flex h-11.5 items-center justify-center rounded-full bg-admin-verde px-5 text-14 font-extrabold text-admin-fondo"
+              className="flex h-11.5 items-center justify-center rounded-full bg-admin-verde px-5 text-14 font-semibold text-admin-fondo"
             >
               Nuevo crédito
             </button>
@@ -208,7 +208,7 @@ export function PanelCreditos({
               onClick={confirmarSalida}
               aria-current={estadoFiltro === e ? "page" : undefined}
               className={
-                "flex h-11 items-center gap-1.5 rounded-full px-4.5 text-14 font-bold no-underline " +
+                "flex h-11 items-center gap-1.5 rounded-full px-4.5 text-14 font-semibold no-underline " +
                 (estadoFiltro === e ? "bg-admin-texto text-admin-fondo" : "text-admin-texto-2 hover:bg-admin-superficie")
               }
             >
@@ -225,7 +225,7 @@ export function PanelCreditos({
               onClick={confirmarSalida}
               aria-current={vista === v ? "page" : undefined}
               className={
-                "flex h-10 items-center rounded-full px-4 text-14 font-bold no-underline " +
+                "flex h-10 items-center rounded-full px-4 text-14 font-semibold no-underline " +
                 (vista === v ? "bg-admin-superficie-2 text-admin-texto" : "text-admin-texto-2 hover:text-admin-texto")
               }
             >
@@ -250,7 +250,7 @@ export function PanelCreditos({
       ) : (
         <div className="grid grid-cols-1 items-start gap-4.5 lg:grid-cols-[minmax(0,1fr)_460px]">
           <section className="overflow-hidden rounded-20 bg-admin-superficie">
-            <div className="grid grid-cols-[2fr_1fr_1fr] gap-2.5 border-b border-admin-borde-sutil px-4.5 py-3.5 text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3 lg:grid-cols-[2fr_1.1fr_1fr_1fr_.9fr]">
+            <div className="grid grid-cols-[2fr_1fr_1fr] gap-2.5 border-b border-admin-borde-sutil px-4.5 py-3.5 text-12 font-semibold text-admin-texto-3 lg:grid-cols-[2fr_1.1fr_1fr_1fr_.9fr]">
               <span>Asociado</span>
               <span className="hidden lg:block">Grado</span>
               <span>Monto</span>
@@ -274,12 +274,12 @@ export function PanelCreditos({
                   }
                 >
                   <span className="flex flex-col gap-0.5 truncate">
-                    <span className="truncate text-15 font-extrabold text-white">{f.nombre}</span>
+                    <span className="truncate text-15 font-semibold text-white">{f.nombre}</span>
                     <span className="text-13 tracking-cedula text-admin-texto-3">{enmascararCedula(f.cedula)}</span>
                   </span>
                   <span className="hidden text-14 text-admin-texto-2 lg:block">{f.grado}</span>
                   <span className="flex flex-col gap-0.5">
-                    <span className="font-mono text-15 font-bold tabular-nums">{formatearPesos(f.monto_solicitado)}</span>
+                    <span className="font-mono text-15 font-semibold tabular-nums">{formatearPesos(f.monto_solicitado)}</span>
                   </span>
                   <span className="hidden text-14 text-admin-texto-2 lg:block">{formatearFecha(f.fecha_solicitud)}</span>
                   <span className="justify-self-start">
@@ -368,7 +368,7 @@ function DetalleCredito({
         <span className="text-13 text-admin-texto-3">{formatearFecha(fila.fecha_solicitud)}</span>
       </div>
       <div className="flex flex-col gap-0.5">
-        <span className="font-display text-26 font-extrabold leading-115">{fila.nombre}</span>
+        <span className="font-display text-26 font-semibold leading-115">{fila.nombre}</span>
         <span className="text-14 text-admin-texto-2">
           C.C. {fila.cedula} · {fila.grado}
         </span>
@@ -390,27 +390,27 @@ function DetalleCredito({
       {fila.telefono ? (
         <div className="rounded-12 bg-admin-superficie-2 px-3 py-2.5 text-14">
           <div className="text-admin-texto-3">Celular</div>
-          <div className="font-bold">{fila.telefono}</div>
+          <div className="font-semibold">{fila.telefono}</div>
         </div>
       ) : null}
 
       <div className="flex flex-col gap-2">
-        <span className="font-display text-44 font-extrabold leading-none tracking-cifra-grande">
+        <span className="font-display text-44 font-semibold leading-none tracking-cifra-grande">
           {formatearPesos(fila.monto_solicitado)}
         </span>
         <div className="flex gap-1.5">
-          <span className="rounded-full bg-admin-superficie-2 px-[11px] py-1.5 text-13 font-bold">
+          <span className="rounded-full bg-admin-superficie-2 px-[11px] py-1.5 text-13 font-semibold">
             {fila.porcentaje_credito}%
           </span>
           {fila.tasa_interes_mensual === null ? null : (
-            <span className="rounded-full bg-admin-superficie-2 px-[11px] py-1.5 text-13 font-bold">
+            <span className="rounded-full bg-admin-superficie-2 px-[11px] py-1.5 text-13 font-semibold">
               {formatTasa(Number(fila.tasa_interes_mensual))} mensual
             </span>
           )}
-          <span className="rounded-full bg-admin-superficie-2 px-[11px] py-1.5 text-13 font-bold">
+          <span className="rounded-full bg-admin-superficie-2 px-[11px] py-1.5 text-13 font-semibold">
             {fila.plazo_meses} {fila.plazo_meses === 1 ? "mes" : "meses"}
           </span>
-          <span className="rounded-full bg-admin-superficie-2 px-[11px] py-1.5 text-13 font-bold">
+          <span className="rounded-full bg-admin-superficie-2 px-[11px] py-1.5 text-13 font-semibold">
             {fila.tipo_credito === "convenio" ? `Convenio${fila.convenio_nombre ? ` · ${fila.convenio_nombre}` : ""}` : "Cooperativa"}
           </span>
         </div>
@@ -420,11 +420,11 @@ function DetalleCredito({
         <dl className="m-0 grid grid-cols-2 gap-2.5 text-14">
           <div className="rounded-12 bg-admin-superficie-2 px-3 py-2.5">
             <dt className="text-admin-texto-3">Recibe</dt>
-            <dd className="m-0 font-bold">{formatearPesos(fila.monto_solicitado)}</dd>
+            <dd className="m-0 font-semibold">{formatearPesos(fila.monto_solicitado)}</dd>
           </div>
           <div className="rounded-12 bg-admin-superficie-2 px-3 py-2.5">
             <dt className="text-admin-texto-3">Devuelve en total</dt>
-            <dd className="m-0 font-bold">
+            <dd className="m-0 font-semibold">
               {fila.total_a_pagar === null ? "Sin definir" : formatearPesos(fila.total_a_pagar)}
               {fila.total_a_pagar === null ? null : (
                 <span className="block text-13 font-medium text-admin-texto-3">
@@ -498,7 +498,7 @@ function DetalleCredito({
             onClick={() => setPaso("aprobar")}
             disabled={dentroDelTope === false && !autorizadoSobreTope}
             title={dentroDelTope === false && !autorizadoSobreTope ? "Supera el tope: edita las condiciones para aprobar" : "Aprobar (A)"}
-            className="flex h-12.5 items-center justify-center rounded-full bg-admin-verde text-16 font-extrabold text-admin-fondo disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-12.5 items-center justify-center rounded-full bg-admin-verde text-16 font-semibold text-admin-fondo disabled:cursor-not-allowed disabled:opacity-40"
           >
             Aprobar
           </button>
@@ -506,7 +506,7 @@ function DetalleCredito({
             type="button"
             onClick={() => setPaso("rechazar")}
             title="Rechazar (R)"
-            className="flex h-12.5 items-center justify-center rounded-full text-16 font-extrabold text-admin-rojo-2 shadow-[inset_0_0_0_1.5px_var(--ga-admin-rojo)]"
+            className="flex h-12.5 items-center justify-center rounded-full text-16 font-semibold text-admin-rojo-2 shadow-[inset_0_0_0_1.5px_var(--ga-admin-rojo)]"
           >
             Rechazar
           </button>
@@ -533,7 +533,7 @@ function DetalleCredito({
         >
           <input type="hidden" name="id" value={fila.id} />
           <input type="hidden" name="decision" value="rechazado" />
-          <label htmlFor="motivo-rechazo" className="text-14 font-bold">
+          <label htmlFor="motivo-rechazo" className="text-14 font-semibold">
             Motivo del rechazo <span className="font-medium text-admin-texto-3">(obligatorio · lo verá el asociado)</span>
           </label>
           <textarea
@@ -565,7 +565,7 @@ function DetalleCredito({
       {HISTORIAL_NOTAS_INTERNAS_HABILITADO ? <NotaInternaCredito /> : null}
 
       <div className="flex flex-col gap-2.5">
-        <span className="text-12 font-bold uppercase tracking-etiqueta text-admin-texto-3">Historial</span>
+        <span className="text-12 font-semibold text-admin-texto-3">Historial</span>
         <ItemHistorial titulo="Envió la solicitud" fecha={fila.fecha_solicitud} />
         {fila.estado !== "pendiente" && fila.fecha_respuesta ? (
           <ItemHistorial titulo={fila.estado === "aprobado" ? "Aprobada" : "Rechazada"} fecha={fila.fecha_respuesta} />
@@ -588,7 +588,7 @@ function NotaInternaCredito() {
   const [notaInterna, setNotaInterna] = useState("");
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor="nota-interna" className="text-14 font-bold">
+      <label htmlFor="nota-interna" className="text-14 font-semibold">
         Nota interna <span className="font-medium text-admin-texto-3">· solo la ve el equipo</span>
       </label>
       <textarea
@@ -608,7 +608,7 @@ function ItemHistorial({ titulo, fecha }: { titulo: string; fecha: string }) {
     <div className="flex gap-2.5 text-14 leading-140">
       <span aria-hidden="true" className="mt-1.5 h-2 w-2 flex-none rounded-full bg-admin-verde" />
       <span className="flex flex-col">
-        <span className="font-bold text-admin-texto">{titulo}</span>
+        <span className="font-semibold text-admin-texto">{titulo}</span>
         <span className="text-admin-texto-3">
           {new Date(fecha).toLocaleString("es-CO", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Bogota" })}
         </span>
@@ -622,7 +622,7 @@ function BotonCancelar({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-bold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
+      className="flex h-11.5 items-center rounded-full px-4.5 text-15 font-semibold shadow-[inset_0_0_0_1px_var(--ga-admin-borde)]"
     >
       Cancelar
     </button>
@@ -646,7 +646,7 @@ function BotonAdmin({
       type="submit"
       disabled={pending}
       aria-busy={pending || undefined}
-      className={`flex h-11.5 flex-1 items-center justify-center gap-2 rounded-full text-15 font-extrabold disabled:opacity-85 ${claseColor}`}
+      className={`flex h-11.5 flex-1 items-center justify-center gap-2 rounded-full text-15 font-semibold disabled:opacity-85 ${claseColor}`}
     >
       {pending ? textoCargando : children}
     </button>

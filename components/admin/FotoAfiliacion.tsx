@@ -15,7 +15,7 @@ export function FotoAfiliacion({ etiqueta, url }: Props) {
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-13 font-bold text-admin-texto-2">{etiqueta}</span>
+      <span className="text-13 font-semibold text-admin-texto-2">{etiqueta}</span>
       <div className="relative aspect-[3/4] w-full overflow-hidden rounded-12 bg-admin-superficie-2">
         {url ? (
           // eslint-disable-next-line @next/next/no-img-element -- URL firmada temporal, no apta para next/image remoto.

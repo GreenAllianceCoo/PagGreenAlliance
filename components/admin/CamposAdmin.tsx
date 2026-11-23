@@ -28,7 +28,7 @@ export function CampoAdmin({
   const desc = [ayuda ? `${id}-ayuda` : "", error ? `${id}-error` : ""].filter(Boolean).join(" ") || undefined;
   return (
     <div className={cx("flex flex-col gap-1.5", className)}>
-      <label htmlFor={id} className="text-13 font-bold uppercase tracking-[0.04em] text-admin-texto-3">
+      <label htmlFor={id} className="text-13 font-semibold text-admin-texto-3">
         {label}
       </label>
       {children({ id, "aria-invalid": error ? true : undefined, "aria-describedby": desc })}
@@ -84,7 +84,7 @@ export function BotonAdmin({
       disabled={pending || deshabilitado}
       aria-busy={pending || undefined}
       className={cx(
-        "flex h-11.5 items-center justify-center rounded-full px-6 text-14 font-extrabold transition-colors duration-200 disabled:opacity-85",
+        "flex h-11.5 items-center justify-center rounded-full px-6 text-14 font-semibold transition-colors duration-200 disabled:opacity-85",
         variante === "verde" && "bg-admin-verde text-admin-fondo",
         variante === "borde" && "text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]",
         variante === "rojo" && "text-admin-rojo shadow-[inset_0_0_0_1px_var(--ga-admin-rojo)] hover:bg-admin-rojo-fondo",

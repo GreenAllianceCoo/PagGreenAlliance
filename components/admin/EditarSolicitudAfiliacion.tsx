@@ -69,7 +69,7 @@ export function EditarSolicitudAfiliacion({
           setVuelta((v) => v + 1);
           setAbierto(true);
         }}
-        className="flex h-11.5 items-center justify-center rounded-full px-6 text-14 font-extrabold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
+        className="flex h-11.5 items-center justify-center rounded-full px-6 text-14 font-semibold text-admin-texto shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
       >
         Editar datos de la solicitud
       </button>
@@ -161,7 +161,7 @@ function Formulario({
         className="flex flex-col gap-4 text-ga-texto"
       >
         <input type="hidden" name="id" value={solicitud.id} />
-        <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-extrabold">
+        <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-semibold">
           Editar datos de la solicitud
         </h2>
         <p className="m-0 text-15 leading-150 text-ga-texto-2">
@@ -242,7 +242,7 @@ function Formulario({
           <button
             type="button"
             onClick={onCerrar}
-            className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-bold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
+            className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-semibold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
           >
             Cancelar
           </button>

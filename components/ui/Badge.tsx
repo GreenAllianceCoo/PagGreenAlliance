@@ -30,7 +30,7 @@ export function Badge({ children, tamano = "sm", estado = "revision" }: BadgePro
   return (
     <span
       className={cx(
-        "rounded-full px-2.5 py-1 text-13 font-bold",
+        "rounded-full px-2.5 py-1 text-13 font-semibold",
         ESTILOS[estado],
         tamano === "md" && "lg:px-3 lg:py-[5px] lg:text-14",
       )}

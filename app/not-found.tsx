@@ -22,8 +22,8 @@ export default function NotFound() {
       </header>
       <main className="flex grow flex-col items-center justify-center gap-4 px-6 py-14 text-center md:mx-auto md:max-w-2xl lg:py-24">
         <Logo variant="apilado" className="w-[140px] lg:w-[160px]" />
-        <p className="m-0 text-15 font-extrabold uppercase tracking-widest text-ga-verde">Error 404</p>
-        <h1 className="m-0 text-28 font-extrabold leading-115 text-ga-navy lg:text-40 lg:leading-110">
+        <p className="m-0 text-15 font-semibold tracking-widest text-ga-verde">Error 404</p>
+        <h1 className="m-0 text-28 font-semibold leading-115 text-ga-navy lg:text-40 lg:leading-110">
           No encontramos esta página
         </h1>
         <p className="m-0 max-w-prose text-15 leading-150 text-ga-texto-2 lg:text-17 lg:leading-155">

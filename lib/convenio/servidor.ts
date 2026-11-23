@@ -51,10 +51,10 @@ export async function exigirConvenio() {
   };
 }
 
-const COLUMNAS_PUBLICACION =
+export const COLUMNAS_PUBLICACION =
   "id, tipo, titulo, descripcion, beneficio, imagenes, pdf_path, inicia_el, termina_el, oculta_en, oculta_motivo, creada_en";
 
-type FilaPublicacion = {
+export type FilaPublicacion = {
   id: string;
   tipo: TipoPublicacion;
   titulo: string;
@@ -87,7 +87,23 @@ export function filaAPublicacion(f: FilaPublicacion): Publicacion {
 }
 
 export type Metricas = { vistas: number; vistasUnicas: number; clics: number; clicsUnicos: number };
-const SIN_METRICAS: Metricas = { vistas: 0, vistasUnicas: 0, clics: 0, clicsUnicos: 0 };
+export const SIN_METRICAS: Metricas = { vistas: 0, vistasUnicas: 0, clics: 0, clicsUnicos: 0 };
+
+type FilaMetricas = { publicacion_id: string; vistas: number; vistas_unicas: number; clics: number; clics_unicos: number };
+
+/** Filas de metricas_publicaciones() → mapa por id de publicación. */
+export function mapaMetricas(filas: unknown): Map<string, Metricas> {
+  const porId = new Map<string, Metricas>();
+  for (const m of (Array.isArray(filas) ? filas : []) as FilaMetricas[]) {
+    porId.set(m.publicacion_id, {
+      vistas: Number(m.vistas),
+      vistasUnicas: Number(m.vistas_unicas),
+      clics: Number(m.clics),
+      clicsUnicos: Number(m.clics_unicos),
+    });
+  }
+  return porId;
+}
 
 /** URLs firmadas (1 h) de archivos del bucket privado; las rutas que fallen quedan sin URL. */
 export async function urlsFirmadas(supabase: SupabaseClient, rutas: string[]): Promise<Record<string, string>> {
@@ -115,15 +131,7 @@ export async function listarPublicacionesPropias(supabase: SupabaseClient) {
     registrar("error", { evento: "convenio_publicaciones_lista_fallo", codigo: error.code, mensaje: error.message });
     return { publicaciones: [] as (Publicacion & { metricas: Metricas; portada: string | null })[], error: true };
   }
-  const porId = new Map<string, Metricas>();
-  for (const m of (metricas ?? []) as { publicacion_id: string; vistas: number; vistas_unicas: number; clics: number; clics_unicos: number }[]) {
-    porId.set(m.publicacion_id, {
-      vistas: Number(m.vistas),
-      vistasUnicas: Number(m.vistas_unicas),
-      clics: Number(m.clics),
-      clicsUnicos: Number(m.clics_unicos),
-    });
-  }
+  const porId = mapaMetricas(metricas);
   const lista = ((data ?? []) as FilaPublicacion[]).map(filaAPublicacion);
   const urls = await urlsFirmadas(
     supabase,

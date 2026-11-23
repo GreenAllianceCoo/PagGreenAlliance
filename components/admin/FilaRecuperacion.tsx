@@ -25,14 +25,14 @@ function Rechazar({ solicitudId, nombre }: { solicitudId: string; nombre: string
       <button
         type="button"
         onClick={() => setAbierto(true)}
-        className="flex h-11.5 items-center justify-center rounded-full px-5 text-14 font-bold text-admin-rojo shadow-[inset_0_0_0_1px_var(--ga-admin-rojo)] hover:bg-admin-rojo-fondo"
+        className="flex h-11.5 items-center justify-center rounded-full px-5 text-14 font-semibold text-admin-rojo shadow-[inset_0_0_0_1px_var(--ga-admin-rojo)] hover:bg-admin-rojo-fondo"
       >
         Rechazar
       </button>
       <Modal abierto={abierto && !estado.mensaje} onCerrar={() => setAbierto(false)} tituloId={tituloId} variante="centrado">
         <form action={accion} noValidate className="flex flex-col gap-4 text-ga-texto">
           <input type="hidden" name="solicitudId" value={solicitudId} />
-          <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-extrabold">
+          <h2 id={tituloId} className="m-0 pr-12 font-display text-22 font-semibold">
             ¿Rechazar la solicitud de {nombre}?
           </h2>
           <p className="m-0 text-15 leading-150 text-ga-texto-2">
@@ -50,7 +50,7 @@ function Rechazar({ solicitudId, nombre }: { solicitudId: string; nombre: string
             <button
               type="button"
               onClick={() => setAbierto(false)}
-              className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-bold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
+              className="flex h-11.5 items-center justify-center rounded-full px-6 text-15 font-semibold text-ga-texto shadow-[inset_0_0_0_1px_var(--ga-borde)]"
             >
               Cancelar
             </button>
@@ -73,9 +73,9 @@ export function FilaRecuperacion({ fila }: { fila: Fila }) {
       }
     >
       <div className="flex flex-col gap-0.5">
-        <span className="flex flex-wrap items-center gap-2 text-15 font-extrabold text-white">
+        <span className="flex flex-wrap items-center gap-2 text-15 font-semibold text-white">
           {fila.nombre}
-          <span className="rounded-full bg-admin-ambar-fondo px-2.5 py-0.5 text-12 font-extrabold text-admin-ambar">
+          <span className="rounded-full bg-admin-ambar-fondo px-2.5 py-0.5 text-12 font-semibold text-admin-ambar">
             Recuperación de acceso
           </span>
         </span>
@@ -109,7 +109,7 @@ export function FilaRecuperacion({ fila }: { fila: Fila }) {
               href={fila.whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-11.5 items-center gap-2 rounded-full px-4 text-14 font-bold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
+              className="flex h-11.5 items-center gap-2 rounded-full px-4 text-14 font-semibold text-admin-texto no-underline shadow-[inset_0_0_0_1px_var(--ga-admin-borde)] hover:bg-white/[.06]"
             >
               <IconoWhatsapp tamano={17} />
               Escribir por WhatsApp (celular del perfil)
@@ -126,7 +126,7 @@ export function FilaRecuperacion({ fila }: { fila: Fila }) {
         </div>
       ) : null}
       {pendiente && !fila.celularCoincide ? (
-        <span role="alert" className="text-13 font-bold text-admin-ambar">
+        <span role="alert" className="text-13 font-semibold text-admin-ambar">
           Cuidado: el celular escrito NO es el del perfil. Verifica la identidad solo con el celular del perfil (el botón
           de WhatsApp ya lo usa); no escribas ni llames al número que puso quien pide.
           {fila.whatsappUrl ? "" : " Este perfil no tiene celular guardado: verifica por otro medio de la cooperativa."}

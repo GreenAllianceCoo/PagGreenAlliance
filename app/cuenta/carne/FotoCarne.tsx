@@ -85,7 +85,7 @@ export function FotoCarne({ origen }: { origen: "propia" | "afiliacion" | null }
 
   return (
     <section aria-labelledby="titulo-foto-carne" className="flex flex-col gap-3 rounded-28 bg-white p-6">
-      <h2 id="titulo-foto-carne" className="m-0 font-display text-20 font-extrabold text-ga-navy">
+      <h2 id="titulo-foto-carne" className="m-0 font-display text-20 font-semibold text-ga-navy">
         Foto de tu carné
       </h2>
       <p className="m-0 text-14 leading-150 text-ga-texto-2">
