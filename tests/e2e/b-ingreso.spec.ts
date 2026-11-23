@@ -243,7 +243,7 @@ test.describe("B9 · Entrar directo al paso 2", () => {
   test("/ingresar/codigo sin paso 1 → /ingresar", async ({ page }) => {
     await page.goto("/ingresar/codigo");
     await expect(page).toHaveURL(/\/ingresar$/);
-    await expect(page.locator("h1")).toHaveText("Tu cuenta en Green Alliance");
+    await expect(page.locator("h1")).toHaveText("Tu crédito, paso a paso");
   });
 
   test("Cookie manipulada → /ingresar", async ({ page, context }) => {
