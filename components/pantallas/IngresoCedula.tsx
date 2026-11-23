@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { PanelIngreso,CLASES_FORM_INGRESO, PieIngresoMovil } from "@/components/ingreso/PanelIngreso";
-import { Button, ButtonLink } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
-import { IconoCheck } from "@/components/ui/Iconos";
+import { IconoCandado } from "@/components/ui/Iconos";
 import { Input } from "@/components/ui/Input";
 import { ProgressSteps } from "@/components/ui/ProgressSteps";
+import { ComprobanteSolicitud } from "@/components/pantallas/landing/ComprobanteSolicitud";
 
 export type IngresoCedulaProps = {
   whatsapp: string;
@@ -19,12 +20,6 @@ export type IngresoCedulaProps = {
   /** Valor inicial del campo (se conserva lo escrito si hubo error). */
   valorCedula?: string;
 };
-
-const BENEFICIOS = [
-  "Pide tu crédito según tu grado",
-  "Mira el estado de tu solicitud",
-  "Usa los convenios para asociados",
-];
 
 /** Ingreso paso 1 · cédula (pieza 3b del rediseño C+, docs/Green Alliance C+.dc.html). */
 export function IngresoCedula({
@@ -46,24 +41,12 @@ export function IngresoCedula({
 
   return (
     <PanelIngreso
-      titulo="Tu cuenta en Green Alliance"
-      subtitulo={
-        <>
-          <span className="lg:hidden">Entra para ver cómo va tu crédito.</span>
-          <span className="hidden lg:inline">
-            Entra con tu cédula y un código que te llega al correo. Sin contraseñas que recordar.
-          </span>
-        </>
-      }
+      // Fase 2: el logo ya está al lado del formulario; el panel dice qué encuentras y lo muestra.
+      titulo="Tu crédito, paso a paso"
+      subtitulo="Entra para ver cómo va tu solicitud."
       extraEscritorio={
-        <ul className="m-0 hidden list-none flex-col gap-3.5 p-0 text-17 lg:flex">
-          {BENEFICIOS.map((texto) => (
-            <li key={texto} className="flex items-center gap-3">
-              <IconoCheck tamano={22} className="text-ga-verde-icono" />
-              {texto}
-            </li>
-          ))}
-        </ul>
+        // El mismo comprobante vivo de la landing (ilustración, sin datos reales).
+        <ComprobanteSolicitud variante="desktop" className="mr-7 mt-14 hidden lg:flex" />
       }
       // Número en lib/config.ts (NEXT_PUBLIC_WHATSAPP); sin él, texto sin enlace.
       pie={<>Ayuda por WhatsApp {numero}</>}
@@ -97,20 +80,36 @@ export function IngresoCedula({
           Enviarme el código
         </Button>
         {/* Recuperación de acceso: quien perdió o cambió su correo pide ayuda a la cooperativa. */}
-        <Link href="/ingresar/recuperar" className="enlace self-center text-15 font-semibold">
+        <Link
+          href="/ingresar/recuperar"
+          className="self-center text-14 font-medium text-ga-texto-2 underline hover:text-ga-verde"
+        >
           ¿Ya no tienes acceso a tu correo?
         </Link>
-        <div className="flex items-center gap-3 text-14 text-ga-texto-3">
-          <span className="h-px grow bg-ga-linea" />
-          ¿Aún no eres asociado?
-          <span className="h-px grow bg-ga-linea" />
+        {/* Fase 2: un solo botón grande; las otras entradas quedan como enlaces discretos. */}
+        <div className="mt-2 flex flex-col gap-2 border-t border-ga-linea pt-5 text-14 text-ga-texto-2">
+          <p className="m-0">
+            ¿Aún no eres asociado?{" "}
+            <Link href="/afiliacion" className="enlace font-semibold">
+              Deseo afiliarme
+            </Link>
+          </p>
+          <p className="m-0">
+            ¿Eres empresa en convenio?{" "}
+            <Link href="/ingresar/convenio" className="enlace font-semibold">
+              Entra con tu NIT
+            </Link>
+          </p>
         </div>
-        <ButtonLink href="/afiliacion" variante="secundario">
-          Deseo afiliarme
-        </ButtonLink>
-        <Link href="/ingresar/convenio" className="enlace self-center text-15 font-semibold">
-          ¿Eres empresa en convenio? Entra con tu NIT
-        </Link>
+        <p className="m-0 flex items-center gap-2 text-13 text-ga-texto-3">
+          <IconoCandado tamano={16} className="shrink-0" />
+          <span>
+            Tus datos están protegidos por la cooperativa ·{" "}
+            <Link href="/politica-de-datos" className="underline hover:text-ga-verde">
+              Política de datos
+            </Link>
+          </span>
+        </p>
         <PieIngresoMovil interlineado={false}>Ayuda por WhatsApp {numero}</PieIngresoMovil>
       </form>
     </PanelIngreso>

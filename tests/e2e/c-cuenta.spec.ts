@@ -15,7 +15,7 @@ test.describe("C1 · Sin sesión", () => {
     test(`${ruta} sin sesión → /ingresar`, async ({ page }) => {
       await page.goto(ruta);
       await expect(page).toHaveURL(/\/ingresar$/);
-      await expect(page.locator("h1")).toHaveText("Tu cuenta en Green Alliance");
+      await expect(page.locator("h1")).toHaveText("Tu crédito, paso a paso");
     });
   }
 });
@@ -205,7 +205,7 @@ test.describe("C3 · «Salir»", () => {
       await page.getByRole("button", { name: "Cerrar sesión" }).click();
     }
     await expect(page).toHaveURL(/\/ingresar$/);
-    await expect(page.locator("h1")).toHaveText("Tu cuenta en Green Alliance");
+    await expect(page.locator("h1")).toHaveText("Tu crédito, paso a paso");
 
     await page.goBack();
     await page.waitForLoadState("networkidle");

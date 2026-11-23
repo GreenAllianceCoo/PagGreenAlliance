@@ -274,11 +274,10 @@ test.describe("E · Ingreso paso 1 /ingresar", () => {
     await page.goto("/ingresar");
     const esperados = esEscritorio(testInfo)
       ? [
-          "Tu cuenta en Green Alliance",
-          "Entra con tu cédula y un código que te llega al correo. Sin contraseñas que recordar.",
-          "Pide tu crédito según tu grado",
-          "Mira el estado de tu solicitud",
-          "Usa los convenios para asociados",
+          // Fase 2: formulario a la izquierda en pantalla, pero en el DOM el panel va primero.
+          "Tu crédito, paso a paso",
+          "Entra para ver cómo va tu solicitud.",
+          "Tu solicitud",
           "Ayuda por WhatsApp 311 724 1942",
           "Paso 1 de 2",
           "Ingresa con tu cédula",
@@ -287,10 +286,12 @@ test.describe("E · Ingreso paso 1 /ingresar", () => {
           "Enviarme el código",
           "¿Aún no eres asociado?",
           "Deseo afiliarme",
+          "Entra con tu NIT",
+          "Tus datos están protegidos por la cooperativa",
         ]
       : [
-          "Tu cuenta en Green Alliance",
-          "Entra para ver cómo va tu crédito.",
+          "Tu crédito, paso a paso",
+          "Entra para ver cómo va tu solicitud.",
           "Paso 1 de 2",
           "Número de cédula",
           "Si tu cédula está registrada, te enviamos un código de 6 números al correo que tienes en la cooperativa. No necesitas contraseña.",
@@ -304,7 +305,8 @@ test.describe("E · Ingreso paso 1 /ingresar", () => {
       "placeholder",
       "Sin puntos ni espacios",
     );
-    await revisarEstilos(page, ["Enviarme el código"], ["Deseo afiliarme"]);
+    // Fase 2: «Deseo afiliarme» pasó de botón secundario a enlace discreto.
+    await revisarEstilos(page, ["Enviarme el código"], []);
   });
 });
 

@@ -18,7 +18,7 @@ import {
 
 const H1 = {
   "/": "Crédito entre compañeros, con reglas claras",
-  "/ingresar": "Tu cuenta en Green Alliance",
+  "/ingresar": "Tu crédito, paso a paso",
   "/afiliacion": "Quiero afiliarme",
 };
 

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Logo } from "@/components/ui/Logo";
@@ -42,7 +43,8 @@ const COLUMNA_TABLETA = "sm:mx-auto sm:w-full sm:max-w-form-ingreso lg:mx-0 lg:m
  * Esqueleto de /ingresar y /ingresar/codigo.
  * Celular: panel verde de 250 px (222 px con `sinBarraEstado`) arriba + formulario abajo
  * (desde `sm` el formulario, el logo y el título quedan en una columna centrada de 440 px).
- * Escritorio (lg): panel verde de 540 px a la izquierda + formulario centrado.
+ * Escritorio (lg): formulario a la izquierda (con el logo a color encima) y panel verde
+ * de 540 px a la derecha; el título y el visual del panel quedan centrados en vertical.
  */
 export function PanelIngreso({
   titulo,
@@ -55,7 +57,7 @@ export function PanelIngreso({
   children,
 }: PanelIngresoProps) {
   return (
-    <div className="flex min-h-dvh flex-col bg-white lg:flex-row">
+    <div className="flex min-h-dvh flex-col bg-white lg:flex-row-reverse">
       <aside
         className={cx(
           "relative flex shrink-0 flex-col justify-between overflow-hidden bg-ga-verde px-6 pb-7 text-white",
@@ -71,7 +73,8 @@ export function PanelIngreso({
           className="pointer-events-none absolute -bottom-[70px] -right-[50px] h-[170px] w-[190px] bg-ga-verde-oscuro lg:-bottom-20 lg:-right-15 lg:h-[240px] lg:w-[260px]"
           style={{ borderRadius: "52% 48% 44% 56% / 55% 45% 55% 45%" }}
         />
-        <div className={cx("relative flex items-center justify-between gap-3", COLUMNA_TABLETA)}>
+        {/* Desde lg el logo pasa a color sobre el lado blanco (main); aquí solo en celular y tableta. */}
+        <div className={cx("relative flex items-center justify-between gap-3 lg:hidden", COLUMNA_TABLETA)}>
           <Link href="/" aria-label="Ir al inicio" className="block h-11 w-logo min-w-0 shrink">
             <Logo tone="light" />
           </Link>
@@ -87,9 +90,9 @@ export function PanelIngreso({
             </a>
           ) : null}
         </div>
-        <div className={cx("relative flex flex-col gap-1.5 lg:mt-14 lg:gap-3.5", COLUMNA_TABLETA)}>
+        <div className={cx("relative flex flex-col gap-1.5 lg:mt-auto lg:gap-3.5", COLUMNA_TABLETA)}>
           {/* Bricolage Grotesque (pieza 3a): títulos grandes, «Tu cuenta en Green Alliance» / «Revisa tu correo». */}
-          <h1 className="m-0 font-display text-32 font-semibold leading-110 lg:text-46 lg:leading-108 lg:tracking-titular">
+          <h1 className="m-0 text-balance font-display text-32 font-semibold leading-110 lg:text-46 lg:leading-108 lg:tracking-titular">
             {titulo}
           </h1>
           <p className="m-0 text-16 leading-145 text-ga-verde-claro lg:text-18 lg:leading-155">
@@ -107,8 +110,33 @@ export function PanelIngreso({
         </span>
       </aside>
       {/* Entre 1024 y 1279 px el relleno baja a 32 px: con el panel de 540 px no caben 48 + 440 + 48. */}
-      <main className="flex grow flex-col lg:min-w-0 lg:items-center lg:justify-center lg:p-8 xl:p-12">
-        {children}
+      {/* Escritorio (fase 2): fondo gris muy claro, el formulario en una tarjeta blanca,
+          el sello de la cooperativa como marca de agua y un pie con la línea legal. */}
+      <main className="relative flex grow flex-col lg:min-w-0 lg:items-center lg:overflow-hidden lg:bg-ga-fondo-suave lg:p-8 xl:p-12">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-16 -left-16 hidden h-[280px] w-[280px] -rotate-12 items-center justify-center rounded-full border-4 border-dashed border-ga-verde opacity-[0.07] lg:flex"
+        >
+          <Image src="/logos/vector/green-alliance-isotipo.svg" alt="" width={150} height={150} />
+        </span>
+        <div className="relative flex grow flex-col lg:my-auto lg:w-full lg:max-w-[520px] lg:grow-0 lg:rounded-24 lg:border lg:border-ga-linea lg:bg-white lg:p-10">
+          {/* Logo oficial a color (escritorio), sobre el formulario. */}
+          <Link href="/" aria-label="Ir al inicio" className="mb-10 hidden h-11 w-full max-w-form-ingreso lg:block">
+            <Logo tone="dark" />
+          </Link>
+          {children}
+        </div>
+        <footer className="relative mt-8 hidden flex-wrap justify-center gap-x-2 text-13 text-ga-texto-3 lg:flex">
+          <span>© {new Date().getFullYear()} Cooperativa Green Alliance</span>
+          <span aria-hidden="true">·</span>
+          <Link href="/politica-de-datos" className="underline hover:text-ga-verde">
+            Política de datos
+          </Link>
+          <span aria-hidden="true">·</span>
+          <Link href="/" className="underline hover:text-ga-verde">
+            Volver al inicio
+          </Link>
+        </footer>
       </main>
     </div>
   );
