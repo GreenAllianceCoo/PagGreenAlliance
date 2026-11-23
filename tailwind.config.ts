@@ -84,6 +84,13 @@ const config: Config = {
           "borde-sutil": "var(--ga-admin-borde-sutil)",
           "verde-fondo": "var(--ga-admin-verde-fondo)",
           "rojo-fondo": "var(--ga-admin-rojo-fondo)",
+          "azul": "var(--ga-admin-azul)",
+          "azul-fondo": "var(--ga-admin-azul-fondo)",
+          "violeta": "var(--ga-admin-violeta)",
+          "violeta-fondo": "var(--ga-admin-violeta-fondo)",
+          "rosa": "var(--ga-admin-rosa)",
+          "rosa-fondo": "var(--ga-admin-rosa-fondo)",
+          "gris-fondo": "var(--ga-admin-gris-fondo)",
         },
       },
       fontFamily: {

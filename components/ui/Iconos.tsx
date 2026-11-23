@@ -143,3 +143,197 @@ export function IconoCandado(props: IconoProps) {
     </Base>
   );
 }
+
+/** Ojo: vistas de una publicación. */
+export function IconoOjo(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+      <circle cx="12" cy="12" r="3" />
+    </Base>
+  );
+}
+
+/** Fachada: «Mi empresa» en el panel del convenio. */
+export function IconoTienda(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <path d="M4 10v10h16V10" />
+      <path d="M3 10l2-6h14l2 6" />
+      <path d="M3 10a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0" />
+      <path d="M10 20v-5h4v5" />
+    </Base>
+  );
+}
+
+/** Casa: inicio de un panel. */
+export function IconoInicio(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <path d="M4 11l8-7 8 7" />
+      <path d="M6 10v10h12V10" />
+    </Base>
+  );
+}
+
+/** Megáfono: promociones. */
+export function IconoMegafono(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <path d="M4 10v4h3l7 4V6L7 10H4z" />
+      <path d="M18 9a4 4 0 0 1 0 6" />
+    </Base>
+  );
+}
+
+/** Libro abierto: catálogos. */
+export function IconoLibro(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <path d="M12 6c-2-1.5-5-2-8-1.5v14c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-14c-3-.5-6 0-8 1.5z" />
+      <path d="M12 6v14" />
+    </Base>
+  );
+}
+
+/** Cuadrícula: resumen del admin. */
+export function IconoCuadricula(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <rect x="4" y="4" width="7" height="7" rx="2" />
+      <rect x="13" y="4" width="7" height="7" rx="2" />
+      <rect x="4" y="13" width="7" height="7" rx="2" />
+      <rect x="13" y="13" width="7" height="7" rx="2" />
+    </Base>
+  );
+}
+
+/** Persona con «+»: afiliaciones. */
+export function IconoPersonaMas(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <circle cx="10" cy="8" r="4" />
+      <path d="M3 20a7 7 0 0 1 14 0" />
+      <path d="M19 8v6M16 11h6" />
+    </Base>
+  );
+}
+
+/** Billetera: créditos. */
+export function IconoBilletera(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <rect x="3" y="6" width="18" height="13" rx="3" />
+      <path d="M3 10h18" />
+      <path d="M16 15h2" />
+    </Base>
+  );
+}
+
+/** Dos personas: asociados. */
+export function IconoPersonas(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+      <path d="M16 4.5a3.5 3.5 0 0 1 0 7" />
+      <path d="M18 14a6.5 6.5 0 0 1 3.5 6" />
+    </Base>
+  );
+}
+
+/** Insignia: asesores. */
+export function IconoInsignia(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <circle cx="12" cy="9" r="5" />
+      <path d="M9 13.5L8 21l4-2 4 2-1-7.5" />
+    </Base>
+  );
+}
+
+/** Campana: alertas. */
+export function IconoCampana(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4l2-2z" />
+      <path d="M10 21h4" />
+    </Base>
+  );
+}
+
+/** Apretón de manos: convenios. */
+export function IconoApreton(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <path d="M2 12l4-4 4 2 2-2 4 0 6 6" />
+      <path d="M7 13l4 4c.8.8 2 .8 2.8 0l4.2-4.2" />
+      <path d="M10 16l1.5 1.5" />
+    </Base>
+  );
+}
+
+/** Regalo: sorteo. */
+export function IconoRegalo(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <rect x="3" y="8" width="18" height="4" rx="1" />
+      <path d="M5 12v8h14v-8" />
+      <path d="M12 8v12" />
+      <path d="M12 8c-2-4-6-4-6-1.5S9 8 12 8c3 0 6-.5 6-1.5S14 4 12 8z" />
+    </Base>
+  );
+}
+
+/** Controles deslizantes: plataforma. */
+export function IconoAjustes(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
+      <circle cx="16" cy="7" r="2" />
+      <circle cx="10" cy="17" r="2" />
+    </Base>
+  );
+}
+
+/** Reloj: historial. */
+export function IconoReloj(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </Base>
+  );
+}
+
+/** Flechas en ciclo: cambios. */
+export function IconoCambios(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <path d="M20 8a8 8 0 0 0-14.5-2L4 8" />
+      <path d="M4 4v4h4" />
+      <path d="M4 16a8 8 0 0 0 14.5 2l1.5-2" />
+      <path d="M20 20v-4h-4" />
+    </Base>
+  );
+}
+
+/** Pantalla: demostración. */
+export function IconoPantalla(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <rect x="3" y="4" width="18" height="12" rx="2" />
+      <path d="M8 20h8M12 16v4" />
+    </Base>
+  );
+}
+
+/** Lápiz: editar. */
+export function IconoLapiz(props: IconoProps) {
+  return (
+    <Base {...props}>
+      <path d="M4 20l1-4L16 5l3 3L8 19l-4 1z" />
+      <path d="M14 7l3 3" />
+    </Base>
+  );
+}

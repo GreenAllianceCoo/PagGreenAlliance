@@ -151,6 +151,32 @@ export const esquemaGuardarConvenio = z
     }
   });
 
+/**
+ * Lo que la empresa edita de su propia ficha en /convenio/empresa (mismos
+ * límites que el admin). Nombre, NIT, orden, visibilidad y medios siguen
+ * siendo solo del admin (migración 20261123000000).
+ */
+export const esquemaDatosConvenioPropio = z.object({
+  especialidad: camposConvenio.especialidad,
+  descripcion: camposConvenio.descripcion,
+  servicios: camposConvenio.servicios,
+  sedes: camposConvenio.sedes,
+  telefonoContacto: camposConvenio.telefonoContacto,
+});
+
+export type CampoConvenioPropio = keyof z.input<typeof esquemaDatosConvenioPropio> | "logo";
+
+/** Lo que escribió la empresa, tal cual, para devolverlo si hay error. */
+export function leerFormularioConvenioPropio(formData: FormData) {
+  return {
+    especialidad: textoDe(formData, "especialidad"),
+    descripcion: textoDe(formData, "descripcion"),
+    servicios: textoDe(formData, "servicios"),
+    sedes: textoDe(formData, "sedes"),
+    telefonoContacto: textoDe(formData, "telefonoContacto"),
+  };
+}
+
 export type CampoConvenio = keyof typeof camposConvenio | "id" | "visible" | "logo";
 export type DatosConvenio = z.output<typeof esquemaGuardarConvenio>;
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { cerrarSesion } from "@/app/cuenta/actions";
 import { seccionesDelRol, type Seccion } from "./secciones";
 import { EncabezadoAdmin } from "./EncabezadoAdmin";
+import { IconoSeccion } from "./IconoSeccion";
 import { contarAlertasPendientes } from "@/lib/admin/alertas";
 import { createClient } from "@/lib/supabase/server";
 
@@ -71,7 +72,7 @@ export async function AdminShell({ nombre, seccion, contadorSeccionActual, rol =
           />
         </Link>
 
-        <nav className="flex flex-col gap-1 text-15 font-semibold">
+        <nav className="flex flex-col gap-0.5 text-15 font-semibold">
           {secciones.map((s) => {
             const activa = s.clave === seccion;
             // «Alertas» muestra siempre cuántas hay pendientes; las demás, el contador de su lista si están activas.
@@ -82,11 +83,15 @@ export async function AdminShell({ nombre, seccion, contadorSeccionActual, rol =
                 href={s.href}
                 aria-current={activa ? "page" : undefined}
                 className={
-                  "flex h-11 items-center justify-between rounded-12 px-3.5 no-underline transition-colors duration-200 " +
-                  (activa ? "bg-admin-superficie-2 text-white" : "text-admin-texto-2 hover:bg-admin-superficie")
+                  "relative flex h-11 items-center justify-between gap-2 rounded-12 pl-1.5 pr-3 no-underline transition-colors duration-200 " +
+                  (activa ? "bg-admin-superficie-2 text-white" : "text-admin-texto-2 hover:bg-admin-superficie hover:text-admin-texto")
                 }
               >
-                {s.etiqueta}
+                {activa ? <span aria-hidden="true" className="absolute -left-4 top-2 h-7 w-1 rounded-r-full bg-admin-verde" /> : null}
+                <span className="flex min-w-0 items-center gap-2.5">
+                  <IconoSeccion seccion={s.clave} />
+                  {s.etiqueta}
+                </span>
                 {chip !== undefined ? (
                   <span
                     className={
@@ -102,7 +107,12 @@ export async function AdminShell({ nombre, seccion, contadorSeccionActual, rol =
         </nav>
 
         <div className="mt-auto flex flex-col gap-2.5 rounded-14 bg-admin-superficie p-3.5">
-          <span className="truncate text-14 font-semibold">{nombre}</span>
+          <div className="flex items-center gap-2.5">
+            <span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-admin-verde font-display text-15 font-semibold text-admin-menu">
+              {nombre.trim().charAt(0).toUpperCase() || "A"}
+            </span>
+            <span className="truncate text-14 font-semibold">{nombre}</span>
+          </div>
           {/* No hay dato de género en `perfiles`: se deja un rótulo neutro
               (el diseño usa «Administradora» como ejemplo de María Fernanda López). */}
           <span className="text-13 text-admin-texto-3">{rol === "secretario" ? "Secretaría" : "Administrador"}</span>

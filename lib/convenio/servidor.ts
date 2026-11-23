@@ -51,6 +51,51 @@ export async function exigirConvenio() {
   };
 }
 
+export type FichaConvenio = {
+  nombre: string;
+  nit: string | null;
+  especialidad: string;
+  descripcion: string | null;
+  telefono: string | null;
+  servicios: string[];
+  sedes: string[];
+  logoUrl: string | null;
+};
+
+/** Datos de la ficha que ve el asociado (RLS: el convenio es visible, así que su sesión lo lee). */
+export async function obtenerFichaPropia(supabase: SupabaseClient, id: string): Promise<FichaConvenio | null> {
+  const { data, error } = await supabase
+    .from("convenios")
+    .select("nombre_empresa, nit, especialidad, descripcion, telefono_contacto, servicios, sedes, logo_path")
+    .eq("id", id)
+    .maybeSingle();
+  if (error || !data) {
+    if (error) registrar("error", { evento: "ficha_convenio_lectura_fallo", codigo: error.code });
+    return null;
+  }
+  return {
+    nombre: data.nombre_empresa as string,
+    nit: (data.nit as string | null) ?? null,
+    especialidad: (data.especialidad as string | null) ?? "",
+    descripcion: (data.descripcion as string | null) ?? null,
+    telefono: (data.telefono_contacto as string | null) ?? null,
+    servicios: (data.servicios as string[] | null) ?? [],
+    sedes: (data.sedes as string[] | null) ?? [],
+    logoUrl: urlLogo(data.logo_path as string | null),
+  };
+}
+
+/** Qué le falta a la ficha para estar completa (guía «Completa tu perfil» del inicio). */
+export function pasosFicha(f: FichaConvenio) {
+  return [
+    { clave: "logo", etiqueta: "Sube tu logo", listo: Boolean(f.logoUrl) },
+    { clave: "descripcion", etiqueta: "Cuenta qué ofreces", listo: Boolean(f.descripcion) },
+    { clave: "servicios", etiqueta: "Agrega tus servicios", listo: f.servicios.length > 0 },
+    { clave: "telefono", etiqueta: "Deja tu WhatsApp", listo: Boolean(f.telefono) },
+    { clave: "sedes", etiqueta: "Indica tus sedes", listo: f.sedes.length > 0 },
+  ];
+}
+
 export const COLUMNAS_PUBLICACION =
   "id, tipo, titulo, descripcion, beneficio, imagenes, pdf_path, inicia_el, termina_el, oculta_en, oculta_motivo, creada_en";
 
